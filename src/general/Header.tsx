@@ -18,7 +18,7 @@ export default function Header({
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   return (
-    <div className="w-full flex flex-col sm:flex-row justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8  px-[38px] md:px-[38px] lg:px-[38px] flex-wrap overflow-hidden">
+    <div className="w-full flex flex-col sm:flex-row justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 lg:pr-[68px] pl-[38px] md:px-[38px] lg:pl-[38px] flex-wrap overflow-hidden">
       {/* Title Section */}
       <div className="w-full sm:w-auto">
         <h1 className="font-gotham font-light text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-1 md:mb-2">

@@ -28,16 +28,16 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
             <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px]">
               Marketer in Charge
             </th>
-            <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px]">
+            <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] hidden lg:block">
               Date Joined
             </th>
-            <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px]">
+            <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] ">
               Property Plans
             </th>
             <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px]">
               Saved Properties
             </th>
-            <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px]">
+            <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] hidden lg:block">
               Phone Number
             </th>
           </tr>
@@ -51,7 +51,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
               <td className="pb-[31px] font-gotham font-[350] text-dark text-sm max-w-[85px] truncate ">
                 {row.marketer}
               </td>
-              <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[73px] truncate">
+              <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[73px] truncate hidden lg:block">
                 {row.dateJoined}
               </td>
               <td className="pb-[31px] font-gotham font-[325] text-dark text-sm">
@@ -60,7 +60,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
               <td className="pb-[31px] font-gotham font-[325] text-dark text-sm">
                 {row.savedProperties}
               </td>
-              <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[100px] truncate">
+              <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[100px] truncate hidden lg:block">
                 {row.phoneNumber}
               </td>
             </tr>

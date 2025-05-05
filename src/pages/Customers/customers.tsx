@@ -43,7 +43,7 @@ export default function Customers() {
         title="Customers"
         subtitle="Manage the list of registered customers"
       />
-      <div className="grid grid-cols-3 gap-[20px] pl-[38px] pr-[68px] mb-[30px]">
+      <div className="grid lg:grid-cols-3 gap-[20px] pl-[38px] pr-[68px] mb-[30px]">
         <MatrixCardGreen />
         <MatrixCard
           title="Total Active Customers"
