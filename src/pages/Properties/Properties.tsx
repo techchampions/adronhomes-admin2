@@ -18,7 +18,7 @@ export default function Properties() {
         title="Properties"
         subtitle="Manage the list of properties"
       />
-          <div className="pl-[38px] pr-[68px]">
+              <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable 
           tabs={tabs} 
           activeTab={activeTab}

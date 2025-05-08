@@ -14,7 +14,7 @@ export default function Payment() {
         subtitle="Manage the list of payments made by customers"
       />
 
-      <div className="grid grid-cols-3 gap-[20px] pl-[38px] pr-[68px] mb-[30px]">
+      <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
           currency={true}
           title="Total Amount Paid"
@@ -33,7 +33,7 @@ export default function Payment() {
           change="Includes all active property plans"
         />
       </div>
-      <div className="pl-[38px] pr-[68px]">
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
      <ReusableTable activeTab={""}>  <PaymentTableComponent data={paymentData as PaymentData[]}/></ReusableTable>
      </div>
 

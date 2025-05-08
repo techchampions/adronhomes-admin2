@@ -17,7 +17,8 @@ interface PropertyTableProps {
 
 export default function PropertyTableComponent({ data }: PropertyTableProps) {
   return (
-    <div className="w-full overflow-x-auto">
+    <><div className="w-full overflow-x-auto">
+      <div className="min-w-[800px] md:min-w-0"> 
       <table className="w-full min-w-[800px]">
         <thead>
           <tr className="text-left">
@@ -97,7 +98,11 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
           ))}
         </tbody>
       </table>
-      <Pagination />
     </div>
+        
+        
+            </div><div className="w-full">
+                <Pagination />
+              </div></>
   );
 }

@@ -1,7 +1,44 @@
 @import "tailwindcss";
 
+/* Gotham Font Setup */
+@font-face {
+  font-family: 'Gotham';
+  src: url('path/to/Gotham-Light.woff2') format('woff2'),
+       url('path/to/Gotham-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('path/to/Gotham-Book.woff2') format('woff2'),
+       url('path/to/Gotham-Book.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('path/to/Gotham-Medium.woff2') format('woff2'),
+       url('path/to/Gotham-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('path/to/Gotham-Bold.woff2') format('woff2'),
+       url('path/to/Gotham-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: #FAFAFA;
+  --background: #F5F5F5;
 
   /* Theme Colors */
   --primary: #79B833;
@@ -13,6 +50,9 @@
   --gray-medium: #767676;
   --gray-muted: #8F8F8F;
   --error: #D70E0E;
+  
+  /* Font family variable */
+  --font-family-gotham: 'Gotham', sans-serif;
 }
 
 /* Custom Utility Classes Using CSS Variables */
@@ -36,7 +76,15 @@
 .text-gray-muted { color: var(--gray-muted) !important; }
 .text-error { color: var(--error) !important; }
 
+/* Font utility classes */
+.font-gotham { font-family: var(--font-family-gotham) !important; }
+.font-light { font-weight: 300 !important; }
+.font-book { font-weight: 400 !important; }
+.font-medium { font-weight: 500 !important; }
+.font-bold { font-weight: 700 !important; }
+
 body {
   background: var(--background);
-  font-family: 'Gotham', sans-serif;
+  font-family: var(--font-family-gotham);
+  font-weight: 400;
 }

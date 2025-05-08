@@ -16,7 +16,8 @@ interface PaymentTableProps {
 
 export default function PaymentTableComponent({ data }: PaymentTableProps) {
   return (
-    <div className="w-full overflow-x-auto">
+     <><div className="w-full overflow-x-auto">
+      <div className="min-w-[800px] md:min-w-0"> 
       <table className="w-full">
         <thead>
           <tr className="text-left">
@@ -73,8 +74,11 @@ export default function PaymentTableComponent({ data }: PaymentTableProps) {
           ))}
         </tbody>
       </table>
-      {/* Pagination */}
-      <Pagination />
-    </div>
+       </div>
+     
+     
+         </div><div className="w-full">
+             <Pagination />
+           </div></>
   );
 }

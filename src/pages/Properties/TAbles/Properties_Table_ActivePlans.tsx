@@ -20,7 +20,8 @@ export default function PropertyTableComponentActivePlan({
   data,
 }: PropertyTableProps) {
   return (
-    <div className="w-full overflow-x-auto">
+    <><div className="w-full overflow-x-auto">
+      <div className="min-w-[800px] md:min-w-0"> 
       <table className="w-full min-w-[800px]">
         <thead>
           <tr className="text-left">
@@ -103,7 +104,11 @@ export default function PropertyTableComponentActivePlan({
           ))}
         </tbody>
       </table>
-      <Pagination />
-    </div>
+   </div>
+       
+       
+           </div><div className="w-full">
+               <Pagination />
+             </div></>
   );
 }

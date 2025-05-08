@@ -123,9 +123,9 @@ export default function Transactions() {
   return (
     <div className="mb-[52px]">
       <Header title="Transactions" subtitle="Manage the list of transactions" />
-      <div className="pl-[38px] pr-[68px]">
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         {" "}
-        <ReusableTable searchPlaceholder={"Search Customer"} tabs={tabs}><CustomerTableComponent data={customerData}/> </ReusableTable>
+        <ReusableTable searchPlaceholder={"Search Customer"} tabs={tabs} activeTab={""}><CustomerTableComponent data={customerData}/> </ReusableTable>
       </div>
     </div>
   );
