@@ -62,19 +62,19 @@ export default function UsersTableComponent() {
           <table className="w-full">
             <thead>
               <tr className="text-left">
-                <th className="pb-6 font-medium   text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
                   User
                 </th>
-                <th className="pb-6 font-medium   text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
                   Email
                 </th>
-                <th className="pb-6 font-medium   text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
                   Status
                 </th>
-                <th className="pb-6 font-medium   text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
                   Role
                 </th>
-                <th className="pb-6 font-medium   text-[#757575] text-sm whitespace-nowrap">
+                <th className="pb-6  font-[325]     text-[#757575] text-sm whitespace-nowrap">
                   Action
                 </th>
               </tr>
@@ -82,16 +82,16 @@ export default function UsersTableComponent() {
             <tbody>
               {userData.map((user) => (
                 <tr key={user.id} className="">
-                  <td className="py-4 font-normal   text-dark text-sm whitespace-nowrap">
+                  <td className="py-4    text-dark text-sm whitespace-nowrap">
                     {user.name}
                   </td>
-                  <td className="py-4 font-normal   text-dark text-sm whitespace-nowrap">
+                  <td className="py-4  font-[325]     text-dark text-sm whitespace-nowrap">
                     {user.email}
                   </td>
-                  <td className="py-4 font-normal   text-dark text-sm whitespace-nowrap">
+                  <td className="py-4  font-[325]     text-dark text-sm whitespace-nowrap">
                     {user.status}
                   </td>
-                  <td className="py-4 font-normal   text-dark text-sm whitespace-nowrap">
+                  <td className="py-4  font-[350]     text-dark text-sm whitespace-nowrap">
                     <div className="flex items-center">
                       {user.role}
                       <span className="ml-2"> <FaCaretDown  className="w-4 h-4"/></span>
@@ -99,7 +99,7 @@ export default function UsersTableComponent() {
                     
                     </div>
                   </td>
-                  <td className="py-4 font-normal   text-dark text-sm whitespace-nowrap">
+                  <td className="py-4  font-[325]     text-dark text-sm whitespace-nowrap">
                     <button className="text-red-500">
                        <img src="mingcute_delete-fill.svg"  className="w-5 h-5" />
                  

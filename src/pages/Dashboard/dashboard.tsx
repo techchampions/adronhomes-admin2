@@ -1,23 +1,19 @@
-import React, { useState } from "react";
 
-import Header from "../../general/Header";
-import { ReusableTable } from "../../components/Tables/Table_one";
 import DashboardHearder from "../../general/DashboardHearder";
 import {
   RevenueCard,
   RevenueWhiteCard,
   StatsCard,
 } from "../../components/firstcard";
-import ProfileCard from "../../general/ProfileCard";
-import InvoicePage from "../../general/InvoiceCard";
-import TableCard from "../../general/TableCard";
-import Transaction from "../../components/Modals/Transaction";
+
+import VirtualTourUpload from "../../general/VirtualTourUpload";
 
 export default function Dashboard() {
 
 
   return (
     <div className="pb-[390px]  overflow-x-hidden">
+
       <DashboardHearder title="Mike Wellington " />
       <div className="space-y-[20px]">
         <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
@@ -42,8 +38,6 @@ export default function Dashboard() {
         </div>
       </div>
       <div className=" lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px] lg:pl-[38px] "></div>
-
-   {/* <Transaction/>÷ */}
     </div>
   );
 }

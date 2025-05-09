@@ -44,19 +44,19 @@ export default function PaymentTableComponent({ data }: PaymentTableProps) {
         <tbody>
           {data.map((payment) => (
             <tr key={payment.id + payment.status}>
-              <td className="py-4   pr-6 font-[325px] text-dark text-sm w-[180px] max-w-[180px]">
+              <td className="py-4   pr-6 font-[325] text-dark text-sm w-[180px] max-w-[180px]">
                 <div className="truncate">{payment.id}</div>
               </td>
-              <td className="py-4   pr-6 font-[325px] text-dark text-sm w-[200px] max-w-[200px]">
+              <td className="py-4   pr-6 font-[325] text-dark text-sm w-[200px] max-w-[200px]">
                 <div className="truncate">{payment.customerName}</div>
               </td>
-              <td className="py-4   pr-6 font-[325px] text-dark text-sm w-[200px] max-w-[200px]">
+              <td className="py-4   pr-6 font-[350] text-dark text-sm w-[200px] max-w-[200px]">
                 <div className="truncate">{payment.marketerInCharge}</div>
               </td>
-              <td className="py-4   pr-6 font-[325px] text-dark text-sm w-[150px] max-w-[150px]">
+              <td className="py-4   pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
                 <div className="truncate">{payment.amount}</div>
               </td>
-              <td className="py-4   pr-6 font-[325px] text-sm w-[120px] max-w-[120px]">
+              <td className="py-4   pr-6 font-[325] text-sm w-[120px] max-w-[120px]">
                 <div
                   className={`truncate ${
                     payment.status === "Approved"

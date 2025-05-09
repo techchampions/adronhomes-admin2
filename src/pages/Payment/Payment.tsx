@@ -14,7 +14,7 @@ export default function Payment() {
         subtitle="Manage the list of payments made by customers"
       />
 
-      <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
+      <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] items-center lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
           currency={true}
           title="Total Amount Paid"

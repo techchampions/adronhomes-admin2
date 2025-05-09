@@ -48,8 +48,8 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
           {tabs.map((tab) => (
             <button
               key={tab}
-              className={`font-gotham font-[325] text-[14px] lg:text-[16px] leading-[100%] tracking-[0%] cursor-pointer whitespace-nowrap ${
-                activeTab === tab ? 'text-dark' : 'text-[#767676]'
+              className={`font-gotham text-[14px] lg:text-[16px] leading-[100%] tracking-[0%] cursor-pointer whitespace-nowrap ${
+                activeTab === tab ? 'text-dark  font-bold' : 'text-[#767676]  font-[325]'
               }`}
               onClick={() => handleTabClick(tab)}
             >

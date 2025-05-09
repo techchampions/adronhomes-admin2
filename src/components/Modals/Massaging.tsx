@@ -54,7 +54,7 @@ export default function MessageModal({ isOpen, setIsOpen }: MessageModalProps) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type your message here... "
-            className="w-full h-72 p-4 rounded-[40px] bg-gray-100 resize-none focus:outline-none placeholder:textsm placeholder:italic placeholder:text-[#767676] placeholder:font-[325]"
+            className="w-full lg:h-96 h-72 p-4 pb-56 rounded-[40px] bg-gray-100 resize-none focus:outline-none placeholder:textsm placeholder:italic placeholder:text-[#767676] placeholder:font-[325]"
           />
         </div>
 

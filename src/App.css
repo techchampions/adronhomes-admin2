@@ -3,8 +3,8 @@
 /* Gotham Font Setup */
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Light.woff2') format('woff2'),
-       url('path/to/Gotham-Light.woff') format('woff');
+  src: url('utils/fonts/Gotham-Thin.otf') format('opentype'),
+       url('utils/fonts/Gotham-Thin.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -12,8 +12,8 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Book.woff2') format('woff2'),
-       url('path/to/Gotham-Book.woff') format('woff');
+  src: url('utils/fonts/Gotham-Book.otf') format('opentype'),
+       url('utils/fonts/Gotham-Book.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -21,8 +21,8 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Medium.woff2') format('woff2'),
-       url('path/to/Gotham-Medium.woff') format('woff');
+  src: url('utils/fonts/Gotham-Medium.otf') format('opentype'),
+       url('utils/fonts/Gotham-Medium.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -30,8 +30,8 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Bold.woff2') format('woff2'),
-       url('path/to/Gotham-Bold.woff') format('woff');
+  src: url('utils/fonts/Gotham-Bold.otf') format('opentype'),
+       url('utils/fonts/Gotham-Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

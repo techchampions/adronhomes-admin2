@@ -3,8 +3,7 @@
 /* Gotham Font Setup */
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Light.woff2') format('woff2'),
-       url('path/to/Gotham-Light.woff') format('woff');
+  src: url('https://example.com/fonts/Gotham-Light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -12,8 +11,23 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Book.woff2') format('woff2'),
-       url('path/to/Gotham-Book.woff') format('woff');
+  src: url('utils/fonts/Gotham-Book.otf') format('opentype');
+  font-weight: 325;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('utils/fonts/Gotham-Medium.otf') format('opentype');
+  font-weight: 350;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('utils/fonts/Gotham-Book.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -21,8 +35,7 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Medium.woff2') format('woff2'),
-       url('path/to/Gotham-Medium.woff') format('woff');
+  src: url('utils/fonts/Gotham-Medium.otf') format('opentype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -30,8 +43,7 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('path/to/Gotham-Bold.woff2') format('woff2'),
-       url('path/to/Gotham-Bold.woff') format('woff');
+  src: url('utils/fonts/Gotham-Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -56,7 +68,7 @@
 }
 
 /* Custom Utility Classes Using CSS Variables */
-.bg-primary { background-color: var(--primary) !important; }
+  .bg-primary { background-color: var(--primary) !important; }
 .bg-dark { background-color: var(--dark) !important; }
 .bg-gray-dark { background-color: var(--gray-dark) !important; }
 .bg-gray { background-color: var(--gray) !important; }
@@ -79,6 +91,8 @@
 /* Font utility classes */
 .font-gotham { font-family: var(--font-family-gotham) !important; }
 .font-light { font-weight: 300 !important; }
+.font-325 { font-weight: 325 !important; }
+.font-350 { font-weight: 350 !important; }
 .font-book { font-weight: 400 !important; }
 .font-medium { font-weight: 500 !important; }
 .font-bold { font-weight: 700 !important; }

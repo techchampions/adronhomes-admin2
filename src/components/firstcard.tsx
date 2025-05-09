@@ -89,11 +89,11 @@ export function RevenueWhiteCard({
       <p className="bg-[#F8F8F8] rounded-[40px] py-1 md:py-2 px-[12px] md:px-[23px] font-[350] text-[#272727] md:text-sm  text-[10px] w-fit mb-[40px]">
         {tag}
       </p>
-      <p className="max-w-[295px] truncate md:text-[30px] tex-[15px] text-dark mb-[10px]">
-        <span className="md:text-[20px] text-[10px]">{currency}</span>
+      <p className="max-w-[295px] truncate md:text-[30px] text-[15px] text-dark mb-[10px] font-[350]">
+        <span className="md:text-[20px] text-[10px] font-[325]">{currency}</span>
         {amount}
       </p>
-      <p className="font-[350] text-[#767676] md:text-sm text-[7px]">{note}</p>
+      <p className="font-[325] text-[#767676] md:text-sm text-[7px]">{note}</p>
     </div>
   );
 }
@@ -116,14 +116,14 @@ export function MatrixCardGreen({
       <div className="font-gotham md:text-[14px]   text-[10px] font-[350] leading-[100%] tracking-[0%] text-white mb-[16px]">
         <p>{title}</p>
       </div>
-      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] leading-[100%] tracking-[0%] text-white mb-[10px] flex">
+      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] items-center text-white mb-[10px] flex">
         {currency && <span className="md:text-[20px] text-[10px]">₦</span>}{" "}
         {/* Only show if currency is true */}
         <p className="max-w-[295px] pr-2 truncate">{value}</p>
       </div>
       <div className="font-gotham md:text-[14px]  pr-2  text-[10px] font-[325] leading-[100%] tracking-[0%] text-white">
         <p>
-          <span className="font-[350]">{change}</span>
+          <span className="font-[325]">{change}</span>
         </p>
       </div>
     </div>
@@ -146,18 +146,18 @@ export function MatrixCard({
   currency = false,
 }: MatrixCardGreenProps) {
   return (
-    <div className="bg-white md:h-[144px] h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px]">
+    <div className="bg-white  h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px]">
       <div className=" md:text-[14px]  text-[10px] font-[350] leading-[100%] tracking-[0%] text-dark mb-[16px]">
         <p>{title}</p>
       </div>
-      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] leading-[100%] tracking-[0%] text-dark mb-[10px] flex">
+      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] items-center text-dark mb-[10px] flex">
         {currency && <span className="md:text-[20px] text-[10px]">₦</span>}{" "}
         {/* Only show if currency is true */}
         <p className="max-w-[295px] pr-2 truncate">{value}</p>
       </div>
       <div className="font-gotham md:text-[14px] pr-2   text-[10px] font-[325] leading-[100%] tracking-[0%] text-dark">
         <p>
-          <span className="font-[350]">{change}</span>
+          <span className="font-[325] text-[#767676] ">{change}</span>
         </p>
       </div>
     </div>

@@ -53,7 +53,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                     />
                   </div>
                       <div className="min-w-0">
-                        <div className="font-medium text-base truncate mb-1">
+                        <div className="font-[325] text-base truncate mb-1">
                           {property.name}
                         </div>
                         <div className="flex items-center text-[#757575] text-sm truncate">
