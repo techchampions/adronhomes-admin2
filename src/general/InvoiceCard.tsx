@@ -68,7 +68,7 @@ export default function InvoiceCard({
           <div className="bg-[#FFFFFF26] bg-opacity-[15%] rounded-[16px] md:rounded-[20px] p-4 md:p-6">
   <div className="grid grid-cols-3 gap-2 md:gap-4">
     {/* Duration */}
-    <div className="min-w-0"> {/* Added min-w-0 to enable truncation */}
+    <div className="min-w-0"> 
       <h3 className="text-lg md:text-xl font-[325] mb-1 md:mb-2 truncate">Duration</h3>
       <p className="font-[325] text-xs md:text-sm truncate">{duration}</p>
     </div>
