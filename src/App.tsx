@@ -12,32 +12,48 @@ import Settings from "./components/Settings/Settings";
 import CustomerSinglePage from "./pages/Customers/CustomerSinglePage";
 import Customers_payment from "./pages/Customers/customers_payment";
 import Customers_singlepayment from "./pages/Customers/customers_singlepayment";
+import General from "./pages/Properties/General";
+import { PropertyProvider } from "./MyContext/MyContext";
 // import Sidebar from "./components/sidebar/sideBar";
-
 
 function App() {
   return (
-    <div className="flex">
-   <div className=" min-h-screen  bg-white" >
-   <Sidebar />
-   </div>
-      <div className=" w-full">
-        <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/customers" element={<Customers />} />
-        <Route path="/payments" element={<Payment/>} />
-        <Route path="/transactions" element={<Transactions/>} />
-        <Route path="/properties" element={<Properties/>} />
-        <Route path="/personnel" element={<Personnel/>} />
-        <Route path="/Requests-Enquiries" element={<Requests_Enquiries/>} />
-        <Route path="/notifications" element={<Notifications/>} />
-        <Route path="/settings" element={<Settings/>} />
-        <Route path="/customers/singlepage" element={<CustomerSinglePage/>} />
-        <Route path="/customers/singlepage/payment" element={<Customers_payment/>} />
-        <Route path="/customers/singlepage/singlepayment" element={<Customers_singlepayment/>} />
-        </Routes>
+    <PropertyProvider>
+      <div className="flex">
+        <div className=" min-h-screen  bg-white">
+          <Sidebar />
+        </div>
+        <div className=" w-full">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/payments" element={<Payment />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/personnel" element={<Personnel />} />
+            <Route
+              path="/Requests-Enquiries"
+              element={<Requests_Enquiries />}
+            />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route
+              path="/customers/singlepage"
+              element={<CustomerSinglePage />}
+            />
+            <Route
+              path="/customers/singlepage/payment"
+              element={<Customers_payment />}
+            />
+            <Route
+              path="/customers/singlepage/singlepayment"
+              element={<Customers_singlepayment />}
+            />
+            <Route path="/properties/form" element={<General />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </PropertyProvider>
   );
 }
 

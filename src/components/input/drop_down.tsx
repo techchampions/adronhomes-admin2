@@ -11,13 +11,12 @@ interface InputFieldProps {
   label: string;
   placeholder: string;
   value: string;
-  onChange: (value: string) => void; // Changed to directly accept value
-  type?: string;
-  required?: boolean;
+  onChange: (value: string) => void;
+  name?: string; // Added name prop
   error?: any;
   disabled?: boolean;
-  options: DropdownOption[]; // New prop for dropdown options
-  dropdownTitle?: string; // New prop for dropdown title
+  options: DropdownOption[];
+  dropdownTitle?: string;
 }
 
 const OptionInputField: React.FC<InputFieldProps> = ({
@@ -25,12 +24,11 @@ const OptionInputField: React.FC<InputFieldProps> = ({
   placeholder,
   value,
   onChange,
-  type = "text",
-  required = false,
+  name, // Added name prop
   error,
   disabled = false,
   options = [],
-  dropdownTitle = "Options", // Default title
+  dropdownTitle = "Options",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -46,7 +44,6 @@ const OptionInputField: React.FC<InputFieldProps> = ({
     setIsOpen(false);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -63,7 +60,6 @@ const OptionInputField: React.FC<InputFieldProps> = ({
     };
   }, []);
 
-  // Find the selected option's label to display
   const selectedOption = options.find((opt) => opt.value === value);
   const displayValue = selectedOption ? selectedOption.label : "";
 
@@ -75,7 +71,7 @@ const OptionInputField: React.FC<InputFieldProps> = ({
 
       <div className="relative">
         <div
-          className={`w-full  bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
+          className={`w-full bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
             error ? "border-red-500" : ""
           } ${disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"}`}
           onClick={toggleDropdown}
@@ -90,7 +86,7 @@ const OptionInputField: React.FC<InputFieldProps> = ({
         </div>
 
         {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-white shadow-lg rounded-[30px] overflow-hidden">
+          <div className="absolute z-50 w-full mt-1 bg-white  shadow rounded-[30px] overflow-hidden">
             <div className="px-6 py-4">
               <p className="font-[350] text-dark mb-[18px]">{dropdownTitle}</p>
               <div className="space-y-[23px]">
@@ -119,17 +115,3 @@ const OptionInputField: React.FC<InputFieldProps> = ({
 };
 
 export default OptionInputField;
-
-
-{/* <OptionInputField
-  label="Property Type"
-  placeholder="Select property type"
-  value={selectedValue}
-  onChange={(value) => setSelectedValue(value)}
-  options={[
-    { value: 'land', label: 'Land' },
-    { value: 'building', label: 'Building' },
-    { value: 'apartment', label: 'Apartment' }
-  ]}
-  dropdownTitle="Property Types"
-/> */}

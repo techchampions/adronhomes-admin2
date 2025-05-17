@@ -1,13 +1,35 @@
-import { useState, ChangeEvent, DragEvent } from 'react';
-import { BiPlus, BiUpload } from 'react-icons/bi';
-import { BsInfo } from 'react-icons/bs';
-import { FaCircleExclamation } from 'react-icons/fa6';
+import { useField, FieldHookConfig } from "formik";
+import { ChangeEvent, DragEvent, useState } from "react";
+import { BiPlus } from "react-icons/bi";
+import { FaPlus } from "react-icons/fa";
+import { FaCircleExclamation, FaTrash } from "react-icons/fa6";
+type FileUploadProps = {
+  name: string;
+  label?: string;
+  accept?: string;
+  multiple?: boolean;
+  maxSize?: number; // in MB
+  minResolution?: { width: number; height: number };
+  recommendedRatio?: string;
+  supportedFormats?: string[];
+  dragDropText?: string;
+  orderHint?: string;
+};
 
-
-export default function VirtualTourUpload() {
-  const [tourLink, setTourLink] = useState<string>('');
-  const [images, setImages] = useState<File[]>([]);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
+const FileUpload = ({
+  label,
+  accept = ".jpg,.jpeg,.png",
+  multiple = true,
+  maxSize = 5,
+  minResolution = { width: 1500, height: 1000 },
+  recommendedRatio = "3:2",
+  supportedFormats = ["JPG", "JPEG", "PNG"],
+  dragDropText = "Drag & drop files here or click to browse",
+  orderHint = "Drag pictures in order in which you want them to appear.",
+  ...props
+}: FileUploadProps & FieldHookConfig<File[]>) => {
+  const [field, meta, helpers] = useField<File[]>(props);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -23,85 +45,117 @@ export default function VirtualTourUpload() {
     setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newImages = Array.from(e.dataTransfer.files).filter((file) => {
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        return validTypes.includes(file.type) && file.size <= 5 * 1024 * 1024;
-      });
-
-      setImages((prev) => [...prev, ...newImages]);
+      processFiles(Array.from(e.dataTransfer.files));
     }
   };
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newImages = Array.from(e.target.files).filter((file) => {
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        return validTypes.includes(file.type) && file.size <= 5 * 1024 * 1024;
-      });
-
-      setImages((prev) => [...prev, ...newImages]);
+      processFiles(Array.from(e.target.files));
     }
   };
 
+  const processFiles = (files: File[]) => {
+    const validFiles = files.filter((file) => {
+      const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+      return validTypes.includes(file.type) && file.size <= maxSize * 1024 * 1024;
+    });
+
+    if (multiple) {
+      helpers.setValue([...(field.value || []), ...validFiles]);
+    } else {
+      helpers.setValue(validFiles.slice(0, 1));
+    }
+  };
+
+  const removeFile = (index: number) => {
+    const newFiles = [...(field.value || [])];
+    newFiles.splice(index, 1);
+    helpers.setValue(newFiles);
+  };
+
   return (
-    <div>
-      {/* Image Upload Section */}
+    <div className="mb-8">
+      {label && (
+        <label className="block text-[14px] font-[325] text-[#767676] mb-2">
+          {label}
+        </label>
+      )}
+
       <div
-        className="mb-8"
+        className="flex flex-wrap gap-4"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className="flex flex-wrap gap-4">
-          {images.map((image, index) => (
-            <div key={index} className="relative md:w-[138px] md:h-[119px] w-20 h-20  bg-gray-200 rounded-[20px] overflow-hidden">
+        {field.value?.map((file, index) => (
+          <div key={index} className="relative group">
+            <div className="relative w-[138px] h-[119px] bg-gray-200 rounded-[20px] overflow-hidden">
               <img
-                src={URL.createObjectURL(image)}
+                src={URL.createObjectURL(file)}
                 alt={`Uploaded ${index + 1}`}
                 className="w-full h-full object-cover"
               />
+              <button
+                type="button"
+                 className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => removeFile(index)}
+              >
+                <FaTrash className="w-3 h-3" />
+              </button>
             </div>
-          ))}
+          </div>
+        ))}
 
+        {(multiple || !field.value?.length) && (
+          
           <label
-            className={`md:w-[138px] md:h-[119px] w-20 h-20 rounded-[20px] flex flex-col items-center justify-center  bg-[#F5F5F5] cursor-pointer ${
-              isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+            className={`relative w-[138px] h-[119px] rounded-[20px] overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer ${
+              isDragging ? "border-[#79B833] bg-[#F0F7E6]" : "border-[#D8D8D8]"
             }`}
           >
             <input
               type="file"
-              accept=".jpg,.jpeg,.png"
+              accept={accept}
               className="hidden"
-              multiple
+              multiple={multiple}
               onChange={handleFileSelect}
-            />
-            <div className="p-4 bg-[#272727] rounded-full mb-2">
-              <BiPlus className="w-4 h-4 text-white" />
-            </div>
+            />  <div className="flex flex-col items-center">
+                            <FaPlus className="w-6 h-6 text-gray-500 mb-1" />
+                            <span className="text-xs text-gray-500">Add Image</span>
+                          </div>
+            {/* <span className="text-xs text-center text-[#767676] px-2">
+              {dragDropText}
+            </span> */}
           </label>
-        </div>
-
-        <div className="mt-4 text-[#767676] text-[14px] space-y-[5px]">
-          <p className="font-[350]">Minimum Resolution: 1500 x 1000 pixels</p>
-          <p className="font-[350]">Recommended Aspect Ratio: 3:2</p>
-          <p className="font-[350]">File Size: Max 5MB per image</p>
-          <p className="font-[350]">Formats Supported: JPG, JPEG, PNG</p>
-        </div>
-
-        <div className="flex items-center mt-[11px] text-[#767676] font-[325] text-sm">
-          <FaCircleExclamation className="w-5 h-5 mr-2 text-[#767676]" />
-          <p>Drag pictures in order in which you want them to appear.</p>
-        </div>
+        )}
       </div>
 
-      {/* Virtual Tour Section */}
-      <div className="mt-8">
-        <h2 className="text-[20px] font-[325] text-dark mb-2">Virtual Tour</h2>
-        <p className="text-[#767676] text-sm  font-[325] mb-3">
-          Upload the virtual tour link of the property in the text field below.
+      <div className="mt-4 text-[#767676] text-[14px] space-y-[5px]">
+        <p className="font-[350]">
+          Minimum Resolution: {minResolution.width} x {minResolution.height} pixels
         </p>
-
+        {recommendedRatio && (
+          <p className="font-[350]">Recommended Aspect Ratio: {recommendedRatio}</p>
+        )}
+        <p className="font-[350]">File Size: Max {maxSize}MB per file</p>
+        <p className="font-[350]">
+          Formats Supported: {supportedFormats.join(", ")}
+        </p>
       </div>
+
+      {orderHint && (
+        <div className="flex items-start mt-[11px] text-[#767676] font-[325] text-[14px]">
+          <FaCircleExclamation className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+          <p>{orderHint}</p>
+        </div>
+      )}
+
+      {meta.touched && meta.error && (
+        <div className="mt-2 text-sm text-red-600">{meta.error}</div>
+      )}
     </div>
   );
-}
+};
+
+export default FileUpload;

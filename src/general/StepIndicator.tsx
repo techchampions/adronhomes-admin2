@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-const StepIndicator = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+const StepIndicator = ({setCurrentStep,currentStep}:{setCurrentStep:any,currentStep:any}) => {
+
 
   const steps = [
     { name: "Basic Details", id: 1 },
@@ -16,8 +16,8 @@ const StepIndicator = () => {
   };
 
   return (
-    <div className="w-full px-4 py-8 mx-auto">
-      <div className="flex md:flex-row flex-col items-center gap-0">
+    <div className="w-full pb-[40px] mx-auto">
+      <div className="flex md:flex-row flex-col items-center justify-center gap-0">
         {steps.map((step, index) => (
           <div key={step.id} className="flex items-center">
             {/* Step indicator */}
@@ -41,13 +41,13 @@ const StepIndicator = () => {
             {/* Connector line */}
             {index < steps.length - 1 && (
              <div
-             className={`h-1 w-10 md:w-20  ${
+             className={`h-[2px] w-10 md:w-8  ${
                currentStep > step.id
                  ? 'bg-[#57713A]'
                  : currentStep <  step.id
-                 ? 'border-t-4 border-dashed border-gray-400'
+                 ? 'border-t-2 border-dashed border-gray-400'
                     : currentStep === step.id
-                 ? 'border-t-4 border-dashed border-gray-400'
+                 ? 'border-t-2 border-dashed border-gray-400'
                  : 'bg-gray-300'
              }`}
            />

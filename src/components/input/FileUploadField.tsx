@@ -41,7 +41,7 @@ const FileUploadField: React.FC<InputFieldProps> = ({
       
       <div className="relative">
         <div
-          className={`w-full border bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
+          className={`w-full  bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
             error ? 'border-red-500' : ''
           } ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'cursor-pointer'}`}
           onClick={handleClick}

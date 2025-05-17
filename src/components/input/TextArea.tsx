@@ -4,12 +4,13 @@ interface InputFieldProps {
   label: string;
   placeholder: string;
   value: string;
-  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void; // Changed to HTMLTextAreaElement
+  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  name?: string; // Added name prop
   type?: string;
   required?: boolean;
   error?: any;
   disabled?: boolean;
-  rows?: number; // Added rows prop for textarea
+  rows?: number;
 }
 
 const InputAreaField: React.FC<InputFieldProps> = ({
@@ -17,18 +18,21 @@ const InputAreaField: React.FC<InputFieldProps> = ({
   placeholder,
   value,
   onChange,
+  name, // Added name prop
   type = "text",
   required = false,
   error,
   disabled = false,
-  rows = 4, // Default rows
+  rows = 4,
 }) => {
   return (
     <div className="w-full">
       <label className="block text-[#4F4F4F] font-[325] text-[14px] mb-2">
-        {label} 
+        {label}
+      
       </label>
       <textarea
+        name={name} // Added name attribute
         value={value}
         onChange={onChange}
         disabled={disabled}
@@ -39,14 +43,12 @@ const InputAreaField: React.FC<InputFieldProps> = ({
         } ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
         placeholder={placeholder}
       />
-
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 };
 
 export default InputAreaField;
-
 
 
 {/* <InputAreaField
