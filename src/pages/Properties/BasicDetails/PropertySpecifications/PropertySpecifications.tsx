@@ -52,7 +52,7 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>((props,
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid   md:grid-cols-2 gap-12">
         <InputField
           label="Number of Bedrooms"
           placeholder="Enter Number of Bedrooms"
@@ -80,7 +80,7 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>((props,
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
        <div className="relative">
          <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">Sq M</p>
         <InputField
@@ -106,7 +106,7 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>((props,
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="Parking Spaces"
           placeholder="Enter Parking Spaces"
@@ -124,7 +124,7 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>((props,
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="Units Available"
           placeholder="Enter Units Available"
@@ -166,7 +166,7 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>((props,
 
       <FileUploadField
         label="Upload Document"
-        placeholder="Click to Upload Property Agreement"
+        placeholder=" Upload Property Agreement"
         onChange={(files) => formik.setFieldValue("documents", files)}
         accept=".pdf,.doc,.docx"
       />

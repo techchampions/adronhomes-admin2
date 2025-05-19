@@ -57,7 +57,7 @@ const Discount = forwardRef<DiscountHandles>((props, ref) => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="Discount Name"
           placeholder="Enter Discount Name"
@@ -86,7 +86,7 @@ const Discount = forwardRef<DiscountHandles>((props, ref) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="Discount Off (%)"
           placeholder="Enter Discount Off (%)"
@@ -114,7 +114,7 @@ const Discount = forwardRef<DiscountHandles>((props, ref) => {
         />
       </div>
      
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <div className="grid grid-cols-2 gap-12">
           <InputField
             label="Valid From"

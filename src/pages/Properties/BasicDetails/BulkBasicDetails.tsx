@@ -103,7 +103,7 @@ const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsPro
         error={formik.touched.address && formik.errors.address}
       />
 
-      <div className="grid lg:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="City"
           placeholder="Enter city"

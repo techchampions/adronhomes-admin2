@@ -14,7 +14,6 @@ import FeaturesInput from "./Features/Features";
 import LandForm from "./BasicDetails/PropertySpecifications/land";
 import FinalSubmission from "./FinalSubmission";
 
-
 export default function General() {
   const {
     currentStep,
@@ -119,15 +118,18 @@ export default function General() {
     "Property Specifications",
     "Media",
     "Features",
-    "Discount",
+    discount ? "Discount":"Set Payment Structure",
     "Payment Structure",
     "Preview",
-    "Complete"
+    "Complete",
   ];
 
-  const nextButtonText = currentStep === 7 ? "Submit" : 
-                        currentStep === 6 ? "Confirm & Submit" : 
-                        "Next";
+  const nextButtonText =
+    currentStep === 7
+      ? "Submit"
+      : currentStep === 6
+      ? "Confirm & Submit"
+      : "Next";
 
   return (
     <div className="w-full">
@@ -136,11 +138,13 @@ export default function General() {
         {currentStep === 6 || currentStep === 7 ? (
           <>
             <p className="text-dark text-2xl font-[350] mb-[8px]">
-              {currentStep === 6 ? "Confirm Property Details" : "Submission Complete"}
+              {currentStep === 6
+                ? "Confirm Property Details"
+                : "Submission Complete"}
             </p>
             <h1 className="text-[#767676] font-[325] text-base mb-[30px]">
-              {currentStep === 6 
-                ? "Confirm everything is in order before proceeding" 
+              {currentStep === 6
+                ? "Confirm everything is in order before proceeding"
                 : "Your property has been successfully submitted"}
             </h1>
           </>
@@ -245,7 +249,7 @@ export default function General() {
             <div>
               {currentStep < 7 && (
                 <button
-                  className="bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4"
+                  className="bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap"
                   onClick={handleNext}
                 >
                   {nextButtonText}

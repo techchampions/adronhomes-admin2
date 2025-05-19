@@ -1,5 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./general/sidebar";
+import AdminSidebar from "./general/sidebar"; // Your new sidebar
 import Dashboard from "./pages/Dashboard/dashboard";
 import Customers from "./pages/Customers/customers";
 import Payment from "./pages/Payment/Payment";
@@ -14,16 +15,22 @@ import Customers_payment from "./pages/Customers/customers_payment";
 import Customers_singlepayment from "./pages/Customers/customers_singlepayment";
 import General from "./pages/Properties/General";
 import { PropertyProvider } from "./MyContext/MyContext";
-// import Sidebar from "./components/sidebar/sideBar";
+import SideBar from "./marketer/sideNav/SideNav";
+import MarketersDashboard from "./marketer/dashboard/page";
 
 function App() {
+  const location = useLocation();
+
+  // Example: Use AdminSidebar for "/admin" routes
+  const isAdminRoute = location.pathname.startsWith("/marketer");
+
   return (
     <PropertyProvider>
       <div className="flex">
-        <div className=" min-h-screen  bg-white">
-          <Sidebar />
+        <div className="min-h-screen bg-white">
+          {isAdminRoute ? <SideBar /> : <Sidebar />}
         </div>
-        <div className=" w-full">
+        <div className="w-full">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/customers" element={<Customers />} />
@@ -31,25 +38,16 @@ function App() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/personnel" element={<Personnel />} />
-            <Route
-              path="/Requests-Enquiries"
-              element={<Requests_Enquiries />}
-            />
+            <Route path="/Requests-Enquiries" element={<Requests_Enquiries />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/settings" element={<Settings />} />
-            <Route
-              path="/customers/singlepage"
-              element={<CustomerSinglePage />}
-            />
-            <Route
-              path="/customers/singlepage/payment"
-              element={<Customers_payment />}
-            />
-            <Route
-              path="/customers/singlepage/singlepayment"
-              element={<Customers_singlepayment />}
-            />
+            <Route path="/customers/singlepage" element={<CustomerSinglePage />} />
+            <Route path="/customers/singlepage/payment" element={<Customers_payment />} />
+            <Route path="/customers/singlepage/singlepayment" element={<Customers_singlepayment />} />
             <Route path="/properties/form" element={<General />} />
+            {/* Admin routes (example) */}
+            <Route path="/marketer" element={<MarketersDashboard />} />
+            {/* Add more admin routes as needed */}
           </Routes>
         </div>
       </div>

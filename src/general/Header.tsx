@@ -39,16 +39,17 @@ export default function Header({
     setIsUserBulk,
   } = useContext(PropertyContext)!;
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const [createpersonnel, setcreatepersonnel] = useState(false);
+  const [createpersonnel, setcreatepersonnel] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const isPersonnelPage = location.pathname === "/personnel";
+  const isPropertiesPage = location.pathname.startsWith("/properties");
 
   const handleButtonClick = () => {
-    if (isCancelState) {
-      // When in cancel state, navigate back
-      navigate(isPersonnelPage ? "/personnel" : "/properties");
+    if (isCancelState && isPropertiesPage) {
+      // When in cancel state and on properties page, navigate back
+      navigate("/properties");
       setIsCancelState(false);
     } else {
       // Normal state behavior
@@ -59,17 +60,18 @@ export default function Header({
       if (isPersonnelPage) {
         // Personnel-specific action
         setcreatepersonnel(true);
-      } else {
+      } else if (isPropertiesPage) {
         // Property-specific action
         setIsCancelState(true);
         setShowBulkModal(true);
+        
       }
     }
   };
 
   // Determine button text based on page and state
   const getButtonText = () => {
-    if (isCancelState) return "Cancel";
+    if (isCancelState && isPropertiesPage) return "Cancel";
     return isPersonnelPage ? "Create Personnel" : buttonText;
   };
 
@@ -114,7 +116,7 @@ export default function Header({
 
           <button
             className={`text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4  whitespace-nowrap ${
-              isCancelState
+              isCancelState && isPropertiesPage
                 ? "bg-[#D70E0E] hover:bg-red-600"
                 : "bg-[#79B833] hover:bg-[#6aa22c]"
             }`}
@@ -125,7 +127,7 @@ export default function Header({
         </div>
       </div>
 
-      {!isPersonnelPage && showBulkModal && (
+      {isPropertiesPage && showBulkModal && (
         <BulkSelectModal
           onSelect={(isBulk) => {
             navigate("/properties/form");
@@ -146,20 +148,22 @@ export default function Header({
           }}
         />
       )}
-  {  createpersonnel &&  <BulkPersonnelSelectModal
-        onSelect={(isBulk) => {
-          setIsUserBulk(true);
-          setPersonnelModal(true);
-          setcreatepersonnel(false)
-        }}
-        onSelects={(isBulk) => {
-          setIsUserBulk(false);
-          setPersonnelModal(true);
-          setcreatepersonnel(false)
-        }}
-        onClose={() => setcreatepersonnel(false)}
-        x={()=>setcreatepersonnel(false)}
-      />}
+      {createpersonnel && (
+        <BulkPersonnelSelectModal
+          onSelect={(isBulk) => {
+            setIsUserBulk(true);
+            setPersonnelModal(true);
+            setcreatepersonnel(false);
+          }}
+          onSelects={(isBulk) => {
+            setIsUserBulk(false);
+            setPersonnelModal(true);
+            setcreatepersonnel(false);
+          }}
+          onClose={() => setcreatepersonnel(false)}
+          x={() => setcreatepersonnel(false)}
+        />
+      )}
       {showPersonnelModal && (
         <>
           {isUserBulk ? (
@@ -170,7 +174,9 @@ export default function Header({
                 files: FileList | null;
               }): Promise<void> {
                 throw new Error("Function not implemented.");
-              } } x={() => setPersonnelModal(false)}            />
+              }}
+              x={() => setPersonnelModal(false)}
+            />
           ) : (
             <PersonnelModal
               isOpen={showPersonnelModal}
@@ -182,5 +188,3 @@ export default function Header({
     </>
   );
 }
-// isUserBulk,
-//       setIsUserBulk,

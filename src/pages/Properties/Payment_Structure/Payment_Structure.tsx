@@ -54,7 +54,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <OptionInputField
           label="Payment Type"
           placeholder="Select Payment Type"
@@ -84,7 +84,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <OptionInputField
           label="Payment Schedule"
           placeholder="Select Payment Schedule"

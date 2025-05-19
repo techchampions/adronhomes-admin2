@@ -63,73 +63,74 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     }
   };
 
-  return (<div className="fixed inset-0 flex items-center justify-center z-50 bg-[rgba(102,102,102,0.2)] p-4 " >
-      <div className="bg-white rounded-3xl w-full max-w-lg px-6 py-8 md:px-8 md:py-10 relative animate-fadeIn ">
-        <div className="w-full items-center justify-between flex mb-6">
-          <p className="font-medium text-xl md:text-2xl">Transaction Details</p>
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-[rgba(102,102,102,0.2)] p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-[95vw] sm:max-w-lg px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 relative animate-fadeIn overflow-y-auto max-h-[95vh]">
+        <div className="w-full items-center justify-between flex mb-4 sm:mb-6">
+          <p className="font-medium text-lg sm:text-xl md:text-2xl">Transaction Details</p>
           <button
             onClick={onClose}
-            className="hover:bg-gray-100 p-2 rounded-full transition-colors"
+            className="hover:bg-gray-100 p-1 sm:p-2 rounded-full transition-colors"
           >
             <FaXmark size={14} />
           </button>
         </div>
 
         {/* From */}
-        <div className="grid grid-cols-3 border-b border-b-gray-200 pb-4 w-full items-center">
+        <div className="grid grid-cols-3 border-b border-b-gray-200 pb-3 sm:pb-4 w-full items-center">
           <div className="col-span-2">
-            <p className="mb-2 text-sm font-normal text-gray-600">From</p>
-            <h1 className="font-normal text-gray-900 text-sm md:text-base">
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">From</p>
+            <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base line-clamp-2">
               {transactionData.from}
             </h1>
           </div>
           <div className="w-full flex justify-end">
             <img
               src={transactionData.bankIcon}
-              className="w-8 h-8 rounded-full"
+              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
               alt="Bank icon"
             />
           </div>
         </div>
 
         {/* Description */}
-        <div className="grid grid-cols-1 border-b border-b-gray-200 py-4 w-full">
+        <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
           <div>
-            <p className="mb-2 text-sm font-normal text-gray-600">
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
               Description
             </p>
-            <h1 className="font-normal text-gray-900 text-sm md:text-base">
+            <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
               {transactionData.description}
             </h1>
           </div>
         </div>
 
         {/* Transaction Type */}
-        <div className="grid grid-cols-1 border-b border-b-gray-200 py-4 w-full">
+        <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
           <div>
-            <p className="mb-2 text-sm font-normal text-gray-600">
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
               Transaction Type
             </p>
-            <h1 className="font-normal text-gray-900 text-sm md:text-base">
+            <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
               {transactionData.type}
             </h1>
           </div>
         </div>
 
         {/* Payment Method */}
-        <div className="grid grid-cols-2 border-b border-b-gray-200 py-4 w-full items-center">
+        <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">
           <div>
-            <p className="mb-2 text-sm font-normal text-gray-600">
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
               Payment Method
             </p>
-            <h1 className="font-normal text-gray-900 text-sm md:text-base">
+            <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
               {transactionData.method}
             </h1>
           </div>
           <div className="w-full flex justify-end">
             <div>
-              <p className="mb-2 text-xs font-normal text-gray-600">Fees</p>
-              <h1 className="font-normal text-gray-900 text-sm md:text-base">
+              <p className="mb-1 sm:mb-2 text-xs font-normal text-gray-600">Fees</p>
+              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
                 {transactionData.fees}
               </h1>
             </div>
@@ -137,36 +138,35 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         </div>
 
         {/* Transaction Reference */}
-        <div className="grid grid-cols-2 border-b border-b-gray-200 py-4 w-full items-center">
+        <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">
           <div>
-            <p className="mb-2 text-sm font-normal text-gray-600">
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
               Transaction Reference
             </p>
-            <h1 className="font-normal text-gray-900 text-sm md:text-base truncate pr-2">
+            <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base truncate pr-1 sm:pr-2">
               {transactionData.reference}
             </h1>
           </div>
           <div className="w-full flex justify-end">
             <button
               onClick={() => handleCopy(transactionData.reference)}
-              className="flex items-center hover:bg-gray-100 p-1 px-2 rounded transition-colors"
+              className="flex items-center hover:bg-gray-100 p-1 sm:px-2 rounded transition-colors text-xs sm:text-sm"
             >
-              <IoCopyOutline className="mr-1" />
-              <p className="text-sm font-normal text-gray-900">
-                {copied ? "Copied!" : "Copy"}
-              </p>
+              <IoCopyOutline className="mr-1" size={14} />
+              <span>{copied ? "Copied!" : "Copy"}</span>
             </button>
           </div>
         </div>
 
         {/* Status */}
-        <div className="grid grid-cols-1 py-4 w-full items-center">
+        <div className="grid grid-cols-1 py-3 sm:py-4 w-full items-center">
           <div>
-            <p className="mb-2 text-sm font-normal text-gray-600">Status</p>
-            <h1 className="font-normal text-gray-900 text-sm md:text-base flex items-center">
+            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">Status</p>
+            <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base flex items-center">
               <GoDotFill
                 color={getStatusColor(transactionData.status)}
                 className="mr-1"
+                size={14}
               />
               {transactionData.status}
             </h1>
@@ -176,12 +176,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         {/* Actions */}
         <div className="grid grid-cols-3 mt-2 gap-2 w-full items-center">
           <div className="col-span-1 flex items-center w-full justify-end">
-            <button className="text-base font-medium text-gray-900 hover:underline">
+            <button className="text-xs sm:text-base font-medium text-gray-900 hover:underline">
               Share
             </button>
           </div>
           <div className="col-span-2 flex justify-end">
-            <button className="bg-gray-900 text-white font-medium text-sm md:text-base py-3 px-6 md:px-10 rounded-full hover:bg-gray-800 transition-colors">
+            <button className="bg-gray-900 text-white font-medium text-xs sm:text-sm md:text-base py-2 sm:py-3 px-4 sm:px-6 md:px-10 rounded-full hover:bg-gray-800 transition-colors">
               Download
             </button>
           </div>

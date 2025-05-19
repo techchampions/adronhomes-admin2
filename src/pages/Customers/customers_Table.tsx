@@ -77,10 +77,6 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
     </div><div className="w-full">
         <Pagination />
       </div>
-      
-      const [isModalOpen, setIsModalOpen] = useState(false);
-
-// In your component
 
       </>
   );

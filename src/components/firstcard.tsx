@@ -163,3 +163,54 @@ export function MatrixCard({
     </div>
   );
 }
+
+// marketergreencard
+
+
+
+interface MatrixCardGreensProps {
+  name?: string;
+  role?: string;
+  date?: string;
+  showSettings?: boolean;
+    iconSrc?: string;  // New prop for icon source
+  iconAlt?: string; 
+}
+
+export function GreenCardMarketer({
+  name = "Mike Wellington",
+  role = "Marketer",
+  date = "Created 3.09.2025",
+  showSettings = true,
+   iconSrc,     
+  iconAlt = "icon",
+}: MatrixCardGreensProps) {
+  return (
+    <div className="bg-[#57713A]  h-full py-[24px] lg:pr-[24px] lg:pl-[24px] pl-[12px] rounded-[20px] pr-[12px]">
+      <div className="font-gotham md:text-[24px] text-[20px] font-[350] leading-[100%] tracking-[0%] text-white mb-[18px]">
+        <p>{name}</p>
+      </div>
+       <div className="font-gotham font-[350] text-white mb-[20px] flex items-center gap-[4px]">
+        {iconSrc && (
+          <img 
+            src={iconSrc} 
+            alt={iconAlt} 
+            className="w-6 h-6" 
+          />
+        )}
+        <p className="truncate">{role}</p>
+      </div>
+      
+   <div className="flex flex-row w-full justify-between">
+       <div className="font-gotham md:text-[14px] text-[10px] font-[325] leading-[100%] tracking-[0%] text-white ">
+        <p>{date}</p>
+      </div>
+      {showSettings && (
+        <div className="font-gotham md:text-[14px] text-[10px] font-[350] leading-[100%] tracking-[0%] text-white">
+          <p>Account Settings</p>
+        </div>
+      )}
+   </div>
+    </div>
+  );
+}
