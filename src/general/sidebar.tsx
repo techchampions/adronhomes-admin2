@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
 
 const navItems = [
-  { label: 'Dashboard', icon: Icon1, path: '/' },
+  { label: 'Dashboard', icon: Icon1, path: '/dashboard' },
   { label: 'Customers', icon: Icon2, path: '/customers' },
   { label: 'Payments', icon: Icon3, path: '/payments' },
   { label: 'Transactions', icon: Icon5, path: '/transactions' },

@@ -112,7 +112,7 @@ export function MatrixCardGreen({
   currency = false, // Default to false
 }: MatrixCardGreenProps) {
   return (
-    <div className="bg-[#57713A] md:h-[144px] h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px]">
+    <div className="bg-[#57713A]  h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px]">
       <div className="font-gotham md:text-[14px]   text-[10px] font-[350] leading-[100%] tracking-[0%] text-white mb-[16px]">
         <p>{title}</p>
       </div>
@@ -173,7 +173,7 @@ interface MatrixCardGreensProps {
   role?: string;
   date?: string;
   showSettings?: boolean;
-    iconSrc?: string;  // New prop for icon source
+    iconSrc?: string;  
   iconAlt?: string; 
 }
 

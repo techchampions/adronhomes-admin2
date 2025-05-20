@@ -179,22 +179,22 @@ const CustomersTableAll = () => {
             <tbody>
               {currentItems.map((row) => (
                 <tr key={row.id} className="cursor-pointer">
-                  <td className="pb-8 font-[325]  text-darktext-sm max-w-xs truncate whitespace-nowrap">
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.name}
                   </td>
-                  <td className="pb-8 font-[350]  text-darktext-sm max-w-xs truncate whitespace-nowrap">
+                  <td className="pb-8 font-[350]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.marketer}
                   </td>
-                  <td className="pb-8 font-[325]  text-darktext-sm max-w-xs truncate whitespace-nowrap">
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.dateJoined}
                   </td>
-                  <td className="pb-8 font-[325]  text-darktext-sm whitespace-nowrap">
+                  <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
                     {row.propertyPlans}
                   </td>
-                  <td className="pb-8 font-[325]  text-darktext-sm whitespace-nowrap">
+                  <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
                     {row.savedProperties}
                   </td>
-                  <td className="pb-8 font-[325]  text-darktext-sm max-w-xs truncate whitespace-nowrap">
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.phoneNumber}
                   </td>
                 </tr>

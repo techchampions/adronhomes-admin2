@@ -49,6 +49,15 @@
   font-display: swap;
 }
 
+/* Cormorant Garamond Font Setup */
+@font-face {
+  font-family: 'CormorantGaramond';
+  src: url('utils/fonts/CormorantGaramond-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #F5F5F5;
 
@@ -63,12 +72,13 @@
   --gray-muted: #8F8F8F;
   --error: #D70E0E;
   
-  /* Font family variable */
+  /* Font family variables */
   --font-family-gotham: 'Gotham', sans-serif;
+  --font-family-cormorant: 'CormorantGaramond', serif;
 }
 
 /* Custom Utility Classes Using CSS Variables */
-  .bg-primary { background-color: var(--primary) !important; }
+.bg-primary { background-color: var(--primary) !important; }
 .bg-dark { background-color: var(--dark) !important; }
 .bg-gray-dark { background-color: var(--gray-dark) !important; }
 .bg-gray { background-color: var(--gray) !important; }
@@ -90,6 +100,7 @@
 
 /* Font utility classes */
 .font-gotham { font-family: var(--font-family-gotham) !important; }
+.font-cormorant { font-family: var(--font-family-cormorant) !important; }
 .font-light { font-weight: 300 !important; }
 .font-325 { font-weight: 325 !important; }
 .font-350 { font-weight: 350 !important; }

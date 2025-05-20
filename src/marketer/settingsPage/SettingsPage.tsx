@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { GreenCardMarketer, MatrixCard, StatsCard } from '../../components/firstcard'
 import { ReusableTable } from '../../components/Tables/Table_one'
-import CustomersTableAll from './allcustomersTable'
-import CustomersTableAllActive from './activePlans'
+
 import Header from '../Header/Hearder'
 import SettingsCard from '../SettingsCard'
 
-export default function MarketersDashboard() {
+export default function SettingsPage() {
   const tabs = ['Registered Customers', 'Active Plans']
   const [activeTab, setActiveTab] = useState('Registered Customers')
 
@@ -41,19 +40,7 @@ export default function MarketersDashboard() {
         </div>
 
         <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-          <ReusableTable
-            tabs={tabs}
-            searchPlaceholder="Search Customer"
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          >
-            {activeTab === 'Registered Customers' ? (
-              <CustomersTableAll />
-            ) : (
-              <CustomersTableAllActive />
-            )}
-          </ReusableTable>
-
+          <SettingsCard/>
         </div>
       </div>
     </div>
