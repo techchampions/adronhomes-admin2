@@ -1,5 +1,5 @@
 // Header.tsx
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate, useLocation } from "react-router-dom";
 import BulkSelectModal from "../pages/Properties/BasicDetails/BulkSelectModal";
@@ -7,6 +7,9 @@ import { PropertyContext } from "../MyContext/MyContext";
 import PersonnelModal from "../pages/Personnel/createPersonnelModal";
 import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../components/Redux/store";
+import { getUser } from "../components/Redux/User/user_Thunk";
 
 interface HeaderProps {
   title?: string;
@@ -73,11 +76,18 @@ export default function Header({
     return isPersonnelPage ? "Create Personnel" : buttonText;
   };
 
+  //  const {
+  //   loading: userLoading,
+  //   success: userSuccess,
+  //   error: userError,
+  //   user,
+  // } = useSelector((state: RootState) => state.user);
+ 
   return (
     <>
       <div className="w-full flex-col lg:flex-row justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] flex overflow-hidden relative">
         <div className="w-full sm:w-auto -4 sm:mb-0 lg:ml-0 ml-10">
-          <h2 className="font-[325] text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-2 text-ri">
+          <h2 className="font-[325] text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-2">
             {title}
           </h2>
           <p className="leading-tight font-[325] text-sm md:text-base text-[#767676]">

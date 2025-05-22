@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { RootState } from '../components/Redux/store';
+import { useSelector } from 'react-redux';
 
 interface HeaderProps {
   title?: string;
@@ -17,11 +19,13 @@ export default function DashboardHeader({
 }: HeaderProps) {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
+  
+
   return (
     <div className="w-full  flex-col lg:flex-row justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px]  flex overflow-hidden">
       {/* Title Section */}
       <div className="w-full sm:w-auto -4 sm:mb-0  md:ml-0   ml-10">
-        <h2 className=" font-[325] text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-2 text-ri">
+        <h2 className=" font-[325] text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-2 max-w-md">
           {title}
         </h2>
         <div className="flex items-center leading-tight font-[350] text-sm md:text-base text-dark">

@@ -2,12 +2,33 @@ import { Form, Formik } from "formik";
 import { FormField, PasswordFormField } from "./logininput";
 import * as Yup from "yup";
 import { IoCheckmarkCircle } from "react-icons/io5";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../Redux/Login/login_thunk";
+import { AppDispatch, RootState } from "../Redux/store";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { clearError } from "../Redux/Login/login_slice";
+import { getUser } from "../Redux/User/user_Thunk";
 
 export default function Login() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, token, success, message, error } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const {
+    loading: userLoading,
+    success: userSuccess,
+    error: userError,
+    user,
+  } = useSelector((state: RootState) => state.user);
+
   const initialValues = {
     email: "",
     password: "",
   };
+  const navigate = useNavigate();
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -19,11 +40,45 @@ export default function Login() {
   });
 
   const onSubmit = async (values: typeof initialValues) => {
-    console.log(values);
+    try {
+      await dispatch(loginUser(values)).unwrap();
+    } catch (err) {
+      // Error is already handled in the useEffect below
+    }
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      dispatch(clearError()); // Clear error after displaying
+    }
+
+    if (success) {
+      toast.success(message || "Login successful!");
+      dispatch(getUser());
+    }
+  }, [error, success, message]);
+
+  useEffect(() => {
+    if (userError) {
+         navigate("/");
+      // toast.error(userError);
+    }
+
+    if (userSuccess) {
+      if (user?.role === 0) {
+        navigate("/dashboard");
+      }
+      if (user?.role === 1) {
+        navigate("/marketer");
+      }
+    }
+  }, [userError, userSuccess, dispatch]);
 
   return (
     <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6">
+      {/* <ToastContainer position="top-center" autoClose={5000} /> */}
+
       <div className="bg-white w-full max-w-[841px] flex flex-col items-center rounded-[20px] md:rounded-[50px] px-6 sm:px-12 md:px-[233px] py-8 sm:py-12 md:py-[54px]">
         <div>
           <img
@@ -36,7 +91,7 @@ export default function Login() {
           Admin Login
         </p>
 
-        <Formik 
+        <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={onSubmit}
@@ -66,10 +121,10 @@ export default function Login() {
                 <div className="w-full">
                   <button
                     type="submit"
-                    className="mt-8 sm:mt-[58px] w-full py-3 sm:py-[15px] rounded-[20px] sm:rounded-[30px] bg-[#79B833] h-12 sm:h-[49px] text-center text-xs sm:text-[12px] font-medium text-white disabled:bg-gray-400"
-                    disabled={isSubmitting}
+                    className="mt-8 sm:mt-[58px] w-full py-3 sm:py-[15px] rounded-[20px] sm:rounded-[30px] bg-[#79B833] h-12 sm:h-[49px] text-center text-xs sm:text-[12px] font-medium text-white disabled:bg-[#6b9933]"
+                    disabled={loading || isSubmitting}
                   >
-                    {"Log In"}
+                    {loading ? "Logging in..." : "Log In"}
                   </button>
                 </div>
               </Form>

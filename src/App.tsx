@@ -1,10 +1,19 @@
-import { Routes, Route, useLocation } from "react-router-dom";
-import AdminSidebar from "./general/sidebar"; // Default sidebar
-import SideBar from "./marketer/sideNav/SideNav"; // Marketer sidebar
-import { PropertyProvider } from "./MyContext/MyContext";
-import Login from "./components/Login/login";
+import { Routes, Route, useLocation, Outlet, Navigate } from "react-router-dom";
+import { Provider, useDispatch } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import Cookies from "js-cookie";
+import { ReactNode, useEffect } from "react";
 
-// Import all other components
+// Context
+import { PropertyProvider } from "./MyContext/MyContext";
+import { AppDispatch, store } from "./components/Redux/store";
+
+// Layout Components
+import AdminSidebar from "./general/sidebar";
+import SideBar from "./marketer/sideNav/SideNav";
+
+// Pages
+import Login from "./components/Login/login";
 import Dashboard from "./pages/Dashboard/dashboard";
 import Customers from "./pages/Customers/customers";
 import Payment from "./pages/Payment/Payment";
@@ -14,63 +23,108 @@ import MarketerInvoice from "./marketer/Payment/customers_payment";
 import Transactions from "./pages/Transactions/Transactions";
 import Properties from "./pages/Properties/Properties";
 import Personnel from "./pages/Personnel/Personnel";
-import Requests_Enquiries from "./pages/Requests_Enquiries/Requests_Enquiries";
+import RequestsEnquiries from "./pages/Requests_Enquiries/Requests_Enquiries";
 import Notifications from "./components/Notifications/Notifications";
 import Settings from "./components/Settings/Settings";
 import CustomerSinglePage from "./pages/Customers/CustomerSinglePage";
-import Customers_payment from "./marketer/Payment/customers_payment";
-import Customers_singlepayment from "./pages/Customers/customers_singlepayment";
+import CustomersPayment from "./marketer/Payment/customers_payment";
+import CustomersSinglePayment from "./pages/Customers/customers_singlepayment";
 import General from "./pages/Properties/General";
-// ... (other imports remain the same)
+import { getUser } from "./components/Redux/User/user_Thunk";
 
-function App() {
+const AuthGuard = () => {
+  const token = Cookies.get("token");
+
+  // const isAuthenticated = () => {
+    // if (!token) return false;
+
+    // try {
+    //   const payload = JSON.parse(atob(token.split(".")[1]));
+    //   return payload.exp * 1000 > Date.now();
+    // } catch (error) {
+    //   return false;
+    // }
+  // };
+
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+interface AppLayoutProps {
+  children: ReactNode;
+}
+
+const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
-
-  // Determine if the current route is a marketer route
   const isMarketerRoute = location.pathname.startsWith("/marketer");
-  // Hide sidebar on login page
   const shouldShowSidebar = location.pathname !== "/";
 
   return (
-    <PropertyProvider>
-      <div className="flex">
-        {shouldShowSidebar && (
-          <div className="min-h-screen bg-white">
-            {isMarketerRoute ? <SideBar /> : <AdminSidebar />}
-          </div>
-        )}
-        <div className="w-full">
+    <div className="flex">
+      {shouldShowSidebar && (
+        <div className="min-h-screen bg-white">
+          {isMarketerRoute ? <SideBar /> : <AdminSidebar />}
+        </div>
+      )}
+      <div className="w-full">{children}</div>
+    </div>
+  );
+};
+ 
+const App = () => {
+  return (
+    <Provider store={store}>
+      <PropertyProvider>
+        <AppLayout>
           <Routes>
-            {/* Public Route (No Sidebar) */}
+            {/* Public Route */}
             <Route path="/" element={<Login />} />
 
-            {/* Admin Routes (Default Sidebar) */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/payments" element={<Payment />} />
-                      <Route path="/dasboard" element={<Dashboard />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/payments" element={<Payment />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/properties" element={<Properties />} />
-            <Route path="/personnel" element={<Personnel />} />
-            <Route path="/Requests-Enquiries" element={<Requests_Enquiries />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/customers/singlepage" element={<CustomerSinglePage />} />
-            <Route path="/customers/singlepage/payment" element={<Customers_payment />} />
-            <Route path="/customers/singlepage/singlepayment" element={<Customers_singlepayment />} />
-            <Route path="/properties/form" element={<General />} />
+            {/* Protected Routes */}
+            <Route element={<AuthGuard />}>
+              {/* Admin Routes */}
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/customers" element={<Customers />} />
+              <Route path="/payments" element={<Payment />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/properties" element={<Properties />} />
+              <Route path="/personnel" element={<Personnel />} />
+              <Route path="/requests-enquiries" element={<RequestsEnquiries />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/customers/singlepage" element={<CustomerSinglePage />} />
+              <Route path="/customers/singlepage/payment" element={<CustomersPayment />} />
+              <Route 
+                path="/customers/singlepage/singlepayment" 
+                element={<CustomersSinglePayment />} 
+              />
+              <Route path="/properties/form" element={<General />} />
 
-            {/* Marketer Routes (Marketer Sidebar) */}
-            <Route path="/marketer" element={<MarketersDashboard />} />
-            <Route path="/marketer/settings" element={<SettingsPage />} />
-            <Route path="/marketer/Payment" element={<MarketerInvoice />} />
+              {/* Marketer Routes */}
+              <Route path="/marketer" element={<MarketersDashboard />} />
+              <Route path="/marketer/settings" element={<SettingsPage />} />
+              <Route path="/marketer/payment" element={<MarketerInvoice />} />
+            </Route>
           </Routes>
-        </div>
-      </div>
-    </PropertyProvider>
+        </AppLayout>
+
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </PropertyProvider>
+    </Provider>
   );
-}
+};
 
 export default App;

@@ -20,17 +20,23 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   icon = "/arrw.svg",
 }) => {
   return (
-    <div className="h-[151px] p-5 bg-white rounded-[20px] relative">
+    <div className="h-[151px] p-5 bg-white rounded-[20px] relative cursor-pointer">
       <p className="bg-[#F8F8F8] rounded-[40px] py-1 md:py-2 px-[12px] md:px-[23px] font-[350] text-[#272727] md:text-sm   text-[10px] w-fit mb-[20px]">
         {tag}
       </p>
       <div className="flex justify-start w-full">
         <div className="grid grid-cols-3 md:gap-[70px] gap-1">
           {stats.map((stat, index) => (
-            <div key={index} className="">
-              <p className="font-gotham font-[350] md:text-[30px] tex-[15px] leading-[100%] text-dark tracking-[0%] text-center mb-[5px]">
-                {stat.value}
+            <div key={index} className="relative group">
+              <p 
+                className="font-gotham font-[350] md:text-[30px] tex-[15px] leading-[100%] text-dark tracking-[0%] text-center mb-[5px] truncate max-w-[100px] mx-auto"
+                title={typeof stat.value === 'string' ? stat.value : String(stat.value)}
+              >
+                {stat.value.toLocaleString()}
               </p>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                {stat.value.toLocaleString()}
+              </div>
               <h1 className="font-gotham font-[325] md:text-[14px]  text-[10px] leading-[100%] tracking-[0%] text-center text-[#767676]">
                 {stat.label}
               </h1>
@@ -73,7 +79,7 @@ export function RevenueCard({
 // RevenueWhiteCard (Payment Card)
 interface RevenueWhiteCardProps {
   tag?: string;
-  amount?: string;
+  amount?: any;
   currency?: string;
   note?: string;
 }
@@ -85,22 +91,30 @@ export function RevenueWhiteCard({
   note = "Includes all property plans",
 }: RevenueWhiteCardProps) {
   return (
-    <div className=" md:min-h-[200px] min-h-full bg-white md:pl-[18px] pl-[9px]  pt-[23px] pb-[20px] pr-[52px] md:pr-[105px] rounded-[20px]">
-      <p className="bg-[#F8F8F8] rounded-[40px] py-1 md:py-2 px-[12px] md:px-[23px] font-[350] text-[#272727] md:text-sm  text-[10px] w-fit mb-[40px]">
+    <div className="md:min-h-[200px] min-h-full bg-white md:pl-[18px] pl-[9px] pt-[23px] pb-[20px] pr-[52px] md:pr-[105px] rounded-[20px] cursor-pointer relative">
+      <p className="bg-[#F8F8F8] rounded-[40px] py-1 md:py-2 px-[12px] md:px-[23px] font-[350] text-[#272727] md:text-sm text-[10px] w-fit mb-[40px]">
         {tag}
       </p>
-      <p className="max-w-[295px] truncate md:text-[30px] text-[15px] text-dark mb-[10px] font-[350]">
-        <span className="md:text-[20px] text-[10px] font-[325]">{currency}</span>
-        {amount}
-      </p>
+      
+      <div className="relative inline-block max-w-full group">
+        <p className="max-w-[295px] truncate md:text-[30px] text-[15px] text-dark mb-[10px] font-[350]">
+          <span className="md:text-[20px] text-[10px] font-[325]">{currency}</span>
+          {amount.toLocaleString()}
+        </p>
+        
+        {/* Tooltip that appears on hover */}
+        <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-50 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+          {currency}{amount.toLocaleString()}
+        </div>
+      </div>
+      
       <p className="font-[325] text-[#767676] md:text-sm text-[7px]">{note}</p>
     </div>
   );
 }
-
 interface MatrixCardGreenProps {
   title?: string;
-  value?: string;
+  value?: any;
   change?: string;
   currency?: boolean; // Add this prop
 }
