@@ -11,23 +11,23 @@ export interface ErrorResponse {
 export interface Transaction {
   id: number;
   property_id: number | null;
-  user_id: number;
+  user_id: number | null;
   plan_id: number | null;
   amount: number;
-  transaction_type: string;
-  created_at: string | null;
-  updated_at: string | null;
   status: number;
-  description: string | null;
+  description: string;
+  transaction_method: string;
+  created_at: string;
+  updated_at: string;
   marketer_id: number | null;
-  transaction_method: string | null;
-  is_payment: number;
   user: {
-    id: number;
     first_name: string;
     last_name: string;
-    email: string;
-  };
+  } | null;
+  marketer: {
+    first_name: string;
+    last_name: string;
+  } | null;
 }
 
 export interface TransactionsList {
@@ -50,15 +50,17 @@ export interface TransactionsList {
   total: number;
 }
 
+export interface TransactionsData {
+  total: number;
+  approved: number;
+  pending: number;
+  list: TransactionsList;
+}
+
 export interface TransactionsResponse {
   success: boolean;
   data: {
-    transactions: {
-      total: number;
-      approved: number;
-      pending: number;
-      list: TransactionsList;
-    };
+    transactions: TransactionsData;
   };
 }
 

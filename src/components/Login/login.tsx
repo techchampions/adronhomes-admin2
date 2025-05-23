@@ -7,10 +7,14 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../Redux/Login/login_thunk";
 import { AppDispatch, RootState } from "../Redux/store";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearError } from "../Redux/Login/login_slice";
 import { getUser } from "../Redux/User/user_Thunk";
+import ForgotPasswordModal from "../input/fogotPassword/ForgotPassword";
+import { PropertyContext } from "../../MyContext/MyContext";
+import { resetOtpPasswordState } from "../Redux/resetPassword/resetPassword_slice";
+import { resetOtpState } from "../Redux/resetPassword/sendOtp_slice";
 
 export default function Login() {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,6 +27,7 @@ export default function Login() {
     error: userError,
     user,
   } = useSelector((state: RootState) => state.user);
+  const { forgotPassword, setForgotPassword } = useContext(PropertyContext)!;
 
   const initialValues = {
     email: "",
@@ -61,7 +66,7 @@ export default function Login() {
 
   useEffect(() => {
     if (userError) {
-         navigate("/");
+      navigate("/");
       // toast.error(userError);
     }
 
@@ -76,10 +81,10 @@ export default function Login() {
   }, [userError, userSuccess, dispatch]);
 
   return (
-    <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6">
+    <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6 ">
       {/* <ToastContainer position="top-center" autoClose={5000} /> */}
 
-      <div className="bg-white w-full max-w-[841px] flex flex-col items-center rounded-[20px] md:rounded-[50px] px-6 sm:px-12 md:px-[233px] py-8 sm:py-12 md:py-[54px]">
+      <div className="bg-white w-full max-w-[841px] flex flex-col items-center rounded-[20px] md:rounded-[50px] px-6 sm:px-12 md:px-[233px] py-8 sm:py-12 md:py-[54px] relative">
         <div>
           <img
             src="/loginlogo.svg"
@@ -97,7 +102,7 @@ export default function Login() {
           onSubmit={onSubmit}
         >
           {({ isSubmitting }) => (
-            <div className="flex w-full">
+            <div className="flex w-full ">
               <Form className="w-full max-w-[374px]">
                 <div className="mb-4 sm:mb-6">
                   <FormField type="text" name="email" placeholder="Email" />
@@ -114,7 +119,12 @@ export default function Login() {
                     <IoCheckmarkCircle className="w-4 h-4" />
                     Remember me
                   </h1>
-                  <p className="text-[#FF4A1B] text-sm sm:text-base font-[400]">
+                  <p
+                    className="text-[#FF4A1B] text-sm sm:text-base font-[400]"
+                    onClick={() => {
+                      setForgotPassword(true);
+                    }}
+                  >
                     Forgot password?
                   </p>
                 </div>
@@ -131,7 +141,18 @@ export default function Login() {
             </div>
           )}
         </Formik>
+         <div className="absolute top-5 md:right-14 right-0 ">
+        <ForgotPasswordModal
+        isOpen={forgotPassword}
+        onClose={() => {
+          setForgotPassword(false);
+          dispatch(resetOtpPasswordState());
+          dispatch(resetOtpState());
+        }}
+      />
+    </div>
       </div>
+   
     </section>
   );
 }

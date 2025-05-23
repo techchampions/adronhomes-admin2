@@ -110,6 +110,8 @@ interface PropertyContextType {
 
   isUserBulk: boolean;
   setIsUserBulk: (showPersonnelModal: boolean) => void;
+  forgotPassword: boolean;
+  setForgotPassword: (forgotPassword: boolean) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(
@@ -127,7 +129,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [showBulkModal, setShowBulkModal] = useState<boolean>(false);
   const [showPersonnelModal, setPersonnelModal] = useState<boolean>(false);
   const [isUserBulk, setIsUserBulk] = useState<boolean>(false);
-
+  const [forgotPassword, setForgotPassword] = useState(false);
   const [isCancelState, setIsCancelState] = useState(false);
   const [formData, setFormData] = useState<PropertyFormData>({
     basicDetails: {
@@ -321,6 +323,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setPersonnelModal,
         isUserBulk,
         setIsUserBulk,
+        forgotPassword,
+         setForgotPassword
       }}
     >
       {children}

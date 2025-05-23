@@ -6,6 +6,8 @@ import dashboardReducer from '../Redux/dashboard/dashboard_slice'
 import customersReducer from '../Redux/customers/customers_slice'
 import transactionsReducer from '../Redux/Transactions/Transactions_slice'
 import paymentsReducer from '../Redux/Payment/payment_slice'
+import otpReducer from '../Redux/resetPassword/sendOtp_slice'
+import reserPasswordReducer from '../Redux/resetPassword/resetPassword_slice'
 
 
 export const store = configureStore({
@@ -15,7 +17,9 @@ export const store = configureStore({
     dashboardData:dashboardReducer,
     customers:customersReducer,
     transactions:transactionsReducer,
-    payments:paymentsReducer
+    payments:paymentsReducer,
+    sendOtp:otpReducer,
+    reserPassword:reserPasswordReducer,
   },
 });
 
