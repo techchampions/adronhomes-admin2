@@ -6,6 +6,7 @@ import CustomersTableComponent from "./customers_Table";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { customer } from "../../components/Redux/customers/customers_thunk";
+import LoadingAnimations from "../../components/LoadingAnimations";
 
 export default function Customers() {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,7 +19,7 @@ export default function Customers() {
   );
   const tabs = ["Registered Customers", "Active Plans"];
   return (
-    <div className="pb-[52px]">
+    <div className="pb-[52px] relative">
       <Header
         title="Customers"
         subtitle="Manage the list of registered customers"
@@ -37,9 +38,10 @@ export default function Customers() {
           change="Includes all active property plans"
         />
       </div>
-
-      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        {" "}
+      {loading ? (
+     <div className=" absolute top-96 left-96 right-96">   <LoadingAnimations loading={loading} /></div>
+      ) :
+     ( <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
           tabs={tabs}
           searchPlaceholder={"Search Customer"}
@@ -47,7 +49,7 @@ export default function Customers() {
         >
           <CustomersTableComponent data={customers} />
         </ReusableTable>
-      </div>
+      </div>)}
     </div>
   );
 }

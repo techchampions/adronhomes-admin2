@@ -71,10 +71,10 @@ export default function Login() {
     }
 
     if (userSuccess) {
-      if (user?.role === 0) {
+      if (user?.role === 1) {
         navigate("/dashboard");
       }
-      if (user?.role === 1) {
+      if (user?.role === 0) {
         navigate("/marketer");
       }
     }

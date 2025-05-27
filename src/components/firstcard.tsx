@@ -28,9 +28,13 @@ export const StatsCard: React.FC<StatsCardProps> = ({
         <div className="grid grid-cols-3 md:gap-[70px] gap-1">
           {stats.map((stat, index) => (
             <div key={index} className="relative group">
-              <p 
+              <p
                 className="font-gotham font-[350] md:text-[30px] tex-[15px] leading-[100%] text-dark tracking-[0%] text-center mb-[5px] truncate max-w-[100px] mx-auto"
-                title={typeof stat.value === 'string' ? stat.value : String(stat.value)}
+                title={
+                  typeof stat.value === "string"
+                    ? stat.value
+                    : String(stat.value)
+                }
               >
                 {stat.value.toLocaleString()}
               </p>
@@ -95,19 +99,22 @@ export function RevenueWhiteCard({
       <p className="bg-[#F8F8F8] rounded-[40px] py-1 md:py-2 px-[12px] md:px-[23px] font-[350] text-[#272727] md:text-sm text-[10px] w-fit mb-[40px]">
         {tag}
       </p>
-      
+
       <div className="relative inline-block max-w-full group">
         <p className="max-w-[295px] truncate md:text-[30px] text-[15px] text-dark mb-[10px] font-[350]">
-          <span className="md:text-[20px] text-[10px] font-[325]">{currency}</span>
+          <span className="md:text-[20px] text-[10px] font-[325]">
+            {currency}
+          </span>
           {amount.toLocaleString()}
         </p>
-        
+
         {/* Tooltip that appears on hover */}
         <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block z-50 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-          {currency}{amount.toLocaleString()}
+          {currency}
+          {amount.toLocaleString()}
         </div>
       </div>
-      
+
       <p className="font-[325] text-[#767676] md:text-sm text-[7px]">{note}</p>
     </div>
   );
@@ -126,14 +133,18 @@ export function MatrixCardGreen({
   currency = false, // Default to false
 }: MatrixCardGreenProps) {
   return (
-    <div className="bg-[#57713A]  h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px]">
+    <div className="bg-[#57713A]  h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px] relative">
       <div className="font-gotham md:text-[14px]   text-[10px] font-[350] leading-[100%] tracking-[0%] text-white mb-[16px]">
         <p>{title}</p>
       </div>
-      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] items-center text-white mb-[10px] flex">
+      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] items-center text-white mb-[10px] flex group cursor-pointer">
         {currency && <span className="md:text-[20px] text-[10px]">₦</span>}{" "}
         {/* Only show if currency is true */}
         <p className="max-w-[295px] pr-2 truncate">{value}</p>
+        <div className="absolute top-10 left-5 mb-2 hidden group-hover:block z-50 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+          {currency}
+          {value.toLocaleString()}
+        </div>
       </div>
       <div className="font-gotham md:text-[14px]  pr-2  text-[10px] font-[325] leading-[100%] tracking-[0%] text-white">
         <p>
@@ -160,14 +171,18 @@ export function MatrixCard({
   currency = false,
 }: MatrixCardGreenProps) {
   return (
-    <div className="bg-white  h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px]">
+    <div className="bg-white  h-full  py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px] relative">
       <div className=" md:text-[14px]  text-[10px] font-[350] leading-[100%] tracking-[0%] text-dark mb-[16px]">
         <p>{title}</p>
       </div>
-      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] items-center text-dark mb-[10px] flex">
+      <div className="font-gotham md:text-[30px]  text-[20px]  font-[350] items-center text-dark mb-[10px] flex group">
         {currency && <span className="md:text-[20px] text-[10px]">₦</span>}{" "}
         {/* Only show if currency is true */}
-        <p className="max-w-[295px] pr-2 truncate">{value}</p>
+        <p className="max-w-[295px] pr-2 truncate cursor-pointer">{value}</p>
+        <div className="absolute top-10 left-5 mb-2 hidden group-hover:block z-50 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+          {currency}
+          {value.toLocaleString()}
+        </div>
       </div>
       <div className="font-gotham md:text-[14px] pr-2   text-[10px] font-[325] leading-[100%] tracking-[0%] text-dark">
         <p>
@@ -180,15 +195,13 @@ export function MatrixCard({
 
 // marketergreencard
 
-
-
 interface MatrixCardGreensProps {
   name?: string;
   role?: string;
   date?: string;
   showSettings?: boolean;
-    iconSrc?: string;  
-  iconAlt?: string; 
+  iconSrc?: string;
+  iconAlt?: string;
 }
 
 export function GreenCardMarketer({
@@ -196,7 +209,7 @@ export function GreenCardMarketer({
   role = "Marketer",
   date = "Created 3.09.2025",
   showSettings = true,
-   iconSrc,     
+  iconSrc,
   iconAlt = "icon",
 }: MatrixCardGreensProps) {
   return (
@@ -204,27 +217,21 @@ export function GreenCardMarketer({
       <div className="font-gotham md:text-[24px] text-[20px] font-[350] leading-[100%] tracking-[0%] text-white mb-[18px]">
         <p>{name}</p>
       </div>
-       <div className="font-gotham font-[350] text-white mb-[20px] flex items-center gap-[4px]">
-        {iconSrc && (
-          <img 
-            src={iconSrc} 
-            alt={iconAlt} 
-            className="w-6 h-6" 
-          />
-        )}
+      <div className="font-gotham font-[350] text-white mb-[20px] flex items-center gap-[4px]">
+        {iconSrc && <img src={iconSrc} alt={iconAlt} className="w-6 h-6" />}
         <p className="truncate">{role}</p>
       </div>
-      
-   <div className="flex flex-row w-full justify-between">
-       <div className="font-gotham md:text-[14px] text-[10px] font-[325] leading-[100%] tracking-[0%] text-white ">
-        <p>{date}</p>
-      </div>
-      {showSettings && (
-        <div className="font-gotham md:text-[14px] text-[10px] font-[350] leading-[100%] tracking-[0%] text-white">
-          <p>Account Settings</p>
+
+      <div className="flex flex-row w-full justify-between">
+        <div className="font-gotham md:text-[14px] text-[10px] font-[325] leading-[100%] tracking-[0%] text-white ">
+          <p>{date}</p>
         </div>
-      )}
-   </div>
+        {showSettings && (
+          <div className="font-gotham md:text-[14px] text-[10px] font-[350] leading-[100%] tracking-[0%] text-white">
+            <p>Account Settings</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

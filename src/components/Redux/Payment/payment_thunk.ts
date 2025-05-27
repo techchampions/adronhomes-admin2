@@ -17,7 +17,7 @@ export interface PaymentData {
   amount_pending: number;
   list: {
     current_page: number;
-    data: any[]; // You might want to replace 'any' with a more specific type
+    data: any[];
     first_page_url: string;
     from: number | null;
     last_page: number;

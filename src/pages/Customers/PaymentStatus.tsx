@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import TransactionModal from "../../components/Modals/Transaction";
 
 // Define types
 type PaymentStatus = "Completed" | "Pending" | "Failed" | "Missed" | "Paid";
@@ -52,7 +51,7 @@ interface PaymentCardProps {
   index: number;
 }
 
-const ProductList: React.FC<PaymentCardProps> = ({
+const PaymentCard: React.FC<PaymentCardProps> = ({
   title,
   date,
   amount,
@@ -64,7 +63,7 @@ const ProductList: React.FC<PaymentCardProps> = ({
 
   return (
     <div
-      className={`grid grid-cols-4 gap-4 w-full px-6 py-4 rounded-[30px] ${bgColor} items-center overflow-auto min-w-[800px] md:min-w-0 ` }
+      className={`grid grid-cols-4 gap-4 w-full px-6 py-4 rounded-[30px] ${bgColor} items-center overflow- min-w-[800px]`}
     >
       <div className="min-w-0 col-span-1">
         <p className="text-base font-[325] text-dark truncate">{title}</p>
@@ -86,16 +85,19 @@ const ProductList: React.FC<PaymentCardProps> = ({
       <div className="flex justify-end col-span-1">
         {status === "Missed" ? (
           <button className="text-sm font-[400] text-white bg-[#272727] py-[11px] rounded-[30px] px-6 whitespace-nowrap">
-            Make as Paid
+            Mark as Paid
           </button>
         ) : null}
       </div>
-
     </div>
   );
 };
 
-const PaymentListComponent = () => {
+interface PaymentListComponentProps {
+  onClose: () => void;
+}
+
+const PaymentListComponent: React.FC<PaymentListComponentProps> = ({ onClose }) => {
   const [payments, setPayments] = useState<Payment[]>([
     {
       id: "1",
@@ -148,10 +150,29 @@ const PaymentListComponent = () => {
     },
   ]);
 
+  const handleMarkAsPaid = (id: string) => {
+    setPayments(payments.map(payment => 
+      payment.id === id ? {...payment, status: "Paid"} : payment
+    ));
+  };
+
   return (
-    <div className="space-y-[10px]">
+        <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+  <div className="space-y-[10px] bg-white rounded-[30px] px-4 sm:px-6 pb-[96px] max-w-full sm:max-w-[1000px] max-h-[90vh] sm:max-h-[700px]">
+    <div className="flex justify-between items-center pt-6 px-2 sm:px-10">
+      <p className="font-[350] text-[20px] text-dark">Payment List</p>
+      <button
+        onClick={onClose}
+        className="text-xl font-bold leading-none focus:outline-none"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
+
+    <div className="overflow-y-auto px-2 sm:px-6 pb-6 space-y-2 max-h-[calc(90vh-100px)]">
       {payments.map((payment, index) => (
-        <ProductList
+        <PaymentCard
           key={payment.id}
           index={index}
           title={payment.description}
@@ -160,8 +181,10 @@ const PaymentListComponent = () => {
           status={payment.status}
         />
       ))}
-      
     </div>
+  </div>
+</div>
+
   );
 };
 

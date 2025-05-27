@@ -44,7 +44,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
       {/* Header */}
       <div className='w-full flex  lg:flex-row items-start lg:items-center pb-[20px] lg:pb-[30px] justify-between gap-4 lg:gap-0 flex-col-reverse'>
         {/* Tabs */}
-        <div className='flex space-x-[10px] lg:space-x-[20px]  w-full lg:w-auto pb-2 lg:pb-0'>
+        <div className='flex space-x-[10px] lg:space-x-[20px]  pr-4 w-full lg:w-auto pb-2 lg:pb-0'>
           {tabs.map((tab) => (
             <button
               key={tab}

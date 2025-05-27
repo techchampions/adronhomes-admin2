@@ -1,5 +1,65 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PaymentData, payments, PaymentsResponse } from "./payment_thunk";
+import { payments, PaymentsResponse } from "./payment_thunk";
+
+// Define the nested interfaces first
+interface PaymentUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+interface PaymentItem {
+  id: number;
+  property_id: number | null;
+  user_id: number;
+  property_plan_id: number | null;
+  order_id: number | null;
+  amount_paid: number;
+  purpose: string;
+  payment_type: string;
+  status: number;
+  reference: string;
+  is_coupon: number;
+  created_at: string;
+  updated_at: string;
+  proof_of_payment: string | null;
+  user: PaymentUser;
+}
+
+interface PaymentList {
+  current_page: number;
+  data: PaymentItem[];
+  first_page_url: string;
+  from: number | null;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
+// The actual payment data structure from the API
+export interface PaymentData {
+  total: number;
+  approved: number;
+  pending: number;
+  amount_total: number;
+  amount_approved: number;
+  amount_pending: number;
+  list: PaymentList;
+}
+
+// The full API response structure
+
 
 interface PaymentsState {
   data: PaymentData | null;
@@ -8,8 +68,8 @@ interface PaymentsState {
   pagination: {
     currentPage: number;
     perPage: number;
-    total: number;
-    lastPage: number;
+    totalItems: number;
+    totalPages: number;
   };
 }
 
@@ -20,8 +80,8 @@ const initialState: PaymentsState = {
   pagination: {
     currentPage: 1,
     perPage: 50,
-    total: 0,
-    lastPage: 1,
+    totalItems: 0,
+    totalPages: 1,
   },
 };
 
@@ -32,46 +92,60 @@ const paymentsSlice = createSlice({
     setCurrentPage: (state, action: PayloadAction<number>) => {
       state.pagination.currentPage = action.payload;
     },
+      resetErrorMessage: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
     resetPayments: () => initialState,
   },
   extraReducers: (builder) => {
     builder
-      // Handle pending state
       .addCase(payments.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      // Handle fulfilled state
-      .addCase(payments.fulfilled, (state, action: PayloadAction<PaymentsResponse>) => {
-        state.loading = false;
-        state.data = action.payload.data.payments;
-        
-        // Update pagination from the response
-        if (action.payload.data.payments.list) {
+      .addCase(
+        payments.fulfilled,
+        (state, action: PayloadAction<PaymentsResponse>) => {
+          state.loading = false;
+          state.data = action.payload.data.payments;
+          
+          // Update pagination from the response
           state.pagination = {
             currentPage: action.payload.data.payments.list.current_page,
             perPage: action.payload.data.payments.list.per_page,
-            total: action.payload.data.payments.list.total,
-            lastPage: action.payload.data.payments.list.last_page,
+            totalItems: action.payload.data.payments.list.total,
+            totalPages: action.payload.data.payments.list.last_page,
           };
         }
-      })
-      // Handle rejected state
+      )
       .addCase(payments.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch payments";
+        state.error = action.error.message || "Failed to fetch payments";
       });
   },
 });
 
-// Export actions
-export const { setCurrentPage, resetPayments } = paymentsSlice.actions;
+export const { setCurrentPage, resetPayments,resetErrorMessage } = paymentsSlice.actions;
 
-// Export reducer
 export default paymentsSlice.reducer;
 
 // Selectors
-export const selectPaymentsData = (state: { payments: PaymentsState }) => state.payments.data;
-export const selectPaymentsLoading = (state: { payments: PaymentsState }) => state.payments.loading;
-export const selectPaymentsError = (state: { payments: PaymentsState }) => state.payments.error;
-export const selectPaymentsPagination = (state: { payments: PaymentsState }) => state.payments.pagination;
+export const selectPaymentsData = (state: { payments: PaymentsState }) =>
+  state.payments.data;
+export const selectPaymentsLoading = (state: { payments: PaymentsState }) =>
+  state.payments.loading;
+export const selectPaymentsError = (state: { payments: PaymentsState }) =>
+  state.payments.error;
+export const selectPaymentsPagination = (state: { payments: PaymentsState }) =>
+  state.payments.pagination;
+export const selectPaymentList = (state: { payments: PaymentsState }) =>
+  state.payments.data?.list.data || [];
+export const selectPaymentStats = (state: { payments: PaymentsState }) => ({
+  total: state.payments.data?.total || 0,
+  approved: state.payments.data?.approved || 0,
+  pending: state.payments.data?.pending || 0,
+  amount_total: state.payments.data?.amount_total || 0,
+  amount_approved: state.payments.data?.amount_approved || 0,
+  amount_pending: state.payments.data?.amount_pending || 0,
+});

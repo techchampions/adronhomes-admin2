@@ -31,6 +31,8 @@ import CustomersPayment from "./marketer/Payment/customers_payment";
 import CustomersSinglePayment from "./pages/Customers/customers_singlepayment";
 import General from "./pages/Properties/General";
 import { getUser } from "./components/Redux/User/user_Thunk";
+import PaymentListComponent from "./pages/Customers/PaymentStatus";
+import PaymentById from "./pages/Payment/paymentById";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -87,7 +89,8 @@ const App = () => {
               {/* Admin Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/customers" element={<Customers />} />
-              <Route path="/payments" element={<Payment />} />
+              <Route path="/payments" element={<Payment/>} />
+                    <Route path="/payments/status" element={<PaymentById />} />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/personnel" element={<Personnel />} />
