@@ -8,7 +8,9 @@ import transactionsReducer from '../Redux/Transactions/Transactions_slice'
 import paymentsReducer from '../Redux/Payment/payment_slice'
 import otpReducer from '../Redux/resetPassword/sendOtp_slice'
 import reserPasswordReducer from '../Redux/resetPassword/resetPassword_slice'
-
+import PaymentsStateReducer from '../Redux/Payment/paymentById_Slice'
+import paymentListReducer from '../Redux/Payment/fetchPaymentListById_slice'
+import updatePaymentReducer from '../Redux/Payment/updatePaymentStatus'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +22,9 @@ export const store = configureStore({
     payments:paymentsReducer,
     sendOtp:otpReducer,
     reserPassword:reserPasswordReducer,
+      paymentsById: PaymentsStateReducer,
+    paymentList: paymentListReducer,
+    updatePayment:updatePaymentReducer
   },
 });
 

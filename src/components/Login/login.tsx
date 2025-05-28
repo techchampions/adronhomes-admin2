@@ -48,14 +48,14 @@ export default function Login() {
     try {
       await dispatch(loginUser(values)).unwrap();
     } catch (err) {
-      // Error is already handled in the useEffect below
+    
     }
   };
 
   useEffect(() => {
     if (error) {
       toast.error(error);
-      dispatch(clearError()); // Clear error after displaying
+      dispatch(clearError()); 
     }
 
     if (success) {
@@ -66,8 +66,7 @@ export default function Login() {
 
   useEffect(() => {
     if (userError) {
-      navigate("/");
-      // toast.error(userError);
+      navigate("/");;
     }
 
     if (userSuccess) {

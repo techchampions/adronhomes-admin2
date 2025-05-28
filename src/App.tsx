@@ -38,14 +38,14 @@ const AuthGuard = () => {
   const token = Cookies.get("token");
 
   // const isAuthenticated = () => {
-    // if (!token) return false;
+  // if (!token) return false;
 
-    // try {
-    //   const payload = JSON.parse(atob(token.split(".")[1]));
-    //   return payload.exp * 1000 > Date.now();
-    // } catch (error) {
-    //   return false;
-    // }
+  // try {
+  //   const payload = JSON.parse(atob(token.split(".")[1]));
+  //   return payload.exp * 1000 > Date.now();
+  // } catch (error) {
+  //   return false;
+  // }
   // };
 
   if (!token) {
@@ -74,7 +74,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     </div>
   );
 };
- 
+
 const App = () => {
   return (
     <Provider store={store}>
@@ -89,19 +89,28 @@ const App = () => {
               {/* Admin Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/customers" element={<Customers />} />
-              <Route path="/payments" element={<Payment/>} />
-                    <Route path="/payments/status" element={<PaymentById />} />
+              <Route path="/payments" element={<Payment />} />
+              <Route path="/payments/status/:paymentId" element={<PaymentById />} />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/personnel" element={<Personnel />} />
-              <Route path="/requests-enquiries" element={<RequestsEnquiries />} />
+              <Route
+                path="/requests-enquiries"
+                element={<RequestsEnquiries />}
+              />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/customers/singlepage" element={<CustomerSinglePage />} />
-              <Route path="/customers/singlepage/payment" element={<CustomersPayment />} />
-              <Route 
-                path="/customers/singlepage/singlepayment" 
-                element={<CustomersSinglePayment />} 
+              <Route
+                path="/customers/singlepage"
+                element={<CustomerSinglePage />}
+              />
+              <Route
+                path="/customers/singlepage/payment"
+                element={<CustomersPayment />}
+              />
+              <Route
+                path="/customers/singlepage/singlepayment"
+                element={<CustomersSinglePayment />}
               />
               <Route path="/properties/form" element={<General />} />
 

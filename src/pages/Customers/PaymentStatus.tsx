@@ -1,4 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPaymentListById } from "../../components/Redux/Payment/payment_thunk";
+import { AppDispatch, RootState } from "../../components/Redux/store";
+import { clearPaymentList, selectPaymentListPagination, setPaymentListPage } from "../../components/Redux/Payment/fetchPaymentListById_slice";
+import Pagination from "../../components/Tables/Pagination";
+import NotFound from "../../components/NotFound";
 
 // Define types
 type PaymentStatus = "Completed" | "Pending" | "Failed" | "Missed" | "Paid";
@@ -11,7 +17,7 @@ interface Payment {
   status: PaymentStatus;
 }
 
-// Extend status styles to include 'Paid' (which we'll map to 'Completed')
+// Status styles
 const statusStyles: Record<
   PaymentStatus,
   { text: string; bg: string; border: string }
@@ -63,7 +69,7 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
 
   return (
     <div
-      className={`grid grid-cols-4 gap-4 w-full px-6 py-4 rounded-[30px] ${bgColor} items-center overflow- min-w-[800px]`}
+      className={`grid grid-cols-4 gap-4 w-full px-6 py-4 rounded-[30px] ${bgColor} items-center min-w-[800px]`}
     >
       <div className="min-w-0 col-span-1">
         <p className="text-base font-[325] text-dark truncate">{title}</p>
@@ -95,96 +101,105 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
 
 interface PaymentListComponentProps {
   onClose: () => void;
+  paymentId: number;
 }
 
-const PaymentListComponent: React.FC<PaymentListComponentProps> = ({ onClose }) => {
-  const [payments, setPayments] = useState<Payment[]>([
-    {
-      id: "1",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Paid",
-    },
-    {
-      id: "2",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Missed",
-    },
-    {
-      id: "3",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Paid",
-    },
-    {
-      id: "4",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Missed",
-    },
-    {
-      id: "5",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Paid",
-    },
-    {
-      id: "6",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Pending",
-    },
-    {
-      id: "7",
-      date: "Tuesday March 18th, 2024",
-      description: "Treasure Parks and Gardens Payment",
-      amount: "₦5,000,000",
-      status: "Pending",
-    },
-  ]);
+const PaymentListComponent: React.FC<PaymentListComponentProps> = ({ 
+  onClose,
+  paymentId 
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { data, loading, error } = useSelector(
+    (state: RootState) => state.paymentList
+  );
+  const pagination = useSelector(selectPaymentListPagination);
 
-  const handleMarkAsPaid = (id: string) => {
-    setPayments(payments.map(payment => 
-      payment.id === id ? {...payment, status: "Paid"} : payment
-    ));
+  useEffect(() => {
+    dispatch(fetchPaymentListById({ paymentId, currentPage: pagination.currentPage }));
+    
+    return () => {
+      dispatch(clearPaymentList());
+    };
+  }, [dispatch, paymentId, pagination.currentPage]);
+
+  const handlePageChange = (page: number) => {
+    dispatch(setPaymentListPage(page));
   };
 
+  // Transform API data to match your UI format
+  const transformedPayments: Payment[] = data.map(payment => ({
+    id: payment.id.toString(),
+    date: new Date(payment.created_at).toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }),
+    description: payment.description,
+    amount: `₦${payment.amount.toLocaleString()}`,
+    status: payment.status === 1 ? "Paid" : "Pending",
+  }));
+
+  if (loading) return (
+    <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-[30px] p-8">
+        <p>Loading payments...</p>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-[30px] p-8">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    </div>
+  );
+
   return (
-        <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-  <div className="space-y-[10px] bg-white rounded-[30px] px-4 sm:px-6 pb-[96px] max-w-full sm:max-w-[1000px] max-h-[90vh] sm:max-h-[700px]">
-    <div className="flex justify-between items-center pt-6 px-2 sm:px-10">
-      <p className="font-[350] text-[20px] text-dark">Payment List</p>
-      <button
-        onClick={onClose}
-        className="text-xl font-bold leading-none focus:outline-none"
-        aria-label="Close"
-      >
-        ×
-      </button>
-    </div>
+    <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="space-y-[10px] bg-white rounded-[30px] px-4 sm:px-6 pb-6 max-w-full sm:max-w-[1000px] max-h-[90vh] sm:max-h-[700px] overflow-hidden flex flex-col">
+        <div className="flex justify-between items-center pt-6 px-2 sm:px-10">
+          <p className="font-[350] text-[20px] text-dark">Payment List</p>
+          <button
+            onClick={onClose}
+            className="text-xl font-bold leading-none focus:outline-none"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
 
-    <div className="overflow-y-auto px-2 sm:px-6 pb-6 space-y-2 max-h-[calc(90vh-100px)]">
-      {payments.map((payment, index) => (
-        <PaymentCard
-          key={payment.id}
-          index={index}
-          title={payment.description}
-          date={payment.date}
-          amount={payment.amount}
-          status={payment.status}
-        />
-      ))}
-    </div>
-  </div>
-</div>
+        <div className="flex-1 overflow-y-auto px-2 sm:px-6 space-y-2">
+          {transformedPayments.length > 0 ? (
+            transformedPayments.map((payment, index) => (
+              <PaymentCard
+                key={payment.id}
+                index={index}
+                title={payment.description}
+                date={payment.date}
+                amount={payment.amount}
+                status={payment.status}
+              />
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <NotFound/>
+              <p>No payments found</p>
+            </div>
+          )}
+        </div>
 
+        {transformedPayments.length > 0 && (
+          <div className="pb-4 px-2 sm:px-6">
+            <Pagination 
+              pagination={pagination} 
+              onPageChange={handlePageChange} 
+            />
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
