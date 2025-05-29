@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 export default function PaymentTableComponent({ data }: { data: any }) {
-  const Navigate =useNavigate()
+  const Navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
@@ -46,7 +46,13 @@ export default function PaymentTableComponent({ data }: { data: any }) {
             </thead>
             <tbody>
               {data.map((payment: any) => (
-                <tr key={payment.id + payment.status} onClick={()=>Navigate(`/payments/status/${payment.id}`)} className="cursor-pointer">
+                <tr
+                  key={payment.id.replace(/^#/, "") + payment.status}
+                  onClick={() =>
+                    Navigate(`/payments/status/${payment.id.replace(/^#/, "")}`)
+                  }
+                  className="cursor-pointer"
+                >
                   <td className="py-4   pr-6 font-[325] text-dark text-sm w-[180px] max-w-[180px]">
                     <div className="truncate">{payment.id}</div>
                   </td>
