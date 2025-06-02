@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useImperativeHandle } from "react";
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Header from "../../../general/Header";
@@ -10,12 +10,12 @@ import { BasicDetailsHandles } from "../types/formRefs";
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((props, ref) => {
   const { formData, setBasicDetails } = useContext(PropertyContext)!;
-
+  const [initialLoad, setInitialLoad] = useState(true);
   const propertyTypeOptions = [
-    { value: "land", label: "Land" },
-    { value: "building", label: "Building" },
-    { value: "apartment", label: "Apartment" },
-    { value: "commercial", label: "Commercial" },
+    { value: "Land", label: "Land" },
+    { value: "Building", label: "Building" },
+    { value: "Apartment", label: "Apartment" },
+    { value: "Commercial", label: "Commercial" },
   ];
 
   const locationTypeOptions = [
@@ -46,21 +46,42 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((props, ref) => {
     locationType: Yup.string().required("Location type is required"),
     purpose: Yup.string().required("Purpose is required"),
   });
+  useEffect(() => {
+    if (formData.basicDetails) {
+      formik.setValues(formData.basicDetails);
+    }
+  }, [formData.basicDetails]);
 
   const formik = useFormik({
     initialValues: formData.basicDetails,
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails(values);
+  alert(JSON.stringify(values, null, 2)); 
     },
   });
 
-  useImperativeHandle(ref, () => ({
-    handleSubmit: () => {
+useImperativeHandle(ref, () => ({
+  handleSubmit: async () => {
+    const errors = await formik.validateForm();
+    const hasErrors = Object.keys(errors).length > 0;
+
+    if (hasErrors) {
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {} as { [field: string]: boolean }),
+        true
+      );
+      return false;
+    } else {
       formik.handleSubmit();
-    },
-    isValid: formik.isValid && Object.keys(formik.touched).length > 0
-  }));
+      return true;
+    }
+  },
+  isValid: formik.isValid 
+}));
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">

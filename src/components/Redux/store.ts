@@ -11,6 +11,10 @@ import reserPasswordReducer from '../Redux/resetPassword/resetPassword_slice'
 import PaymentsStateReducer from '../Redux/Payment/paymentById_Slice'
 import paymentListReducer from '../Redux/Payment/fetchPaymentListById_slice'
 import updatePaymentReducer from '../Redux/Payment/updatePaymentStatus'
+import PropertiesState from '../Redux/Properties/propertiesTable_slice'
+import addpropertyReducer from '../Redux/addProperty/addProperty_slice'
+import updatepropertyReducer from '../Redux/addProperty/UpdateProperties/update_slice'
+import DeletePropertyReducer from './addProperty/UpdateProperties/delete_slice';
 
 export const store = configureStore({
   reducer: {
@@ -24,7 +28,11 @@ export const store = configureStore({
     reserPassword:reserPasswordReducer,
       paymentsById: PaymentsStateReducer,
     paymentList: paymentListReducer,
-    updatePayment:updatePaymentReducer
+    updatePayment:updatePaymentReducer,
+    properties: PropertiesState,
+    addproperty:addpropertyReducer,
+    updateproperty:updatepropertyReducer,
+    DeleteProperty:DeletePropertyReducer
   },
 });
 

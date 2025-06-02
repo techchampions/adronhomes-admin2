@@ -3,7 +3,6 @@ import { BiX } from "react-icons/bi";
 import * as Yup from "yup";
 import { PropertyContext } from "../../../MyContext/MyContext";
 
-
 interface FeaturesInputHandles {
   handleSubmit: () => void;
   isValid: boolean;
@@ -13,22 +12,42 @@ interface FeaturesFormValues {
   features: string[];
 }
 
+const predefinedFeatures = [
+  "Gym",
+  "Swimming Pool",
+  "Drainage",
+  "Super Market",
+  "Street Light"
+];
+
 const FeaturesInput = forwardRef<FeaturesInputHandles>((props, ref) => {
   const { formData, setFeatures: setContextFeatures } = useContext(PropertyContext)!;
-  const [features, setLocalFeatures] = useState<string[]>(formData.features.features || []);
+  const [features, setLocalFeatures] = useState<string[]>([]);
   const [newFeature, setNewFeature] = useState("");
   const [touched, setTouched] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  // Initialize with context values on first load
+  useEffect(() => {
+    if (initialLoad && formData.features.features && formData.features.features.length > 0) {
+      setLocalFeatures(formData.features.features);
+      setTouched(true); // Mark as touched to show validation if empty
+      setInitialLoad(false);
+    }
+  }, [formData.features.features, initialLoad]);
+
+  // Sync with context whenever features change
+  useEffect(() => {
+    if (!initialLoad) {
+      setContextFeatures({ features });
+    }
+  }, [features, setContextFeatures, initialLoad]);
 
   const validationSchema = Yup.object().shape({
     features: Yup.array()
       .min(1, "At least one feature is required")
       .required("Features are required"),
   });
-
-  useEffect(() => {
-    // Sync with context when features change
-    setContextFeatures({ features });
-  }, [features, setContextFeatures]);
 
   const removeFeature = (featureToRemove: string) => {
     setTouched(true);
@@ -43,9 +62,19 @@ const FeaturesInput = forwardRef<FeaturesInputHandles>((props, ref) => {
     }
   };
 
+  const toggleFeature = (feature: string) => {
+    setTouched(true);
+    if (features.includes(feature)) {
+      removeFeature(feature);
+    } else {
+      setLocalFeatures([...features, feature]);
+    }
+  };
+
   const validate = async () => {
     try {
       await validationSchema.validate({ features });
+      alert(features)
       return true;
     } catch (error) {
       return false;
@@ -59,13 +88,35 @@ const FeaturesInput = forwardRef<FeaturesInputHandles>((props, ref) => {
         setContextFeatures({ features });
       }
     },
-    isValid: features.length > 0 && touched
+    isValid: features.length > 0 || (formData.features.features && formData.features.features.length > 0)
   }));
 
   return (
     <div className="mx-auto">
       <div className="mb-4">
-        <div className="flex flex-wrap gap-2 mb-60">
+        {/* Predefined features with checkboxes */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-3">Common Features</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {predefinedFeatures.map((feature) => (
+              <div key={feature} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`feature-${feature}`}
+                  checked={features.includes(feature)}
+                  onChange={() => toggleFeature(feature)}
+                  className="mr-2 h-4 w-4 rounded border-gray-300 accent-black"
+                />
+                <label htmlFor={`feature-${feature}`} className="text-sm text-gray-700">
+                  {feature}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Selected features display */}
+        <div className="flex flex-wrap gap-2 mb-4">
           {features.map((feature) => (
             <div
               key={feature}
@@ -83,7 +134,9 @@ const FeaturesInput = forwardRef<FeaturesInputHandles>((props, ref) => {
             </div>
           ))}
         </div>
-        <div className="flex">
+
+        {/* Custom feature input */}
+        <div className="flex items-center">
           <input
             type="text"
             value={newFeature}

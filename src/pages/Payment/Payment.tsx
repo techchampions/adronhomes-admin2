@@ -10,7 +10,7 @@ import { formatDate } from "../../utils/formatdate";
 import NotFound from "../../components/NotFound";
 import { toast } from "react-toastify";
 import LoadingAnimations from "../../components/LoadingAnimations";
-import { resetErrorMessage } from "../../components/Redux/Payment/payment_slice";
+import { resetErrorMessage, resetPayments } from "../../components/Redux/Payment/payment_slice";
 
 export default function Payment() {
   const dispatch = useDispatch<AppDispatch>();
@@ -27,8 +27,8 @@ export default function Payment() {
 
   useEffect(() => {
     if (error) {
-      toast.error(error);
       dispatch(resetErrorMessage());
+         dispatch(resetPayments())
     }
   }, [error, dispatch]);
 

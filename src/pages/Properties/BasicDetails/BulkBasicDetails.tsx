@@ -16,13 +16,12 @@ interface BulkBasicDetailsProps {}
 const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsProps>((props, ref) => {
   const { formData, setBulkDetails } = useContext(PropertyContext)!;
 
-  const propertyTypeOptions = [
-    { value: "land", label: "Land" },
-    { value: "building", label: "Building" },
-    { value: "apartment", label: "Apartment" },
-    { value: "commercial", label: "Commercial" },
+    const propertyTypeOptions = [
+    { value: "Land", label: "Land" },
+    { value: "Building", label: "Building" },
+    { value: "Apartment", label: "Apartment" },
+    { value: "Commercial", label: "Commercial" },
   ];
-
   const validationSchema = Yup.object().shape({
     propertyName: Yup.string().required("Property name is required"),
     propertyType: Yup.string().required("Property type is required"),
@@ -46,14 +45,27 @@ const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsPro
       setBulkDetails(values);
     },
   });
+useImperativeHandle(ref, () => ({
+  handleSubmit: async () => {
+    const errors = await formik.validateForm();
+    const hasErrors = Object.keys(errors).length > 0;
 
-  useImperativeHandle(ref, () => ({
-    handleSubmit: () => {
+    if (hasErrors) {
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {} as { [field: string]: boolean }),
+        true
+      );
+      return false;
+    } else {
       formik.handleSubmit();
-    },
-    isValid: formik.isValid && Object.keys(formik.touched).length > 0
-  }));
-
+      return true;
+    }
+  },
+  isValid: formik.isValid 
+}));
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
       <InputField

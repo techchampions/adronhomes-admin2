@@ -1,5 +1,9 @@
 import React from "react";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../../components/Tables/Pagination";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../../components/Redux/store";
+import { selectPropertiesagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
+import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
 
 export interface PropertyDataActivePlan {
   name: string;
@@ -19,6 +23,12 @@ interface PropertyTableProps {
 export default function PropertyTableComponentActivePlan({
   data,
 }: PropertyTableProps) {
+   const dispatch = useDispatch<AppDispatch>();
+  const handlePageChange = async (page: number) => {
+    await dispatch(setPropertiesPage(page));
+    await dispatch(fetchProperties());
+  };
+  const pagination = useSelector(selectPropertiesagination);
   return (
     <><div className="w-full overflow-x-auto">
       <div className="min-w-[800px] md:min-w-0"> 
@@ -107,8 +117,13 @@ export default function PropertyTableComponentActivePlan({
    </div>
        
        
-           </div><div className="w-full">
-               <Pagination />
+           </div>
+         <div className="w-full">
+        <Pagination
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          className="mt-8 mb-4"
+        />
              </div></>
   );
 }

@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useContext, useRef } from "react";
+import React, { forwardRef, useImperativeHandle, useContext, useRef, useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FileUpload from "../../../general/VirtualTourUpload";
@@ -17,6 +17,10 @@ interface MediaFormValues {
 
 const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
   const { formData, setMedia } = useContext(PropertyContext)!;
+  const [initialValues, setInitialValues] = useState<MediaFormValues>({
+    tourLink: '',
+    images: []
+  });
 
   const validationSchema = Yup.object().shape({
     images: Yup.array()
@@ -27,26 +31,49 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
 
   const formikRef = useRef<any>(null);
 
+  // Initialize form values from context
+  useEffect(() => {
+    if (formData.media) {
+      setInitialValues({
+        tourLink: formData.media.tourLink || '',
+        images: formData.media.images || []
+      });
+    }
+  }, [formData.media]);
+
   useImperativeHandle(ref, () => ({
     handleSubmit: () => {
       if (formikRef.current) {
+        // Manually touch all fields before submission
+        formikRef.current.setTouched({
+          tourLink: true,
+          images: true
+        });
         formikRef.current.handleSubmit();
       }
     },
     get isValid() {
-      return (
-        formikRef.current?.isValid &&
-        Object.keys(formikRef.current?.touched || {}).length > 0
-      );
+      if (!formikRef.current) return false;
+      
+      // Force validation before checking
+      formikRef.current.validateForm().then(() => {
+        formikRef.current?.setTouched({
+          tourLink: true,
+          images: true
+        });
+      });
+      
+      return formikRef.current.isValid;
     },
   }));
 
   return (
     <Formik
       innerRef={formikRef}
-      initialValues={formData.media as MediaFormValues}
+      initialValues={initialValues}
       validationSchema={validationSchema}
-      validateOnMount={true}
+      enableReinitialize={true}  // This allows the form to reinitialize when initialValues change
+      validateOnMount={false}   // We'll handle validation manually
       onSubmit={(values: MediaFormValues) => {
         setMedia(values);
       }}

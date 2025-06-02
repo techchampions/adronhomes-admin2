@@ -1,4 +1,4 @@
-import { useState, useContext, useRef, ChangeEvent } from "react";
+import { useState, useContext, useRef, ChangeEvent, useEffect } from "react";
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { FaCamera, FaCheck, FaPen, FaTag, FaTrash } from "react-icons/fa6";
 import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus } from "react-icons/fa";
@@ -19,7 +19,7 @@ interface EditingState {
 }
 
 export default function PropertyListing() {
-  const { formData, isBulk, setMedia } = useContext(PropertyContext)!;
+  const { formData, isBulk, isLandProperty, setMedia } = useContext(PropertyContext)!;
   const [activeImage, setActiveImage] = useState<number>(0);
   const [editing, setEditing] = useState<EditingState>({
     title: false,
@@ -43,14 +43,16 @@ export default function PropertyListing() {
     title: isBulk ? formData.bulkDetails.propertyName : formData.basicDetails.propertyName,
     location: isBulk ? formData.bulkDetails.address : formData.basicDetails.address,
     virtualTour: formData.media.tourLink,
-    squareMeters: formData.specifications.propertySize ? `${formData.specifications.propertySize} Sq M` : "",
+    squareMeters: isLandProperty ? 
+      formData.landForm.propertySize ? `${formData.landForm.propertySize} Sq M` : "" : 
+      formData.specifications.propertySize ? `${formData.specifications.propertySize} Sq M` : "",
     propertyUnits: isBulk ? formData.bulkDetails.propertyUnits : "1",
     propertyType: isBulk ? formData.bulkDetails.propertyType : formData.basicDetails.propertyType,
     price: isBulk ? 
       formData.bulkDetails.price ? `₦${Number(formData.bulkDetails.price).toLocaleString()}` : "" : 
       formData.basicDetails.price ? `₦${Number(formData.basicDetails.price).toLocaleString()}` : "",
-    overview: formData.specifications.overview,
-    description: formData.specifications.description,
+    overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
+    description: isLandProperty ? formData.landForm.description : formData.specifications.description,
     features: formData.features.features,
     address: isBulk ? formData.bulkDetails.address : formData.basicDetails.address,
     discount: {
@@ -65,31 +67,102 @@ export default function PropertyListing() {
   });
 
   const [tempData, setTempData] = useState({...propertyData});
-  
-  // Handle image upload
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newImages = [...formData.media.images, ...Array.from(e.target.files)];
-      setMedia({
-        ...formData.media,
-        images: newImages
-      });
-    }
-  };
-
-  // Handle image removal
-  const handleRemoveImage = (index: number) => {
-    const newImages = formData.media.images.filter((_, i) => i !== index);
-    setMedia({
-      ...formData.media,
-      images: newImages
+    const images = formData.media.images.map(file => 
+    file instanceof File ? URL.createObjectURL(file) : file
+  );
+  useEffect(() => {
+    setPropertyData({
+      title: isBulk ? formData.bulkDetails.propertyName : formData.basicDetails.propertyName,
+      location: isBulk ? formData.bulkDetails.address : formData.basicDetails.address,
+      virtualTour: formData.media.tourLink,
+      squareMeters: isLandProperty
+        ? formData.landForm.propertySize
+          ? `${formData.landForm.propertySize} Sq M`
+          : ""
+        : formData.specifications.propertySize
+          ? `${formData.specifications.propertySize} Sq M`
+          : "",
+      propertyUnits: isBulk ? formData.bulkDetails.propertyUnits : "1",
+      propertyType: isBulk ? formData.bulkDetails.propertyType : formData.basicDetails.propertyType,
+      price: isBulk
+        ? formData.bulkDetails.price
+          ? `₦${Number(formData.bulkDetails.price).toLocaleString()}`
+          : ""
+        : formData.basicDetails.price
+          ? `₦${Number(formData.basicDetails.price).toLocaleString()}`
+          : "",
+      overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
+      description: isLandProperty ? formData.landForm.description : formData.specifications.description,
+      features: formData.features.features,
+      address: isBulk ? formData.bulkDetails.address : formData.basicDetails.address,
+      discount: {
+        name: formData.discount.discountName,
+        off: formData.discount.discountOff,
+        units: formData.discount.unitsRequired,
+        from: formData.discount.validFrom,
+        to: formData.discount.validTo
+      },
+      city: isBulk ? formData.bulkDetails.city : "",
+      state: isBulk ? formData.bulkDetails.state : ""
     });
-  };
+
+    setTempData(prevTempData => ({
+      ...prevTempData,
+      ...propertyData
+    }));
+  }, [
+    isBulk,
+    isLandProperty,
+    formData.bulkDetails.propertyName,
+    formData.bulkDetails.address,
+    formData.bulkDetails.propertyUnits,
+    formData.bulkDetails.propertyType,
+    formData.bulkDetails.price,
+    formData.bulkDetails.city,
+    formData.bulkDetails.state,
+    formData.basicDetails.propertyName,
+    formData.basicDetails.address,
+    formData.basicDetails.propertyType,
+    formData.basicDetails.price,
+    formData.media.tourLink,
+    formData.media.images, // you might want to add this for images, if relevant
+    formData.landForm.propertySize,
+    formData.landForm.overview,
+    formData.landForm.description,
+    formData.specifications.propertySize,
+    formData.specifications.overview,
+    formData.specifications.description,
+    formData.features.features,
+    formData.discount.discountName,
+    formData.discount.discountOff,
+    formData.discount.unitsRequired,
+    formData.discount.validFrom,
+    formData.discount.validTo
+  ]);
+  // // Handle image upload
+  // const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     const newImages = [...formData.media.images, ...Array.from(e.target.files)];
+  //     setMedia({
+  //       ...formData.media,
+  //       images: newImages
+  //     });
+  //   }
+  // };
+
+  // // Handle image removal
+  // const handleRemoveImage = (index: number) => {
+  //   const newImages = formData.media.images.filter((_, i) => i !== index);
+  //   setMedia({
+  //     ...formData.media,
+  //     images: newImages
+  //   });
+  // };
 
   // Use actual images if available, otherwise use placeholders
-  const images = formData.media.images.length > 0 
-    ? formData.media.images.map(file => URL.createObjectURL(file))
-    : [];
+  // const images = formData.media.images.length > 0 
+  //   ? formData.media.images.map(file => URL.createObjectURL(file))
+  //   : [];
 
   const handleEdit = (field: keyof EditingState) => {
     setTempData({...propertyData});
@@ -114,11 +187,30 @@ export default function PropertyListing() {
     updatedFeatures[index] = value;
     setTempData({...tempData, features: updatedFeatures});
   };
+ // Handle image upload - update the context directly
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newImages = [...formData.media.images, ...Array.from(e.target.files)];
+      setMedia({
+        ...formData.media,
+        images: newImages
+      });
+    }
+  };
 
+  // Handle image removal
+  const handleRemoveImage = (index: number) => {
+    const newImages = formData.media.images.filter((_, i) => i !== index);
+    setMedia({
+      ...formData.media,
+      images: newImages
+    });
+  };
+
+  // For virtual tour, use the one from formData
+  const virtualTourLink = formData.media.tourLink;
   return (
     <div className="mx-auto bg-white rounded-[40px] p-6">
-      {/* Header and other sections remain the same... */}
-
       <div className="flex flex-col mb-4">
         <div className="flex justify-between items-center">
           {editing.title ? (
@@ -237,7 +329,7 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2 w-full">
               <input
                 type="text"
-                value={tempData.virtualTour}
+                value={virtualTourLink}
                 onChange={(e) => handleChange("virtualTour", e.target.value)}
                 className="w-full p-2 pr-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                 autoFocus
@@ -429,7 +521,7 @@ export default function PropertyListing() {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-600">{propertyData.overview}</p>
+          <p className="text-sm text-gray-600">{propertyData.overview || "No overview provided"}</p>
         )}
       </div>
 
@@ -466,7 +558,7 @@ export default function PropertyListing() {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-600">{propertyData.description}</p>
+          <p className="text-sm text-gray-600">{propertyData.description || "No description provided"}</p>
         )}
       </div>
 
@@ -519,7 +611,6 @@ export default function PropertyListing() {
         )}
       </div>
 
- 
       {/* Address */}
       <div>
         <div className="flex items-center mb-2">

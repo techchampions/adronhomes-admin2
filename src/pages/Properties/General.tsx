@@ -71,6 +71,7 @@ export default function General() {
           mediaRef.current.handleSubmit();
           canProceed = mediaRef.current.isValid;
         }
+        
         break;
       case 4:
         if (featuresRef.current) {
@@ -92,7 +93,7 @@ export default function General() {
         break;
       case 6:
         // Preview step - no validation needed
-        canProceed = true;
+        await submitForm();
         break;
       case 7:
         // Final submission

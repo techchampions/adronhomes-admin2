@@ -40,15 +40,31 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>((props,
     validationSchema,
     onSubmit: (values) => {
       setSpecifications(values);
+        alert(JSON.stringify(values, null, 2)); 
     },
   });
 
-  useImperativeHandle(ref, () => ({
-    handleSubmit: () => {
+useImperativeHandle(ref, () => ({
+  handleSubmit: async () => {
+    const errors = await formik.validateForm();
+    const hasErrors = Object.keys(errors).length > 0;
+
+    if (hasErrors) {
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {} as { [field: string]: boolean }),
+        true
+      );
+      return false;
+    } else {
       formik.handleSubmit();
-    },
-    isValid: formik.isValid && Object.keys(formik.touched).length > 0
-  }));
+      return true;
+    }
+  },
+  isValid: formik.isValid 
+}));
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">

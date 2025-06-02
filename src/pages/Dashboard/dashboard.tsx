@@ -10,6 +10,8 @@ import { getUser } from "../../components/Redux/User/user_Thunk";
 import { getDashboardData } from "../../components/Redux/dashboard/dashboard_thunk";
 import DashboardHeader from "../../general/DashboardHearder";
 import { capitalize } from "../../utils/formatname";
+import LoadingAnimations from "../../components/LoadingAnimations";
+import NotFound from "../../components/NotFound";
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -91,47 +93,50 @@ export default function Dashboard() {
     },
   ];
 
-  if (userLoading || dashLoading) {
-    return <div>Loading dashboard data...</div>;
-  }
 
   if (userError || dashError) {
-    return <div>Error loading dashboard data</div>;
-  }
+  return (
+    <div className="flex h-screen w-full justify-center items-center">
+      <div className="text-center">
+        <p className="font-normal text-[#767676]">No data found</p>
+        <NotFound />
+      </div>
+    </div>
+  );
+}
+
 
   return (
-    <div className="pb-[390px] overflow-x-hidden">
-      <DashboardHeader
-        title={`${capitalize(user?.first_name )|| "N/A"} ${capitalize(user?.last_name) || "N/A"}`}
-      />
-      <div className="space-y-[20px]">
-        <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-          <StatsCard stats={propstats} />
-          <StatsCard stats={Customerstats} tag="Customers" />
-        </div>
+    <div className="pb-[390px] overflow-x-hidden ">
+        {userLoading || dashLoading ? (
+   <div className="flex justify-center items-center h-screen">  <LoadingAnimations loading={userLoading || dashLoading} /></div>
+      ) :(
+      <><DashboardHeader
+            title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`} /><div className="space-y-[20px]">
+              <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+                <StatsCard stats={propstats} />
+                <StatsCard stats={Customerstats} tag="Customers" />
+              </div>
 
-        <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-          <StatsCard stats={Transactionstat} tag="Transactions" />
-          <StatsCard stats={PaymentsStat} tag="Payments" />
-        </div>
-        <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">
-          <RevenueCard
-       value2 ={`${dashdata?.revenue.percentage}%`}
-           />
-          <RevenueWhiteCard
-       tag="Total Payments Made"
-            amount={dashdata?.payments?.pending_amount?.toLocaleString() || "0"}
-            currency="₦"
-            note="Includes all property plans"
-          />
-          <RevenueWhiteCard
-            tag="Pending Payments"
-            amount={dashdata?.payments?.pending_amount?.toLocaleString() || "0"}
-            currency="₦"
-            note="from last 6 months"
-          />
-        </div>
-      </div>
+              <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+                <StatsCard stats={Transactionstat} tag="Transactions" />
+                <StatsCard stats={PaymentsStat} tag="Payments" />
+              </div>
+              <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">
+                <RevenueCard
+                  value2={`${dashdata?.revenue.percentage}%`} />
+                <RevenueWhiteCard
+                  tag="Total Payments Made"
+                  amount={dashdata?.payments?.pending_amount?.toLocaleString() || "0"}
+                  currency="₦"
+                  note="Includes all property plans" />
+                <RevenueWhiteCard
+                  tag="Pending Payments"
+                  amount={dashdata?.payments?.pending_amount?.toLocaleString() || "0"}
+                  currency="₦"
+                  note="from last 6 months" />
+              </div>
+            </div></>)}
       <div className="lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px] lg:pl-[38px]"></div>
     </div>
   );

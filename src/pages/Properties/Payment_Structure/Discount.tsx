@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useContext } from 'react';
+import React, { forwardRef, useImperativeHandle, useContext, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import OptionInputField from '../../../components/input/drop_down';
@@ -45,16 +45,41 @@ const Discount = forwardRef<DiscountHandles>((props, ref) => {
     validationSchema,
     onSubmit: (values) => {
       setDiscount(values);
+        alert(JSON.stringify(values, null, 2)); 
     },
   });
 
-  useImperativeHandle(ref, () => ({
-    handleSubmit: () => {
-      formik.handleSubmit();
-    },
-    isValid: formik.isValid && Object.keys(formik.touched).length > 0
-  }));
+  useEffect(() => {
+    if (formData.discount) {
+      formik.setValues(formData.discount);
+    }
+  }, [formData.discount]);
 
+
+    
+   useImperativeHandle(ref, () => ({
+     handleSubmit: async () => {
+       const errors = await formik.validateForm();
+       const hasErrors = Object.keys(errors).length > 0;
+   
+       if (hasErrors) {
+         formik.setTouched(
+           Object.keys(errors).reduce((acc, key) => {
+             acc[key] = true;
+             return acc;
+           }, {} as { [field: string]: boolean }),
+           true
+         );
+         return false;
+       } else {
+         formik.handleSubmit();
+         return true;
+       }
+     },
+     isValid: formik.isValid 
+   }));
+   
+ 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
       <div className="grid md:grid-cols-2 gap-12">
