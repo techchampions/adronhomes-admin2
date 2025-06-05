@@ -17,7 +17,7 @@ interface PropertyFormData {
   price: string; // "700000"
   type: string; // "1" (property type ID)
   no_of_bedroom: string; // "3"
-  features: string[]; // ["Gym", "247 Electricity", "Light", "Cinema", "Swimming Pool", "Resort"]
+  features: string[]; 
   
   // Description & Location
   overview: string; // "Welcome to Emirates Park and Gardens Phase 2,..."
@@ -47,7 +47,7 @@ interface PropertyFormData {
   discount_end_date: string; // ISO date string
   
   // Additional Details
-  parking_space: string; // (contains date string, might be incorrect)
+  parking_space: string;
   number_of_bathroom: string; // "3"
   number_of_unit: string; // "3"
   property_agreement: File[]; // Contract files

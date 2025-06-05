@@ -1,9 +1,16 @@
-import React, { forwardRef, useImperativeHandle, useContext, useEffect } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import OptionInputField from "../../../components/input/drop_down";
 import InputField from "../../../components/input/inputtext";
 import { PropertyContext } from "../../../MyContext/MyContext";
+import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
 
 interface PaymentStructureHandles {
   handleSubmit: () => void;
@@ -18,7 +25,8 @@ interface PaymentStructureFormValues {
 }
 
 const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
-  const { formData, setPaymentStructure,} = useContext(PropertyContext)!;
+  const { formData, setPaymentStructure } = useContext(PropertyContext)!;
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const paymentTypeOptions = [
     { value: "installment", label: "Installment" },
@@ -49,19 +57,18 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
   //   validationSchema,
   //   onSubmit: (values) => {
   //     setPaymentStructure(values);
-  //     console.log("Submitted values:", values); 
+  //     console.log("Submitted values:", values);
   //   },
   // });
 
-    const formik = useFormik({
-      initialValues: formData.paymentStructure,
-      validationSchema,
-      onSubmit: (values) => {
-        setPaymentStructure(values);
-    alert(JSON.stringify(values, null, 2)); 
-
-      },
-    });
+  const formik = useFormik({
+    initialValues: formData.paymentStructure,
+    validationSchema,
+    onSubmit: (values) => {
+      setPaymentStructure(values);
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
 
   useEffect(() => {
     if (formData.paymentStructure) {
@@ -69,39 +76,38 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
     }
   }, [formData.paymentStructure]);
 
- useImperativeHandle(ref, () => ({
-   handleSubmit: async () => {
-     const errors = await formik.validateForm();
-     const hasErrors = Object.keys(errors).length > 0;
- 
-     if (hasErrors) {
-       formik.setTouched(
-         Object.keys(errors).reduce((acc, key) => {
-           acc[key] = true;
-           return acc;
-         }, {} as { [field: string]: boolean }),
-         true
-       );
-       return false;
-     } else {
-       formik.handleSubmit();
-       return true;
-     }
-   },
-   isValid: formik.isValid 
- }));
- 
+  useImperativeHandle(ref, () => ({
+    handleSubmit: async () => {
+      const errors = await formik.validateForm();
+      const hasErrors = Object.keys(errors).length > 0;
+
+      if (hasErrors) {
+        formik.setTouched(
+          Object.keys(errors).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+          }, {} as { [field: string]: boolean }),
+          true
+        );
+        return false;
+      } else {
+        formik.handleSubmit();
+        return true;
+      }
+    },
+    isValid: formik.isValid,
+  }));
 
   const handleScheduleChange = (value: string) => {
     const currentSchedules = [...formik.values.paymentSchedule];
     const index = currentSchedules.indexOf(value);
-    
+
     if (index === -1) {
       currentSchedules.push(value);
     } else {
       currentSchedules.splice(index, 1);
     }
-    
+
     formik.setFieldValue("paymentSchedule", currentSchedules);
   };
 
@@ -128,7 +134,14 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
           placeholder="Enter Payment Duration Limit"
           name="paymentDuration"
           value={formik.values.paymentDuration}
-          onChange={formik.handleChange}
+          onChange={(e) => {
+            let newValue = e.target.value.replace(/,/g, "");
+            if (/^\d*$/.test(newValue)) {
+              {
+                formik.setFieldValue("paymentDuration", newValue);
+              }
+            }
+          }}
           error={
             formik.touched.paymentDuration && formik.errors.paymentDuration
               ? formik.errors.paymentDuration
@@ -168,13 +181,26 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
           )}
         </div>
 
-        <InputField
-          label="Fees & Charges"
-          placeholder="Enter Fees & Charges"
-          name="feesCharges"
-          value={formik.values.feesCharges}
-          onChange={formik.handleChange}
-        />
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsModalOpen(true);
+            }}
+            className="w-full py-3 px-4 bg-[#79B833] text-white rounded-[80px] font-medium max-w-xl"
+          >
+            Add Infrastructure Fees
+          </button>
+
+          <InfrastructureFeesModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </div>
       </div>
     </form>
   );

@@ -32,7 +32,7 @@ export default function Customers_singlepayment() {
         Payment List
         </p>
         <div className="w-full overflow-x-auto">
-          <ProductList />
+          {/* <ProductList /> */}
         </div>
       </div>
     </div>

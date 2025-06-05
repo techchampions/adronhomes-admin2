@@ -6,7 +6,7 @@ interface FileUploadFieldProps {
   placeholder: string;
   onChange: (files: FileList | null) => void;
   required?: boolean;
-  error?: string | string[];
+  error?: any
   disabled?: boolean;
   accept?: string;
   multiple?: boolean;

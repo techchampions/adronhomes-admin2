@@ -7,7 +7,6 @@ export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
 }
-
 export interface Property {
   id: number;
   name: string;
@@ -16,15 +15,15 @@ export interface Property {
   size: string;
   price: number;
   type: number;
-  no_of_bedroom: number;
+  no_of_bedroom: number | null;
   slug: string;
-  features: string[];
+  features: string[] | string; // Can be array or stringified array
   overview: string;
   description: string;
   street_address: string;
-  country: string;
-  state: string;
-  lga: string;
+  country: string | null;
+  state: string | null;
+  lga: string | null;
   created_at: string | null;
   updated_at: string | null;
   area: string | null;
@@ -37,13 +36,32 @@ export interface Property {
   is_sold: number;
   is_active: number;
   property_duration_limit: number;
-  payment_schedule: any | null;
+  payment_schedule: string[] | string | null; // Can be array or stringified array
+  category: string;
+  is_discount: boolean;
+  discount_name: string | null;
+  discount_percentage: number | null;
+  discount_units: number | null;
+  discount_start_date: string | null;
+  discount_end_date: string | null;
+  parking_space: string | null;
+  number_of_bathroom: number | null;
+  number_of_unit: number | null;
+  property_agreement: string | null;
+  payment_type: string | null;
+  location_type: string | null;
+  purpose: string | null;
+  year_built: string | null;
   total_amount: number;
 }
 
 export interface PropertiesResponse {
   status: string;
   message: string;
+  total_properties: number;
+  live_properties: number;
+  active_plans: number;
+  total_sold: number;
   data: {
     current_page: number;
     data: Property[];
@@ -64,7 +82,7 @@ export interface PropertiesResponse {
     total: number;
   };
 }
-// types/propertiesState.ts
+
 export interface PropertiesState {
   data: Property[];
   loading: boolean;
@@ -74,6 +92,12 @@ export interface PropertiesState {
     perPage: number;
     totalItems: number;
     totalPages: number;
+  };
+  stats: {
+    totalProperties: number;
+    liveProperties: number;
+    activePlans: number;
+    totalSold: number;
   };
 }
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

@@ -9,11 +9,19 @@ import {
   createProperty,
   resetPropertyState,
 } from "../components/Redux/addProperty/addProperty_slice";
+import { add_property_detail } from "../components/Redux/addProperty/addFees/addFees_thunk";
 
+
+interface Fee {
+  id: number;
+  name: string;
+  amount: string;
+  checked: boolean;
+}
 // Define the form data types
 interface BasicDetailsFormValues {
   propertyName: string;
-  propertyType: string;
+  propertyType: any;
   price: string;
   initialDeposit: string;
   address: string;
@@ -23,12 +31,13 @@ interface BasicDetailsFormValues {
 
 interface BulkDetailsFormValues {
   propertyName: string;
-  propertyType: string;
+  propertyType: any;
   propertyUnits: string;
   price: string;
   address: string;
   city: string;
   state: string;
+    initialDeposit: string;
 }
 
 interface PropertySpecificationsFormValues {
@@ -42,9 +51,11 @@ interface PropertySpecificationsFormValues {
   description: string;
   overview: string;
   documents: File[];
+   director_id:any
 }
 
 interface LandFormValues {
+  director_id:any
   plotShape: string;
   topography: string;
   propertySize: string;
@@ -122,6 +133,10 @@ interface PropertyContextType {
   forgotPassword: boolean;
   setForgotPassword: (forgotPassword: boolean) => void;
   loading: boolean;
+  fees:Fee[],
+   setFees: any,
+   isInfrastructure:boolean;
+   setIsCancelInfrastructure:(isInfrastructure: boolean) => void;
   
 }
 
@@ -146,6 +161,12 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [isUserBulk, setIsUserBulk] = useState<boolean>(false);
   const [forgotPassword, setForgotPassword] = useState(false);
   const [isCancelState, setIsCancelState] = useState(false);
+    const [isInfrastructure, setIsCancelInfrastructure] = useState(false);
+
+      const [fees, setFees] = useState<Fee[]>([
+    { id: 1, name: "Building Charge", amount: "₦16,000,000", checked: true },
+    { id: 2, name: "Service charge", amount: "₦2,000,000", checked: true },
+  ]);
 
   const [formData, setFormData] = useState<PropertyFormData>({
     basicDetails: {
@@ -165,8 +186,10 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       address: "",
       city: "",
       state: "",
+            initialDeposit: "",
     },
     specifications: {
+       director_id:"",
       bedrooms: "",
       bathrooms: "",
       propertySize: "",
@@ -179,6 +202,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       documents: [],
     },
     landForm: {
+        director_id:"",
       plotShape: "",
       topography: "",
       propertySize: "",
@@ -227,7 +251,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   }, [success, error, dispatch]);
 
   const setBasicDetails = (data: BasicDetailsFormValues) => {
-    const isLand = data.propertyType.toLowerCase() === "land";
+    const isLand = data.propertyType === 1;
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -237,7 +261,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   const setBulkDetails = (data: BulkDetailsFormValues) => {
-    const isLand = data.propertyType.toLowerCase() === "land";
+    const isLand = data.propertyType=== 1;
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -250,7 +274,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     const propertyType = isBulk
       ? formData.bulkDetails.propertyType
       : formData.basicDetails.propertyType;
-    const isLand = propertyType.toLowerCase() === "land";
+    const isLand = propertyType === 1;
     if (isLandProperty !== isLand) {
       setIsLandProperty(isLand);
     }
@@ -302,7 +326,6 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       paymentStructure: data,
     }));
   };
-
 const submitForm = async () => {
   try {
     const {
@@ -320,11 +343,8 @@ const submitForm = async () => {
 
     const formPayload = new FormData();
 
-    console.log("Building form payload...");
-
     // Basic or Bulk
     if (isBulk) {
-      console.log("Adding bulk details:", bulkDetails);
       formPayload.append("name", bulkDetails.propertyName);
       formPayload.append("type", bulkDetails.propertyType);
       formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
@@ -333,8 +353,8 @@ const submitForm = async () => {
       formPayload.append("city", bulkDetails.city || "");
       formPayload.append("state", bulkDetails.state || "");
       formPayload.append("category", "bulk");
+      formPayload.append("initial_deposit", basicDetails.initialDeposit || "0");
     } else {
-      console.log("Adding basic details:", basicDetails);
       formPayload.append("name", basicDetails.propertyName);
       formPayload.append("type", basicDetails.propertyType);
       formPayload.append("price", basicDetails.price);
@@ -347,17 +367,17 @@ const submitForm = async () => {
 
     // Specifications
     if (isLandProperty) {
-      console.log("Adding land specifications:", landForm);
       formPayload.append("size", landForm.propertySize);
-      formPayload.append("plot_shape", landForm.plotShape || "");
+      formPayload.append("shape", landForm.plotShape || "");
       formPayload.append("topography", landForm.topography || "");
       formPayload.append("road_access", landForm.roadAccess || "");
       formPayload.append("title_document_type", landForm.titleDocumentType || "");
       formPayload.append("overview", landForm.overview);
       formPayload.append("description", landForm.description);
       formPayload.append("units_available", landForm.unitsAvailable || "1");
+         formPayload.append("director_id", landForm.director_id || "1");
+
     } else {
-      console.log("Adding property specifications:", specifications);
       formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
       formPayload.append("number_of_bathroom", specifications.bathrooms || "0");
       formPayload.append("size", specifications.propertySize);
@@ -366,20 +386,17 @@ const submitForm = async () => {
       formPayload.append("description", specifications.description);
       formPayload.append("year_built", specifications.yearBuilt || "");
       formPayload.append("units_available", specifications.unitsAvailable || "1");
+         formPayload.append("director_id", specifications.director_id || "1");
     }
 
     // Features
-    console.log("Adding features:", features);
     if (Array.isArray(features.features)) {
       features.features.forEach((feature, index) => {
         formPayload.append(`features[${index}]`, feature);
       });
-    } else {
-      console.warn("features.features is not an array:", features.features);
     }
 
     // Media
-    console.log("Adding media:", media);
     if (Array.isArray(media.images)) {
       media.images.forEach((image, index) => {
         if (image instanceof File) {
@@ -387,12 +404,8 @@ const submitForm = async () => {
           if (index === 0) {
             formPayload.append("display_image", image);
           }
-        } else {
-          console.warn(`Image at index ${index} is not a File object`, image);
         }
       });
-    } else {
-      console.warn("media.images is not an array:", media.images);
     }
 
     if (media.tourLink) {
@@ -400,22 +413,18 @@ const submitForm = async () => {
     }
 
     // Payment Structure
-    console.log("Adding payment structure:", paymentStructure);
-    formPayload.append("type", paymentStructure.paymentType);
+    formPayload.append("payment_type", paymentStructure.paymentType);
     formPayload.append("property_duration_limit", paymentStructure.paymentDuration);
 
     if (Array.isArray(paymentStructure.paymentSchedule)) {
       paymentStructure.paymentSchedule.forEach((schedule, index) => {
         formPayload.append(`payment_schedule[${index}]`, schedule);
       });
-    } else {
-      console.warn("paymentSchedule is not an array:", paymentStructure.paymentSchedule);
     }
 
     formPayload.append("fees_charges", paymentStructure.feesCharges);
 
     // Discount
-    console.log("Adding discount:", discount);
     if (discount.discountName) {
       formPayload.append("is_discount", "1");
       formPayload.append("discount_name", discount.discountName);
@@ -429,49 +438,73 @@ const submitForm = async () => {
 
     // Documents
     const docs = isLandProperty ? landForm.documents : specifications.documents;
-    console.log("Adding documents:", docs);
-
     if (Array.isArray(docs)) {
       docs.forEach((doc, index) => {
         if (doc instanceof File) {
           formPayload.append(`property_agreement[${index}]`, doc);
-        } else {
-          console.warn(`Document at index ${index} is not a File object`, doc);
         }
       });
-    } else {
-      console.warn("docs is not an array:", docs);
     }
 
     // Status fields
     formPayload.append("is_active", "1");
     formPayload.append("status", "available");
 
-    // Final log
-    console.log("Final FormData contents:");
-    for (let [key, value] of formPayload.entries()) {
-      console.log(key, value);
+    // Dispatch property creation
+    const result = await dispatch(createProperty({ credentials: formPayload })).unwrap();
+    
+    toast.success("Property created successfully!");
+
+    // Process fees after successful property creation
+    const createdPropertyId = result.data.property.id || 0;
+    
+    if (createdPropertyId) {
+      const feePromises = fees
+        .filter(fee => fee.checked)
+        .map(fee => ({
+          property_id: createdPropertyId.toString(),
+          name: fee.name,
+          value: fee.amount.replace(/[^\d.]/g, '') 
+        }))
+        .map(feeDetail => 
+          dispatch(add_property_detail({ credentials: feeDetail }))
+            .then(result => {
+              console.log(`Successfully added fee: ${feeDetail.name}`);
+              return result;
+            })
+            .catch(error => {
+              console.error(`Failed to add fee ${feeDetail.name}:`, error);
+              toast.error(`Failed to add fee ${feeDetail.name}`);
+              throw error;
+            }));
+
+      // Wait for all fee submissions to complete
+      const feeResults = await Promise.allSettled(feePromises);
+      
+      const successfulFees = feeResults.filter(r => r.status === 'fulfilled').length;
+      const failedFees = feeResults.filter(r => r.status === 'rejected').length;
+
+      if (failedFees === 0) {
+        toast.success("All fees added successfully!");
+      } else {
+        toast.warning(`Property created but ${failedFees} fee(s) failed to add`);
+      }
+
+      // Reset form or navigate if needed
+      dispatch(resetPropertyState());
+      setCurrentStep(1);
+    } else {
+      toast.error("Property created but couldn't add fees - missing property ID");
     }
 
-    // Dispatch
-    console.log("Dispatching createProperty action...");
-    await dispatch(createProperty({ credentials: formPayload })).unwrap();
-  alert(JSON.stringify(formPayload, null, 2)); 
-    toast.success("Property created successfully!");
-    console.log("Property creation successful");
   } catch (error: any) {
     console.error("Error submitting form:", error);
 
     if (error.response) {
-      console.error("Response data:", error.response.data);
-      console.error("Response status:", error.response.status);
-      console.error("Response headers:", error.response.headers);
       toast.error(`Server error: ${error.response.data.message || error.response.statusText}`);
     } else if (error.request) {
-      console.error("No response received:", error.request);
       toast.error("No response from server. Please check your network connection.");
     } else {
-      console.error("Request setup error:", error.message);
       toast.error(`Request error: ${error.message}`);
     }
   }
@@ -481,6 +514,10 @@ const submitForm = async () => {
   return (
     <PropertyContext.Provider
       value={{
+        isInfrastructure,
+        setIsCancelInfrastructure,
+        fees,
+        setFees,
         isCancelState,
         setIsCancelState,
         formData,

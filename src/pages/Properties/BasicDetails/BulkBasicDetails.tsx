@@ -16,12 +16,13 @@ interface BulkBasicDetailsProps {}
 const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsProps>((props, ref) => {
   const { formData, setBulkDetails } = useContext(PropertyContext)!;
 
-    const propertyTypeOptions = [
-    { value: "Land", label: "Land" },
-    { value: "Building", label: "Building" },
-    { value: "Apartment", label: "Apartment" },
-    { value: "Commercial", label: "Commercial" },
+     const propertyTypeOptions = [
+    { value: 1, label: "Land" },
+    { value: 2, label: "Residential" },
+    { value: 3, label: "Industrial" },
+    { value: 4, label: "Commercial" },
   ];
+
   const validationSchema = Yup.object().shape({
     propertyName: Yup.string().required("Property name is required"),
     propertyType: Yup.string().required("Property type is required"),
@@ -36,6 +37,10 @@ const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsPro
     address: Yup.string().required("Address is required"),
     city: Yup.string().required("City is required"),
     state: Yup.string().required("State is required"),
+      initialDeposit: Yup.number()
+          .typeError("Initial deposit must be a number")
+          .positive("Initial deposit must be positive")
+          .required("Initial deposit is required"),
   });
 
   const formik = useFormik({
@@ -102,8 +107,37 @@ useImperativeHandle(ref, () => ({
         placeholder="Enter price per unit"
         name="price"
         value={formik.values.price}
-        onChange={formik.handleChange}
+        // onChange={formik.handleChange}
         error={formik.touched.price && formik.errors.price}
+        
+        onChange={(e) => {
+                  let newValue = e.target.value.replace(/,/g, "");
+                  if (/^\d*$/.test(newValue)) {
+                    {
+                      formik.setFieldValue("price", newValue);
+                    }
+                  }
+                }}
+      />
+      <InputField
+        label="Initial Deposit"
+        placeholder="Enter initial deposit"
+        name="initialDeposit"
+        value={formik.values.initialDeposit}
+         
+        onChange={(e) => {
+                  let newValue = e.target.value.replace(/,/g, "");
+                  if (/^\d*$/.test(newValue)) {
+                    {
+                      formik.setFieldValue("initialDeposit", newValue);
+                    }
+                  }
+                }}
+        error={
+          formik.touched.initialDeposit && formik.errors.initialDeposit
+            ? formik.errors.initialDeposit
+            : undefined
+        }
       />
 
       <InputField

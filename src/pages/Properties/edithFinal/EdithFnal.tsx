@@ -2,6 +2,7 @@ import { useState, useContext, useRef, ChangeEvent, useEffect } from "react";
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { FaCamera, FaCheck, FaPen, FaTag, FaTrash } from "react-icons/fa6";
 import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus } from "react-icons/fa";
+import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
 
 interface EditingState {
   title: boolean;
@@ -19,7 +20,9 @@ interface EditingState {
 }
 
 export default function PropertyListing() {
-  const { formData, isBulk, isLandProperty, setMedia } = useContext(PropertyContext)!;
+   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { formData, isBulk, isLandProperty, setMedia,isInfrastructure, setIsCancelInfrastructure
+   } = useContext(PropertyContext)!;
   const [activeImage, setActiveImage] = useState<number>(0);
   const [editing, setEditing] = useState<EditingState>({
     title: false,
@@ -487,6 +490,18 @@ export default function PropertyListing() {
           )}
         </div>
       </div>
+          {/* Infrastructure Fees  */}
+      <div className="mb-6">
+        <div className="flex flex-col  justify-between mb-2">
+          <h2 className="text-lg font-semibold">Infrastructure Fees</h2>
+          <button 
+            className="text-sm flex items-center gap-1 py-2  px-4 w-fit rounded-4xl bg-gray-100"
+          onClick={() => setIsModalOpen(true)}
+          >
+          Add Fees
+          </button>
+        </div>
+      </div>
 
       {/* Overview */}
       <div className="mb-6">
@@ -752,6 +767,10 @@ export default function PropertyListing() {
           </div>
         )}
       </div>
+      <InfrastructureFeesModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

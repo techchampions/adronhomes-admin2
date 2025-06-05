@@ -114,10 +114,10 @@ export default function Login() {
                   />
                 </div>
                 <div className="flex justify-between mt-3 sm:mt-4 cursor-pointer">
-                  <h1 className="text-[#79B833] flex gap-1 items-center text-sm sm:text-[16px] font-[400]">
+                  {/* <h1 className="text-[#79B833] flex gap-1 items-center text-sm sm:text-[16px] font-[400]">
                     <IoCheckmarkCircle className="w-4 h-4" />
                     Remember me
-                  </h1>
+                  </h1> */}
                   <p
                     className="text-[#FF4A1B] text-sm sm:text-base font-[400]"
                     onClick={() => {

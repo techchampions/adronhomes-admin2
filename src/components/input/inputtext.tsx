@@ -40,6 +40,7 @@ const InputField: React.FC<InputFieldProps> = ({
         } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         placeholder={placeholder}
         required={required}
+        
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>

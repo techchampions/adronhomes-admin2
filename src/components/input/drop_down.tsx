@@ -3,7 +3,7 @@ import { ChangeEvent } from "react";
 import { IoCaretDown } from "react-icons/io5";
 
 interface DropdownOption {
-  value: string;
+  value: any;
   label: string;
 }
 

@@ -18,7 +18,7 @@ interface PropertyFormData {
   photos: File[];
   size: string;
   price: string;
-  type: string;
+  type: number;
   no_of_bedroom: string;
   features: string[];
   overview: string;
@@ -57,11 +57,44 @@ interface PropertyFormData {
 
 export interface AddPropertySuccessResponse {
   status: "success";
-  success: true;
-  propertyId: string;
-  message?: string;
+  message: string;
+  data: {
+    property: {
+      name: string;
+      display_image: string;
+      size: string;
+      price: string;
+      is_active: string;
+      type: {
+        id: number;
+        name: string;
+        created_at: string | null;
+        updated_at: string | null;
+      };
+      features: string;
+      overview: string;
+      description: string;
+      street_address: string;
+      virtual_tour: string;
+      initial_deposit: string;
+      property_duration_limit: string;
+      payment_schedule: string;
+      category: string;
+      status: string;
+      is_discount: boolean;
+      location_type: string;
+      purpose: string;
+      payment_type: string;
+      photos: string[];
+      slug: string;
+      is_sold: number;
+      updated_at: string;
+      created_at: string;
+      id: number;
+      total_amount: number;
+    };
+  };
 }
-
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
@@ -135,9 +168,8 @@ interface PropertyState {
   success: boolean;
   error: string | null;
   validationErrors: Record<string, string[]> | null;
-  propertyId: string | null;
+  propertyId: any | null;
 }
-
 const initialState: PropertyState = {
   loading: false,
   success: false,
@@ -170,7 +202,7 @@ const propertySlice = createSlice({
       .addCase(createProperty.fulfilled, (state, action: PayloadAction<AddPropertySuccessResponse>) => {
         state.loading = false;
         state.success = true;
-        state.propertyId = action.payload.propertyId;
+        state.propertyId = action.payload.data.property.id; // Fixed this line
         state.error = null;
         state.validationErrors = null;
       })

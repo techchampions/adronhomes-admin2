@@ -1,4 +1,10 @@
-import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from "react";
+import React, {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Header from "../../../general/Header";
@@ -7,15 +13,14 @@ import OptionInputField from "../../../components/input/drop_down";
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
 
-
 const BasicDetails = forwardRef<BasicDetailsHandles>((props, ref) => {
   const { formData, setBasicDetails } = useContext(PropertyContext)!;
   const [initialLoad, setInitialLoad] = useState(true);
   const propertyTypeOptions = [
-    { value: "Land", label: "Land" },
-    { value: "Building", label: "Building" },
-    { value: "Apartment", label: "Apartment" },
-    { value: "Commercial", label: "Commercial" },
+    { value: 1, label: "Land" },
+    { value: 2, label: "Residential" },
+    { value: 3, label: "Industrial" },
+    { value: 4, label: "Commercial" },
   ];
 
   const locationTypeOptions = [
@@ -57,31 +62,31 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((props, ref) => {
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails(values);
-  alert(JSON.stringify(values, null, 2)); 
+      alert(JSON.stringify(values, null, 2));
     },
   });
 
-useImperativeHandle(ref, () => ({
-  handleSubmit: async () => {
-    const errors = await formik.validateForm();
-    const hasErrors = Object.keys(errors).length > 0;
+  useImperativeHandle(ref, () => ({
+    handleSubmit: async () => {
+      const errors = await formik.validateForm();
+      const hasErrors = Object.keys(errors).length > 0;
 
-    if (hasErrors) {
-      formik.setTouched(
-        Object.keys(errors).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {} as { [field: string]: boolean }),
-        true
-      );
-      return false;
-    } else {
-      formik.handleSubmit();
-      return true;
-    }
-  },
-  isValid: formik.isValid 
-}));
+      if (hasErrors) {
+        formik.setTouched(
+          Object.keys(errors).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+          }, {} as { [field: string]: boolean }),
+          true
+        );
+        return false;
+      } else {
+        formik.handleSubmit();
+        return true;
+      }
+    },
+    isValid: formik.isValid,
+  }));
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
@@ -115,15 +120,19 @@ useImperativeHandle(ref, () => ({
 
       <InputField
         label="Price"
-        placeholder="Enter price"
+        placeholder="Enter price per unit"
         name="price"
         value={formik.values.price}
-        onChange={formik.handleChange}
-        error={
-          formik.touched.price && formik.errors.price
-            ? formik.errors.price
-            : undefined
-        }
+        // onChange={formik.handleChange}
+        error={formik.touched.price && formik.errors.price}
+        onChange={(e) => {
+          let newValue = e.target.value.replace(/,/g, "");
+          if (/^\d*$/.test(newValue)) {
+            {
+              formik.setFieldValue("price", newValue);
+            }
+          }
+        }}
       />
 
       <InputField
@@ -131,7 +140,14 @@ useImperativeHandle(ref, () => ({
         placeholder="Enter initial deposit"
         name="initialDeposit"
         value={formik.values.initialDeposit}
-        onChange={formik.handleChange}
+        onChange={(e) => {
+          let newValue = e.target.value.replace(/,/g, "");
+          if (/^\d*$/.test(newValue)) {
+            {
+              formik.setFieldValue("initialDeposit", newValue);
+            }
+          }
+        }}
         error={
           formik.touched.initialDeposit && formik.errors.initialDeposit
             ? formik.errors.initialDeposit

@@ -2,10 +2,10 @@ import { Routes, Route, useLocation, Outlet, Navigate } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Cookies from "js-cookie";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useContext, useEffect } from "react";
 
 // Context
-import { PropertyProvider } from "./MyContext/MyContext";
+import { PropertyContext, PropertyProvider } from "./MyContext/MyContext";
 import { AppDispatch, store } from "./components/Redux/store";
 
 // Layout Components
@@ -33,6 +33,7 @@ import General from "./pages/Properties/General";
 import { getUser } from "./components/Redux/User/user_Thunk";
 import PaymentListComponent from "./pages/Customers/PaymentStatus";
 import PaymentById from "./pages/Payment/paymentById";
+import InfrastructureFeesModal from "./components/Modals/InfrastructureFeesModal";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -76,6 +77,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 };
 
 const App = () => {
+    const { formData, isBulk, isLandProperty, setMedia,isInfrastructure, setIsCancelInfrastructure
+   } = useContext(PropertyContext)!;
   return (
     <Provider store={store}>
       <PropertyProvider>
@@ -121,7 +124,10 @@ const App = () => {
             </Route>
           </Routes>
         </AppLayout>
-
+  {isInfrastructure &&  (<InfrastructureFeesModal 
+        isOpen={isInfrastructure}
+        onClose={() => setIsCancelInfrastructure(false)}
+      />)}
         <ToastContainer
           position="top-right"
           autoClose={5000}

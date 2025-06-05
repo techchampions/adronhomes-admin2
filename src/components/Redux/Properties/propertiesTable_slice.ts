@@ -17,6 +17,12 @@ const initialState: PropertiesState = {
     totalItems: 0,
     totalPages: 1,
   },
+  stats: {
+    totalProperties: 0,
+    liveProperties: 0,
+    activePlans: 0,
+    totalSold: 0,
+  },
 };
 
 const propertiesSlice = createSlice({
@@ -44,6 +50,12 @@ const propertiesSlice = createSlice({
             totalItems: action.payload.data.total,
             totalPages: action.payload.data.last_page,
           };
+          state.stats = {
+            totalProperties: action.payload.total_properties,
+            liveProperties: action.payload.live_properties,
+            activePlans: action.payload.active_plans,
+            totalSold: action.payload.total_sold,
+          };
         }
       )
       .addCase(fetchProperties.rejected, (state, action) => {
@@ -54,6 +66,7 @@ const propertiesSlice = createSlice({
       });
   },
 });
+
 
 export const { setPropertiesPage} = propertiesSlice.actions;
 

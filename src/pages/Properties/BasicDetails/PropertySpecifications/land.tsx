@@ -24,6 +24,7 @@ interface LandFormValues {
   description: string;
   overview: string;
   documents: File[];
+    director_id: string; // Add this field
 }
 
 const LandForm = forwardRef<LandFormHandles>((props, ref) => {
@@ -33,6 +34,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
     propertySize: Yup.string().required("Property size is required"),
     description: Yup.string().required("Description is required"),
     overview: Yup.string().required("Overview is required"),
+       director_id: Yup.string().required("Director is required"), // Add validation
   });
 
   const formik = useFormik<LandFormValues>({
@@ -64,6 +66,14 @@ useImperativeHandle(ref, () => ({
   },
   isValid: formik.isValid 
 }));
+ const propertyTypeOptions = [
+      { value: 0, label: "customers" },
+      { value: 1, label: "admin" },
+      { value: 2, label: "marketer" },
+      { value: 3, label: "director" },
+      { value: 4, label: "accountant" },
+      { value: 5, label: "hr" },
+    ];
   // Options for dropdowns
   const plotShapeOptions = [
     { value: "regular", label: "Regular" },
@@ -97,6 +107,20 @@ useImperativeHandle(ref, () => ({
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
+            <OptionInputField
+          label="Role"
+          placeholder="Select director"
+          name="director_id"
+          value={formik.values.director_id}
+          onChange={(value: any) => formik.setFieldValue("director_id", value)}
+          options={propertyTypeOptions}
+          dropdownTitle="Roles"
+          error={
+            formik.touched.director_id && formik.errors.director_id
+              ? formik.errors.director_id
+              : undefined
+          }
+        />
       <div className="grid grid-cols-2 gap-12">
         <OptionInputField
           label="Plot Shape"

@@ -12,6 +12,7 @@ import DashboardHeader from "../../general/DashboardHearder";
 import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
+import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesModal";
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -138,6 +139,7 @@ export default function Dashboard() {
               </div>
             </div></>)}
       <div className="lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px] lg:pl-[38px]"></div>
+
     </div>
   );
 }
