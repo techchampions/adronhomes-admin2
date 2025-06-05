@@ -12,10 +12,23 @@ import InputField from "../../../components/input/inputtext";
 import OptionInputField from "../../../components/input/drop_down";
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../components/Redux/store";
+import { personnels } from "../../../components/Redux/personnel/personnel_thunk";
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((props, ref) => {
   const { formData, setBasicDetails } = useContext(PropertyContext)!;
   const [initialLoad, setInitialLoad] = useState(true);
+     const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+  dispatch(personnels("4"));
+  }, [dispatch]);
+
+  const {
+    loading: userLoading,
+    error: userError,
+data
+  } = useSelector((state: RootState) => state.getpersonnel);
   const propertyTypeOptions = [
     { value: 1, label: "Land" },
     { value: 2, label: "Residential" },

@@ -1,10 +1,13 @@
 // BulkBasicDetails.tsx
-import React, { forwardRef, useContext, useImperativeHandle } from "react";
+import React, { forwardRef, useContext, useEffect, useImperativeHandle } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../components/input/inputtext";
 import OptionInputField from "../../../components/input/drop_down";
 import { PropertyContext } from "../../../MyContext/MyContext";
+import { personnels } from "../../../components/Redux/personnel/personnel_thunk";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../components/Redux/store";
 
 interface BulkBasicDetailsHandles {
   handleSubmit: () => void;
@@ -15,6 +18,16 @@ interface BulkBasicDetailsProps {}
 
 const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsProps>((props, ref) => {
   const { formData, setBulkDetails } = useContext(PropertyContext)!;
+   const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+  dispatch(personnels("4"));
+  }, [dispatch]);
+
+  const {
+    loading: userLoading,
+    error: userError,
+data
+  } = useSelector((state: RootState) => state.getpersonnel);
 
      const propertyTypeOptions = [
     { value: 1, label: "Land" },

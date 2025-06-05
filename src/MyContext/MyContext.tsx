@@ -17,6 +17,7 @@ interface Fee {
   name: string;
   amount: string;
   checked: boolean;
+   type: string;
 }
 // Define the form data types
 interface BasicDetailsFormValues {
@@ -164,8 +165,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     const [isInfrastructure, setIsCancelInfrastructure] = useState(false);
 
       const [fees, setFees] = useState<Fee[]>([
-    { id: 1, name: "Building Charge", amount: "₦16,000,000", checked: true },
-    { id: 2, name: "Service charge", amount: "₦2,000,000", checked: true },
+    { id: 1, name: "Building Charge", amount: "₦16,000,000", checked: true, type: "₦16,000,000", },
+    { id: 2, name: "Service charge", amount: "₦2,000,000", checked: true,type: "₦16,000,000", },
   ]);
 
   const [formData, setFormData] = useState<PropertyFormData>({
@@ -464,7 +465,8 @@ const submitForm = async () => {
         .map(fee => ({
           property_id: createdPropertyId.toString(),
           name: fee.name,
-          value: fee.amount.replace(/[^\d.]/g, '') 
+          value: fee.amount.replace(/[^\d.]/g, ''),
+          type:fee.type
         }))
         .map(feeDetail => 
           dispatch(add_property_detail({ credentials: feeDetail }))

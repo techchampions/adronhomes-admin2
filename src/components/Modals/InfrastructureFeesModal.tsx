@@ -2,12 +2,14 @@ import { ChangeEvent, useContext, useState } from "react";
 import { BiCheck, BiX } from "react-icons/bi";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import { PropertyContext } from "../../MyContext/MyContext";
+import OptionInputField from "../input/drop_down";
 
 interface Fee {
   id: number;
   name: string;
   amount: string;
   checked: boolean;
+  type: string;
 }
 
 interface InfrastructureFeesModalProps {
@@ -21,7 +23,13 @@ export default function InfrastructureFeesModal({
 }: InfrastructureFeesModalProps) {
   const { formData, isBulk, isLandProperty, setFees, fees } = useContext(PropertyContext)!;
   const [newFeeName, setNewFeeName] = useState<string>("");
+  const [newFeetype, setNewFeetype] = useState<string>("");
   const [newFeeAmount, setNewFeeAmount] = useState<string>("");
+
+  const typeOptions = [
+    { value: "Infrastructure", label: "Infrastructure" },
+    { value: "others", label: "others" },
+  ];
 
   const toggleFee = (id: number) => {
     setFees(
@@ -40,6 +48,7 @@ export default function InfrastructureFeesModal({
       const newFee: Fee = {
         id: Math.max(...fees.map((f) => f.id), 0) + 1,
         name: newFeeName,
+        type: newFeetype,
         amount: newFeeAmount.startsWith("₦")
           ? newFeeAmount
           : `₦${newFeeAmount}`,
@@ -48,6 +57,7 @@ export default function InfrastructureFeesModal({
       setFees([...fees, newFee]);
       setNewFeeName("");
       setNewFeeAmount("");
+      setNewFeetype("");
     }
   };
 
@@ -97,6 +107,11 @@ export default function InfrastructureFeesModal({
                   <div className="text-base font-semibold text-gray-900">
                     {fee.amount}
                   </div>
+                  {fee.type && (
+                    <div className="text-xs text-gray-500">
+                      Type: {typeOptions.find(t => t.value === fee.type)?.label || fee.type}
+                    </div>
+                  )}
                 </div>
               </div>
               <button
@@ -144,9 +159,20 @@ export default function InfrastructureFeesModal({
                   />
                 </div>
               </div>
+
+              <OptionInputField
+                label="Type"
+                placeholder="Select type of fee"
+                name="type"
+                value={newFeetype}
+                onChange={(value) => setNewFeetype(value)}
+                options={typeOptions}
+                dropdownTitle="Fee Types"
+              />
+
               <button
                 onClick={addFee}
-                disabled={!newFeeName || !newFeeAmount}
+                disabled={!newFeeName || !newFeeAmount || !newFeetype}
                 className="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-[80px] hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Add Feature

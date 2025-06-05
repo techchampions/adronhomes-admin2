@@ -15,6 +15,9 @@ import PropertiesState from '../Redux/Properties/propertiesTable_slice'
 import addpropertyReducer from '../Redux/addProperty/addProperty_slice'
 import updatepropertyReducer from '../Redux/addProperty/UpdateProperties/update_slice'
 import DeletePropertyReducer from './addProperty/UpdateProperties/delete_slice';
+import getpersonelReducer from './personnel/personnel_slice';
+import directorsReducer from './directors/directors_slice'
+
 
 export const store = configureStore({
   reducer: {
@@ -32,7 +35,9 @@ export const store = configureStore({
     properties: PropertiesState,
     addproperty:addpropertyReducer,
     updateproperty:updatepropertyReducer,
-    DeleteProperty:DeletePropertyReducer
+    DeleteProperty:DeletePropertyReducer,
+    getpersonnel:getpersonelReducer,
+    directors:directorsReducer
   },
 });
 

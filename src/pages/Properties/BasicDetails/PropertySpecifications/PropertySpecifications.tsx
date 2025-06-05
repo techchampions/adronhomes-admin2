@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useContext } from "react";
+import React, { forwardRef, useImperativeHandle, useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../../components/input/inputtext";
@@ -7,6 +7,10 @@ import InputAreaField from "../../../../components/input/TextArea";
 
 import { PropertyContext } from "../../../../MyContext/MyContext";
 import OptionInputField from "../../../../components/input/drop_down";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../components/Redux/store";
+import { personnels } from "../../../../components/Redux/personnel/personnel_thunk";
+import { directors } from "../../../../components/Redux/directors/directors_thunk";
 
 interface PropertySpecificationsHandles {
   handleSubmit: () => void;
@@ -26,20 +30,32 @@ interface PropertySpecificationsFormValues {
   documents: File[];
   director_id: string; // Add this field
 }
+interface DropdownOption {
+  label: string;
+  value: string | number;
+}
 
 const PropertySpecifications = forwardRef<PropertySpecificationsHandles>(
   (props, ref) => {
     const { formData, setSpecifications } = useContext(PropertyContext)!;
+     const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+  dispatch(directors());
+  }, [dispatch]);
 
-    // Add your options for the dropdown
-    const propertyTypeOptions = [
-      { value: 0, label: "customers" },
-      { value: 1, label: "admin" },
-      { value: 2, label: "marketer" },
-      { value: 3, label: "director" },
-      { value: 4, label: "accountant" },
-      { value: 5, label: "hr" },
-    ];
+  const {
+    loading: userLoading,
+    error: userError,
+data
+  } = useSelector((state: RootState) => state.directors);
+ 
+const labels: DropdownOption[] = Array.isArray(data)
+  ? data.map(person => ({
+      label: `${person.first_name} ${person.last_name}`,
+      value: person.id,
+    }))
+  : [];
+
 
     const validationSchema = Yup.object().shape({
       bedrooms: Yup.string().required("Number of bedrooms is required"),
@@ -92,7 +108,7 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>(
           name="director_id"
           value={formik.values.director_id}
           onChange={(value: any) => formik.setFieldValue("director_id", value)}
-          options={propertyTypeOptions}
+          options={labels}
           dropdownTitle="Roles"
           error={
             formik.touched.director_id && formik.errors.director_id

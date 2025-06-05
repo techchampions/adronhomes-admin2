@@ -16,6 +16,7 @@ export interface add_property_detailFormData {
   property_id: string;
   name: any;
   value: any;
+   type: any;
 }
 
 

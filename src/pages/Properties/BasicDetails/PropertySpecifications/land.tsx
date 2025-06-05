@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useContext } from "react";
+import React, { forwardRef, useImperativeHandle, useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../../components/input/inputtext";
@@ -7,6 +7,10 @@ import InputAreaField from "../../../../components/input/TextArea";
 
 import { PropertyContext } from "../../../../MyContext/MyContext";
 import OptionInputField from "../../../../components/input/drop_down";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../components/Redux/store";
+import { personnels } from "../../../../components/Redux/personnel/personnel_thunk";
+import { directors } from "../../../../components/Redux/directors/directors_thunk";
 
 interface LandFormHandles {
   handleSubmit: () => void;
@@ -26,9 +30,29 @@ interface LandFormValues {
   documents: File[];
     director_id: string; // Add this field
 }
-
+interface DropdownOption {
+  label: string;
+  value: string | number;
+}
 const LandForm = forwardRef<LandFormHandles>((props, ref) => {
   const { formData, setLandForm } = useContext(PropertyContext)!;
+      const dispatch = useDispatch<AppDispatch>();
+      useEffect(() => {
+      dispatch(directors());
+      }, [dispatch]);
+    
+      const {
+        loading: userLoading,
+        error: userError,
+    data
+      } = useSelector((state: RootState) => state.directors);
+     
+ const labels: DropdownOption[] = Array.isArray(data)
+  ? data.map(person => ({
+      label: `${person.first_name} ${person.last_name}`,
+      value: person.id,
+    }))
+  : [];
 
   const validationSchema = Yup.object().shape({
     propertySize: Yup.string().required("Property size is required"),
@@ -107,13 +131,13 @@ useImperativeHandle(ref, () => ({
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-            <OptionInputField
+          <OptionInputField
           label="Role"
           placeholder="Select director"
           name="director_id"
           value={formik.values.director_id}
           onChange={(value: any) => formik.setFieldValue("director_id", value)}
-          options={propertyTypeOptions}
+          options={labels}
           dropdownTitle="Roles"
           error={
             formik.touched.director_id && formik.errors.director_id
