@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useContext, useEffect } from "react";
+import React, { forwardRef, useImperativeHandle, useContext, useEffect, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../../components/input/inputtext";
@@ -66,39 +66,55 @@ const labels: DropdownOption[] = Array.isArray(data)
       director_id: Yup.string().required("Director is required"), // Add validation
     });
 
-    const formik = useFormik<PropertySpecificationsFormValues>({
-      initialValues: {
-        ...formData.specifications,
-        director_id: "", // Add initial value
-      },
-      validationSchema,
-      onSubmit: (values) => {
-        setSpecifications(values);
-        alert(JSON.stringify(values, null, 2));
-      },
-    });
+
+  const formik = useFormik<PropertySpecificationsFormValues>({
+    initialValues: {
+      bedrooms: formData.specifications?.bedrooms || "",
+      bathrooms: formData.specifications?.bathrooms || "",
+      propertySize: formData.specifications?.propertySize || "",
+      landSize: formData.specifications?.landSize || "",
+      parkingSpaces: formData.specifications?.parkingSpaces || "",
+      yearBuilt: formData.specifications?.yearBuilt || "",
+      unitsAvailable: formData.specifications?.unitsAvailable || "",
+      description: formData.specifications?.description || "",
+      overview: formData.specifications?.overview || "",
+      documents: formData.specifications?.documents || [],
+      director_id: formData.specifications?.director_id || "",
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      setSpecifications(values);
+    },
+  });
+
+
+  const validateAndSubmit = useCallback(async () => {
+    try {
+      const errors = await formik.validateForm();
+      if (Object.keys(errors).length > 0) {
+        formik.setTouched(
+          Object.keys(errors).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+          }, {} as Record<string, boolean>)
+        );
+        return false;
+      }
+      formik.handleSubmit();
+      return true;
+    } catch (error) {
+      console.error("Validation error:", error);
+      return false;
+    }
+  }, [formik]);
+
 
     useImperativeHandle(ref, () => ({
-      handleSubmit: async () => {
-        const errors = await formik.validateForm();
-        const hasErrors = Object.keys(errors).length > 0;
+    handleSubmit: validateAndSubmit,
+    isValid: formik.isValid && Object.keys(formik.touched).length > 0,
+  }));
 
-        if (hasErrors) {
-          formik.setTouched(
-            Object.keys(errors).reduce((acc, key) => {
-              acc[key] = true;
-              return acc;
-            }, {} as { [field: string]: boolean }),
-            true
-          );
-          return false;
-        } else {
-          formik.handleSubmit();
-          return true;
-        }
-      },
-      isValid: formik.isValid,
-    }));
+
 
     return (
       <form onSubmit={formik.handleSubmit} className="space-y-[30px]">

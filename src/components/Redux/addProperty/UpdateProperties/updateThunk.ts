@@ -87,7 +87,7 @@ export const UpdateProperty = createAsyncThunk<
     }
 
     try {
-      const response = await axios.put<AddPropertySuccessResponse>(
+      const response = await axios.post<AddPropertySuccessResponse>(
         `${BASE_URL}/api/admin/edit-property/${UpdateId}`,
         credentials,
         {

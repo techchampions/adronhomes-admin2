@@ -15,6 +15,7 @@ import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { personnels } from "../../../components/Redux/personnel/personnel_thunk";
+import { formatToNaira } from "../../../utils/formatcurrency";
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((props, ref) => {
   const { formData, setBasicDetails } = useContext(PropertyContext)!;
@@ -41,13 +42,21 @@ data
     { value: "suburban", label: "Suburban" },
     { value: "rural", label: "Rural" },
   ];
+const purposeOptions = [
+  { value: "bungalow", label: "Bungalow" },
+  { value: "bungalow_duplex", label: "Bungalow Duplex" },
+  { value: "single_family", label: "Single-Family Home" },
+  { value: "duplex", label: "Duplex" },
+  { value: "triplex", label: "Triplex" },
+  { value: "fourplex", label: "Fourplex" },
+  { value: "townhouse", label: "Townhouse" },
+  { value: "apartment", label: "Apartment" },
+  { value: "condo", label: "Condominium (Condo)" },
+  { value: "cottage", label: "Cottage" },
+  { value: "villa", label: "Villa" },
+  { value: "semi_detached", label: "Semi-Detached House" }
+];
 
-  const purposeOptions = [
-    { value: "residential", label: "Residential" },
-    { value: "commercial", label: "Commercial" },
-    { value: "investment", label: "Investment" },
-    { value: "industrial", label: "Industrial" },
-  ];
 
   const validationSchema = Yup.object().shape({
     propertyName: Yup.string().required("Property name is required"),
@@ -75,7 +84,7 @@ data
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails(values);
-      alert(JSON.stringify(values, null, 2));
+      // alert(JSON.stringify(values, null, 2));
     },
   });
 
@@ -100,6 +109,7 @@ data
     },
     isValid: formik.isValid,
   }));
+
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
@@ -131,42 +141,36 @@ data
         }
       />
 
-      <InputField
-        label="Price"
-        placeholder="Enter price per unit"
-        name="price"
-        value={formik.values.price}
-        // onChange={formik.handleChange}
-        error={formik.touched.price && formik.errors.price}
-        onChange={(e) => {
-          let newValue = e.target.value.replace(/,/g, "");
-          if (/^\d*$/.test(newValue)) {
-            {
-              formik.setFieldValue("price", newValue);
-            }
-          }
-        }}
-      />
-
-      <InputField
-        label="Initial Deposit"
-        placeholder="Enter initial deposit"
-        name="initialDeposit"
-        value={formik.values.initialDeposit}
-        onChange={(e) => {
-          let newValue = e.target.value.replace(/,/g, "");
-          if (/^\d*$/.test(newValue)) {
-            {
-              formik.setFieldValue("initialDeposit", newValue);
-            }
-          }
-        }}
-        error={
-          formik.touched.initialDeposit && formik.errors.initialDeposit
-            ? formik.errors.initialDeposit
-            : undefined
-        }
-      />
+    <InputField
+  label="Price"
+  placeholder="Enter price per unit"
+  name="price"
+  value={formatToNaira(formik.values.price)}
+  error={formik.touched.price && formik.errors.price}
+  onChange={(e) => {
+    let rawValue = e.target.value.replace(/[₦,]/g, "");
+    if (/^\d*$/.test(rawValue)) {
+      formik.setFieldValue("price", rawValue);
+    }
+  }}
+/>
+   <InputField
+  label="Initial Deposit"
+  placeholder="Enter initial deposit"
+  name="initialDeposit"
+  value={formatToNaira(formik.values.initialDeposit)}
+  error={
+    formik.touched.initialDeposit && formik.errors.initialDeposit
+      ? formik.errors.initialDeposit
+      : undefined
+  }
+  onChange={(e) => {
+    let rawValue = e.target.value.replace(/[₦,]/g, "");
+    if (/^\d*$/.test(rawValue)) {
+      formik.setFieldValue("initialDeposit", rawValue);
+    }
+  }}
+/>
 
       <InputField
         label="Address"

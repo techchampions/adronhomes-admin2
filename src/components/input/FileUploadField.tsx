@@ -1,4 +1,4 @@
-import React, { useRef, ChangeEvent } from "react";
+import React, { useRef, useState, ChangeEvent } from "react";
 import { AiOutlineUpload } from "react-icons/ai";
 
 interface FileUploadFieldProps {
@@ -6,7 +6,7 @@ interface FileUploadFieldProps {
   placeholder: string;
   onChange: (files: FileList | null) => void;
   required?: boolean;
-  error?: any
+  error?: any;
   disabled?: boolean;
   accept?: string;
   multiple?: boolean;
@@ -23,6 +23,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
   multiple = false,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileNames, setFileNames] = useState<string>("");
 
   const handleClick = () => {
     if (!disabled && fileInputRef.current) {
@@ -33,7 +34,12 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    console.log("Selected files:", files); // Debug
+    if (files) {
+      const namesArray = Array.from(files).map(file => file.name);
+      setFileNames(namesArray.join(", "));
+    } else {
+      setFileNames("");
+    }
     onChange(files); // Pass FileList to parent
   };
 
@@ -46,11 +52,14 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
       <div className="relative">
         <div
           className={`w-full bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
-            error ? "border-red-500" : ""
+            error ? "border border-red-500" : ""
           } ${disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"}`}
           onClick={handleClick}
         >
-          {placeholder}
+          <span className="truncate">
+            {fileNames || placeholder}
+          </span>
+
           <AiOutlineUpload
             className={`absolute top-3 right-3 ${
               disabled ? "text-gray-400" : "text-[#4F4F4F]"
