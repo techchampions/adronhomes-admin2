@@ -15,12 +15,18 @@ interface FormData {
   role: string;
   email: string;
   password: string;
+  paymentType: string; // Added payment type field
 }
 
 const roleOptions = [
   { value: "admin", label: "Admin" },
   { value: "manager", label: "Manager" },
   { value: "staff", label: "Staff" },
+];
+
+const paymentTypeOptions = [
+  { value: "full", label: "Full Payment" },
+  { value: "installment", label: "Installment" },
 ];
 
 const validationSchema = Yup.object().shape({
@@ -30,6 +36,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required"),
+  paymentType: Yup.string().required("Payment type is required"), // Added validation
 });
 
 export default function PersonnelModal({
@@ -72,13 +79,23 @@ export default function PersonnelModal({
             role: "",
             email: "",
             password: "",
+            paymentType: "", // Added initial value
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ errors, touched, handleChange, values }) => (
             <Form>
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
+              <div className="mb-3 sm:mb-4 md:mb-[40px] grid md:grid-cols-2">
+                <InputField
+                  label="Full Name"
+                  placeholder="Enter full name"
+                  value={values.fullName}
+                  onChange={handleChange}
+                  name="fullName"
+                  error={touched.fullName && errors.fullName}
+                  required
+                />
                 <InputField
                   label="Full Name"
                   placeholder="Enter full name"
@@ -89,6 +106,40 @@ export default function PersonnelModal({
                   required
                 />
               </div>
+              
+              <div className="mb-3 sm:mb-4 md:mb-[40px]">
+                <OptionInputField
+                  label="Payment Type"
+                  placeholder="Select payment type"
+                  value={values.paymentType}
+                  onChange={(value) => {
+                    handleChange({
+                      target: {
+                        name: "paymentType",
+                        value,
+                      },
+                    } as any);
+                  }}
+                  name="paymentType"
+                  error={touched.paymentType && errors.paymentType}
+                  options={paymentTypeOptions}
+                  dropdownTitle="Select Payment Type"
+                />
+              </div>
+
+              {/* Conditionally render payment schedule based on payment type */}
+              {values.paymentType === "installment" && (
+                <div className="mb-3 sm:mb-4 md:mb-[40px]">
+                  {/* Add your payment schedule fields here */}
+                  <InputField
+                    label="Payment Schedule"
+                    placeholder="Enter payment schedule"
+                    value=""
+                    onChange={() => {}}
+                    name="paymentSchedule"
+                  />
+                </div>
+              )}
 
               <div className="mb-3 sm:mb-4 md:mb-[40px]">
                 <OptionInputField

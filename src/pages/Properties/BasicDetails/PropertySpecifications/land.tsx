@@ -145,7 +145,7 @@ useImperativeHandle(ref, () => ({
               : undefined
           }
         />
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid md:  md:grid-cols-2 gap-12">
         <OptionInputField
           label="Plot Shape"
           placeholder="Select Plot Shape"
@@ -165,7 +165,7 @@ useImperativeHandle(ref, () => ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid  md:grid-cols-2 gap-12">
        <div className="relative">
          <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">Sq M</p>
          <InputField
@@ -191,7 +191,7 @@ useImperativeHandle(ref, () => ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid  md:grid-cols-2 gap-12">
         <OptionInputField
           label="Road Access"
           placeholder="Select Road Access"
@@ -211,7 +211,7 @@ useImperativeHandle(ref, () => ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid  md:grid-cols-2 gap-12">
         <InputField
           label="Units Available"
           placeholder="Enter Units Available"

@@ -24,7 +24,6 @@ const Discount = forwardRef<DiscountHandles>((props, ref) => {
 
   const discountTypeOptions = [
     { value: "percentage", label: "Percentage" },
-    { value: "fixed", label: "Fixed Amount" },
   ];
 
   const validationSchema = Yup.object().shape({

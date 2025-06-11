@@ -29,6 +29,9 @@ interface BasicDetailsFormValues {
   address: string;
   locationType: string;
   purpose: string;
+      country: any;
+      state: any;
+      lga:any;
 }
 
 interface BulkDetailsFormValues {
@@ -40,6 +43,8 @@ interface BulkDetailsFormValues {
   city: string;
   state: string;
   initialDeposit: string;
+    country: any;
+      lga:any;
 }
 
 interface PropertySpecificationsFormValues {
@@ -159,6 +164,9 @@ const initialFormData: PropertyFormData = {
     address: "",
     locationType: "",
     purpose: "",
+    country: '',
+    state: '',
+    lga:""
   },
   bulkDetails: {
     propertyName: "",
@@ -169,6 +177,9 @@ const initialFormData: PropertyFormData = {
     city: "",
     state: "",
     initialDeposit: "",
+     country: '',
+    lga:""
+    
   },
   specifications: {
     director_id: "",
@@ -381,21 +392,32 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("price", bulkDetails.price);
         formPayload.append("street_address", bulkDetails.address);
         formPayload.append("city", bulkDetails.city || "");
-        formPayload.append("state", bulkDetails.state || "");
+
+           formPayload.append("name", basicDetails.propertyName);
+        formPayload.append("type", basicDetails.propertyType);
+        formPayload.append("price", basicDetails.price);
+  
+         formPayload.append("country", basicDetails.country);
+         formPayload.append("state", basicDetails.state);
+          formPayload.append("lga", basicDetails.lga);
+        
         formPayload.append("category", "bulk");
         formPayload.append(
           "initial_deposit",
-          basicDetails.initialDeposit || "0"
-        );
+          basicDetails.initialDeposit || "0");
       } else {
         formPayload.append("name", basicDetails.propertyName);
         formPayload.append("type", basicDetails.propertyType);
         formPayload.append("price", basicDetails.price);
+        
         formPayload.append(
           "initial_deposit",
           basicDetails.initialDeposit || "0"
         );
-        formPayload.append("street_address", basicDetails.address);
+        formPayload.append("country", basicDetails.country);
+         formPayload.append("state", basicDetails.state);
+          formPayload.append("lga", basicDetails.lga);
+           formPayload.append("street_address", basicDetails.address);
         formPayload.append("location_type", basicDetails.locationType || "");
         formPayload.append("purpose", basicDetails.purpose || "");
         formPayload.append("category", "single");

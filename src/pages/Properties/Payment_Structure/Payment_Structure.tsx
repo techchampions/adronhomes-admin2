@@ -38,35 +38,26 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
     { value: "quarterly", label: "Quarterly" },
     { value: "yearly", label: "Yearly" },
   ];
-
-  const validationSchema = Yup.object().shape({
-    paymentType: Yup.string().required("Payment type is required"),
-    paymentDuration: Yup.string().required("Payment duration is required"),
-    paymentSchedule: Yup.array()
-      .of(Yup.string())
-      .min(1, "At least one payment schedule is required"),
-  });
-
-  // const formik = useFormik<PaymentStructureFormValues>({
-  //   initialValues: {
-  //     paymentType: formData.paymentStructure.paymentType || "",
-  //     paymentDuration: formData.paymentStructure.paymentDuration || "",
-  //     paymentSchedule: formData.paymentStructure.paymentSchedule || [],
-  //     feesCharges: formData.paymentStructure.feesCharges || "",
-  //   },
-  //   validationSchema,
-  //   onSubmit: (values) => {
-  //     setPaymentStructure(values);
-  //     console.log("Submitted values:", values);
-  //   },
-  // });
-
+const validationSchema = Yup.object().shape({
+  paymentType: Yup.string().required("Payment type is required"),
+  paymentDuration: Yup.string()
+    .when('paymentType', {
+      is: (value: string) => value !== 'full',
+      then: (schema) => schema.required('Payment duration is required'),
+      otherwise: (schema) => schema.notRequired()
+    }),
+  paymentSchedule: Yup.array()
+    .when('paymentType', {
+      is: (value: string) => value !== 'full',
+      then: (schema) => schema.of(Yup.string()).min(1, "At least one payment schedule is required"),
+      otherwise: (schema) => schema.notRequired()
+    }),
+});
   const formik = useFormik({
     initialValues: formData.paymentStructure,
     validationSchema,
     onSubmit: (values) => {
       setPaymentStructure(values);
-      alert(JSON.stringify(values, null, 2));
     },
   });
 
@@ -112,7 +103,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
   };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
+    <><form onSubmit={formik.handleSubmit} className="space-y-[30px]">
       <div className="grid md:grid-cols-2 gap-12">
         <OptionInputField
           label="Payment Type"
@@ -122,87 +113,83 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
           onChange={(value) => formik.setFieldValue("paymentType", value)}
           options={paymentTypeOptions}
           dropdownTitle="Payment Type"
-          error={
-            formik.touched.paymentType && formik.errors.paymentType
-              ? formik.errors.paymentType
-              : undefined
-          }
-        />
+          error={formik.touched.paymentType && formik.errors.paymentType
+            ? formik.errors.paymentType
+            : undefined} />
 
-        <InputField
-          label="Payment Duration Limit (months)"
-          placeholder="Enter Payment Duration Limit"
-          name="paymentDuration"
-          value={formik.values.paymentDuration}
-          onChange={(e) => {
-            let newValue = e.target.value.replace(/,/g, "");
-            if (/^\d*$/.test(newValue)) {
-              {
+        {formik.values.paymentType !== "full" && (
+          <InputField
+            label="Payment Duration Limit (months)"
+            placeholder="Enter Payment Duration Limit"
+            name="paymentDuration"
+            value={formik.values.paymentDuration}
+            onChange={(e) => {
+              let newValue = e.target.value.replace(/,/g, "");
+              if (/^\d*$/.test(newValue)) {
                 formik.setFieldValue("paymentDuration", newValue);
               }
-            }
-          }}
-          error={
-            formik.touched.paymentDuration && formik.errors.paymentDuration
+            } }
+            error={formik.touched.paymentDuration && formik.errors.paymentDuration
               ? formik.errors.paymentDuration
-              : undefined
-          }
-        />
+              : undefined} />
+        )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Payment Schedule
-          </label>
-          <div className="space-y-2">
-            {paymentScheduleOptions.map((option) => (
-              <div key={option.value} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={`schedule-${option.value}`}
-                  checked={formik.values.paymentSchedule.includes(option.value)}
-                  onChange={() => handleScheduleChange(option.value)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 accent-black border-gray-300 rounded"
-                />
-                <label
-                  htmlFor={`schedule-${option.value}`}
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  {option.label}
-                </label>
-              </div>
-            ))}
+      {formik.values.paymentType !== "full" && (
+        <div className="grid md:grid-cols-2 gap-12">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Payment Schedule
+            </label>
+            <div className="space-y-2">
+              {paymentScheduleOptions.map((option) => (
+                <div key={option.value} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`schedule-${option.value}`}
+                    checked={formik.values.paymentSchedule.includes(option.value)}
+                    onChange={() => handleScheduleChange(option.value)}
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 accent-black border-gray-300 rounded" />
+                  <label
+                    htmlFor={`schedule-${option.value}`}
+                    className="ml-2 block text-sm text-gray-900"
+                  >
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+            {formik.touched.paymentSchedule && formik.errors.paymentSchedule && (
+              <p className="mt-1 text-sm text-red-600">
+                {formik.errors.paymentSchedule}
+              </p>
+            )}
           </div>
-          {formik.touched.paymentSchedule && formik.errors.paymentSchedule && (
-            <p className="mt-1 text-sm text-red-600">
-              {formik.errors.paymentSchedule}
-            </p>
-          )}
-        </div>
 
-        <div
+
+        </div>
+      )}
+    </form><div
+    className="pt-5"
+      onClick={(e) => {
+        e.stopPropagation();
+      } }
+    >
+        <button
           onClick={(e) => {
             e.stopPropagation();
-          }}
+            setIsModalOpen(true);
+          } }
+          className="w-full py-3 px-4 bg-[#79B833] text-white rounded-[80px] font-medium max-w-xl 
+        "
         >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsModalOpen(true);
-            }}
-            className="w-full py-3 px-4 bg-[#79B833] text-white rounded-[80px] font-medium max-w-xl"
-          >
-            Add Infrastructure Fees
-          </button>
+          Add Infrastructure Fees
+        </button>
 
-          <InfrastructureFeesModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
-        </div>
-      </div>
-    </form>
+        <InfrastructureFeesModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)} />
+      </div></>
   );
 });
 
