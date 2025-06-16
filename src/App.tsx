@@ -77,8 +77,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 };
 
 const App = () => {
-    const { formData, isBulk, isLandProperty, setMedia,isInfrastructure, setIsCancelInfrastructure
-   } = useContext(PropertyContext)!;
+  const {
+    formData,
+    isBulk,
+    isLandProperty,
+    setMedia,
+    isInfrastructure,
+    setIsCancelInfrastructure,
+  } = useContext(PropertyContext)!;
   return (
     <Provider store={store}>
       <PropertyProvider>
@@ -93,7 +99,10 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/payments" element={<Payment />} />
-              <Route path="/payments/status/:paymentId" element={<PaymentById />} />
+              <Route
+                path="/payments/status/:paymentId"
+                element={<PaymentById />}
+              />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/personnel" element={<Personnel />} />
@@ -124,10 +133,12 @@ const App = () => {
             </Route>
           </Routes>
         </AppLayout>
-  {isInfrastructure &&  (<InfrastructureFeesModal 
-        isOpen={isInfrastructure}
-        onClose={() => setIsCancelInfrastructure(false)}
-      />)}
+        {isInfrastructure && (
+          <InfrastructureFeesModal
+            isOpen={isInfrastructure}
+            onClose={() => setIsCancelInfrastructure(false)}
+          />
+        )}
         <ToastContainer
           position="top-right"
           autoClose={5000}

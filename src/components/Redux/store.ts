@@ -17,7 +17,11 @@ import updatepropertyReducer from '../Redux/addProperty/UpdateProperties/update_
 import DeletePropertyReducer from './addProperty/UpdateProperties/delete_slice';
 import getpersonelReducer from './personnel/personnel_slice';
 import directorsReducer from './directors/directors_slice'
-
+import CreatepersonnelReducer from './personnel/createPersonell_slice'
+import editPersonnelReducer from './personnel/edithPersonelle'
+import DeletePersonnelReducer from"./personnel/delete_slice"
+import editPersonnelSliceReducer from"./personnel/edithPersonelle"
+import marketerdashboardSlice from "./Marketer/Dashboard_slice"
 
 export const store = configureStore({
   reducer: {
@@ -37,7 +41,12 @@ export const store = configureStore({
     updateproperty:updatepropertyReducer,
     DeleteProperty:DeletePropertyReducer,
     getpersonnel:getpersonelReducer,
-    directors:directorsReducer
+    directors:directorsReducer,
+   Createpersonnel:CreatepersonnelReducer,
+   Edithpersonel:editPersonnelReducer,
+   DeletePersonnel:DeletePersonnelReducer,
+   editPersonnelSlice:editPersonnelSliceReducer,
+   marketerdashboard:marketerdashboardSlice
   },
 });
 

@@ -196,41 +196,38 @@ export function MatrixCard({
 // marketergreencard
 
 interface MatrixCardGreensProps {
-  name?: string;
-  role?: string;
-  date?: string;
-  showSettings?: boolean;
-  iconSrc?: string;
-  iconAlt?: string;
+  title?: string;
+  value?: string | number;
+  change?: string;
+  currency?: boolean;
+  view?: string;
+  handleClickView?: () => void;
 }
 
 export function GreenCardMarketer({
-  name = "Mike Wellington",
-  role = "Marketer",
-  date = "Created 3.09.2025",
-  showSettings = true,
-  iconSrc,
-  iconAlt = "icon",
+  title = "Total Registered Customers",
+  value = "704",
+  change = "+203 last month",
+  currency = false,
+  view = "View More",
+  handleClickView,
 }: MatrixCardGreensProps) {
   return (
-    <div className="bg-[#57713A]  h-full py-[24px] lg:pr-[24px] lg:pl-[24px] pl-[12px] rounded-[20px] pr-[12px]">
-      <div className="font-gotham md:text-[24px] text-[20px] font-[350] leading-[100%] tracking-[0%] text-white mb-[18px]">
-        <p>{name}</p>
+    <div className="bg-[#57713A] h-full py-[24px] lg:pl-[24px] pl-[12px] rounded-[20px] relative">
+      <div className="font-gotham md:text-[14px] flex text-[10px] font-[350] leading-[100%] tracking-[0%] text-white mb-[16px] justify-between pr-4">
+        <p >{title}</p>
+        <p className="cursor-pointer text-[10px] ml-4" onClick={() => handleClickView?.()}>{view}</p>
       </div>
-      <div className="font-gotham font-[350] text-white mb-[20px] flex items-center gap-[4px]">
-        {iconSrc && <img src={iconSrc} alt={iconAlt} className="w-6 h-6" />}
-        <p className="truncate">{role}</p>
-      </div>
-
-      <div className="flex flex-row w-full justify-between">
-        <div className="font-gotham md:text-[14px] text-[10px] font-[325] leading-[100%] tracking-[0%] text-white ">
-          <p>{date}</p>
+      <div className="font-gotham md:text-[30px] text-[20px] font-[350] items-center text-white mb-[10px] flex group cursor-pointer">
+        {currency && <span className="md:text-[20px] text-[10px]">₦</span>}
+        <p className="max-w-[270px] pr-2 truncate">{value}</p>
+        <div className="absolute top-10 left-5 mb-2 hidden group-hover:block z-50 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+          {currency}
+          {value.toLocaleString()}
         </div>
-        {showSettings && (
-          <div className="font-gotham md:text-[14px] text-[10px] font-[350] leading-[100%] tracking-[0%] text-white">
-            <p>Account Settings</p>
-          </div>
-        )}
+      </div>
+      <div className="font-gotham md:text-[14px] pr-2 text-[10px] font-[325] leading-[100%] tracking-[0%] text-white">
+        <p><span className="font-[325]">{change}</span></p>
       </div>
     </div>
   );

@@ -251,14 +251,14 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       name: "Building Charge",
       amount: "₦16,000,000",
       checked: true,
-      type: "₦16,000,000",
+      type: "others",
     },
     {
       id: 2,
       name: "Service charge",
       amount: "₦2,000,000",
       checked: true,
-      type: "₦16,000,000",
+      type: "others",
     },
   ]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);

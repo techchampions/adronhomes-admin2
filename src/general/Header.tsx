@@ -180,7 +180,7 @@ export default function Header({
                 files: FileList | null;
               }): Promise<void> {
                 throw new Error("Function not implemented.");
-              } } x={() => setPersonnelModal(false)}            />
+              } } x={() => setPersonnelModal(false)}/>
           ) : (
             <PersonnelModal
               isOpen={showPersonnelModal}

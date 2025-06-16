@@ -180,7 +180,7 @@ export default function InfrastructureFeesModal({
                 disabled={!newFeeName || !newFeeAmount || !newFeetype}
                 className="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-[80px] hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Add Feature
+                Add Fees
               </button>
             </div>
           </div>

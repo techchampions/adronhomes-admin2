@@ -1,139 +1,27 @@
-
 import React, { useState } from "react";
 import { IoCaretBack, IoCaretForward } from "react-icons/io5";
-import Pagination from "../../components/Pagination";
+import Pagination from "../../components/Tables/Pagination";
 
-const CustomersTableAllActive = () => {
-  // Data extracted from the updated image
-  const customerData = [
-    {
-      id: "1",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "2",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "3",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "4",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "5",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "6",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "7",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "8",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "9",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "10",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "11",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "12",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "13",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "14",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      nextPayment: "19.07.2025",
-      upcomingPayment: "₦57,600,000",
-      phoneNumber: "08094563678"
-    }
-  ];
+import { fetchMarketerDashboard } from "../../components/Redux/Marketer/Dashboard_thunk";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../components/Redux/store";
+import {
+  selectActivePlansPagination,
+  setActivePlansCurrentPage,
+} from "../../components/Redux/Marketer/Dashboard_slice";
+import { formatDate } from "../../utils/formatdate";
+import { formatAsNaira } from "../../utils/formatcurrency";
 
+const CustomersTableAllActive = ({ customerData }: { customerData?: any }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const pagination = useSelector(selectActivePlansPagination);
+
+  // Use the sample data from image if no customerData is provided
+
+  const handlePageChange = (page: number) => {
+    dispatch(setActivePlansCurrentPage(page));
+    dispatch(fetchMarketerDashboard({ currentpage: page }));
+  };
 
   return (
     <div className="w-full">
@@ -141,47 +29,41 @@ const CustomersTableAllActive = () => {
         <div className="min-w-[800px] md:min-w-0">
           <table className="w-full">
             <thead>
-              <tr className="text-left">
-                <th className="pb-6 font-[325] text-[#757575] text-[12px] pr-6 whitespace-nowrap">
+              <tr className="text-left ">
+                <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
                   Customer's Name
                 </th>
-                <th className="pb-6 font-[325] text-[#757575] text-[12px] pr-6 whitespace-nowrap">
-                  Marketer in Charge
-                </th>
-                <th className="pb-6 font-[325] text-[#757575] text-[12px] pr-6 whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Date Joined
                 </th>
-                <th className="pb-6 font-[325] text-[#757575] text-[12px] pr-6 whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Next Payment
                 </th>
-                <th className="pb-6 font-[325] text-[#757575] text-[12px] pr-6 whitespace-nowrap">
-                  Upcoming Payment
+                <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
+                 Paid Amount
                 </th>
-                <th className="pb-6 font-[325] text-[#757575] text-[12px] whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
                   Phone Number
                 </th>
               </tr>
             </thead>
             <tbody>
-              {customerData.map((row) => (
+              {customerData.map((row: any) => (
                 <tr key={row.id} className="cursor-pointer">
-                  <td className="pb-8 font-[325] text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.name}
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                    {row.name ?? 'N/A'}
                   </td>
-                  <td className="pb-8 font-[350] text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.marketer}
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                    {formatDate(row.dateJoined )}
                   </td>
-                  <td className="pb-8 font-[325] text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.dateJoined}
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                    {formatDate(row.nextPayment)}
                   </td>
-                  <td className="pb-8 font-[325] text-dark text-sm whitespace-nowrap">
-                    {row.nextPayment}
+                  <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
+                    {formatAsNaira(row.paid_amount )?? 'N/A'}
                   </td>
-                  <td className="pb-8 font-[325] text-dark text-sm whitespace-nowrap">
-                    {row.upcomingPayment}
-                  </td>
-                  <td className="pb-8 font-[325] text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.phoneNumber}
+                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                    {row.phoneNumber ?? 'N/A'}
                   </td>
                 </tr>
               ))}
@@ -189,7 +71,11 @@ const CustomersTableAllActive = () => {
           </table>
         </div>
       </div>
-      <Pagination />
+      <Pagination
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        className="mt-8 mb-4"
+      />
     </div>
   );
 };
