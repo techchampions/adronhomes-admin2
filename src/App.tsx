@@ -34,6 +34,13 @@ import { getUser } from "./components/Redux/User/user_Thunk";
 import PaymentListComponent from "./pages/Customers/PaymentStatus";
 import PaymentById from "./pages/Payment/paymentById";
 import InfrastructureFeesModal from "./components/Modals/InfrastructureFeesModal";
+import SliderSettings from "./components/Settings/SliderSettings/SliderSettings";
+import HeaderSettings from "./components/Settings/HeaderSettings/HeaderSettings";
+import EditHeaderDetails from "./components/Settings/HeaderSettings/EditHeaderDetails";
+import OfficeLocations from "./components/Settings/Site location/SiteLoactions";
+import LeaderShipSettings from "./components/Settings/LeaderShipSettings/LeaderShipSettings";
+import AddHeaderDetails from "./components/Settings/HeaderSettings/AddNewHeaderDetails";
+import { QueryProvider } from "./utils/hooks/MyQueryProvider";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -67,80 +74,114 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <div className="flex">
       {shouldShowSidebar && (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white w-[20%]">
           {isMarketerRoute ? <SideBar /> : <AdminSidebar />}
         </div>
       )}
-      <div className="w-full">{children}</div>
+      <div className="w-full lg:w-[80%]">{children}</div>
     </div>
   );
 };
 
 const App = () => {
-    const { formData, isBulk, isLandProperty, setMedia,isInfrastructure, setIsCancelInfrastructure
-   } = useContext(PropertyContext)!;
+  const {
+    formData,
+    isBulk,
+    isLandProperty,
+    setMedia,
+    isInfrastructure,
+    setIsCancelInfrastructure,
+  } = useContext(PropertyContext)!;
   return (
     <Provider store={store}>
-      <PropertyProvider>
-        <AppLayout>
-          <Routes>
-            {/* Public Route */}
-            <Route path="/" element={<Login />} />
+      <QueryProvider>
+        <PropertyProvider>
+          <AppLayout>
+            <Routes>
+              {/* Public Route */}
+              <Route path="/" element={<Login />} />
 
-            {/* Protected Routes */}
-            <Route element={<AuthGuard />}>
-              {/* Admin Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/payments" element={<Payment />} />
-              <Route path="/payments/status/:paymentId" element={<PaymentById />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/properties" element={<Properties />} />
-              <Route path="/personnel" element={<Personnel />} />
-              <Route
-                path="/requests-enquiries"
-                element={<RequestsEnquiries />}
-              />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route
-                path="/customers/singlepage"
-                element={<CustomerSinglePage />}
-              />
-              <Route
-                path="/customers/singlepage/payment"
-                element={<CustomersPayment />}
-              />
-              <Route
-                path="/customers/singlepage/singlepayment"
-                element={<CustomersSinglePayment />}
-              />
-              <Route path="/properties/form" element={<General />} />
+              {/* Protected Routes */}
+              <Route element={<AuthGuard />}>
+                {/* Admin Routes */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/payments" element={<Payment />} />
+                <Route
+                  path="/payments/status/:paymentId"
+                  element={<PaymentById />}
+                />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/properties" element={<Properties />} />
+                <Route path="/personnel" element={<Personnel />} />
+                <Route
+                  path="/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/settings/sliders" element={<SliderSettings />} />
+                <Route
+                  path="/settings/page-headers"
+                  element={<HeaderSettings />}
+                />
+                <Route
+                  path="/settings/page-headers/edit/:id"
+                  element={<EditHeaderDetails />}
+                />
+                <Route
+                  path="/settings/page-headers/new"
+                  element={<AddHeaderDetails />}
+                />
+                <Route
+                  path="/settings/office-locations"
+                  element={<OfficeLocations />}
+                />
+                <Route
+                  path="/settings/leadership"
+                  element={<LeaderShipSettings />}
+                />
+                <Route
+                  path="/customers/singlepage"
+                  element={<CustomerSinglePage />}
+                />
+                <Route
+                  path="/customers/singlepage/payment"
+                  element={<CustomersPayment />}
+                />
+                <Route
+                  path="/customers/singlepage/singlepayment"
+                  element={<CustomersSinglePayment />}
+                />
+                <Route path="/properties/form" element={<General />} />
 
-              {/* Marketer Routes */}
-              <Route path="/marketer" element={<MarketersDashboard />} />
-              <Route path="/marketer/settings" element={<SettingsPage />} />
-              <Route path="/marketer/payment" element={<MarketerInvoice />} />
-            </Route>
-          </Routes>
-        </AppLayout>
-  {isInfrastructure &&  (<InfrastructureFeesModal 
-        isOpen={isInfrastructure}
-        onClose={() => setIsCancelInfrastructure(false)}
-      />)}
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </PropertyProvider>
+                {/* Marketer Routes */}
+                <Route path="/marketer" element={<MarketersDashboard />} />
+                <Route path="/marketer/settings" element={<SettingsPage />} />
+                <Route path="/marketer/payment" element={<MarketerInvoice />} />
+              </Route>
+            </Routes>
+          </AppLayout>
+          {isInfrastructure && (
+            <InfrastructureFeesModal
+              isOpen={isInfrastructure}
+              onClose={() => setIsCancelInfrastructure(false)}
+            />
+          )}
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </PropertyProvider>
+      </QueryProvider>
     </Provider>
   );
 };
