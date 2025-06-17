@@ -42,7 +42,7 @@ const MassUploadModal: React.FC<MassUploadModalProps> = ({ isOpen, onClose, onSu
   });
 
   return (
-    <div className="fixed inset-0 bg-[#17191CBA] bg-opacity-25 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-[#17191CBA] bg-opacity-25 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto z-40">
       <div className="relative bg-white rounded-2xl sm:rounded-3xl md:rounded-[40px] w-full max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-6">
              <p
           className="absolute top-4 right-4 md:top-6 md:right-6 cursor-pointer text-lg md:text-base"

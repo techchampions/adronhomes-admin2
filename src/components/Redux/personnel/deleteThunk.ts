@@ -4,59 +4,13 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { RootState } from "../../store";
+import { RootState } from "../store";
 
 
-interface PropertyDocument {
-  name: string;
-  url: string;
-  type: string;
-}
 
-interface PropertyFormData {
-  name: string;
-  display_image: File[];
-  photos: File[];
-  size: string;
-  price: string;
-  type: string;
-  no_of_bedroom: string;
-  features: string[];
-  overview: string;
-  description: string;
-  street_address: string;
-  country: string;
-  state: string;
-  lga: string;
-  area: string;
-  property_map: string;
-  property_video: string;
-  virtual_tour: string;
-  status: string;
-  initial_deposit: string;
-  property_duration_limit: string;
-  payment_schedule: string[];
-  category: string;
-  is_discount: string;
-  discount_name: string;
-  discount_percentage: string;
-  discount_units: string;
-  discount_start_date: string;
-  discount_end_date: string;
-  parking_space: string;
-  number_of_bathroom: string;
-  number_of_unit: string;
-  property_agreement: File[];
-  is_active: string;
-  details: string[];
-  keyValuePairs: Array<{
-    key: string;
-    value: string;
-    description: string;
-  }>;
-}
 
-export interface AddPropertySuccessResponse {
+
+export interface deleteResponse {
   status: "success";
   success: true;
   propertyId: string;
@@ -70,13 +24,13 @@ export interface ErrorResponse {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const UpdateProperty = createAsyncThunk<
-  AddPropertySuccessResponse,
-  { UpdateId:any,credentials: FormData },
+export const DeletePersonel = createAsyncThunk<
+  deleteResponse,
+  { propertyId: string }, // Changed from UpdateId to propertyId for clarity
   { rejectValue: ErrorResponse; state: RootState }
 >(
-  "property/UpdateProperty",
-  async ({UpdateId, credentials }, { rejectWithValue }) => {
+  "property/DeleteProperty",
+  async ({ propertyId }, { rejectWithValue }) => {
     const token = Cookies.get('token');
     
     if (!token) {
@@ -87,9 +41,8 @@ export const UpdateProperty = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<AddPropertySuccessResponse>(
-        `${BASE_URL}/api/admin/edit-property/${UpdateId}`,
-        credentials,
+      const response = await axios.delete<deleteResponse>(
+        `${BASE_URL}/api/admin/delete-personnel/${propertyId}`,
         {
           headers: {
             'Content-Type': 'multipart/form-data',

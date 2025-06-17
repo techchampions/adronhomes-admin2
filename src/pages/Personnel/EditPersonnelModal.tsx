@@ -1,3 +1,4 @@
+// EditPersonnelModal.tsx
 import { useState } from "react";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
@@ -5,30 +6,32 @@ import InputField from "../../components/input/inputtext";
 import OptionInputField from "../../components/input/drop_down";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
-import { CreatePersonnel } from "../../components/Redux/personnel/personnel_thunk";
 import { toast } from "react-toastify";
+import { Edithpersonel, User } from "../../components/Redux/personnel/edithPersonelle";
+import { personnels } from "../../components/Redux/personnel/personnel_thunk";
 
-
-interface PersonnelModalProps {
-  isOpen?: boolean;
-  onClose?: () => void;
+interface EditPersonnelModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  personnel: User;
 }
 
-interface PersonnelFormValues {
+interface EditPersonnelFormValues {
   firstName: string;
   lastName: string;
   phoneNumber: string;
   role: string;
   email: string;
-  password: string;
+  password: string; // new field
 }
+
 
 const roleOptions = [
   { value: "1", label: "Admin" },
   { value: "2", label: "Marketer" },
   { value: "3", label: "Director" },
-   { value: "4", label: "Accountant" },
-    { value: "5", label: "Hr" },
+  { value: "4", label: "Accountant" },
+  { value: "5", label: "Hr" },
 ];
 
 const validationSchema = Yup.object().shape({
@@ -42,60 +45,66 @@ const validationSchema = Yup.object().shape({
   role: Yup.string().required("Role is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
+    .min(6, "Password must be at least 6 characters")
+    .optional(), // Make optional for updates
 });
 
-export default function PersonnelModal({
 
-  isOpen = true,
-  onClose = () => {},
-}: PersonnelModalProps) {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-     const dispatch = useDispatch<AppDispatch>()
-       const { loading, error, success } = useSelector(
-    (state: RootState) => state.Createpersonnel
+export default function EditPersonnelModal({
+  isOpen,
+  onClose,
+  personnel,
+}: EditPersonnelModalProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector(
+    (state: RootState) => state.Edithpersonel
   );
 
-const handleSubmit = async (
-  values: PersonnelFormValues,
-  { setSubmitting }: FormikHelpers<PersonnelFormValues>
-) => {
-  const formData = new FormData();
-  
-  // Append each field to the FormData object
-  formData.append("first_name", values.firstName);
-  formData.append("last_name", values.lastName);
-  formData.append("phone_number", values.phoneNumber);
-  formData.append("role", values.role);
-  formData.append("email", values.email);
+  const handleSubmit = async (
+    values: EditPersonnelFormValues,
+    { setSubmitting }: FormikHelpers<EditPersonnelFormValues>
+  ) => {
+    const formData = new FormData();
+    
+    formData.append("first_name", values.firstName);
+    formData.append("last_name", values.lastName);
+    formData.append("phone_number", values.phoneNumber);
+    formData.append("role", values.role);
+    formData.append("email", values.email);
+    if (values.password) {
   formData.append("password", values.password);
+}
 
-  try {
-    const resultAction = await dispatch(CreatePersonnel({ credentials: formData }));
+    try {
+      const resultAction = await dispatch(
+        Edithpersonel({
+          UpdateId: personnel.id,
+          credentials: formData
+        })
+      );
 
-    if (CreatePersonnel.fulfilled.match(resultAction)) {
-      toast.success("Personnel created successfully!");
-      onClose();
-    } else if (CreatePersonnel.rejected.match(resultAction)) {
-      const errorMessage = resultAction.payload?.message || 'Failed to create personnel.';
-      toast.error(errorMessage);
+      if (Edithpersonel.fulfilled.match(resultAction)) {
+        dispatch(personnels())
+        onClose();
+      } else if (Edithpersonel.rejected.match(resultAction)) {
+        const errorMessage = resultAction.payload?.message || 'Failed to update personnel.';
+        toast.error(errorMessage);
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setSubmitting(false);
     }
-  } catch (err) {
-    toast.error("An unexpected error occurred.");
-  } finally {
-    setSubmitting(false);
-  }
-};
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#17191CBA] bg-opacity-25 flex items-center justify-center p-1 sm:p-4 overflow-y-auto overflow-x-hidden z-40" >
-      <div className="bg-white rounded-xl sm:rounded-2xl md:rounded-3xl w-full max-w-[95vw] xs:max-w-xs sm:max-w-md mx-auto my-1 p-2 sm:p-4 md:p-6 z-50">
+    <div className="fixed inset-0 bg-[#17191CBA] bg-opacity-25 flex items-center justify-center p-1 sm:p-4 overflow-y-auto overflow-x-hidden">
+      <div className="bg-white rounded-xl sm:rounded-2xl md:rounded-3xl w-full max-w-[95vw] xs:max-w-xs sm:max-w-md mx-auto my-1 p-2 sm:p-4 md:p-6">
         <div className="flex justify-between items-center mb-1 sm:mb-2">
           <h2 className="text-sm xs:text-base sm:text-lg md:text-xl font-medium text-dark">
-            Create Personnel
+            Edit Personnel
           </h2>
           <button
             onClick={onClose}
@@ -107,18 +116,18 @@ const handleSubmit = async (
         </div>
 
         <p className="text-gray-600 text-xs xs:text-sm mb-2 sm:mb-3 md:mb-4">
-          Create a new Personnel and assign a role.
+          Update personnel information and role.
         </p>
 
         <Formik
-          initialValues={{
-            firstName: "",
-            lastName: "",
-            phoneNumber: "",
-            role: "",
-            email: "",
-            password: "",
-          }}
+        initialValues={{
+    firstName: personnel.first_name,
+    lastName: personnel.last_name,
+    phoneNumber: personnel.phone_number,
+    role: personnel.role.toString(),
+    email: personnel.email,
+    password: "", // default empty
+  }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
@@ -134,7 +143,6 @@ const handleSubmit = async (
                     name="firstName"
                     error={touched.firstName && errors.firstName}
                     required
-        
                   />
                 </div>
                 <div>
@@ -146,7 +154,6 @@ const handleSubmit = async (
                     name="lastName"
                     error={touched.lastName && errors.lastName}
                     required
-        
                   />
                 </div>
               </div>
@@ -161,7 +168,6 @@ const handleSubmit = async (
                   type="tel"
                   error={touched.phoneNumber && errors.phoneNumber}
                   required
-      
                 />
               </div>
 
@@ -182,7 +188,6 @@ const handleSubmit = async (
                   error={touched.role && errors.role}
                   options={roleOptions}
                   dropdownTitle="Select Role"
-      
                 />
 
                 <div className="flex items-start mt-1 text-[#767676] font-light text-[10px] xs:text-xs">
@@ -219,28 +224,22 @@ const handleSubmit = async (
                   type="email"
                   error={touched.email && errors.email}
                   required
-      
                 />
               </div>
+              <div className="mb-2 sm:mb-3 md:mb-4">
+  <InputField
+    label="Password"
+    placeholder="Enter new password (leave blank to keep current)"
+    value={values.password}
+    onChange={handleChange}
+    name="password"
+    type="password"
+    error={touched.password && errors.password}
+  />
+</div>
 
-              <div className="mb-3 sm:mb-4">
-                <div className="relative">
-                  <InputField
-                    label="Password"
-                    placeholder="Password"
-                    value={values.password}
-                    onChange={handleChange}
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    error={touched.password && errors.password}
-                    required
-        
-                  />
-              
-                </div>
-              </div>
 
-                 <div className="flex justify-between items-center gap-2 mt-[50px]">
+              <div className="flex justify-between items-center gap-2 mt-[50px]">
                 <button
                   type="button"
                   onClick={onClose}
@@ -248,25 +247,25 @@ const handleSubmit = async (
                 >
                   Cancel
                 </button>
-               <button
-  type="submit"
-  disabled={loading}
-  className={`${
-    loading ? 'bg-[#272727]/70 cursor-not-allowed' : 'bg-[#272727] cursor-pointer'
-  } text-xs sm:text-sm md:text-base font-bold text-white rounded-full py-2 px-4 sm:py-3 sm:px-6 md:py-[21px] md:px-[82px] flex items-center justify-center`}
->
-  {loading ? (
-    <>
-      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Creating...
-    </>
-  ) : (
-    "Create"
-  )}
-</button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`${
+                    loading ? 'bg-[#272727]/70 cursor-not-allowed' : 'bg-[#272727] cursor-pointer'
+                  } text-xs sm:text-sm md:text-base font-bold text-white rounded-full py-2 px-4 sm:py-3 sm:px-6 md:py-[21px] md:px-[82px] flex items-center justify-center`}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    "Update"
+                  )}
+                </button>
               </div>
             </Form>
           )}

@@ -61,12 +61,12 @@ export default function InfrastructureFeesModal({
     }
   };
 
-  const formatAmount = (value: string): string => {
-    // Remove non-numeric characters except commas
-    const cleaned = value.replace(/[^\d,]/g, "");
-    // Add ₦ prefix if not present
-    return cleaned ? `₦${cleaned}` : "";
-  };
+  // const formatAmount = (value: string): string => {
+  //   // Remove non-numeric characters except commas
+  //   const cleaned = value.replace(/[^\d,]/g, "");
+  //   // Add ₦ prefix if not present
+  //   return cleaned ? `₦${cleaned}` : "";
+  // };
 
   if (!isOpen) return null;
 
@@ -148,15 +148,20 @@ export default function InfrastructureFeesModal({
                   <label className="block text-[#4F4F4F] font-[325] text-[14px] mb-2">
                     Amount
                   </label>
-                  <input
-                    type="text"
-                    value={newFeeAmount}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      setNewFeeAmount(formatAmount(e.target.value))
-                    }
-                    className="w-full relative bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px]"
-                    placeholder="₦0"
-                  />
+                <input
+  type="text"
+  value={newFeeAmount}
+  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/[^\d]/g, ""); // keep digits only
+    const formatted = rawValue
+      ? "₦" + parseInt(rawValue, 10).toLocaleString("en-NG")
+      : "";
+    setNewFeeAmount(formatted);
+  }}
+  className="w-full relative bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px]"
+  placeholder="₦0"
+/>
+
                 </div>
               </div>
 
@@ -175,7 +180,7 @@ export default function InfrastructureFeesModal({
                 disabled={!newFeeName || !newFeeAmount || !newFeetype}
                 className="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded-[80px] hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Add Feature
+                Add Fees
               </button>
             </div>
           </div>

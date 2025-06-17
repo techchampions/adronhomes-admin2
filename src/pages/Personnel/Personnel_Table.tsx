@@ -1,60 +1,87 @@
-import React from "react";
-import { IoCaretBack, IoCaretForward } from "react-icons/io5";
-import Pagination from "../../components/Pagination";
+// Personnel_Table.tsx
+import React, { useEffect, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
+import Pagination from "../../components/Tables/Pagination";
+import { personnels } from "../../components/Redux/personnel/personnel_thunk";
+import { selectPersonnelPagination, setCurrentPage } from "../../components/Redux/personnel/personnel_slice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../components/Redux/store";
+import { formatDate } from "../../utils/formatdate";
+import EditPersonnelModal from "./EditPersonnelModal";
+import { User } from "../../components/Redux/personnel/edithPersonelle";
+import ConfirmationModal from "../../components/Modals/delete";
+import { DeletePersonel } from "../../components/Redux/personnel/deleteThunk";
+import { resetUpdatePropertyState } from "../../components/Redux/personnel/delete_slice";
+import { toast } from "react-toastify";
 
-interface UsersTable {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  role: string;
+
+
+
+export interface UsersTable {
+  User: string;
+  Email: string;
+  Role: string;
+  Created: string;
+  id: any;
+  user: User; // Add the full user object
 }
 
 interface UsersTableProps {
-  data: UsersTable[];
+  userData: UsersTable[];
 }
 
-export default function UsersTableComponent() {
-  // Using the data from the image
-  const userData = [
-    {
-      id: "1",
-      name: "Sarah Mka",
-      email: "SarahMka@yahoo.com",
-      status: "Active",
-      role: "Marketer"
-    },
-    {
-      id: "2",
-      name: "Sarah Mka",
-      email: "SarahMka@yahoo.com",
-      status: "Active",
-      role: "Marketer"
-    },
-    {
-      id: "3",
-      name: "Sarah Mka",
-      email: "SarahMka@yahoo.com",
-      status: "Active",
-      role: "Marketer"
-    },
-    {
-      id: "4",
-      name: "Sarah Mka",
-      email: "SarahMka@yahoo.com",
-      status: "Active",
-      role: "Marketer"
-    },
-    {
-      id: "5",
-      name: "Sarah Mka",
-      email: "SarahMka@yahoo.com",
-      status: "Active",
-      role: "Marketer"
-    }
-  ];
+export default function UsersTableComponent({ userData }: UsersTableProps) {
+  const pagination = useSelector(selectPersonnelPagination);
+  const dispatch = useDispatch<AppDispatch>();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPersonnel, setEditingPersonnel] = useState<User | null>(null);
+   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+const [personelToDelete, setPersonelToDelete] = useState<User | null>(null);
+  const { loading:deleteloading, success:deletesuccess, error:deleteerror } = useSelector((state: RootState) => state.DeletePersonnel);
+    const { loading, success, error } = useSelector((state: RootState) => state.editPersonnelSlice);
+  useEffect(() => {
+  if (deletesuccess && personelToDelete) {
+    toast.success("Property deleted successfully!");
+  dispatch(personnels());
+    handleCloseDeleteModal();
+  }
+  
+  if (deleteerror) {
+    toast.error(deleteerror || "Failed to delete property");
+  }
+}, [deletesuccess, deleteerror, dispatch, personelToDelete]);
+  const handlePageChange = async (page: number) => {
+    dispatch(setCurrentPage(page));
+    dispatch(personnels());
+  };
 
+  const handleEditPersonnel = (user: User) => {
+    setEditingPersonnel(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingPersonnel(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setPersonelToDelete(null);
+    dispatch(resetUpdatePropertyState());
+  };
+
+  
+  const handleDeleteClick = (user: User)=> {
+    setPersonelToDelete(user);
+    setIsDeleteModalOpen(true);
+
+  };
+  const handleConfirmDelete = async () => {
+    if (personelToDelete) {
+      await dispatch(DeletePersonel({ propertyId: personelToDelete.id.toString() }));
+    }
+  };
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -62,19 +89,19 @@ export default function UsersTableComponent() {
           <table className="w-full">
             <thead>
               <tr className="text-left">
-                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
                   User
                 </th>
-                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
                   Email
                 </th>
-                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
-                  Status
-                </th>
-                <th className="pb-6  font-[325]     text-[#757575] text-sm pr-8 whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
                   Role
                 </th>
-                <th className="pb-6  font-[325]     text-[#757575] text-sm whitespace-nowrap">
+                <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
+                  Created
+                </th>
+                <th className="pb-6 font-[325] text-[#757575] text-sm whitespace-nowrap">
                   Action
                 </th>
               </tr>
@@ -82,29 +109,37 @@ export default function UsersTableComponent() {
             <tbody>
               {userData.map((user) => (
                 <tr key={user.id} className="">
-                  <td className="py-4    text-dark text-sm whitespace-nowrap">
-                    {user.name}
+                  <td className="py-4 text-dark text-sm whitespace-nowrap">
+                    {user.User}
                   </td>
-                  <td className="py-4  font-[325]     text-dark text-sm whitespace-nowrap">
-                    {user.email}
+                  <td className="py-4 font-[325] text-dark text-sm whitespace-nowrap">
+                    {user.Email}
                   </td>
-                  <td className="py-4  font-[325]     text-dark text-sm whitespace-nowrap">
-                    {user.status}
-                  </td>
-                  <td className="py-4  font-[350]     text-dark text-sm whitespace-nowrap">
+                  <td className="py-4 font-[350] text-dark text-sm whitespace-nowrap">
                     <div className="flex items-center">
-                      {user.role}
-                      <span className="ml-2"> <FaCaretDown  className="w-4 h-4"/></span>
-                     
-                    
+                      {user.Role}
+                      <span className="ml-2"><FaCaretDown className="w-4 h-4"/></span>
                     </div>
                   </td>
-                  <td className="py-4  font-[325]     text-dark text-sm whitespace-nowrap">
-                    <button className="text-red-500">
-                       <img src="mingcute_delete-fill.svg"  className="w-5 h-5" />
-                 
-                   
-                    </button>
+                  <td className="py-4 font-[325] text-dark text-sm whitespace-nowrap">
+                    <div className="flex items-center">
+                      {formatDate(user.Created)}
+                    </div>
+                  </td>
+                  <td className="py-4 font-[325] text-dark text-sm whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      <button 
+                        aria-label="Edit personnel"
+                        onClick={() => handleEditPersonnel(user.user)}
+                      >
+                        <img src="/ic_round-edit.svg" className="w-[18px] h-[18px]"/>
+                      </button>
+                      <button aria-label="Delete personnel" onClick={()=>handleDeleteClick(
+                        user.user
+                      )}>
+                        <img src="mingcute_delete-fill.svg" className="w-[18px] h-[18px]"/>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -113,8 +148,35 @@ export default function UsersTableComponent() {
         </div>
       </div>
       <div className="w-full mt-4">
-        <Pagination />
+        <Pagination
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          className="mt-8 mb-4"
+        />
       </div>
+     {/* delete property */}
+   {isDeleteModalOpen && personelToDelete && (
+  <ConfirmationModal
+    isOpen={isDeleteModalOpen}
+    title="Delete Personel"
+    description="Are you sure you want to delete"
+    subjectName={`${personelToDelete.first_name} ${personelToDelete.last_name}`}
+    onClose={handleCloseDeleteModal}
+    onConfirm={handleConfirmDelete}
+    confirmButtonText="Delete Property"
+    cancelButtonText="Cancel"
+    loading={deleteloading}
+  />
+)}
+      {/* Edit Personnel Modal */}
+      {editingPersonnel && (
+        <EditPersonnelModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          personnel={editingPersonnel}
+       
+        />
+      )}
     </>
   );
 }

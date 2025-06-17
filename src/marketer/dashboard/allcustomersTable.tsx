@@ -1,152 +1,24 @@
 import React, { useState } from "react";
 import { IoCaretBack, IoCaretForward } from "react-icons/io5";
-import Pagination from "../../components/Pagination";
 
-const CustomersTableAll = () => {
-  // Data extracted from the image
-  const customerData = [
-    {
-      id: "1",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "2",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "3",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "4",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "5",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "6",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "7",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "8",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "9",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "10",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "11",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "12",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "13",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    },
-    {
-      id: "14",
-      name: "Sarah Mka",
-      marketer: "Mikel Otega",
-      dateJoined: "19.07.2025",
-      propertyPlans: "3",
-      savedProperties: "4",
-      phoneNumber: "08094563678"
-    }
-  ];
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../components/Redux/store";
 
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(customerData.length / itemsPerPage);
-  
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = customerData.slice(indexOfFirstItem, indexOfLastItem);
+import { fetchMarketerDashboard } from "../../components/Redux/Marketer/Dashboard_thunk";
+import { selectReferredUsersPagination, setReferredUsersCurrentPage } from "../../components/Redux/Marketer/Dashboard_slice";
+import Pagination from "../../components/Tables/Pagination";
+import { formatDate } from "../../utils/formatdate";
 
-  const handlePageChange = (pageNumber: React.SetStateAction<number>) => {
-    setCurrentPage(pageNumber);
+const CustomersTableAll = ({currentItems}:{currentItems:any}) => {
+
+  const dispatch = useDispatch<AppDispatch>();
+  const pagination = useSelector(selectReferredUsersPagination);
+  // const activePlans = useSelector(selectActivePlans);
+
+  const handlePageChange = (page: number) => {
+    dispatch(setReferredUsersCurrentPage(page));
+    dispatch(fetchMarketerDashboard({ currentpage: page }));
   };
-
-
 
     
   return (
@@ -157,11 +29,9 @@ const CustomersTableAll = () => {
             <thead>
               <tr className="text-left ">
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
-                  Customer's Name
+                 Customer’s Name
                 </th>
-                <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowra text-[12px]">
-                  Marketer in Charge
-                </th>
+               
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Date Joined
                 </th>
@@ -177,25 +47,23 @@ const CustomersTableAll = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((row) => (
+              {currentItems.map((row:any) => (
                 <tr key={row.id} className="cursor-pointer">
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.name}
+                    {row.name ?? 'N/A'}
                   </td>
-                  <td className="pb-8 font-[350]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.marketer}
-                  </td>
+               
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.dateJoined}
+                    {formatDate(row.dateJoined )?? 'N/A'}
                   </td>
                   <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
-                    {row.propertyPlans}
+                    {row.propertyPlans ?? 'N/A'} 
                   </td>
                   <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
-                    {row.savedProperties}
+                    {row.savedProperties ?? 'N/A'}
                   </td>
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.phoneNumber}
+                    {row.phoneNumber ?? 'N/A'}
                   </td>
                 </tr>
               ))}
@@ -203,7 +71,11 @@ const CustomersTableAll = () => {
           </table>
         </div>
       </div>
-      <Pagination />
+  <Pagination
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        className="mt-8 mb-4"
+      />
     </div>
   );
 };

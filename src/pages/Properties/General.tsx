@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import StepIndicator from "../../general/StepIndicator";
 import ForProperties from "../../components/Tables/forProperties";
 import BasicDetails from "./BasicDetails/BasicDetails";
@@ -13,6 +13,8 @@ import PropertyListing from "./edithFinal/EdithFnal";
 import FeaturesInput from "./Features/Features";
 import LandForm from "./BasicDetails/PropertySpecifications/land";
 import FinalSubmission from "./FinalSubmission";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../components/Redux/store";
 
 export default function General() {
   const {
@@ -22,8 +24,14 @@ export default function General() {
     formData,
     isLandProperty,
     isBulk,
+    isSubmitting,
   } = useContext(PropertyContext)!;
   const [discount, setDiscount] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
+      const { loading, success, error } = useSelector((state: RootState) => state.addproperty);
+      // useEffect(()=>{
+      //   if(s)
+      // })
 
   // Create refs for all form components
   const basicDetailsRef = useRef<any>(null);
@@ -36,6 +44,8 @@ export default function General() {
   const land = useRef<any>(null);
 
   const handleNext = async () => {
+    if (isSubmitting) return;
+    
     let canProceed = true;
 
     // Validate current step before proceeding
@@ -71,7 +81,6 @@ export default function General() {
           mediaRef.current.handleSubmit();
           canProceed = mediaRef.current.isValid;
         }
-        
         break;
       case 4:
         if (featuresRef.current) {
@@ -92,24 +101,18 @@ export default function General() {
         }
         break;
       case 6:
-        // Preview step - no validation needed
-        await submitForm();
-        break;
-      case 7:
-        // Final submission
-        await submitForm();
-        return;
+        case 7:
+          await submitForm();
+          return;
     }
 
     if (canProceed) {
       setCurrentStep(currentStep + 1);
-    } else {
-      alert("Please fill all required fields correctly");
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 1) {
+    if (currentStep > 1 && !isSubmitting) {
       setCurrentStep(currentStep - 1);
     }
   };
@@ -119,7 +122,7 @@ export default function General() {
     "Property Specifications",
     "Media",
     "Features",
-    discount ? "Discount":"Set Payment Structure",
+    discount ? "Discount" : "Set Payment Structure",
     "Payment Structure",
     "Preview",
     "Complete",
@@ -136,6 +139,18 @@ export default function General() {
     <div className="w-full">
       <Header />
       <div className="w-full lg:pl-[38px] lg:pr-[64px] pr-[15px] pl-[15px]">
+        {/* {isSubmitting && (
+          <div className="fixed inset-0 bg-[#272727] flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#79B833]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Submitting your property...
+            </div>
+          </div>
+        )} */}
+
         {currentStep === 6 || currentStep === 7 ? (
           <>
             <p className="text-dark text-2xl font-[350] mb-[8px]">
@@ -210,7 +225,7 @@ export default function General() {
               <div className="relative">
                 <p
                   className="absolute top-5 right-5 cursor-pointer"
-                  onClick={() => setDiscount(false)}
+                  onClick={() => !isSubmitting && setDiscount(false)}
                 >
                   x
                 </p>
@@ -221,8 +236,8 @@ export default function General() {
               </div>
             ) : (
               <p
-                className="text-dark font-bold text-sm text-center cursor-pointer"
-                onClick={() => setDiscount(true)}
+                className={`text-dark font-bold text-sm text-center cursor-pointer ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => !isSubmitting && setDiscount(true)}
               >
                 Add Discount
               </p>
@@ -238,8 +253,11 @@ export default function General() {
             <div>
               {currentStep > 1 && currentStep < 7 && (
                 <button
-                  className="bg-[#272727] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#272727] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4"
+                  className={`bg-[#272727] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#272727] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   onClick={handleBack}
+                  disabled={isSubmitting}
                 >
                   Back
                 </button>
@@ -250,10 +268,23 @@ export default function General() {
             <div>
               {currentStep < 7 && (
                 <button
-                  className="bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap"
+                  className={`bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   onClick={handleNext}
+                  disabled={isSubmitting}
                 >
-                  {nextButtonText}
+                  {isSubmitting ? (
+                    <div className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </div>
+                  ) : (
+                    nextButtonText
+                  )}
                 </button>
               )}
             </div>

@@ -26,7 +26,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
     images: Yup.array()
       .min(1, "At least one image is required")
       .required("Images are required"),
-    tourLink: Yup.string().url("Must be a valid URL").required("Tour link is required"),
+    // tourLink: Yup.string().url("Must be a valid URL").required("Tour link is required"),
   });
 
   const formikRef = useRef<any>(null);

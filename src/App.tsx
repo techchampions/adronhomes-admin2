@@ -100,7 +100,6 @@ const App = () => {
             <Routes>
               {/* Public Route */}
               <Route path="/" element={<Login />} />
-
               {/* Protected Routes */}
               <Route element={<AuthGuard />}>
                 {/* Admin Routes */}

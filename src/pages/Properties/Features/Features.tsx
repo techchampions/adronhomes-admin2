@@ -74,7 +74,7 @@ const FeaturesInput = forwardRef<FeaturesInputHandles>((props, ref) => {
   const validate = async () => {
     try {
       await validationSchema.validate({ features });
-      alert(features)
+      // alert(features)÷
       return true;
     } catch (error) {
       return false;

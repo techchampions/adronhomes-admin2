@@ -710,7 +710,7 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2">
               <span className="text-sm w-24">From:</span>
               <input
-                type="text"
+                type="date"
                 value={tempData.discount.from}
                 onChange={(e) => setTempData({
                   ...tempData,
@@ -722,7 +722,7 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2">
               <span className="text-sm w-24">To:</span>
               <input
-                type="text"
+                type="date"
                 value={tempData.discount.to}
                 onChange={(e) => setTempData({
                   ...tempData,

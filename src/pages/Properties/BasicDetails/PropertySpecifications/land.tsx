@@ -1,15 +1,18 @@
-import React, { forwardRef, useImperativeHandle, useContext, useEffect } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useContext,
+  useEffect,
+} from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../../components/input/inputtext";
 import FileUploadField from "../../../../components/input/FileUploadField";
 import InputAreaField from "../../../../components/input/TextArea";
-
 import { PropertyContext } from "../../../../MyContext/MyContext";
 import OptionInputField from "../../../../components/input/drop_down";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../components/Redux/store";
-import { personnels } from "../../../../components/Redux/personnel/personnel_thunk";
 import { directors } from "../../../../components/Redux/directors/directors_thunk";
 
 interface LandFormHandles {
@@ -28,7 +31,7 @@ interface LandFormValues {
   description: string;
   overview: string;
   documents: File[];
-    director_id: string; // Add this field
+  director_id: string; // Add this field
 }
 interface DropdownOption {
   label: string;
@@ -36,29 +39,29 @@ interface DropdownOption {
 }
 const LandForm = forwardRef<LandFormHandles>((props, ref) => {
   const { formData, setLandForm } = useContext(PropertyContext)!;
-      const dispatch = useDispatch<AppDispatch>();
-      useEffect(() => {
-      dispatch(directors());
-      }, [dispatch]);
-    
-      const {
-        loading: userLoading,
-        error: userError,
-    data
-      } = useSelector((state: RootState) => state.directors);
-     
- const labels: DropdownOption[] = Array.isArray(data)
-  ? data.map(person => ({
-      label: `${person.first_name} ${person.last_name}`,
-      value: person.id,
-    }))
-  : [];
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    dispatch(directors());
+  }, [dispatch]);
+
+  const {
+    loading: userLoading,
+    error: userError,
+    data,
+  } = useSelector((state: RootState) => state.directors);
+
+  const labels: DropdownOption[] = Array.isArray(data)
+    ? data.map((person) => ({
+        label: `${person.first_name} ${person.last_name}`,
+        value: person.id,
+      }))
+    : [];
 
   const validationSchema = Yup.object().shape({
     propertySize: Yup.string().required("Property size is required"),
     description: Yup.string().required("Description is required"),
     overview: Yup.string().required("Overview is required"),
-       director_id: Yup.string().required("Director is required"), // Add validation
+    director_id: Yup.string().required("Director is required"), // Add validation
   });
 
   const formik = useFormik<LandFormValues>({
@@ -69,35 +72,35 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
     },
   });
 
-useImperativeHandle(ref, () => ({
-  handleSubmit: async () => {
-    const errors = await formik.validateForm();
-    const hasErrors = Object.keys(errors).length > 0;
+  useImperativeHandle(ref, () => ({
+    handleSubmit: async () => {
+      const errors = await formik.validateForm();
+      const hasErrors = Object.keys(errors).length > 0;
 
-    if (hasErrors) {
-      formik.setTouched(
-        Object.keys(errors).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {} as { [field: string]: boolean }),
-        true
-      );
-      return false;
-    } else {
-      formik.handleSubmit();
-      return true;
-    }
-  },
-  isValid: formik.isValid 
-}));
- const propertyTypeOptions = [
-      { value: 0, label: "customers" },
-      { value: 1, label: "admin" },
-      { value: 2, label: "marketer" },
-      { value: 3, label: "director" },
-      { value: 4, label: "accountant" },
-      { value: 5, label: "hr" },
-    ];
+      if (hasErrors) {
+        formik.setTouched(
+          Object.keys(errors).reduce((acc, key) => {
+            acc[key] = true;
+            return acc;
+          }, {} as { [field: string]: boolean }),
+          true
+        );
+        return false;
+      } else {
+        formik.handleSubmit();
+        return true;
+      }
+    },
+    isValid: formik.isValid,
+  }));
+  const propertyTypeOptions = [
+    { value: 0, label: "customers" },
+    { value: 1, label: "admin" },
+    { value: 2, label: "marketer" },
+    { value: 3, label: "director" },
+    { value: 4, label: "accountant" },
+    { value: 5, label: "hr" },
+  ];
   // Options for dropdowns
   const plotShapeOptions = [
     { value: "regular", label: "Regular" },
@@ -131,21 +134,21 @@ useImperativeHandle(ref, () => ({
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-          <OptionInputField
-          label="Role"
-          placeholder="Select director"
-          name="director_id"
-          value={formik.values.director_id}
-          onChange={(value: any) => formik.setFieldValue("director_id", value)}
-          options={labels}
-          dropdownTitle="Roles"
-          error={
-            formik.touched.director_id && formik.errors.director_id
-              ? formik.errors.director_id
-              : undefined
-          }
-        />
-      <div className="grid grid-cols-2 gap-12">
+      <OptionInputField
+        label="Role"
+        placeholder="Select director"
+        name="director_id"
+        value={formik.values.director_id}
+        onChange={(value: any) => formik.setFieldValue("director_id", value)}
+        options={labels}
+        dropdownTitle="Roles"
+        error={
+          formik.touched.director_id && formik.errors.director_id
+            ? formik.errors.director_id
+            : undefined
+        }
+      />
+      <div className="grid md:  md:grid-cols-2 gap-12">
         <OptionInputField
           label="Plot Shape"
           placeholder="Select Plot Shape"
@@ -165,22 +168,24 @@ useImperativeHandle(ref, () => ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
-       <div className="relative">
-         <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">Sq M</p>
-         <InputField
-           label="Property Size"
-           placeholder="Enter Property Size"
-           name="propertySize"
-           value={formik.values.propertySize}
-           onChange={formik.handleChange}
-           error={
-             formik.touched.propertySize && formik.errors.propertySize
-               ? formik.errors.propertySize
-               : undefined
-           }
-         />
-       </div>
+      <div className="grid  md:grid-cols-2 gap-12">
+        <div className="relative">
+          <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">
+            Sq M
+          </p>
+          <InputField
+            label="Property Size"
+            placeholder="Enter Property Size"
+            name="propertySize"
+            value={formik.values.propertySize}
+            onChange={formik.handleChange}
+            error={
+              formik.touched.propertySize && formik.errors.propertySize
+                ? formik.errors.propertySize
+                : undefined
+            }
+          />
+        </div>
 
         <InputField
           label="Land Size"
@@ -191,7 +196,7 @@ useImperativeHandle(ref, () => ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid  md:grid-cols-2 gap-12">
         <OptionInputField
           label="Road Access"
           placeholder="Select Road Access"
@@ -211,7 +216,7 @@ useImperativeHandle(ref, () => ({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-12">
+      <div className="grid  md:grid-cols-2 gap-12">
         <InputField
           label="Units Available"
           placeholder="Enter Units Available"

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {personnels, PersonnelsResponse } from "./personnel_thunk";
+import { personnels, PersonnelsResponse } from "./personnel_thunk";
 
 export interface Personnel {
   id: number;
@@ -25,6 +25,14 @@ export interface Personnel {
   personnel: string;
   contract_id: string | null;
 }
+
+interface Pagination {
+  currentPage: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+}
+
 interface PersonnelsState {
   data: {
     current_page: number;
@@ -48,6 +56,7 @@ interface PersonnelsState {
   loading: boolean;
   error: string | null;
   success: boolean;
+  pagination: Pagination;
 }
 
 const initialState: PersonnelsState = {
@@ -55,6 +64,12 @@ const initialState: PersonnelsState = {
   loading: false,
   error: null,
   success: false,
+  pagination: {
+    currentPage: 1,
+    perPage: 10,
+    totalItems: 0,
+    totalPages: 1,
+  },
 };
 
 const personnelsSlice = createSlice({
@@ -66,6 +81,7 @@ const personnelsSlice = createSlice({
       if (state.data) {
         state.data.current_page = action.payload;
       }
+      state.pagination.currentPage = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -81,6 +97,12 @@ const personnelsSlice = createSlice({
           state.loading = false;
           state.success = action.payload.success;
           state.data = action.payload.data;
+          state.pagination = {
+            currentPage: action.payload.data.current_page,
+            perPage: action.payload.data.per_page,
+            totalItems: action.payload.data.total,
+            totalPages: action.payload.data.last_page,
+          };
         }
       )
       .addCase(personnels.rejected, (state, action) => {
@@ -93,3 +115,6 @@ const personnelsSlice = createSlice({
 
 export const { resetPersonnelsState, setCurrentPage } = personnelsSlice.actions;
 export default personnelsSlice.reducer;
+
+export const selectPersonnelPagination = (state: { getpersonnel: PersonnelsState }) => 
+  state.getpersonnel.pagination;
