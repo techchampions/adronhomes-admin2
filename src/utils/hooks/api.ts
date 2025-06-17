@@ -3,6 +3,14 @@ import {
   UpdateHeaderPayload,
   UpdateHeaderResponse,
 } from "../../pages/Properties/types/HeaderDataTypes";
+import {
+  CreateLeaderPayload,
+  CreateLeadershipResponse,
+  DeleteLeadershipResponse,
+  EditLeaderPayload,
+  LeadershipItem,
+  LeadershipResponse,
+} from "../../pages/Properties/types/LeadershipDataTypes";
 import { SliderByTypeRes } from "../../pages/Properties/types/SliderByTypeResponse";
 import {
   UploadSliderPayload,
@@ -80,4 +88,55 @@ export const updateHeaderData = async (
     },
   });
   return res.data;
+};
+
+// Get Leaders Data
+export const getLeadersData = async (
+  page: number
+): Promise<LeadershipResponse> => {
+  const endpoint = `/leaderships?page=${page}`;
+  const response = await apiClient.get(endpoint);
+  return response.data;
+};
+
+// Create Leader data
+export const createLeaderData = async (
+  payload: Partial<CreateLeaderPayload>
+): Promise<CreateLeadershipResponse> => {
+  const formData = new FormData();
+  if (payload.position) formData.append("position", payload.position);
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.description) formData.append("description", payload.description);
+  if (payload.picture) formData.append("picture", payload.picture);
+  const response = await apiClient.post("/create-leader", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+// Edit Leader data
+export const editLeaderData = async (
+  payload: Partial<EditLeaderPayload>
+): Promise<CreateLeadershipResponse> => {
+  const formData = new FormData();
+  if (payload.position) formData.append("position", payload.position);
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.description) formData.append("description", payload.description);
+  if (payload.picture) formData.append("picture", payload.picture);
+  const response = await apiClient.post(`/edit-leader/${payload.id}`, payload, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+// Delete Leader data
+export const deleteLeaderData = async (
+  id: number
+): Promise<DeleteLeadershipResponse> => {
+  const endpoint = `/delete-leader/${id}`;
+  const response = await apiClient.delete(endpoint);
+  return response.data;
 };

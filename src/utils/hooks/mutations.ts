@@ -1,5 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteSliderById, updateHeaderData, uploadSliderByType } from "./api";
+import {
+  createLeaderData,
+  deleteLeaderData,
+  deleteSliderById,
+  editLeaderData,
+  updateHeaderData,
+  uploadSliderByType,
+} from "./api";
 
 // Query hook for Uploading Slides
 export const useUploadSlideByType = () => {
@@ -39,6 +46,46 @@ export const useEditHeader = () => {
       // Refetch relevant data if needed
       queryClient.invalidateQueries({
         queryKey: ["Headers"],
+      });
+    },
+  });
+};
+
+export const useAddLeader = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createLeaderData,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Leaders"],
+      });
+    },
+  });
+};
+export const useEditLeader = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: editLeaderData,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Leaders"],
+      });
+    },
+  });
+};
+
+export const useDeleteLeader = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteLeaderData,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Leaders"],
       });
     },
   });
