@@ -1,16 +1,29 @@
+import { toast } from "react-toastify";
+import { useDeleteLeader } from "../../../utils/hooks/mutations";
 import Button from "../../input/Button";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
+  leader: number;
 }
 
 export default function DeleteLeader({
   isOpen = true,
+  leader,
   onClose = () => {},
 }: ModalProps) {
+  const { mutate: deleteLeader, isPending } = useDeleteLeader();
   const handleSubmit = () => {
-    console.log("Form submitted:");
+    deleteLeader(leader, {
+      onSuccess(data, variables, context) {
+        toast.success("Deleted Leader Successfully");
+      },
+      onError(error, variables, context) {
+        toast.error("Failed to delete Leader");
+      },
+    });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -39,7 +52,13 @@ export default function DeleteLeader({
             className="!bg-transparent !text-black"
             onClick={onClose}
           />
-          <Button label="Delete" className="!bg-red-500" />
+          <Button
+            label="Delete"
+            className="!bg-red-500"
+            isLoading={isPending}
+            disabled={isPending}
+            onClick={handleSubmit}
+          />
         </div>
       </div>
     </div>

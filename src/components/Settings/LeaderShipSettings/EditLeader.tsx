@@ -6,14 +6,19 @@ import InputField from "../../input/inputtext";
 import OptionInputField from "../../input/drop_down";
 import Button from "../../input/Button";
 import InputAreaField from "../../input/TextArea";
-import { useAddLeader } from "../../../utils/hooks/mutations";
-import { CreateLeaderPayload } from "../../../pages/Properties/types/LeadershipDataTypes";
+import { useAddLeader, useEditLeader } from "../../../utils/hooks/mutations";
+import {
+  CreateLeaderPayload,
+  EditLeaderPayload,
+  LeadershipItem,
+} from "../../../pages/Properties/types/LeadershipDataTypes";
 import { toast } from "react-toastify";
 import SoosarInputField from "../../soosarInput";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
+  leaderData: LeadershipItem;
 }
 
 interface FormData {
@@ -23,33 +28,34 @@ interface FormData {
   picture: null | File;
 }
 
-const initialValues = {
-  name: "",
-  picture: null,
-  description: "",
-  position: "",
-};
-
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
-  picture: Yup.array().required("picture is required"),
-  position: Yup.string().required("Position is required"),
-  description: Yup.string().required("Description is required"),
+  // name: Yup.string().required("Name is required"),
+  // position: Yup.string().required("Position is required"),
+  // picture: Yup.array().required("picture is required"),
 });
 
-export default function AddLeader({
+export default function EditLeaderModal({
   isOpen = true,
   onClose = () => {},
+  leaderData,
 }: ModalProps) {
-  const { mutate: createLeader, isError, isPending } = useAddLeader();
-  const handleSubmit = (values: CreateLeaderPayload) => {
+  const initialValues = {
+    id: leaderData.id,
+    name: leaderData.name,
+    picture: null,
+    description: leaderData.description,
+    position: leaderData.position,
+  };
+
+  const { mutate: editLeader, isError, isPending } = useEditLeader();
+  const handleSubmit = (values: EditLeaderPayload) => {
     console.log("Form submitted:", values);
-    createLeader(values, {
+    editLeader(values, {
       onSuccess(data, variables, context) {
-        toast.success("Leader added successfully");
+        toast.success("Leader Updated successfully");
       },
       onError(error, variables, context) {
-        toast.error("Error adding leader");
+        toast.error("Error updating leader");
       },
     });
     onClose();
@@ -59,10 +65,10 @@ export default function AddLeader({
 
   return (
     <div className="fixed inset-0 z-50 bg-[#17191CBA] bg-opacity-25 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-h-[95%] overflow-y-scroll scrollbar-hide max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-10">
+      <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-h-[95%] overflow-y-scroll scrollbar-hide max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-20">
         <div className="flex justify-between items-center mb-1 sm:mb-2 md:mb-[10px]">
           <h2 className="text-lg sm:text-xl md:text-2xl font-[350] text-dark">
-            Add New Leader{" "}
+            Edit Leader
           </h2>
           <button
             onClick={onClose}
@@ -102,12 +108,12 @@ export default function AddLeader({
                     }
                   }}
                 />
-                {values.picture ? (
+                {values.picture || leaderData.picture ? (
                   <img
                     src={
                       values.picture
                         ? URL.createObjectURL(values.picture)
-                        : "/user.svg"
+                        : `${leaderData.picture}`
                     }
                     alt="Profile"
                     className="w-full h-full rounded-full object-cover"
@@ -138,12 +144,12 @@ export default function AddLeader({
                 </label>
                 <SoosarInputField
                   name="description"
-                  placeholder="Enter Description"
                   type="textarea"
+                  placeholder="Enter Description"
                 />
               </div>
 
-              <div className="flex justify-between items-center gap-2 mt-[20px]">
+              <div className="flex justify-between items-center gap-2 mt-[20px] px-7">
                 <Button
                   label="Cancel"
                   onClick={onClose}

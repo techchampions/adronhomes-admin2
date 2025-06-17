@@ -11,6 +11,7 @@ import {
 import { useEditHeader } from "../../../utils/hooks/mutations";
 import { IoAdd } from "react-icons/io5";
 import { toast } from "react-toastify";
+import SoosarInputField from "../../soosarInput";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -19,7 +20,7 @@ interface ModalProps {
 }
 const EditHeaderDetails: React.FC<ModalProps> = ({
   isOpen,
-  onClose,
+  onClose = () => {},
   headerDetails,
 }) => {
   const initialValues = {
@@ -50,6 +51,20 @@ const EditHeaderDetails: React.FC<ModalProps> = ({
   }, [headerDetails]);
 
   const { mutate: editHeader, isPending, isError } = useEditHeader();
+  const handleSubmit = (values: typeof initialValues) => {
+    const payload = createPayload(values);
+    console.log(payload);
+    editHeader(payload, {
+      onSuccess(data, variables, context) {
+        toast.success("Updated Header Successfully");
+      },
+      onError(error, variables, context) {
+        toast.error("Failed to Update Header");
+      },
+    });
+    onClose();
+  };
+
   const createPayload = (values: typeof initialValues) => {
     const payload: UpdateHeaderPayload = {
       id: headerDetails?.id,
@@ -89,25 +104,14 @@ const EditHeaderDetails: React.FC<ModalProps> = ({
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            const payload = createPayload(values);
-            console.log(payload);
-            editHeader(payload, {
-              onSuccess(data, variables, context) {
-                toast.success("Updated Header Successfully");
-              },
-              onError(error, variables, context) {
-                toast.error("Failed to Update Header");
-              },
-            });
-          }}
+          onSubmit={handleSubmit}
         >
           {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form className="space-y-6">
                 {/* Profile Picture */}
-                <div className="bg-white rounded-3xl p-0 space-y-6">
-                  <div className="flex justify-center items-center gap-4">
+                <div className="bg-white rounded-3xl p-0 space-y-4">
+                  <div className="flex justify-center items-center gap-4 px-7">
                     <label className="cursor-pointer border border-dashed border-gray-300 overflow-hidden p-2 rounded-2xl relative w-full h-[200px] flex flex-col justify-center items-center">
                       <input
                         type="file"
@@ -140,130 +144,103 @@ const EditHeaderDetails: React.FC<ModalProps> = ({
                       )}
                     </label>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 px-7">
                     <div className="">
-                      <InputField
-                        label="Name"
-                        value={initialValues.name}
-                        placeholder={initialValues.name}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value) {
-                            setFieldValue("header", value);
-                          }
-                        }}
-                      />
+                      <label htmlFor="" className="text-sm text-gray-500">
+                        Name
+                      </label>
+                      <SoosarInputField name="name" placeholder="Enter Name" />
                     </div>
-                    <div>
-                      <InputField
-                        label="Slug"
-                        disabled
-                        value={initialValues.slug}
-                        placeholder={initialValues.slug}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value) {
-                            setFieldValue("slug", value);
-                          }
-                        }}
-                      />
+                    <div className="">
+                      <label htmlFor="" className="text-sm text-gray-500">
+                        Slug
+                      </label>
+                      <SoosarInputField name="slu" placeholder="Enter Slug" />
                     </div>
                   </div>
 
-                  {/* Email & Phone */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <InputField
-                        label="Action Link"
-                        value={initialValues.action_link || ""}
-                        placeholder={initialValues.action_link || ""}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value) {
-                            setFieldValue("header", value);
-                          }
-                        }}
+                    <div className=" px-7">
+                      <label htmlFor="" className="text-sm text-gray-500">
+                        Action Link
+                      </label>
+                      <SoosarInputField
+                        name="action_link"
+                        placeholder="Enter Action link"
                       />
                     </div>
-                    <div className="">
-                      <InputField
-                        label="header"
-                        value={initialValues.header}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value) {
-                            setFieldValue("header", value);
-                          }
-                        }}
-                        placeholder={initialValues.header}
+                    <div className=" px-7">
+                      <label htmlFor="" className="text-sm text-gray-500">
+                        Header
+                      </label>
+                      <SoosarInputField
+                        name="header"
+                        placeholder="Enter Header"
                       />
                     </div>
                   </div>
                   <div className=" flex">
                     <div className="flex flex-col flex-1">
-                      <div className="flex items-end gap-2">
-                        <InputField
-                          label="List Desc"
-                          value={values.list}
-                          placeholder="Input list item"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value) {
-                              setFieldValue(`list`, value);
-                            }
-                          }}
-                        />
-                        <div
-                          className="border border-gray-300 rounded-full p-3 hover:border-gray-700"
-                          onClick={() => {
-                            setListDescription((prev) => [
-                              ...prev,
-                              values.list,
-                            ]);
-                            setFieldValue("list", "");
-                          }}
-                        >
-                          <IoAdd className="" />
+                      <div className=" px-7">
+                        <label htmlFor="" className="text-sm text-gray-500">
+                          List Description
+                        </label>
+                        <div className="flex items-end gap-2">
+                          <SoosarInputField
+                            name="list"
+                            placeholder="Enter List item"
+                          />
+
+                          <div
+                            className="border border-gray-300 rounded-full p-3 hover:border-gray-700"
+                            onClick={() => {
+                              setListDescription((prev) => [
+                                ...prev,
+                                values.list,
+                              ]);
+                              setFieldValue("list", "");
+                            }}
+                          >
+                            <IoAdd className="" />
+                          </div>
                         </div>
                       </div>
-
-                      {listDescription.map((list, index) => (
-                        <InputField
-                          key={index}
-                          label=""
-                          value={list}
-                          placeholder="Input list item"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value) {
-                              setFieldValue(
-                                `list_description[${index}]`,
-                                value
-                              );
-                            }
-                          }}
-                        />
-                      ))}
+                      <div className="flex flex-col px-7">
+                        {listDescription.map((list, index) => (
+                          <InputField
+                            key={index}
+                            label=""
+                            value={list}
+                            placeholder="Input list item"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value) {
+                                setFieldValue(
+                                  `list_description[${index}]`,
+                                  value
+                                );
+                              }
+                            }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  <div>
-                    <InputAreaField
-                      label="Description"
-                      value={headerDetails?.description || ""}
-                      placeholder={initialValues.description || ""}
-                      onChange={(e) => {
-                        const text = e.target.value;
-                        if (text) {
-                          setFieldValue("description", text);
-                        }
-                      }}
+                  <div className=" px-7">
+                    <label htmlFor="" className="text-sm text-gray-500">
+                      Description
+                    </label>
+                    <SoosarInputField
+                      type="textarea"
+                      name="description"
+                      placeholder="Enter description"
                     />
                   </div>
                 </div>
 
                 {/* Save Button */}
-                <div className="text-right">
+                <div className="text-right px-7">
                   <Button
                     label={
                       isSubmitting || isPending ? `Saving...` : `Save Changes`
