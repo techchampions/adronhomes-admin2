@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteSliderById, uploadSliderByType } from "./api";
+import { deleteSliderById, updateHeaderData, uploadSliderByType } from "./api";
 
 // Query hook for Uploading Slides
 export const useUploadSlideByType = () => {
@@ -25,6 +25,20 @@ export const useDeleteSlide = () => {
       // Refetch relevant data if needed
       queryClient.invalidateQueries({
         queryKey: ["Sliders"],
+      });
+    },
+  });
+};
+
+export const useEditHeader = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateHeaderData,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Headers"],
       });
     },
   });

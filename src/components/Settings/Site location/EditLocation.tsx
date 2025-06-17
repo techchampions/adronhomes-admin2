@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { FiEyeOff } from "react-icons/fi";
 import InputField from "../../input/inputtext";
 import OptionInputField from "../../input/drop_down";
 import Button from "../../input/Button";
