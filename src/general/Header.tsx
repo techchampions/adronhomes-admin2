@@ -42,22 +42,25 @@ export default function Header({
     setIsUserBulk,
   } = useContext(PropertyContext)!;
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const [createpersonnel, setcreatepersonnel] = useState(false);
+  const [createpersonnel, setcreatepersonnel] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const isPersonnelPage = location.pathname === "/personnel";
 
   const handleButtonClick = () => {
-    if (isCancelState) {
+    if (onButtonClick) {
+      setIsCancelState(false);
+      onButtonClick();
+    } else if (isCancelState) {
       // When in cancel state, navigate back
       navigate(isPersonnelPage ? "/personnel" : "/properties");
       setIsCancelState(false);
     } else {
       // Normal state behavior
-      if (onButtonClick) {
-        onButtonClick();
-      }
+      // if (onButtonClick) {
+      //   onButtonClick();
+      // }
 
       if (isPersonnelPage) {
         // Personnel-specific action
@@ -82,7 +85,7 @@ export default function Header({
   //   error: userError,
   //   user,
   // } = useSelector((state: RootState) => state.user);
- 
+
   return (
     <>
       <div className="w-full flex-col lg:flex-row justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] flex overflow-hidden relative">
@@ -95,10 +98,16 @@ export default function Header({
           </p>
           {history && (
             <>
-              <p className="text-dark font-meduim text-base lg:flex items-center mt-4 hidden">
+              <p
+                onClick={() => navigate(-1)}
+                className="text-dark font-meduim text-base lg:flex items-center mt-4 hidden"
+              >
                 <IoMdArrowBack className="mr-2" /> Back
               </p>
-              <p className="text-dark font-meduim text-base lg:hidden absolute top-0 right-10 items-center mt-4 flex">
+              <p
+                onClick={() => navigate(-1)}
+                className="text-dark font-meduim text-base lg:hidden absolute top-0 right-10 items-center mt-4 flex"
+              >
                 <IoMdArrowBack className="mr-2" /> Back
               </p>
             </>
@@ -156,20 +165,22 @@ export default function Header({
           }}
         />
       )}
-  {  createpersonnel &&  <BulkPersonnelSelectModal
-        onSelect={(isBulk) => {
-          setIsUserBulk(true);
-          setPersonnelModal(true);
-          setcreatepersonnel(false)
-        }}
-        onSelects={(isBulk) => {
-          setIsUserBulk(false);
-          setPersonnelModal(true);
-          setcreatepersonnel(false)
-        }}
-        onClose={() => setcreatepersonnel(false)}
-        x={()=>setcreatepersonnel(false)}
-      />}
+      {createpersonnel && (
+        <BulkPersonnelSelectModal
+          onSelect={(isBulk) => {
+            setIsUserBulk(true);
+            setPersonnelModal(true);
+            setcreatepersonnel(false);
+          }}
+          onSelects={(isBulk) => {
+            setIsUserBulk(false);
+            setPersonnelModal(true);
+            setcreatepersonnel(false);
+          }}
+          onClose={() => setcreatepersonnel(false)}
+          x={() => setcreatepersonnel(false)}
+        />
+      )}
       {showPersonnelModal && (
         <>
           {isUserBulk ? (
@@ -180,7 +191,9 @@ export default function Header({
                 files: FileList | null;
               }): Promise<void> {
                 throw new Error("Function not implemented.");
-              } } x={() => setPersonnelModal(false)}/>
+              }}
+              x={() => setPersonnelModal(false)}
+            />
           ) : (
             <PersonnelModal
               isOpen={showPersonnelModal}
@@ -193,18 +206,8 @@ export default function Header({
   );
 }
 
-
-
-
-
-
-
-
 // isUserBulk,
 //       setIsUserBulk,
-
-
-
 
 // // Header.tsx
 // import React, { useContext, useState } from "react";
@@ -272,7 +275,7 @@ export default function Header({
 //         // Property-specific action
 //         setIsCancelState(true);
 //         setShowBulkModal(true);
-        
+
 //       }
 //     }
 //   };

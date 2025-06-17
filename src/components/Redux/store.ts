@@ -23,19 +23,20 @@ import DeletePersonnelReducer from"./personnel/delete_slice"
 import editPersonnelSliceReducer from"./personnel/edithPersonelle"
 import marketerdashboardSlice from "./Marketer/Dashboard_slice"
 
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    user:userReducer,
-    dashboardData:dashboardReducer,
-    customers:customersReducer,
-    transactions:transactionsReducer,
-    payments:paymentsReducer,
-    sendOtp:otpReducer,
-    reserPassword:reserPasswordReducer,
-      paymentsById: PaymentsStateReducer,
+    user: userReducer,
+    dashboardData: dashboardReducer,
+    customers: customersReducer,
+    transactions: transactionsReducer,
+    payments: paymentsReducer,
+    sendOtp: otpReducer,
+    reserPassword: reserPasswordReducer,
+    paymentsById: PaymentsStateReducer,
     paymentList: paymentListReducer,
-    updatePayment:updatePaymentReducer,
+    updatePayment: updatePaymentReducer,
     properties: PropertiesState,
     addproperty:addpropertyReducer,
     updateproperty:updatepropertyReducer,
