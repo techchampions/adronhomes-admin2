@@ -41,6 +41,7 @@ import OfficeLocations from "./components/Settings/Site location/SiteLoactions";
 import LeaderShipSettings from "./components/Settings/LeaderShipSettings/LeaderShipSettings";
 import AddHeaderDetails from "./components/Settings/HeaderSettings/AddNewHeaderDetails";
 import { QueryProvider } from "./utils/hooks/MyQueryProvider";
+import AccountDetails from "./components/Settings/AddAccountSettings/AccountDetails";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -139,6 +140,10 @@ const App = () => {
                 <Route
                   path="/settings/leadership"
                   element={<LeaderShipSettings />}
+                />
+                <Route
+                  path="/settings/add-account"
+                  element={<AccountDetails />}
                 />
                 <Route
                   path="/customers/singlepage"

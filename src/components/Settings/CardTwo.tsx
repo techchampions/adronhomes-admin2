@@ -34,10 +34,12 @@ const paymentSettings = [
   {
     title: "Add Payment Method",
     description: "Click to add a new payment method",
+    slug: "add-payment",
   },
   {
     title: "Add Account Details",
     description: "Click to add a bank account details",
+    slug: "add-account",
   },
 ];
 
@@ -81,9 +83,10 @@ export default function CardTwo() {
         {paymentSettings.map((item, index) => (
           <div
             key={index}
-            className={`pl-4 md:pl-6 pr-6 md:pr-[36px] py-4 md:py-[18px] rounded-2xl md:rounded-[30px] ${
+            className={`cursor-pointer pl-4 md:pl-6 pr-6 md:pr-[36px] py-4 md:py-[18px] rounded-2xl md:rounded-[30px] ${
               index % 2 === 1 ? "bg-[#F5F5F5]" : ""
             }`}
+            onClick={() => navigate(`${item.slug}`)}
           >
             <div className="flex justify-between items-start">
               <div>
