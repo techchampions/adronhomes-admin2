@@ -6,22 +6,24 @@ import InputField from "../../input/inputtext";
 import OptionInputField from "../../input/drop_down";
 import Button from "../../input/Button";
 import InputAreaField from "../../input/TextArea";
-import { useAddLeader, useCreateAccount } from "../../../utils/hooks/mutations";
+import {
+  useAddLeader,
+  useCreateAccount,
+  useEditAccount,
+} from "../../../utils/hooks/mutations";
 import { CreateLeaderPayload } from "../../../pages/Properties/types/LeadershipDataTypes";
 import { toast } from "react-toastify";
 import SoosarInputField from "../../soosarInput";
-import { CreateAccountPayload } from "../../../pages/Properties/types/AccountDetailsTypes";
+import {
+  AccountDetail,
+  CreateAccountPayload,
+} from "../../../pages/Properties/types/AccountDetailsTypes";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
+  account: AccountDetail | undefined;
 }
-
-const initialValues = {
-  account_name: "",
-  bank_name: "",
-  account_number: "",
-};
 
 const validationSchema = Yup.object().shape({
   account_name: Yup.string().required("Name is required"),
@@ -29,11 +31,18 @@ const validationSchema = Yup.object().shape({
   account_number: Yup.string().required("Account Number is required"),
 });
 
-export default function AddAccount({
+export default function EditAccount({
   isOpen = true,
   onClose = () => {},
+  account,
 }: ModalProps) {
-  const { mutate: createAccount, isError, isPending } = useCreateAccount();
+  const initialValues = {
+    id: account?.id,
+    account_name: account?.account_name,
+    bank_name: account?.bank_name,
+    account_number: account?.account_number,
+  };
+  const { mutate: createAccount, isError, isPending } = useEditAccount();
   const handleSubmit = (values: CreateAccountPayload) => {
     console.log("Form submitted:", values);
     createAccount(values, {

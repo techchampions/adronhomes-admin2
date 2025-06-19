@@ -1,8 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  createAccountDetails,
   createLeaderData,
+  deleteAccount,
   deleteLeaderData,
   deleteSliderById,
+  editAccountDetails,
   editLeaderData,
   updateHeaderData,
   uploadSliderByType,
@@ -86,6 +89,43 @@ export const useDeleteLeader = () => {
       // Refetch relevant data if needed
       queryClient.invalidateQueries({
         queryKey: ["Leaders"],
+      });
+    },
+  });
+};
+
+export const useCreateAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createAccountDetails,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Accounts"],
+      });
+    },
+  });
+};
+export const useEditAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: editAccountDetails,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Accounts"],
+      });
+    },
+  });
+};
+export const useDeleteAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteAccount,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Accounts"],
       });
     },
   });

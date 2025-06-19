@@ -1,4 +1,8 @@
 import {
+  AccountDetailsResponse,
+  CreateAccountPayload,
+} from "../../pages/Properties/types/AccountDetailsTypes";
+import {
   HeadersResponse,
   UpdateHeaderPayload,
   UpdateHeaderResponse,
@@ -17,6 +21,7 @@ import {
   UploadSliderResponse,
 } from "../../pages/Properties/types/UploadSilderPayload";
 import apiClient from "./ApiClient";
+import openApiClient from "./GeneralApiClient";
 
 //Get Sliders By Type
 export const getSliderByType = async (
@@ -108,7 +113,7 @@ export const createLeaderData = async (
   if (payload.name) formData.append("name", payload.name);
   if (payload.description) formData.append("description", payload.description);
   if (payload.picture) formData.append("picture", payload.picture);
-  const response = await apiClient.post("/create-leader", payload, {
+  const response = await apiClient.post("/create-leader", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -124,11 +129,15 @@ export const editLeaderData = async (
   if (payload.name) formData.append("name", payload.name);
   if (payload.description) formData.append("description", payload.description);
   if (payload.picture) formData.append("picture", payload.picture);
-  const response = await apiClient.post(`/edit-leader/${payload.id}`, payload, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await apiClient.post(
+    `/edit-leader/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
   return response.data;
 };
 
@@ -137,6 +146,66 @@ export const deleteLeaderData = async (
   id: number
 ): Promise<DeleteLeadershipResponse> => {
   const endpoint = `/delete-leader/${id}`;
+  const response = await apiClient.delete(endpoint);
+  return response.data;
+};
+
+//Get All Account Details
+export const getAllAccountDetails =
+  async (): Promise<AccountDetailsResponse> => {
+    const response = await openApiClient.get("/account-details");
+    return response.data;
+  };
+
+// Create Account Details
+export const createAccountDetails = async (
+  payload: Partial<CreateAccountPayload>
+): Promise<AccountDetailsResponse> => {
+  const formData = new FormData();
+  if (payload.bank_name) formData.append("bank_name", payload.bank_name);
+  if (payload.account_name)
+    formData.append("account_name", payload.account_name);
+  if (payload.account_number)
+    formData.append("account_number", payload.account_number);
+
+  const response = await apiClient.post("/create-account-details", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+// Update Account Details
+export const editAccountDetails = async (
+  payload: Partial<CreateAccountPayload>
+): Promise<AccountDetailsResponse> => {
+  const formData = new FormData();
+  if (payload.bank_name) formData.append("bank_name", payload.bank_name);
+  if (payload.account_name)
+    formData.append("account_name", payload.account_name);
+  if (payload.account_number)
+    formData.append("account_number", payload.account_number);
+
+  const response = await apiClient.post(
+    `/update-account-details/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Delete Account data
+export const deleteAccount = async (
+  id: number | undefined
+): Promise<DeleteLeadershipResponse> => {
+  if (!id) {
+    throw new Error("id is required");
+  }
+  const endpoint = `/delete-account-details/${id}`;
   const response = await apiClient.delete(endpoint);
   return response.data;
 };

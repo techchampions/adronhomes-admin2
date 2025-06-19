@@ -42,6 +42,8 @@ import LeaderShipSettings from "./components/Settings/LeaderShipSettings/LeaderS
 import AddHeaderDetails from "./components/Settings/HeaderSettings/AddNewHeaderDetails";
 import { QueryProvider } from "./utils/hooks/MyQueryProvider";
 import AccountDetails from "./components/Settings/AddAccountSettings/AccountDetails";
+import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
+import DirectorsDashboard from "./director/DirectorDashboard";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -70,13 +72,20 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isMarketerRoute = location.pathname.startsWith("/marketer");
+  const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
 
   return (
     <div className="flex">
       {shouldShowSidebar && (
         <div className="min-h-screen bg-white w-[20%]">
-          {isMarketerRoute ? <SideBar /> : <AdminSidebar />}
+          {isMarketerRoute ? (
+            <SideBar />
+          ) : isDirectorRoute ? (
+            <DirectorSideBar />
+          ) : (
+            <AdminSidebar />
+          )}
         </div>
       )}
       <div className="w-full lg:w-[80%]">{children}</div>
@@ -161,6 +170,7 @@ const App = () => {
 
                 {/* Marketer Routes */}
                 <Route path="/marketer" element={<MarketersDashboard />} />
+                <Route path="/director" element={<DirectorsDashboard />} />
                 <Route path="/marketer/settings" element={<SettingsPage />} />
                 <Route path="/marketer/payment" element={<MarketerInvoice />} />
               </Route>
