@@ -5,7 +5,7 @@ import PaymentListCard from "../../general/PaymentListCard";
 import InvoiceCard from "../../general/InvoiceCard";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import Pagination from "../../components/Pagination";
-import PaymentCard from "./PaymentTable";
+// import PaymentCard from "./PaymentTable";
 import ProductList from "./PaymentStatus";
 import PaymentListComponent from "./PaymentStatus";
 
@@ -31,9 +31,11 @@ export default function Customers_singlepayment() {
         <p className="text-dark font-[350] md:text-[20px] text-base px-[24px]">
         Payment List
         </p>
-        <div className="w-full overflow-x-auto">
-          {/* <ProductList /> */}
-        </div>
+        {/* <div className="w-full overflow-x-auto">
+          <ProductList onClose={function (): void {
+            throw new Error("Function not implemented.");
+          } } paymentId={0} />
+        </div> */}
       </div>
     </div>
   );
