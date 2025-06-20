@@ -1,25 +1,31 @@
 import React from "react";
 import { IoCaretForwardSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const websiteSettings = [
   {
     title: "Slider",
+    slug: "sliders",
     description: "Manage the content on the homepage slider",
   },
   {
     title: "Pages Headers",
+    slug: "page-headers",
     description: "Manage page headers",
   },
   {
     title: "Site Information",
+    slug: "site-information",
     description: "Manage site information",
   },
   {
     title: "Office Locations",
+    slug: "office-locations",
     description: "Update office locations",
   },
   {
     title: "Leadership",
+    slug: "leadership",
     description: "Manage leadership information",
   },
 ];
@@ -36,6 +42,7 @@ const paymentSettings = [
 ];
 
 export default function CardTwo() {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-2xl md:rounded-[30px] px-4 md:px-[23px] py-6 md:py-[38px]">
       {/* Website Settings section */}
@@ -46,9 +53,10 @@ export default function CardTwo() {
         {websiteSettings.map((item, index) => (
           <div
             key={index}
-            className={`pl-4 md:pl-6 pr-6 md:pr-[36px] py-4 md:py-[18px] rounded-2xl md:rounded-[30px] ${
+            className={`pl-4 cursor-pointer md:pl-6 pr-6 md:pr-[36px] py-4 md:py-[18px] rounded-2xl md:rounded-[30px] ${
               index % 2 === 1 ? "bg-[#F5F5F5]" : ""
             }`}
+            onClick={() => navigate(`${item.slug}`)}
           >
             <div className="flex justify-between items-start">
               <div>

@@ -71,45 +71,147 @@
   --gray-medium: #767676;
   --gray-muted: #8F8F8F;
   --error: #D70E0E;
-  
+
   /* Font family variables */
   --font-family-gotham: 'Gotham', sans-serif;
   --font-family-cormorant: 'CormorantGaramond', serif;
 }
 
 /* Custom Utility Classes Using CSS Variables */
-.bg-primary { background-color: var(--primary) !important; }
-.bg-dark { background-color: var(--dark) !important; }
-.bg-gray-dark { background-color: var(--gray-dark) !important; }
-.bg-gray { background-color: var(--gray) !important; }
-.bg-white { background-color: var(--white) !important; }
-.bg-gray-light { background-color: var(--gray-light) !important; }
-.bg-gray-medium { background-color: var(--gray-medium) !important; }
-.bg-gray-muted { background-color: var(--gray-muted) !important; }
-.bg-error { background-color: var(--error) !important; }
+.bg-primary {
+  background-color: var(--primary) !important;
+}
 
-.text-primary { color: var(--primary) !important; }
-.text-dark { color: var(--dark) !important; }
-.text-gray-dark { color: var(--gray-dark) !important; }
-.text-gray { color: var(--gray) !important; }
-.text-white { color: var(--white) !important; }
-.text-gray-light { color: var(--gray-light) !important; }
-.text-gray-medium { color: var(--gray-medium) !important; }
-.text-gray-muted { color: var(--gray-muted) !important; }
-.text-error { color: var(--error) !important; }
+.bg-dark {
+  background-color: var(--dark) !important;
+}
+
+.bg-gray-dark {
+  background-color: var(--gray-dark) !important;
+}
+
+.bg-gray {
+  background-color: var(--gray) !important;
+}
+
+.bg-white {
+  background-color: var(--white) !important;
+}
+
+.bg-gray-light {
+  background-color: var(--gray-light) !important;
+}
+
+.bg-gray-medium {
+  background-color: var(--gray-medium) !important;
+}
+
+.bg-gray-muted {
+  background-color: var(--gray-muted) !important;
+}
+
+.bg-error {
+  background-color: var(--error) !important;
+}
+
+.text-primary {
+  color: var(--primary) !important;
+}
+
+.text-dark {
+  color: var(--dark) !important;
+}
+
+.text-gray-dark {
+  color: var(--gray-dark) !important;
+}
+
+.text-gray {
+  color: var(--gray) !important;
+}
+
+.text-white {
+  color: var(--white) !important;
+}
+
+.text-gray-light {
+  color: var(--gray-light) !important;
+}
+
+.text-gray-medium {
+  color: var(--gray-medium) !important;
+}
+
+.text-gray-muted {
+  color: var(--gray-muted) !important;
+}
+
+.text-error {
+  color: var(--error) !important;
+}
 
 /* Font utility classes */
-.font-gotham { font-family: var(--font-family-gotham) !important; }
-.font-cormorant { font-family: var(--font-family-cormorant) !important; }
-.font-light { font-weight: 300 !important; }
-.font-325 { font-weight: 325 !important; }
-.font-350 { font-weight: 350 !important; }
-.font-book { font-weight: 400 !important; }
-.font-medium { font-weight: 500 !important; }
-.font-bold { font-weight: 700 !important; }
+.font-gotham {
+  font-family: var(--font-family-gotham) !important;
+}
+
+.font-cormorant {
+  font-family: var(--font-family-cormorant) !important;
+}
+
+.font-light {
+  font-weight: 300 !important;
+}
+
+.font-325 {
+  font-weight: 325 !important;
+}
+
+.font-350 {
+  font-weight: 350 !important;
+}
+
+.font-book {
+  font-weight: 400 !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
 
 body {
   background: var(--background);
   font-family: var(--font-family-gotham);
   font-weight: 400;
+}
+
+@theme inline {
+  --color-adron-gray: #F6F6F8;
+  --color-adron-body: #f5f5f5;
+  --color-adron-black: #272727;
+  --color-adron-green: #79B833;
+  --color-adron-green-100: #e7ffcc;
+  --color-adron-green-200: #EFFFDE;
+  --color-adron-green-300: #CCFF93;
+  --color-adron-red: #D70E0E;
+  --color-adron-gray-50: #f5f5f5;
+  --color-adron-gray-200: #8F8F8F;
+  --color-adron-gray-300: #767676;
+  --color-adron-gray-400: #717171;
+  --color-adron-gray-500: #4F4F4F;
+
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
 }

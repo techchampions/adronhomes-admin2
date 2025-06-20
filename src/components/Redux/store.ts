@@ -27,19 +27,20 @@ import marketerUserPropertyPlanReducer from './Marketer/user_property_plan'
 import propertyPlanPaymentsReducer from './Marketer/PaymentList'
 import customerByIdReducer   from './customers/customerByid'
 
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    user:userReducer,
-    dashboardData:dashboardReducer,
-    customers:customersReducer,
-    transactions:transactionsReducer,
-    payments:paymentsReducer,
-    sendOtp:otpReducer,
-    reserPassword:reserPasswordReducer,
-      paymentsById: PaymentsStateReducer,
+    user: userReducer,
+    dashboardData: dashboardReducer,
+    customers: customersReducer,
+    transactions: transactionsReducer,
+    payments: paymentsReducer,
+    sendOtp: otpReducer,
+    reserPassword: reserPasswordReducer,
+    paymentsById: PaymentsStateReducer,
     paymentList: paymentListReducer,
-    updatePayment:updatePaymentReducer,
+    updatePayment: updatePaymentReducer,
     properties: PropertiesState,
     addproperty:addpropertyReducer,
     updateproperty:updatepropertyReducer,
