@@ -9,6 +9,7 @@ import {
 } from "../../components/Redux/customers/customers_slice";
 import { customer } from "../../components/Redux/customers/customers_thunk";
 import { formatDate } from "../../utils/formatdate";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 interface CustomersTable {
   id: any;
@@ -33,7 +34,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
     await dispatch(setCustomersPage(page));
     await dispatch(customer());
   };
-
+const navigate=useNavigate()
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -63,7 +64,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
             </thead>
             <tbody>
               {data.map((row) => (
-                <tr key={row.id} className="cursor-pointer">
+                <tr key={row.id} className="cursor-pointer" onClick={()=> navigate(`/customers/${row.id}`)}>
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[72px] truncate whitespace-nowrap pr-4"
                     title={

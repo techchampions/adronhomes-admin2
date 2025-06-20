@@ -35,6 +35,8 @@ export default function MarketersDashboard() {
       nextPayment: item.next_payment_date,
       paid_amount: item.paid_amount,
       phoneNumber: item.user.phone_number,
+      plan_id:item.user_id,
+      user_id:item.id
     }));
   };
 
@@ -128,3 +130,4 @@ export default function MarketersDashboard() {
     </div>
   );
 }
+

@@ -8,13 +8,14 @@ interface InvoiceProps {
   duration: string;
   nextPaymentDate: string;
   dueDate: string;
-  property: {
+ property: {
     name: string;
     address: string;
     image: string;
     size: string;
-    hasStreetLights: boolean;
-    hasGym: boolean;
+    hasStreetLights?: boolean; // make optional
+    hasGym?: boolean; // make optional
+    features?: string[]; // add features array
     type: string;
   };
 }
@@ -128,43 +129,39 @@ export default function InvoiceCard({
               </span>
             </div>
 
-            {/* Features Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-4">
-              {/* Size */}
-              <div className="flex items-center gap-1 md:gap-2">
-                <img src="/ruler.svg" className="h-4 w-4 md:h-5 md:w-5" />
-                <span className="text-sm md:text-base truncate font-[325]">
-                  {property.size}
-                </span>
-              </div>
+        {/* Features Grid */}
+<div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-4">
+  {/* Size */}
+  <div className="flex items-center gap-1 md:gap-2">
+    <img src="/ruler.svg" className="h-4 w-4 md:h-5 md:w-5" />
+    <span className="text-sm md:text-base truncate font-[325]">
+      {property.size}
+    </span>
+  </div>
 
-              {/* Street Lights */}
-              {property.hasStreetLights && (
-                <div className="flex items-center gap-1 md:gap-2">
-                  <img src="/wand.svg" className="h-4 w-4 md:h-5 md:w-5" />
-                  <span className="text-sm md:text-base truncate font-[325]">
-                    Str Lights
-                  </span>
-                </div>
-              )}
+  {/* Features - dynamically render based on what exists */}
+  {property.features?.slice(0, 2).map((feature, index) => (
+    <div key={index} className="flex items-center gap-1 md:gap-2">
+      {feature.toLowerCase().includes('light') ? (
+        <img src="/wand.svg" className="h-4 w-4 md:h-5 md:w-5" />
+      ) : feature.toLowerCase().includes('gym') ? (
+        <BiDumbbell className="h-4 w-4 md:h-5 md:w-5" />
+      ) : (
+        <img src="/dot.svg" className="h-4 w-4 md:h-5 md:w-5" />
+      )}
+      <span className="text-sm md:text-base truncate font-[325]">
+        {feature.length > 10 ? `${feature.substring(0, 10)}...` : feature}
+      </span>
+    </div>
+  ))}
 
-              {/* Gym */}
-              {property.hasGym && (
-                <div className="flex items-center gap-1 md:gap-2">
-                  <BiDumbbell className="h-4 w-4 md:h-5 md:w-5" />
-                  <span className="text-sm md:text-base truncate font-[325]">
-                    Gym
-                  </span>
-                </div>
-              )}
-
-              {/* Property Type */}
-              <div className="flex items-center">
-                <span className="text-sm md:text-base truncate font-[325]">
-                  {property.type}
-                </span>
-              </div>
-            </div>
+  {/* Property Type */}
+  <div className="flex items-center">
+    <span className="text-sm md:text-base truncate font-[325]">
+      {property.type}
+    </span>
+  </div>
+</div>
 
             {/* View Property Link */}
             <p className="mt-4 md:mt-[10px] text-sm md:text-base truncate font-[350]">

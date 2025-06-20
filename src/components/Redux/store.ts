@@ -22,6 +22,10 @@ import editPersonnelReducer from './personnel/edithPersonelle'
 import DeletePersonnelReducer from"./personnel/delete_slice"
 import editPersonnelSliceReducer from"./personnel/edithPersonelle"
 import marketerdashboardSlice from "./Marketer/Dashboard_slice"
+import marketerMonthlyStatsReducer from './Marketer/marketers_months_slice'
+import marketerUserPropertyPlanReducer from './Marketer/user_property_plan'
+import propertyPlanPaymentsReducer from './Marketer/PaymentList'
+import customerByIdReducer   from './customers/customerByid'
 
 export const store = configureStore({
   reducer: {
@@ -46,7 +50,11 @@ export const store = configureStore({
    Edithpersonel:editPersonnelReducer,
    DeletePersonnel:DeletePersonnelReducer,
    editPersonnelSlice:editPersonnelSliceReducer,
-   marketerdashboard:marketerdashboardSlice
+   marketerdashboard:marketerdashboardSlice,
+   marketerMonthlyStats:marketerMonthlyStatsReducer,
+   marketerUserPropertyPlan:marketerUserPropertyPlanReducer,
+   propertyPlanPayments:propertyPlanPaymentsReducer,
+   customerById:customerByIdReducer
   },
 });
 
