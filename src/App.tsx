@@ -42,6 +42,9 @@ import OfficeLocations from "./components/Settings/Site location/SiteLoactions";
 import LeaderShipSettings from "./components/Settings/LeaderShipSettings/LeaderShipSettings";
 import AddHeaderDetails from "./components/Settings/HeaderSettings/AddNewHeaderDetails";
 import { QueryProvider } from "./utils/hooks/MyQueryProvider";
+import AccountDetails from "./components/Settings/AddAccountSettings/AccountDetails";
+import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
+import DirectorsDashboard from "./director/DirectorDashboard";
 
 
 const AuthGuard = () => {
@@ -71,13 +74,20 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isMarketerRoute = location.pathname.startsWith("/marketer");
+  const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
 
   return (
     <div className="flex">
       {shouldShowSidebar && (
         <div className="min-h-screen bg-white w-[20%]">
-          {isMarketerRoute ? <SideBar /> : <AdminSidebar />}
+          {isMarketerRoute ? (
+            <SideBar />
+          ) : isDirectorRoute ? (
+            <DirectorSideBar />
+          ) : (
+            <AdminSidebar />
+          )}
         </div>
       )}
       <div className="w-full lg:w-[80%]">{children}</div>
@@ -143,6 +153,10 @@ const App = () => {
                   element={<LeaderShipSettings />}
                 />
                 <Route
+                  path="/settings/add-account"
+                  element={<AccountDetails />}
+                />
+                <Route
                   path="/customers/singlepage"
                   element={<CustomerSinglePage />}
                 />
@@ -162,13 +176,15 @@ const App = () => {
                 <Route path="/customers/payment/:user_id/:plan_id" element={<Customers_payment />} />
               <Route path="/properties/form" element={<General />} />
 
-              {/* Marketer Routes */}
-              <Route path="/marketer" element={<MarketersDashboard />} />
-              <Route path="/marketer/settings" element={<SettingsPage />} /> </Route>
-                    <Route path="/marketer/payment/:user_id/:plan_id" element={<MarketerInvoice />} />
+                {/* Marketer Routes */}
+                <Route path="/marketer" element={<MarketersDashboard />} />
+                <Route path="/director" element={<DirectorsDashboard />} />
+                <Route path="/marketer/settings" element={<SettingsPage />} />
+             <Route path="/marketer/payment/:user_id/:plan_id" element={<MarketerInvoice />} />
                         
  
              </Route>
+
             </Routes>
           </AppLayout>
           {isInfrastructure && (
