@@ -2,11 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createAccountDetails,
   createLeaderData,
+  createOfficeLocation,
   deleteAccount,
   deleteLeaderData,
+  deleteOfficeLoaction,
   deleteSliderById,
   editAccountDetails,
   editLeaderData,
+  editOfficeLocation,
   updateHeaderData,
   uploadSliderByType,
 } from "./api";
@@ -126,6 +129,43 @@ export const useDeleteAccount = () => {
       // Refetch relevant data if needed
       queryClient.invalidateQueries({
         queryKey: ["Accounts"],
+      });
+    },
+  });
+};
+
+export const useCreateOfficeLocation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createOfficeLocation,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Office-locations"],
+      });
+    },
+  });
+};
+export const useEditOfficeLocation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: editOfficeLocation,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Office-locations"],
+      });
+    },
+  });
+};
+export const useDeleteOfficeLocation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteOfficeLoaction,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["Office-locations"],
       });
     },
   });

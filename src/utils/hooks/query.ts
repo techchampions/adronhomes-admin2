@@ -2,13 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { SliderByTypeRes } from "../../pages/Properties/types/SliderByTypeResponse";
 import {
   getAllAccountDetails,
+  getDirectorDashboardData,
   getHeadersData,
   getLeadersData,
+  getOfficeLocations,
   getSliderByType,
 } from "./api";
 import { HeadersResponse } from "../../pages/Properties/types/HeaderDataTypes";
 import { LeadershipResponse } from "../../pages/Properties/types/LeadershipDataTypes";
 import { AccountDetailsResponse } from "../../pages/Properties/types/AccountDetailsTypes";
+import { OfficeLocationsResponse } from "../../pages/Properties/types/OfficeLocationsTypes";
+import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 
 // Query hook for properties and filtering
 export const useGetSlidersByType = (type: string) => {
@@ -37,5 +41,18 @@ export const useGetAccounts = () => {
   return useQuery<AccountDetailsResponse>({
     queryKey: ["Accounts"],
     queryFn: getAllAccountDetails,
+  });
+};
+export const useGetOfficeLocations = () => {
+  return useQuery<OfficeLocationsResponse>({
+    queryKey: ["Office-locations"],
+    queryFn: getOfficeLocations,
+  });
+};
+
+export const useGetDirectorDashboard = () => {
+  return useQuery<DirectorDashboardResponse>({
+    queryKey: ["Directors-dashboard"],
+    queryFn: getDirectorDashboardData,
   });
 };

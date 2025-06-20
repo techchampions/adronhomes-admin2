@@ -3,10 +3,14 @@ import Header from "../general/Header";
 import { GreenCardMarketer, MatrixCard } from "../components/firstcard";
 import { ReusableTable } from "../components/Tables/Table_one";
 import ReferralModal from "../marketer/referalModal/referralModal";
+import DashCard from "./DashCard";
+import { FaUserShield } from "react-icons/fa6";
+import { useGetDirectorDashboard } from "../utils/hooks/query";
 
 export default function DirectorsDashboard() {
-  const tabs = ["Registered Customers", "Active Plans"];
-  const [activeTab, setActiveTab] = useState("Registered Customers");
+  const { data, isPending, isError } = useGetDirectorDashboard();
+  const tabs = ["Properties"];
+  const [activeTab, setActiveTab] = useState("Properties");
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -14,35 +18,40 @@ export default function DirectorsDashboard() {
       <Header title="Dashboard" subtitle="Manage settings" />
 
       <div className="space-y-[30px]">
-        <div className="grid lg:grid-cols-4 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-          <GreenCardMarketer
-            currency={false}
-            value="Director"
-            // change="Includes all total referred amount for this month"
-            title="Mike Wellington"
-            handleClickView={() => setShowModal(true)}
+        <div className="grid lg:grid-cols-5 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+          <DashCard
+            className="col-span-2"
+            isHighlighted={true}
+            valueText={data?.director.personnel}
+            mainText={`${data?.director.first_name} ${data?.director.last_name}`}
+            mutedText={`Created at ${data?.director.created_at}`}
+            actionText="Account Settings"
+            icon={<FaUserShield />}
           />
-          <MatrixCard
-            title="Referred Customers"
-            value={"0"}
-            change="Includes all customers on a property plan"
+          <DashCard
+            className=""
+            mainText="Total Properties"
+            valueText={data?.total_properties}
+            mutedText="Includes all Properties"
           />
-          <MatrixCard
-            title="Active Plans"
-            value={"0"}
-            change="All customers on a property plan"
+          <DashCard
+            className=""
+            mainText="Total Properties Available"
+            valueText={data?.total_available}
+            mutedText="All Properties Available"
           />
-          <MatrixCard
-            title="Active Plans"
-            value={"0"}
-            change="All customers on a property plan"
+          <DashCard
+            className=""
+            mainText="Total Bought Properties"
+            valueText={data?.total_sold}
+            mutedText="Includes total bought Properties"
           />
         </div>
 
         <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
           <ReusableTable
             tabs={tabs}
-            searchPlaceholder="Search Customer"
+            searchPlaceholder="Search Properties"
             activeTab={activeTab}
             onTabChange={setActiveTab}
           ></ReusableTable>

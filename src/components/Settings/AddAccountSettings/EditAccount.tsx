@@ -30,6 +30,12 @@ const validationSchema = Yup.object().shape({
   bank_name: Yup.string().required("Bank is required"),
   account_number: Yup.string().required("Account Number is required"),
 });
+const TypeOptions = [
+  { value: "property", label: "Property Account" },
+  { value: "infrastructure", label: "Infrastructure Account" },
+  { value: "other", label: "Others Fees Account" },
+  { value: "fund", label: "Fund Wallet Account" },
+];
 
 export default function EditAccount({
   isOpen = true,
@@ -41,6 +47,7 @@ export default function EditAccount({
     account_name: account?.account_name,
     bank_name: account?.bank_name,
     account_number: account?.account_number,
+    type: account?.type || "",
   };
   const { mutate: createAccount, isError, isPending } = useEditAccount();
   const handleSubmit = (values: CreateAccountPayload) => {
@@ -91,6 +98,26 @@ export default function EditAccount({
             isSubmitting,
           }) => (
             <Form className="flex flex-col gap-5">
+              <div className="mb-1.5 px-7">
+                <OptionInputField
+                  label="Type"
+                  placeholder={values.type ? values.type : "Select Type"}
+                  value={values.type}
+                  onChange={(value) => {
+                    handleChange({
+                      target: {
+                        name: "type",
+                        value,
+                      },
+                    });
+                  }}
+                  name="state"
+                  error={touched.type && errors.type}
+                  options={TypeOptions}
+                  dropdownTitle="Select Role"
+                />
+              </div>
+
               <div className="mb-1.5 px-7">
                 <label htmlFor="" className="text-sm text-gray-500">
                   Account Name

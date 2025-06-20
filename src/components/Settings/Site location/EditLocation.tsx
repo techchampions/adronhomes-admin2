@@ -3,19 +3,19 @@ import * as Yup from "yup";
 import InputField from "../../input/inputtext";
 import OptionInputField from "../../input/drop_down";
 import Button from "../../input/Button";
+import {
+  CreateOfficeLocationPayload,
+  EditOfficeLocationPayload,
+  OfficeLocation,
+} from "../../../pages/Properties/types/OfficeLocationsTypes";
+import SoosarInputField from "../../soosarInput";
+import { useEditOfficeLocation } from "../../../utils/hooks/mutations";
+import { toast } from "react-toastify";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
-}
-
-interface FormData {
-  officeName: string;
-  address: string;
-  state: string;
-  email: string;
-  phone1: string;
-  phone2: string;
+  item: OfficeLocation | undefined;
 }
 
 const stateOptions = [
@@ -25,23 +25,37 @@ const stateOptions = [
 ];
 
 const validationSchema = Yup.object().shape({
-  officeName: Yup.string().required("Office name is required"),
-  address: Yup.string().required("Address is required"),
-  phone1: Yup.string().required("Phone number is required"),
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  state: Yup.string().required("state is required"),
+  office_name: Yup.string().required("Office name is required"),
+  office_address: Yup.string().required("Address is required"),
+  first_contact: Yup.string().required("Phone number is required"),
+  second_contact: Yup.string().required("Alternative Phone number is required"),
 });
 
 export default function EditLocationModal({
   isOpen = true,
   onClose = () => {},
+  item,
 }: ModalProps) {
-  const handleSubmit = (
-    values: FormData,
-    { setSubmitting }: FormikHelpers<FormData>
-  ) => {
+  const { mutate: update, isPending } = useEditOfficeLocation();
+  const initialValues = {
+    office_name: item?.office_name,
+    first_contact: item?.first_contact,
+    second_contact: item?.second_contact,
+    third_contact: item?.third_contact,
+    office_address: item?.office_address,
+    id: item?.id,
+  };
+
+  const handleSubmit = (values: EditOfficeLocationPayload) => {
+    update(values, {
+      onSuccess(data, variables, context) {
+        toast.success("Office Contact Edited Successfully");
+      },
+      onError(error, variables, context) {
+        toast.error("Failed to Update contacts");
+      },
+    });
     console.log("Form submitted:", values);
-    setSubmitting(false);
     onClose();
   };
 
@@ -67,43 +81,26 @@ export default function EditLocationModal({
         </p>
 
         <Formik
-          initialValues={{
-            officeName: "",
-            address: "",
-            state: "",
-            email: "",
-            phone1: "",
-            phone2: "",
-          }}
+          initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, handleChange, values }) => (
+          {({ errors, touched, handleChange, values, isValid }) => (
             <Form>
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
-                <InputField
-                  label="Office Name"
-                  placeholder="Enter Office name"
-                  value={values.officeName}
-                  onChange={handleChange}
-                  name="officeName"
-                  error={touched.officeName && errors.officeName}
-                  required
-                />
+              <div className="mb-2">
+                <label htmlFor="" className="text-xs text-gray-400">
+                  Office Name
+                </label>
+                <SoosarInputField name="office_name" />
               </div>
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
-                <InputField
-                  label="Address"
-                  placeholder="Enter Address"
-                  value={values.address}
-                  onChange={handleChange}
-                  name="address"
-                  error={touched.address && errors.address}
-                  required
-                />
+              <div className="mb-2">
+                <label htmlFor="" className="text-xs text-gray-400">
+                  Office Address
+                </label>
+                <SoosarInputField name="office_address" />
               </div>
 
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
+              {/* <div className="mb-3 sm:mb-4">
                 <OptionInputField
                   label="State"
                   placeholder="Select a State"
@@ -121,41 +118,25 @@ export default function EditLocationModal({
                   options={stateOptions}
                   dropdownTitle="Select Role"
                 />
-              </div>
+              </div> */}
 
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
-                <InputField
-                  label="Email"
-                  placeholder="Enter email"
-                  value={values.email}
-                  onChange={handleChange}
-                  name="email"
-                  type="email"
-                  error={touched.email && errors.email}
-                  required
-                />
+              <div className="mb-2">
+                <label htmlFor="" className="text-xs text-gray-400">
+                  Phone Number
+                </label>
+                <SoosarInputField name="first_contact" />
               </div>
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
-                <InputField
-                  label="Phone Number"
-                  placeholder="Enter Phone Number"
-                  value={values.phone1}
-                  onChange={handleChange}
-                  name="phone1"
-                  error={touched.phone1 && errors.phone1}
-                  required
-                />
+              <div className="mb-2">
+                <label htmlFor="" className="text-xs text-gray-400">
+                  Alt Phone Number
+                </label>
+                <SoosarInputField name="second_contact" />
               </div>
-              <div className="mb-3 sm:mb-4 md:mb-[40px]">
-                <InputField
-                  label="Alt Phone Number"
-                  placeholder="Enter Alternate Phone Number"
-                  value={values.phone2}
-                  onChange={handleChange}
-                  name="phone2"
-                  error={touched.phone2 && errors.phone2}
-                  required
-                />
+              <div className="mb-2">
+                <label htmlFor="" className="text-xs text-gray-400">
+                  Alt Phone Number 2
+                </label>
+                <SoosarInputField name="third_contact" />
               </div>
 
               <div className="flex justify-between items-center gap-2 mt-[50px]">
@@ -164,7 +145,12 @@ export default function EditLocationModal({
                   onClick={onClose}
                   className="!text-black !bg-transparent"
                 />
-                <Button label="Submit" type="submit" />
+                <Button
+                  label="Submit"
+                  type="submit"
+                  isLoading={isPending}
+                  disabled={isPending || !isValid}
+                />
               </div>
             </Form>
           )}

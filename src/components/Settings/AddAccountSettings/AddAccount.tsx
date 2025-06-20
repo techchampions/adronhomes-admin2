@@ -17,10 +17,18 @@ interface ModalProps {
   onClose?: () => void;
 }
 
+const TypeOptions = [
+  { value: "AdronAccount", label: "Adron Homes Account" },
+  { value: "Infrastructure", label: "Infrastructure Account" },
+  { value: "Others", label: "Others Fees Account" },
+  { value: "fund", label: "Fund Wallet Account" },
+];
+
 const initialValues = {
   account_name: "",
   bank_name: "",
   account_number: "",
+  type: "",
 };
 
 const validationSchema = Yup.object().shape({
@@ -82,6 +90,26 @@ export default function AddAccount({
             isSubmitting,
           }) => (
             <Form className="flex flex-col gap-5">
+              <div className="mb-1.5 px-7">
+                <OptionInputField
+                  label="Type"
+                  placeholder={values.type ? values.type : "Select Type"}
+                  value={values.type}
+                  onChange={(value) => {
+                    handleChange({
+                      target: {
+                        name: "type",
+                        value,
+                      },
+                    });
+                  }}
+                  name="state"
+                  error={touched.type && errors.type}
+                  options={TypeOptions}
+                  dropdownTitle="Select Role"
+                />
+              </div>
+
               <div className="mb-1.5 px-7">
                 <label htmlFor="" className="text-sm text-gray-500">
                   Account Name

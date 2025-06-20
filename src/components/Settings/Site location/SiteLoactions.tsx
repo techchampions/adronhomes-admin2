@@ -5,30 +5,17 @@ import { PropertyContext } from "../../../MyContext/MyContext";
 import AddLocationModal from "./AddLocation";
 import DeleteLocationModal from "./DeleteLocation";
 import EditLocationModal from "./EditLocation";
-
-interface OfficeLocation {
-  id: number;
-  title: string;
-  address: string;
-  phones: string[];
-  email: string;
-}
-
-const officeData: OfficeLocation[] = Array(9)
-  .fill(0)
-  .map((_, i) => ({
-    id: i,
-    title: "Lekki Office",
-    address: "34b Freedom way, Ikate, Lekki, Lagos",
-    phones: ["+2348051011951", "+2348051011951"],
-    email: "telesales@adronhomes",
-  }));
+import { useGetOfficeLocations } from "../../../utils/hooks/query";
+import { OfficeLocation } from "../../../pages/Properties/types/OfficeLocationsTypes";
 
 const OfficeLocations = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [officeItem, setOfficeItem] = useState<OfficeLocation>();
   const { setIsCancelState } = useContext(PropertyContext)!;
+  const { data, isLoading, isError } = useGetOfficeLocations();
+  const officeData = data?.data || [];
 
   return (
     <div className="px-6 max-w-7xl mx-auto">
@@ -49,10 +36,12 @@ const OfficeLocations = () => {
       <EditLocationModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
+        item={officeItem}
       />
       <DeleteLocationModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
+        item={officeItem}
       />
       <div className="bg-white p-6 rounded-4xl">
         <div className="flex justify-between mb-5">
@@ -71,22 +60,29 @@ const OfficeLocations = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {officeData.map((office) => (
             <div key={office.id} className="bg-white p-4 rounded-md shadow-sm">
-              <h3 className="font-semibold mb-1">{office.title}</h3>
-              <p className="text-sm text-gray-700">{office.address}</p>
+              <h3 className="font-semibold mb-1">{office.office_name}</h3>
+              <p className="text-sm text-gray-700">{office.office_address}</p>
               <p className="text-sm text-gray-700">
-                {office.phones.join(", ")}
+                {office.first_contact || ""},{office.second_contact || ""},
+                {office.third_contact || ""}
               </p>
               <p className="text-sm text-gray-700 mb-3">{office.email}</p>
               <div className="flex gap-4 text-sm font-semibold">
                 <button
                   className="text-gray-700 hover:underline"
-                  onClick={() => setShowEditModal(true)}
+                  onClick={() => {
+                    setOfficeItem(office);
+                    setShowEditModal(true);
+                  }}
                 >
                   Edit
                 </button>
                 <button
                   className="text-red-600 hover:underline"
-                  onClick={() => setShowDeleteModal(true)}
+                  onClick={() => {
+                    setOfficeItem(officeItem);
+                    setShowDeleteModal(true);
+                  }}
                 >
                   Delete
                 </button>

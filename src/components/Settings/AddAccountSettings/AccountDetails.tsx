@@ -64,6 +64,11 @@ const AccountDetails = () => {
                         key={index}
                         className="even:bg-gray-100 odd:bg-white odd:border odd:border-gray-100 rounded-2xl p-4 flex flex-col gap-3"
                       >
+                        <div className="text-xs text-center">
+                          Bank Details for{" "}
+                          <span className="font-bold">{account.type}</span>{" "}
+                          Payments
+                        </div>
                         <div className="">
                           <div className="text-sm">{account.account_name}</div>
                           <div className="text-xs text-gray-500">

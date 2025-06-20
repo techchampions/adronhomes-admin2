@@ -46,7 +46,6 @@ import AccountDetails from "./components/Settings/AddAccountSettings/AccountDeta
 import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import DirectorsDashboard from "./director/DirectorDashboard";
 
-
 const AuthGuard = () => {
   const token = Cookies.get("token");
 
@@ -156,10 +155,7 @@ const App = () => {
                   path="/settings/add-account"
                   element={<AccountDetails />}
                 />
-                <Route
-                  path="/customers/singlepage"
-                  element={<CustomerSinglePage />}
-                />
+                <Route path="/customers/:id" element={<CustomerSinglePage />} />
                 <Route
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
@@ -169,22 +165,25 @@ const App = () => {
                   element={<CustomersSinglePayment />}
                 />
                 <Route path="/properties/form" element={<General />} />
-  <Route
-                path="/customers/singlepage/singlepayment"
-                element={<CustomersSinglePayment />}
-              />
-                <Route path="/customers/payment/:user_id/:plan_id" element={<Customers_payment />} />
-              <Route path="/properties/form" element={<General />} />
+                <Route
+                  path="/customers/singlepage/singlepayment"
+                  element={<CustomersSinglePayment />}
+                />
+                <Route
+                  path="/customers/payment/:user_id/:plan_id"
+                  element={<Customers_payment />}
+                />
+                <Route path="/properties/form" element={<General />} />
 
                 {/* Marketer Routes */}
                 <Route path="/marketer" element={<MarketersDashboard />} />
                 <Route path="/director" element={<DirectorsDashboard />} />
                 <Route path="/marketer/settings" element={<SettingsPage />} />
-             <Route path="/marketer/payment/:user_id/:plan_id" element={<MarketerInvoice />} />
-                        
- 
-             </Route>
-
+                <Route
+                  path="/marketer/payment/:user_id/:plan_id"
+                  element={<MarketerInvoice />}
+                />
+              </Route>
             </Routes>
           </AppLayout>
           {isInfrastructure && (

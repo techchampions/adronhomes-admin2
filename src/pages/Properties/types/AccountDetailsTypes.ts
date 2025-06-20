@@ -5,6 +5,7 @@ export interface AccountDetail {
   account_number: string;
   updated_at: string;
   created_at: string;
+  type: string;
 }
 export interface AccountDetailsResponse {
   status: boolean;
@@ -15,4 +16,5 @@ export interface CreateAccountPayload {
   bank_name?: string;
   account_number?: string;
   id?: number;
+  type: string;
 }
