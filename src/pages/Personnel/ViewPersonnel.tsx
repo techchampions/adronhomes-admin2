@@ -142,7 +142,7 @@ export default function EditPersonnelModal({
                     onChange={handleChange}
                     name="firstName"
                     error={touched.firstName && errors.firstName}
-                    required
+                   disabled
                   />
                 </div>
                 <div>
@@ -153,8 +153,7 @@ export default function EditPersonnelModal({
                     onChange={handleChange}
                     name="lastName"
                     error={touched.lastName && errors.lastName}
-                    required
-            
+                    disabled
                   />
                 </div>
               </div>
@@ -167,12 +166,13 @@ export default function EditPersonnelModal({
                   onChange={handleChange}
                   type="tel"
                   error={touched.phoneNumber && errors.phoneNumber}
-                  required
+                  disabled
                 />
               </div>
 
               <div className="mb-2 sm:mb-3 md:mb-4">
                 <OptionInputField
+                disabled
                   label="Role"
                   placeholder="Select role"
                   value={values.role}
@@ -223,19 +223,11 @@ export default function EditPersonnelModal({
                   name="email"
                   type="email"
                   error={touched.email && errors.email}
-                  required
+                  disabled
                 />
               </div>
               <div className="mb-2 sm:mb-3 md:mb-4">
-  <InputField
-    label="Password"
-    placeholder="Enter new password (leave blank to keep current)"
-    value={values.password}
-    onChange={handleChange}
-    name="password"
-    type="password"
-    error={touched.password && errors.password}
-  />
+  
 </div>
 
 
@@ -254,17 +246,7 @@ export default function EditPersonnelModal({
                     loading ? 'bg-[#272727]/70 cursor-not-allowed' : 'bg-[#272727] cursor-pointer'
                   } text-xs sm:text-sm md:text-base font-bold text-white rounded-full py-2 px-4 sm:py-3 sm:px-6 md:py-[21px] md:px-[82px] flex items-center justify-center`}
                 >
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Updating...
-                    </>
-                  ) : (
-                    "Update"
-                  )}
+                 
                 </button>
               </div>
             </Form>

@@ -7,21 +7,20 @@ import { GiPaperClip } from "react-icons/gi"
 type MessageModalProps = {
   isOpen: boolean
   setIsOpen: (value: boolean) => void
+  handleSend ?:()=>void
+  message:any,
+   setMessage:any,
+   userImage:any,
+   userNmae:any,
+   loading:any
 }
 
-export default function MessageModal({ isOpen, setIsOpen }: MessageModalProps) {
-  const [message, setMessage] = useState("")
-
-  const handleSend = () => {
-    console.log("Sending message:", message)
-    setMessage("")
-    setIsOpen(false)
-  }
+export default function MessageModal({ isOpen, setIsOpen ,handleSend,message, loading,setMessage,userImage,userNmae}: MessageModalProps) {
 
   const handleCancel = () => {
     setIsOpen(false)
   }
-
+      const [messaging, setMessaging] = useState(loading)
   if (!isOpen) return null
 
   return (
@@ -43,9 +42,9 @@ export default function MessageModal({ isOpen, setIsOpen }: MessageModalProps) {
         {/* User info */}
         <div className="px-5 pb-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden">
-            <img src="/profile.svg" alt="User avatar" className="w-full h-full object-cover" />
+            <img src={userImage?userImage:"/profile.svg"} alt="User avatar" className="w-full h-full object-cover" />
           </div>
-          <span className="font-[350] text-dark text-lg">Ahmed Musa</span>
+          <span className="font-[350] text-dark text-lg max-w-xs truncate">{userNmae}</span>
         </div>
 
         {/* Message input */}
@@ -65,13 +64,18 @@ export default function MessageModal({ isOpen, setIsOpen }: MessageModalProps) {
           </button>
 
           <div className="flex items-center gap-3">
-          
-            <button
-              onClick={handleSend}
-              className="px-6 py-3 bg-[#79B833]  text-xs md:text-sm text-white font-bold rounded-full"
-            >
-              Send Message
-            </button>
+         <button
+  onClick={() => handleSend?.()}
+  disabled={!message.trim() || loading}
+  className={`px-6 py-3 text-xs md:text-sm font-bold rounded-full 
+    ${!message.trim() || loading
+      ? "bg-gray-300 text-white cursor-not-allowed"
+      : "bg-[#79B833] text-white cursor-pointer"}
+  `}
+>
+  Send Message
+</button>
+
             <button className="p-3 rounded-full bg-gray-100 hover:bg-gray-200">
               <GiPaperClip className="w-5 h-5 text-gray-600" />
             </button>

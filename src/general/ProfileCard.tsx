@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import { GoDotFill } from "react-icons/go";
 import MessageModal from "../components/Modals/Massaging";
+import { toast } from "react-toastify";
+import { sendMessage } from "../components/Redux/customers/send_message";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../components/Redux/store";
+import ConfirmationModal from "../components/Modals/delete";
+import { deleteUser } from "../components/Redux/customers/delete_customers";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 interface ProfileCardProps {
+  loadingdelete:any
+  loading:any
   profileImage: string;
+  userId:any
   name: string;
   dateJoined: string;
   email: string;
   phone: string;
+  userNmae:any;
+  userImage:any
   stats: {
     viewedProperties: number;
     savedProperties: number;
@@ -34,8 +46,69 @@ export default function ProfileCard({
   paymentInfo,
   marketerName,
   buttonTexts,
+  userId,
+  userNmae,
+  userImage,loading,loadingdelete
 }: ProfileCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+    const [isOpendelete, setIsOpendelete] = useState(false);
+      const [message, setMessage] = useState("")
+        const dispatch = useDispatch<AppDispatch>();
+
+        const navigate=useNavigate()
+  const handleSend = async () => {
+    console.log("Sending message:", message);
+    
+    if (!message.trim()) {
+      toast.error("Message cannot be empty");
+      return;
+    }
+
+    if (!userId) {
+      toast.error("No recipient selected");
+      return;
+    }
+
+    
+    try {
+      const result = await dispatch(sendMessage({ userId, message }));
+      
+      if (sendMessage.fulfilled.match(result)) {
+        // toast.success(result.payload.message || "Message sent successfully");
+        setIsOpen(false);
+        setMessage(""); // Clear the message input
+      } else if (sendMessage.rejected.match(result)) {
+        const errorMessage = result.payload?.message || "Failed to send message";
+        // toast.error(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("An unexpected error occurred");
+    }
+  };
+
+
+  const handleDelete = async () => {
+    try {
+      const result = await dispatch(deleteUser(userId));
+      
+      if (deleteUser.fulfilled.match(result)) {
+        // toast.success(result.payload.message || "User deleted successfully");
+              setIsOpendelete(false);
+              navigate("/customers")
+      } else if (deleteUser.rejected.match(result)) {
+        const errorMessage = result.payload?.message || "Failed to delete user";
+        // toast.error(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      // toast.error("An unexpected error occurred");
+    } finally {
+      setIsOpendelete(false);
+    }
+  };
+
+
   return (
     <>
       <div className="bg-white rounded-[30px] pr-6 pl-6 pt-6  md:pt-0 lg:px-8 lg:pl-[152px] md:pr-[20px] md:pb-[34px] lg:flex md:space-x-8 lg:space-x-[70px] pb-[34px] ">
@@ -120,13 +193,14 @@ export default function ProfileCard({
               >
                 {buttonTexts.sendMessage}
               </button>
-              <button className="bg-white text-[#D70E0E] font-bold text-sm rounded-[30px] py-[14px] px-[44px] border border-[#D70E0E]">
+              <button className="bg-white text-[#D70E0E] font-bold text-sm rounded-[30px] py-[14px] px-[44px] border border-[#D70E0E]"  onClick={()=>setIsOpendelete(true) }>
                 {buttonTexts.removeClient}
               </button>
             </div>
           </div>
         </div>
-        <MessageModal isOpen={isOpen} setIsOpen={setIsOpen} />
+        <MessageModal isOpen={isOpen} setIsOpen={setIsOpen} handleSend={() => handleSend()} message={message} setMessage={setMessage} userImage={userImage} userNmae={userNmae} loading={loading} />
+          <ConfirmationModal isOpen={isOpendelete} title={"Delete User"} description={`Are you sure you want to delete ${name}`} onClose={()=>setIsOpendelete(false) } onConfirm={handleDelete} loading={loadingdelete} />
       </div>
     </>
   );
