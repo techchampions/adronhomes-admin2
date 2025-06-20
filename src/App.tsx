@@ -92,7 +92,7 @@ const App = () => {
       <PropertyProvider>
         <AppLayout>
           <Routes>
-            {/* Public Route */}
+            {/* Public Routes */}
             <Route path="/" element={<Login />} />
 
             {/* Protected Routes */}
