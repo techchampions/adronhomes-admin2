@@ -10,7 +10,9 @@ export const formatToNaira = (value: number | string) => {
 };
 
 // Add this at the top of your file
+
 export const formatAsNaira = (value: number | null | undefined): string => {
   if (value === null || value === undefined) return "₦0";
   return `₦${value.toLocaleString("en-NG")}`;
+
 };

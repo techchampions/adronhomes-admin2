@@ -11,13 +11,14 @@ import {
 } from "../../components/Redux/Marketer/Dashboard_slice";
 import { formatDate } from "../../utils/formatdate";
 import { formatAsNaira } from "../../utils/formatcurrency";
+import { useNavigate } from "react-router-dom";
 
 const CustomersTableAllActive = ({ customerData }: { customerData?: any }) => {
   const dispatch = useDispatch<AppDispatch>();
   const pagination = useSelector(selectActivePlansPagination);
 
   // Use the sample data from image if no customerData is provided
-
+const navigate=useNavigate()
   const handlePageChange = (page: number) => {
     dispatch(setActivePlansCurrentPage(page));
     dispatch(fetchMarketerDashboard({ currentpage: page }));
@@ -49,7 +50,8 @@ const CustomersTableAllActive = ({ customerData }: { customerData?: any }) => {
             </thead>
             <tbody>
               {customerData.map((row: any) => (
-                <tr key={row.id} className="cursor-pointer">
+                <tr key={row.id} className="cursor-pointer" onClick={() => navigate(`/marketer/payment/${row.plan_id}/${row.user_id}`)}
+>
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.name ?? 'N/A'}
                   </td>

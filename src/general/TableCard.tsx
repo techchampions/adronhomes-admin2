@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type ColumnConfig<T = any> = {
   key: string;
@@ -31,7 +32,7 @@ const TableCard = <T extends Record<string, any>>({
     if (typeof rowKey === 'function') return rowKey(row);
     return row[rowKey] || index;
   };
-
+const navigate=useNavigate()
   const getWidthStyle = (width?: number) => ({
     width: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
     minWidth: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
@@ -70,7 +71,8 @@ const TableCard = <T extends Record<string, any>>({
             {data.map((row, index) => (
               <tr
                 key={getRowKey(row, index)}
-                className="text-sm text-dark font-[325]"
+                className="text-sm text-dark font-[325] cursor-pointer"
+          onClick={() => navigate(`/customers/payment/${row.plan_id}/${row.user_id}`)}
               >
                 {columns.map((column) => {
                   const cellValue = row[column.key];
