@@ -13,13 +13,12 @@ import {
 } from "../../general/icon";
 
 const navItems = [
-  { label: "Dashboard", icon: Icon1, path: "/marketer" },
-  { label: "Customers", icon: Icon2, path: "/customers" },
+  { label: "Dashboard", icon: Icon1, path: "/director" },
   { label: "Notifications", icon: Icon8, path: "/notifications" },
   { label: "Settings", icon: Icon9, path: "/settings" },
 ];
 
-export default function SideBar() {
+export default function DirectorSideBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;

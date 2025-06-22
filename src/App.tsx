@@ -35,7 +35,16 @@ import PaymentListComponent from "./pages/Customers/PaymentStatus";
 import PaymentById from "./pages/Payment/paymentById";
 import InfrastructureFeesModal from "./components/Modals/InfrastructureFeesModal";
 import Customers_payment from "./pages/Customers/customers_payment";
-
+import SliderSettings from "./components/Settings/SliderSettings/SliderSettings";
+import HeaderSettings from "./components/Settings/HeaderSettings/HeaderSettings";
+import EditHeaderDetails from "./components/Settings/HeaderSettings/EditHeaderDetails";
+import OfficeLocations from "./components/Settings/Site location/SiteLoactions";
+import LeaderShipSettings from "./components/Settings/LeaderShipSettings/LeaderShipSettings";
+import AddHeaderDetails from "./components/Settings/HeaderSettings/AddNewHeaderDetails";
+import { QueryProvider } from "./utils/hooks/MyQueryProvider";
+import AccountDetails from "./components/Settings/AddAccountSettings/AccountDetails";
+import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
+import DirectorsDashboard from "./director/DirectorDashboard";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -64,13 +73,20 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isMarketerRoute = location.pathname.startsWith("/marketer");
+  const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
 
   return (
     <div className="flex">
       {shouldShowSidebar && (
         <div className="min-h-screen bg-white">
-          {isMarketerRoute ? <SideBar /> : <AdminSidebar />}
+          {isMarketerRoute ? (
+            <SideBar />
+          ) : isDirectorRoute ? (
+            <DirectorSideBar />
+          ) : (
+            <AdminSidebar />
+          )}
         </div>
       )}
       <div className="w-full">{children}</div>
@@ -89,72 +105,107 @@ const App = () => {
   } = useContext(PropertyContext)!;
   return (
     <Provider store={store}>
-      <PropertyProvider>
-        <AppLayout>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Login />} />
+      <QueryProvider>
+        <PropertyProvider>
+          <AppLayout>
+            <Routes>
+              {/* Public Route */}
+              <Route path="/" element={<Login />} />
+              {/* Protected Routes */}
+              <Route element={<AuthGuard />}>
+                {/* Admin Routes */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/payments" element={<Payment />} />
+                <Route
+                  path="/payments/status/:paymentId"
+                  element={<PaymentById />}
+                />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/properties" element={<Properties />} />
+                <Route path="/personnel" element={<Personnel />} />
+                <Route
+                  path="/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/settings/sliders" element={<SliderSettings />} />
+                <Route
+                  path="/settings/page-headers"
+                  element={<HeaderSettings />}
+                />
+                <Route
+                  path="/settings/page-headers/edit/:id"
+                  element={<EditHeaderDetails />}
+                />
+                <Route
+                  path="/settings/page-headers/new"
+                  element={<AddHeaderDetails />}
+                />
+                <Route
+                  path="/settings/office-locations"
+                  element={<OfficeLocations />}
+                />
+                <Route
+                  path="/settings/leadership"
+                  element={<LeaderShipSettings />}
+                />
+                <Route
+                  path="/settings/add-account"
+                  element={<AccountDetails />}
+                />
+                <Route path="/customers/:id" element={<CustomerSinglePage />} />
+                <Route
+                  path="/customers/singlepage/payment"
+                  element={<CustomersPayment />}
+                />
+                <Route
+                  path="/customers/singlepage/singlepayment"
+                  element={<CustomersSinglePayment />}
+                />
+                <Route path="/properties/form" element={<General />} />
+                <Route
+                  path="/customers/singlepage/singlepayment"
+                  element={<CustomersSinglePayment />}
+                />
+                <Route
+                  path="/customers/payment/:user_id/:plan_id"
+                  element={<Customers_payment />}
+                />
+                <Route path="/properties/form" element={<General />} />
 
-            {/* Protected Routes */}
-            <Route element={<AuthGuard />}>
-              {/* Admin Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/payments" element={<Payment />} />
-              <Route
-                path="/payments/status/:paymentId"
-                element={<PaymentById />}
-              />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/properties" element={<Properties />} />
-              <Route path="/personnel" element={<Personnel />} />
-              <Route
-                path="/requests-enquiries"
-                element={<RequestsEnquiries />}
-              />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route
-                path="/customers/:id"
-                element={<CustomerSinglePage />}
-              />
-              <Route
-                path="/customers/singlepage/payment"
-                element={<CustomersPayment />}
-              />
-              <Route
-                path="/customers/singlepage/singlepayment"
-                element={<CustomersSinglePayment />}
-              />
-                <Route path="/customers/payment/:user_id/:plan_id" element={<Customers_payment />} />
-              <Route path="/properties/form" element={<General />} />
-
-              {/* Marketer Routes */}
-              <Route path="/marketer" element={<MarketersDashboard />} />
-              <Route path="/marketer/settings" element={<SettingsPage />} /> </Route>
-                    <Route path="/marketer/payment/:user_id/:plan_id" element={<MarketerInvoice />} />
-                        
-          </Routes>
-        </AppLayout>
-        {isInfrastructure && (
-          <InfrastructureFeesModal
-            isOpen={isInfrastructure}
-            onClose={() => setIsCancelInfrastructure(false)}
+                {/* Marketer Routes */}
+                <Route path="/marketer" element={<MarketersDashboard />} />
+                <Route path="/director" element={<DirectorsDashboard />} />
+                <Route path="/marketer/settings" element={<SettingsPage />} />
+                <Route
+                  path="/marketer/payment/:user_id/:plan_id"
+                  element={<MarketerInvoice />}
+                />
+              </Route>
+            </Routes>
+          </AppLayout>
+          {isInfrastructure && (
+            <InfrastructureFeesModal
+              isOpen={isInfrastructure}
+              onClose={() => setIsCancelInfrastructure(false)}
+            />
+          )}
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
           />
-        )}
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </PropertyProvider>
+        </PropertyProvider>
+      </QueryProvider>
     </Provider>
   );
 };
