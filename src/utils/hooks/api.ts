@@ -2,6 +2,7 @@ import {
   AccountDetailsResponse,
   CreateAccountPayload,
 } from "../../pages/Properties/types/AccountDetailsTypes";
+import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
   HeadersResponse,
   UpdateHeaderPayload,
@@ -15,6 +16,11 @@ import {
   LeadershipItem,
   LeadershipResponse,
 } from "../../pages/Properties/types/LeadershipDataTypes";
+import {
+  CreateOfficeLocationPayload,
+  EditOfficeLocationPayload,
+  OfficeLocationsResponse,
+} from "../../pages/Properties/types/OfficeLocationsTypes";
 import { SliderByTypeRes } from "../../pages/Properties/types/SliderByTypeResponse";
 import {
   UploadSliderPayload,
@@ -162,6 +168,7 @@ export const createAccountDetails = async (
   payload: Partial<CreateAccountPayload>
 ): Promise<AccountDetailsResponse> => {
   const formData = new FormData();
+  if (payload.type) formData.append("type", payload.type);
   if (payload.bank_name) formData.append("bank_name", payload.bank_name);
   if (payload.account_name)
     formData.append("account_name", payload.account_name);
@@ -180,6 +187,7 @@ export const editAccountDetails = async (
   payload: Partial<CreateAccountPayload>
 ): Promise<AccountDetailsResponse> => {
   const formData = new FormData();
+  if (payload.type) formData.append("type", payload.type);
   if (payload.bank_name) formData.append("bank_name", payload.bank_name);
   if (payload.account_name)
     formData.append("account_name", payload.account_name);
@@ -209,3 +217,78 @@ export const deleteAccount = async (
   const response = await apiClient.delete(endpoint);
   return response.data;
 };
+
+// Get Office Locations
+export const getOfficeLocations =
+  async (): Promise<OfficeLocationsResponse> => {
+    const response = await openApiClient.get("/office-info");
+    return response.data;
+  };
+
+// Create Office Location
+export const createOfficeLocation = async (
+  payload: Partial<CreateOfficeLocationPayload>
+): Promise<OfficeLocationsResponse> => {
+  const formData = new FormData();
+  if (payload.office_name) formData.append("office_name", payload.office_name);
+  if (payload.office_address)
+    formData.append("office_address", payload.office_address);
+  if (payload.first_contact)
+    formData.append("first_contact", payload.first_contact);
+  if (payload.second_contact)
+    formData.append("second_contact", payload.second_contact);
+  if (payload.third_contact)
+    formData.append("third_contact", payload.third_contact);
+
+  const response = await apiClient.post("/create-office-info", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+// Edit Office Location
+export const editOfficeLocation = async (
+  payload: Partial<EditOfficeLocationPayload>
+): Promise<OfficeLocationsResponse> => {
+  const formData = new FormData();
+  if (payload.office_name) formData.append("office_name", payload.office_name);
+  if (payload.office_address)
+    formData.append("office_address", payload.office_address);
+  if (payload.first_contact)
+    formData.append("first_contact", payload.first_contact);
+  if (payload.second_contact)
+    formData.append("second_contact", payload.second_contact);
+  if (payload.third_contact)
+    formData.append("third_contact", payload.third_contact);
+
+  const response = await apiClient.post(
+    `/update-office-info/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+//delete Location
+export const deleteOfficeLoaction = async (
+  id: number | undefined
+): Promise<DeleteLeadershipResponse> => {
+  if (!id) {
+    throw new Error("id is required");
+  }
+  const endpoint = `/delete-office-info/${id}`;
+  const response = await apiClient.delete(endpoint);
+  return response.data;
+};
+
+// get Directors Data
+export const getDirectorDashboardData =
+  async (): Promise<DirectorDashboardResponse> => {
+    const response = await openApiClient.get("/director/dashboard");
+    return response.data;
+  };

@@ -1,16 +1,30 @@
+import { toast } from "react-toastify";
+import { OfficeLocation } from "../../../pages/Properties/types/OfficeLocationsTypes";
+import { useDeleteOfficeLocation } from "../../../utils/hooks/mutations";
 import Button from "../../input/Button";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
+  item: OfficeLocation | undefined;
 }
 
 export default function DeleteLocationModal({
   isOpen = true,
   onClose = () => {},
+  item,
 }: ModalProps) {
+  const { mutate: deleteOffice, isPending } = useDeleteOfficeLocation();
   const handleSubmit = () => {
-    console.log("Form submitted:");
+    deleteOffice(item?.id, {
+      onSuccess(data, variables, context) {
+        toast.success("Deleted Contact Successfully");
+      },
+      onError(error, variables, context) {
+        toast.error("Failed to delete Contact");
+      },
+    });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -39,7 +53,13 @@ export default function DeleteLocationModal({
             className="!bg-transparent !text-black"
             onClick={onClose}
           />
-          <Button label="Delete" className="!bg-red-500" />
+          <Button
+            label="Delete"
+            className="!bg-red-500"
+            onClick={handleSubmit}
+            isLoading={isPending}
+            disabled={isPending}
+          />
         </div>
       </div>
     </div>
