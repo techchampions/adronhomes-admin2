@@ -79,7 +79,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <div className="flex">
       {shouldShowSidebar && (
-        <div className="min-h-screen bg-white w-[20%]">
+        <div className="min-h-screen bg-white">
           {isMarketerRoute ? (
             <SideBar />
           ) : isDirectorRoute ? (
@@ -89,7 +89,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           )}
         </div>
       )}
-      <div className="w-full lg:w-[80%]">{children}</div>
+      <div className="w-full">{children}</div>
     </div>
   );
 };
