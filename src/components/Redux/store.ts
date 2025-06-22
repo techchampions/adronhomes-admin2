@@ -26,6 +26,9 @@ import marketerMonthlyStatsReducer from './Marketer/marketers_months_slice'
 import marketerUserPropertyPlanReducer from './Marketer/user_property_plan'
 import propertyPlanPaymentsReducer from './Marketer/PaymentList'
 import customerByIdReducer   from './customers/customerByid'
+import messageSliceReducer from './customers/send_message'
+import deleteUserSliceReducer from './customers/delete_customers'
+
 
 
 export const store = configureStore({
@@ -55,7 +58,9 @@ export const store = configureStore({
    marketerMonthlyStats:marketerMonthlyStatsReducer,
    marketerUserPropertyPlan:marketerUserPropertyPlanReducer,
    propertyPlanPayments:propertyPlanPaymentsReducer,
-   customerById:customerByIdReducer
+   customerById:customerByIdReducer,
+   messagingcustomer: messageSliceReducer,
+   deleteUserSlice:deleteUserSliceReducer
   },
 });
 

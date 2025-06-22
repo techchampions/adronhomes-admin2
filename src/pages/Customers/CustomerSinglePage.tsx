@@ -16,7 +16,18 @@ export default function CustomerSinglePage() {
   const { data, loading, error } = useSelector(
     (state: RootState) => state.customerById
   );
+    const { loading:messagingcustomerloading} = useSelector(
+    (state: RootState) => state.messagingcustomer
+  );
 
+
+      const { loading:loadingdelete} = useSelector(
+    (state: RootState) => state.deleteUserSlice
+  );
+
+
+
+  
   useEffect(() => {
     if (id) {
       dispatch(fetchCustomerById(id));
@@ -193,12 +204,11 @@ export default function CustomerSinglePage() {
           amount: formatAsNaira(data.total_paid),
           date: formatDate(data.customer.updated_at),
         }}
-        marketerName={data.customer.personnel || "Unknown Marketer"}
+        marketerName={data.customer.referral_code || "Unknown Marketer"}
         buttonTexts={{
           sendMessage: "Send Message",
           removeClient: "Remove Client",
-        }}
-      />
+        }} userId={data.customer.id} userNmae={`${data.customer.first_name} ${data.customer.last_name}`} userImage={data.customer.profile_picture} loading={messagingcustomerloading} loadingdelete={loadingdelete}      />
 
       <TableCard
         title="Active Plans"

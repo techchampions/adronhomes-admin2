@@ -9,7 +9,7 @@ import { loginUser } from "../Redux/Login/login_thunk";
 import { AppDispatch, RootState } from "../Redux/store";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearError } from "../Redux/Login/login_slice";
+import { clearError, resetSuccess } from "../Redux/Login/login_slice";
 import { getUser } from "../Redux/User/user_Thunk";
 import ForgotPasswordModal from "../input/fogotPassword/ForgotPassword";
 import { PropertyContext } from "../../MyContext/MyContext";
@@ -61,19 +61,20 @@ export default function Login() {
     if (success) {
       toast.success(message || "Login successful!");
       dispatch(getUser());
+      dispatch(resetSuccess());
     }
   }, [error, success, message]);
 
   useEffect(() => {
     if (userError) {
-      navigate("/");;
+      navigate("/");
     }
 
     if (userSuccess) {
       if (user?.role === 1) {
         navigate("/dashboard");
       }
-      if (user?.role === 0) {
+      if (user?.role === 2) {
         navigate("/marketer");
       }
     }
@@ -127,15 +128,18 @@ export default function Login() {
                     Forgot password?
                   </p>
                 </div>
-                <div className="w-full">
-                  <button
-                    type="submit"
-                    className="mt-8 sm:mt-[58px] w-full py-3 sm:py-[15px] rounded-[20px] sm:rounded-[30px] bg-[#79B833] h-12 sm:h-[49px] text-center text-xs sm:text-[12px] font-medium text-white disabled:bg-[#6b9933]"
-                    disabled={loading || isSubmitting}
-                  >
-                    {loading ? "Logging in..." : "Log In"}
-                  </button>
-                </div>
+               <div className="w-full">
+  <button
+    type="submit"
+    className={`mt-8 sm:mt-[58px] w-full py-3 sm:py-[15px] rounded-[20px] sm:rounded-[30px] bg-[#79B833] h-12 sm:h-[49px] text-center text-xs sm:text-[12px] font-medium text-white disabled:bg-[#6b9933] ${
+      loading || isSubmitting ? 'cursor-not-allowed' : ''
+    }`}
+    disabled={loading || isSubmitting}
+  >
+    {loading ? "Logging in..." : "Log In"}
+  </button>
+</div>
+
               </Form>
             </div>
           )}
