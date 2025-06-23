@@ -128,7 +128,7 @@ export default function Dashboard() {
                   value2={`${dashdata?.revenue.percentage}%`} />
                 <RevenueWhiteCard
                   tag="Total Payments Made"
-                  amount={dashdata?.payments?.pending_amount?.toLocaleString() || "0"}
+                  amount={dashdata?.payments?.total_amount?.toLocaleString() || "0"}
                   currency="₦"
                   note="Includes all property plans" />
                 <RevenueWhiteCard
