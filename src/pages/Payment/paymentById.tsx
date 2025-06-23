@@ -11,12 +11,13 @@ import { clearPayment } from "../../components/Redux/Payment/paymentById_Slice";
 import { useParams } from "react-router-dom";
 import { getUser } from "../../components/Redux/User/user_Thunk";
 import { capitalize } from "../../utils/formatname";
+import LoadingAnimations from "../../components/LoadingAnimations";
 
 
 export default function PaymentById() {
   const [isPaymentListOpen, setIsPaymentListOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { payment, loading, error } = useSelector(
+  const { payment, loading, error} = useSelector(
     (state: RootState) => state.paymentsById
   );
     const {
@@ -78,9 +79,8 @@ export default function PaymentById() {
           subtitle="Manage the list of payments made by customers"
           history={true}
         />
-        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-          <p className="text-center py-10">Loading payment details...</p>
-        </div>
+     <div className="flex items-center justify-center h-screen text-center "><LoadingAnimations loading={loading}/></div>;
+
       </div>
     );
   }
@@ -137,14 +137,16 @@ export default function PaymentById() {
         paymentId2={payment.id}
           paymentId={payment.reference}
           amount={formatCurrency(payment.amount_paid)}
-          additionalPayments="34 more payments" // This should probably be dynamic
-          bankName="UBA" // This should come from payment data if available
-          accountNumber="834993948393" // This should come from payment data if available
-          accountName="VUBAH MANIA CHUKS" // This should come from payment data if available
+          // additionalPayments="34 more payments" // This should probably be dynamic
+          bankName={payment.bank_name || "N/A"} 
+          // accountNumber="834993948393" // This should come from payment data if available
+          // accountName={payment.bank_name || "N/A"}
+          // This should come from payment data if available
           date={formatDate(payment.created_at)}
           receiptImage={payment.proof_of_payment || "/reciept.svg"}
           fullReciept={payment.proof_of_payment || "/fullreciept.svg"}
           handleHistory={() => setIsPaymentListOpen(true)}
+          // additionalPayments={payment. || "N/A"}
         />
 
         {payment.property && payment.plan && (
@@ -178,12 +180,10 @@ export default function PaymentById() {
         <div>
           <p className="text-[20px] font-[325] text-dark mb-[20px]">Customer</p>
           <ProfileCard
-            imageUrl="/profile.svg" // This should come from user data
-            name={`${capitalize(user?.first_name )|| "N/A"} ${capitalize(user?.last_name) || "N/A"}`}
-           dateJoined={formatDate(user?.created_at ?? 'N/A')}
-
-            className=""
-          />
+            imageUrl={payment?.user.profile_picture ?? "/profile.svg"} // This should come from user data
+            name={`${capitalize(payment?.user?.first_name) || "N/A"} ${capitalize(payment?.user?.last_name) || "N/A"}`}
+            dateJoined={formatDate(payment?.user.email_verified_at ?? 'N/A')}
+             customerId={`/customers/${payment.user.id}`}          />
         </div>
       </div> 
 

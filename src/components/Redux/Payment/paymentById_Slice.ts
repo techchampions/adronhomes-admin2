@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchPaymentById } from './payment_thunk';
+import { fetchPaymentById, User } from './payment_thunk';
 
 // Types
 interface Property {
@@ -33,6 +33,7 @@ interface Property {
   property_duration_limit: number;
   payment_schedule: string | null;
   total_amount: number;
+  user:User
 }
 
 interface PaymentPlan {
@@ -64,6 +65,8 @@ interface PaymentData {
   proof_of_payment: string;
   property: Property | null;
   plan: PaymentPlan | null;
+  bank_name:string
+    user:User
 }
 
 interface SinglePaymentResponse {

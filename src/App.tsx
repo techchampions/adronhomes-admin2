@@ -36,7 +36,6 @@ import PaymentById from "./pages/Payment/paymentById";
 import InfrastructureFeesModal from "./components/Modals/InfrastructureFeesModal";
 import Customers_payment from "./pages/Customers/customers_payment";
 
-
 const AuthGuard = () => {
   const token = Cookies.get("token");
 
@@ -114,10 +113,7 @@ const App = () => {
               />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/settings" element={<Settings />} />
-              <Route
-                path="/customers/:id"
-                element={<CustomerSinglePage />}
-              />
+              <Route path="/customers/:id" element={<CustomerSinglePage />} />
               <Route
                 path="/customers/singlepage/payment"
                 element={<CustomersPayment />}
@@ -126,14 +122,22 @@ const App = () => {
                 path="/customers/singlepage/singlepayment"
                 element={<CustomersSinglePayment />}
               />
-                <Route path="/customers/payment/:user_id/:plan_id" element={<Customers_payment />} />
+              <Route
+                path="/customers/payment/:user_id/:plan_id"
+                element={<Customers_payment />}
+              />
               <Route path="/properties/form" element={<General />} />
-
               {/* Marketer Routes */}
               <Route path="/marketer" element={<MarketersDashboard />} />
-              <Route path="/marketer/settings" element={<SettingsPage />} /> </Route>
-                    <Route path="/marketer/payment/:user_id/:plan_id" element={<MarketerInvoice />} />
-                        
+              <Route
+                path="/marketer-settings"
+                element={<SettingsPage />}
+              />{" "}
+            </Route>
+            <Route
+              path="/marketer-payment/:user_id/:plan_id"
+              element={<MarketerInvoice />}
+            />
           </Routes>
         </AppLayout>
         {isInfrastructure && (

@@ -50,7 +50,7 @@ const navigate=useNavigate()
             </thead>
             <tbody>
               {customerData.map((row: any) => (
-                <tr key={row.id} className="cursor-pointer" onClick={() => navigate(`/marketer/payment/${row.plan_id}/${row.user_id}`)}
+                <tr key={row.id} className="cursor-pointer" onClick={() => navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)}
 >
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.name ?? 'N/A'}

@@ -9,6 +9,7 @@ import { fetchCustomerById } from "../../components/Redux/customers/customerByid
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { formatDate } from "../../utils/formatdate";
 import { formatAsNaira } from "../../utils/formatcurrency";
+import LoadingAnimations from "../../components/LoadingAnimations";
 
 export default function CustomerSinglePage() {
   const { id } = useParams<{ id: string }>();
@@ -146,14 +147,15 @@ export default function CustomerSinglePage() {
   ];
 
   if (loading) {
-    return <div className="text-center py-8">Loading customer data...</div>;
+    return     <div className="flex items-center justify-center h-screen text-center "><LoadingAnimations loading={loading}/></div>;
   }
 
   if (error) {
     return (
-      <div className="text-center py-8 text-red-500">
-        Error: {error.message}
-      </div>
+    <div className="flex items-center justify-center h-screen text-center text-red-500">
+  Error: {error.message}
+</div>
+
     );
   }
 

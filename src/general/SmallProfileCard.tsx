@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate, useNavigation } from 'react-router-dom';
 
 interface ProfileCardProps {
   imageUrl: string;
   name: string;
   dateJoined: string;
   className?: string;
+  customerId:any
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
@@ -12,7 +14,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   name,
   dateJoined,
   className = '',
+  customerId=""
 }) => {
+
+  const  navigate=useNavigate()
   return (
     <div className={`bg-white py-5 px-6 md:py-6 md:px-8 rounded-3xl flex items-center space-x-4 md:space-x-6 w-full ${className}`} >
       <img
@@ -27,7 +32,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           Date Joined: <span className="font-normal">{dateJoined}</span>
         </p>
 
-        <p className='text-dark md:text-sm font-bold  text-[10px]'>View Customer</p>
+        <p className='text-dark md:text-sm font-bold  text-[10px] cursor-pointer' onClick={()=>navigate(`${customerId}`)} >View Customer</p>
        </div>
       </div>
     </div>
