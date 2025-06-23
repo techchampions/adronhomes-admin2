@@ -30,19 +30,20 @@ import messageSliceReducer from './customers/send_message'
 import deleteUserSliceReducer from './customers/delete_customers'
 
 
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    user:userReducer,
-    dashboardData:dashboardReducer,
-    customers:customersReducer,
-    transactions:transactionsReducer,
-    payments:paymentsReducer,
-    sendOtp:otpReducer,
-    reserPassword:reserPasswordReducer,
-      paymentsById: PaymentsStateReducer,
+    user: userReducer,
+    dashboardData: dashboardReducer,
+    customers: customersReducer,
+    transactions: transactionsReducer,
+    payments: paymentsReducer,
+    sendOtp: otpReducer,
+    reserPassword: reserPasswordReducer,
+    paymentsById: PaymentsStateReducer,
     paymentList: paymentListReducer,
-    updatePayment:updatePaymentReducer,
+    updatePayment: updatePaymentReducer,
     properties: PropertiesState,
     addproperty:addpropertyReducer,
     updateproperty:updatepropertyReducer,
