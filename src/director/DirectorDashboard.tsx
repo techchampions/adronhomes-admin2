@@ -6,9 +6,11 @@ import ReferralModal from "../marketer/referalModal/referralModal";
 import DashCard from "./DashCard";
 import { FaUserShield } from "react-icons/fa6";
 import { useGetDirectorDashboard } from "../utils/hooks/query";
+import NotFound from "../components/NotFound";
 
 export default function DirectorsDashboard() {
   const { data, isPending, isError } = useGetDirectorDashboard();
+  const properties = data?.properties || [];
   const tabs = ["Properties"];
   const [activeTab, setActiveTab] = useState("Properties");
   const [showModal, setShowModal] = useState(false);
@@ -54,7 +56,9 @@ export default function DirectorsDashboard() {
             searchPlaceholder="Search Properties"
             activeTab={activeTab}
             onTabChange={setActiveTab}
-          ></ReusableTable>
+          >
+            {properties.length < 1 && <NotFound />}
+          </ReusableTable>
 
           {showModal && <ReferralModal onClose={() => setShowModal(false)} />}
         </div>
