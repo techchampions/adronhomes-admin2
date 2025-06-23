@@ -156,6 +156,14 @@ export const fetchPaymentById = createAsyncThunk<
     }
   }
 );
+export interface User {
+  id: number;
+  email_verified_at: string;
+  last_name: string;
+  first_name: string;
+  profile_picture: string | null;
+}
+
 
 interface SinglePaymentResponse {
   status: string;
@@ -177,6 +185,8 @@ interface SinglePaymentResponse {
     proof_of_payment: string;
     property: any | null; // Replace 'any' with proper type if available
     plan: any | null;     // Replace 'any' with proper type if available
+      bank_name:string
+      user:User
   };
 }
 
@@ -259,6 +269,7 @@ export interface UpdatePaymentstatusResponse {
     created_at: string;
     updated_at: string;
     proof_of_payment: string;
+      bank_name:string
   };
 }
 

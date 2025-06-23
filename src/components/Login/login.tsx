@@ -21,6 +21,7 @@ export default function Login() {
   const { loading, token, success, message, error } = useSelector(
     (state: RootState) => state.auth
   );
+
   const {
     loading: userLoading,
     success: userSuccess,
@@ -47,15 +48,13 @@ export default function Login() {
   const onSubmit = async (values: typeof initialValues) => {
     try {
       await dispatch(loginUser(values)).unwrap();
-    } catch (err) {
-    
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {
     if (error) {
       toast.error(error);
-      dispatch(clearError()); 
+      dispatch(clearError());
     }
 
     if (success) {
@@ -128,34 +127,32 @@ export default function Login() {
                     Forgot password?
                   </p>
                 </div>
-               <div className="w-full">
-  <button
-    type="submit"
-    className={`mt-8 sm:mt-[58px] w-full py-3 sm:py-[15px] rounded-[20px] sm:rounded-[30px] bg-[#79B833] h-12 sm:h-[49px] text-center text-xs sm:text-[12px] font-medium text-white disabled:bg-[#6b9933] ${
-      loading || isSubmitting ? 'cursor-not-allowed' : ''
-    }`}
-    disabled={loading || isSubmitting}
-  >
-    {loading ? "Logging in..." : "Log In"}
-  </button>
-</div>
-
+                <div className="w-full">
+                  <button
+                    type="submit"
+                    className={`mt-8 sm:mt-[58px] w-full py-3 sm:py-[15px] rounded-[20px] sm:rounded-[30px] bg-[#79B833] h-12 sm:h-[49px] text-center text-xs sm:text-[12px] font-medium text-white disabled:bg-[#6b9933] ${
+                      loading || isSubmitting ? "cursor-not-allowed" : ""
+                    }`}
+                    disabled={loading || isSubmitting}
+                  >
+                    {loading ? "Logging in..." : "Log In"}
+                  </button>
+                </div>
               </Form>
             </div>
           )}
         </Formik>
-         <div className="absolute top-5 md:right-14 right-0 ">
-        <ForgotPasswordModal
-        isOpen={forgotPassword}
-        onClose={() => {
-          setForgotPassword(false);
-          dispatch(resetOtpPasswordState());
-          dispatch(resetOtpState());
-        }}
-      />
-    </div>
+        <div className="absolute top-5 md:right-14 right-0 ">
+          <ForgotPasswordModal
+            isOpen={forgotPassword}
+            onClose={() => {
+              setForgotPassword(false);
+              dispatch(resetOtpPasswordState());
+              dispatch(resetOtpState());
+            }}
+          />
+        </div>
       </div>
-   
     </section>
   );
 }

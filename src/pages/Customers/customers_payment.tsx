@@ -17,6 +17,7 @@ import {
 import PaymentModal, { PaymentStatus } from "../../pages/Customers/PaymentList";
 import { fetchPropertyPlanPayments } from "../../components/Redux/Marketer/PaymentList";
 import { PaymentCard } from "../../pages/Customers/PaymentTable";
+import LoadingAnimations from "../../components/LoadingAnimations";
 
 export default function MarketerInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -132,9 +133,19 @@ if(plan_id && user_id){
 
   const tabs = ["All", "Completed", "Pending", "Failed"];
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!planProperties) return <div>No data found</div>;
+   if (loading) {
+    return     <div className="flex items-center justify-center h-screen text-center "><LoadingAnimations loading={loading}/></div>;
+  }
+
+ if (error) {
+    return (
+    <div className="flex items-center justify-center h-screen text-center text-red-500">
+  Error: {error}
+</div>
+
+    );
+  }
+  if (!planProperties) return <div className="flex items-center justify-center h-screen text-center ">No data found</div>;
 
   return (
     <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
@@ -153,8 +164,7 @@ if(plan_id && user_id){
           day: "numeric",
           month: "long",
           year: "numeric",
-        })}
-      />
+        })} customerId={undefined}      />
 
       <InvoiceCard
         invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`}

@@ -178,9 +178,9 @@ const App = () => {
                 {/* Marketer Routes */}
                 <Route path="/marketer" element={<MarketersDashboard />} />
                 <Route path="/director" element={<DirectorsDashboard />} />
-                <Route path="/marketer/settings" element={<SettingsPage />} />
+                <Route path="marketer-settings" element={<SettingsPage />} />
                 <Route
-                  path="/marketer/payment/:user_id/:plan_id"
+                  path="/marketer-payment/:user_id/:plan_id"
                   element={<MarketerInvoice />}
                 />
               </Route>
