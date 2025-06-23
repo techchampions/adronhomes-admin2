@@ -49,7 +49,7 @@ export const useGetOfficeLocations = () => {
     queryFn: getOfficeLocations,
   });
 };
-
+// Directors Dashboard
 export const useGetDirectorDashboard = () => {
   return useQuery<DirectorDashboardResponse>({
     queryKey: ["Directors-dashboard"],

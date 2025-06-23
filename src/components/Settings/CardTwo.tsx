@@ -28,6 +28,11 @@ const websiteSettings = [
     slug: "leadership",
     description: "Manage leadership information",
   },
+  {
+    title: "Testimonials",
+    slug: "testmonials",
+    description: "Manage Testmonials",
+  },
 ];
 
 const paymentSettings = [

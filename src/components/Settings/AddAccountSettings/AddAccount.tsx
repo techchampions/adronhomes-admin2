@@ -18,9 +18,9 @@ interface ModalProps {
 }
 
 const TypeOptions = [
-  { value: "AdronAccount", label: "Adron Homes Account" },
-  { value: "Infrastructure", label: "Infrastructure Account" },
-  { value: "Others", label: "Others Fees Account" },
+  { value: "property", label: "Property Account" },
+  { value: "infrastructure", label: "Infrastructure Account" },
+  { value: "other", label: "Others Fees Account" },
   { value: "fund", label: "Fund Wallet Account" },
 ];
 
