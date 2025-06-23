@@ -5,9 +5,9 @@ import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from '../../ge
 
 const navItems = [
   { label: 'Dashboard', icon: Icon1, path: '/marketer' },
-  { label: 'Customers', icon: Icon2, path: '/customers' },
-  { label: 'Notifications', icon: Icon8, path: '/notifications' },
-  { label: 'Settings', icon: Icon9, path: '/settings' },
+  { label: 'Customers', icon: Icon2, path: '"/marketer/payment/:user_id/:plan_id"' },
+  // { label: 'Notifications', icon: Icon8, path: '/notifications' },
+  { label: 'Settings', icon: Icon9, path: '/marketer/settings' },
 ];
 
 export default function SideBar() {
