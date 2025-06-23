@@ -62,7 +62,7 @@ const AccountDetails = () => {
                     {accounts.map((account, index) => (
                       <div
                         key={index}
-                        className="even:bg-gray-100 odd:bg-white odd:border odd:border-gray-100 rounded-2xl p-4 flex flex-col gap-3"
+                        className=" hover:bg-gray-100 border cursor-pointer border-gray-100 rounded-2xl p-4 flex flex-col gap-3"
                       >
                         <div className="text-xs text-center">
                           Bank Details for{" "}
