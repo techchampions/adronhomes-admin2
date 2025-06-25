@@ -69,12 +69,17 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
                     <div className="truncate">{transaction.amount}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">
-                    <div className={`truncate ${
-                      transaction.status === "Approved" ? "text-green-500" :
-                      transaction.status === "Pending" ? "text-yellow-500" :
-                      "text-red-500"
-                    }`}>
-                      {transaction.status}
+                  <div
+                      className={`truncate ${
+                        transaction.status === "Approved"
+                          ? "text-[#2E9B2E]":  transaction.status === "Rejected"
+                          
+                           
+                          ? "text-[#D70E0E]"
+                          : "text-[#FF9131]"
+                      }`}
+                    >
+                      { transaction.status === "Rejected"?"Disapproved":transaction.status}
                     </div>
                   </td>
                   <td className="py-4 pl-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">

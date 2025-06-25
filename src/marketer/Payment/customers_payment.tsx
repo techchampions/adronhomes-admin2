@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../Header/Hearder";
 import ProfileCard from "../../general/SmallProfileCard";
-import InvoiceCard from "../../general/InvoiceCard";
+
 import PaymentListCard from "../../general/PaymentListCard";
 
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -18,6 +18,7 @@ import PaymentModal, { PaymentStatus } from "../../pages/Customers/PaymentList";
 import { fetchPropertyPlanPayments } from "../../components/Redux/Marketer/PaymentList";
 import { PaymentCard } from "../../pages/Customers/PaymentTable";
 import LoadingAnimations from "../../components/LoadingAnimations";
+import InvoiceCard from "../../general/invioceCardTwo";
 
 export default function MarketerInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -163,31 +164,50 @@ if(plan_id && user_id){
           year: "numeric",
         })} customerId={undefined}      />
 
-      <InvoiceCard
-        invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`}
-        paidAmount= {`₦${planProperties.total_amount?.toLocaleString()}`}
-        paymentSchedule={planProperties.repayment_schedule}
-        progressPercentage={
-          (planProperties.paid_amount / planProperties.total_amount) * 100
-        }
-        duration={`${planProperties.monthly_duration} Months`}
-        nextPaymentDate={new Date(
-          planProperties.next_payment_date
-        ).toLocaleDateString()}
-        dueDate={
-          nextRepayment
-            ? new Date(nextRepayment.due_date).toLocaleDateString()
-            : "N/A"
-        }
-       property={{
-    name: planProperties.property?.name || "Property",
-    address: `${planProperties.property?.lga}, ${planProperties.property?.state}`,
-    image: planProperties.property?.display_image || "/land.svg",
-    size: planProperties.property?.size || "N/A",
-    features: planProperties.property?.features || [], // pass features array
-    type: getPropertyType(planProperties.property.type),
-  }}
-      />
+ <InvoiceCard
+   other={
+     planProperties.other_amount > 0 ? {
+       percentage: planProperties.other_percentage,
+       amount: planProperties.other_amount,
+       remainingBalance: planProperties.remaining_other_balance,
+       paidAmount: planProperties.paid_other_amount
+     } : undefined
+   }
+   invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`}
+   paidAmount={`₦${planProperties.total_amount?.toLocaleString()}`}
+   paymentSchedule={planProperties.repayment_schedule}
+   progressPercentage={
+     planProperties.payment_percentage ??
+     (planProperties.paid_amount / planProperties.total_amount) * 100
+   }
+   duration={`${planProperties.monthly_duration} Months`}
+   nextPaymentDate={
+     planProperties.next_payment_date
+       ? new Date(planProperties.next_payment_date).toLocaleDateString()
+       : "N/A"
+   }
+   dueDate={
+     nextRepayment?.due_date
+       ? new Date(nextRepayment.due_date).toLocaleDateString()
+       : "N/A"
+   }
+   property={{
+     name: planProperties.property?.name || "Property",
+     address: `${planProperties.property?.lga}, ${planProperties.property?.state}`,
+     image: planProperties.property?.display_image || "/land.svg",
+     size: planProperties.property?.size || "N/A",
+     features: planProperties.property?.features || [],
+     type: getPropertyType(planProperties.property_type),
+   }}
+   infrastructure={
+     planProperties.infrastructure_amount > 0 ? {
+       percentage: planProperties.infrastructure_percentage,
+       amount: planProperties.infrastructure_amount,
+       remainingBalance: planProperties.remaining_infrastructure_balance,
+       paidAmount: planProperties.paid_infrastructure_amount
+     } : undefined
+   }
+ />
 
       <PaymentListCard
         title="Payment Schedule"

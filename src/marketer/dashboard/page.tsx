@@ -13,9 +13,10 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { fetchMarketerDashboard } from "../../components/Redux/Marketer/Dashboard_thunk";
 import NotFound from "../../components/NotFound";
 import LoadingAnimations from "../../components/LoadingAnimations";
+import Upcomingdata from "./Upcomingdata ";
 
 export default function MarketersDashboard() {
-  const tabs = ["Registered Customers", "Active Plans"];
+  const tabs = ["Registered Customers", "Active Plans",'Upcoming Payments'];
   const [activeTab, setActiveTab] = useState("Registered Customers");
   const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
@@ -51,10 +52,28 @@ export default function MarketersDashboard() {
     }));
   };
 
+
+
+    const getUpcomingdata = (): any[] => {
+    if (!data?.upcoming_payment_customers?.data) return [];
+    return data.upcoming_payment_customers.data.map((item) => ({
+  name: item ? `${item?.first_name} ${item?.last_name}` : "N/A",
+      dateJoined: item.created_at,
+      nextPayment: item.due_date,
+      paid_amount: item.amount,
+      phoneNumber: item.phone_number,
+      user_id:item.id
+
+
+    }));
+  };
+
   const referredUsers = getReferredUsersData();
   const activePlans = getActivePlansData();
   const isReferredEmpty = referredUsers.length === 0;
   const isActiveEmpty = activePlans.length === 0;
+const upcomingPayments = getUpcomingdata();
+const isUpcomingEmpty = upcomingPayments.length === 0;
 
   return (
     <div className="mb-[52px]">
@@ -97,31 +116,43 @@ export default function MarketersDashboard() {
             activeTab={activeTab}
             onTabChange={setActiveTab}
           >
-            {loading ? (
-              <div className="w-full flex items-center justify-center">
-                <LoadingAnimations loading={loading} />
-              </div>
-            ) : activeTab === "Registered Customers" ? (
-              isReferredEmpty ? (
-                <div className="max-h-screen">
-                  <p className="text-center font-normal text-[#767676]">
-                    No registered customers found
-                  </p>
-                  <NotFound />
-                </div>
-              ) : (
-                <CustomersTableAll currentItems={referredUsers} />
-              )
-            ) : isActiveEmpty ? (
-              <div className="max-h-screen">
-                <p className="text-center font-normal text-[#767676]">
-                  No active plans found
-                </p>
-                <NotFound />
-              </div>
-            ) : (
-              <CustomersTableAllActive customerData={activePlans} />
-            )}
+       {loading ? (
+  <div className="w-full flex items-center justify-center">
+    <LoadingAnimations loading={loading} />
+  </div>
+) : activeTab === "Registered Customers" ? (
+  isReferredEmpty ? (
+    <div className="max-h-screen">
+      <p className="text-center font-normal text-[#767676]">
+        No registered customers found
+      </p>
+      <NotFound />
+    </div>
+  ) : (
+    <CustomersTableAll currentItems={referredUsers} />
+  )
+) : activeTab === "Active Plans" ? (
+  isActiveEmpty ? (
+    <div className="max-h-screen">
+      <p className="text-center font-normal text-[#767676]">
+        No active plans found
+      </p>
+      <NotFound />
+    </div>
+  ) : (
+    <CustomersTableAllActive customerData={activePlans} />
+  )
+) : isUpcomingEmpty ? (
+  <div className="max-h-screen">
+    <p className="text-center font-normal text-[#767676]">
+      No upcoming payments found
+    </p>
+    <NotFound />
+  </div>
+) : (
+  <Upcomingdata customerData={upcomingPayments} />
+)}
+
           </ReusableTable>
 
           {showModal && <ReferralModal onClose={() => setShowModal(false)} />}

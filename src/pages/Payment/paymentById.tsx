@@ -134,6 +134,7 @@ export default function PaymentById() {
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[40px]">
         <PaymentCard
+        status={payment.status}
         paymentId2={payment.id}
           paymentId={payment.reference}
           amount={formatCurrency(payment.amount_paid)}
@@ -167,11 +168,8 @@ export default function PaymentById() {
                 address: payment.property.street_address,
                 image: payment.property.display_image || "/land.svg",
                 size: payment.property.size,
-                hasStreetLights: payment.property.features.includes(
-                  "24/7 Security"
-                ),
-                hasGym: payment.property.features.includes("Gym"),
-                type: getPropertyType(payment.property.type),
+                
+              
               }}
             />
           </div>
