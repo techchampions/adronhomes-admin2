@@ -69,7 +69,7 @@ export default function ReferralModal({ onClose }: { onClose: () => void }) {
               change="All customers on a property plan"
             />
             <MatrixCard
-              title="Referred Customers"
+              title="Total Amount for this month"
               value={total_expected.toLocaleString()}
               change="Includes all customers on a property plan"
             />

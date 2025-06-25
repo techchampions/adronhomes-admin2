@@ -9,7 +9,7 @@ export interface ErrorResponse {
   errors?: Record<string, string[]>;
 }
 
- export interface User {
+export interface User {
   id: number;
   email: string;
   phone_number: string;
@@ -33,7 +33,6 @@ export interface ErrorResponse {
   personnel: string;
   contract_id: number | null;
 }
-
 
 export interface ReferredUser {
   id: number;
@@ -114,11 +113,57 @@ export interface PropertyPlan {
   paid_infrastructure_amount: number;
   paid_other_amount: number;
   user: User;
+  contract_id: string | null;
+  number_of_unit: number;
 }
 
 export interface PropertyPlansData {
   current_page: number;
   data: PropertyPlan[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLinks[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
+export interface UpcomingPaymentCustomer {
+  id: number;
+  email: string;
+  phone_number: string;
+  referral_code: string;
+  name: string | null;
+  first_name: string;
+  last_name: string;
+  role: number;
+  country: string | null;
+  state: string | null;
+  lga: string | null;
+  otp_verified_at: string | null;
+  email_verified_at: string | null;
+  profile_picture: string | null;
+  gender: string | null;
+  notification_enabled: number;
+  device_id: string;
+  address: string | null;
+  created_at: string;
+  updated_at: string;
+  personnel: string;
+  contract_id: string | null;
+  amount:any| null
+  due_date:any|null
+  }
+
+
+export interface UpcomingPaymentCustomersData {
+  current_page: number;
+  data: UpcomingPaymentCustomer[];
   first_page_url: string;
   from: number;
   last_page: number;
@@ -148,6 +193,7 @@ export interface MarketerDashboardResponse {
     total_amount: number;
     expected_payment_count: number;
     active_plan: PropertyPlansData;
+    upcoming_payment_customers: UpcomingPaymentCustomersData;
   };
 }
 

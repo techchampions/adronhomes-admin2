@@ -69,11 +69,14 @@ export default function PaymentTableComponent({ data }: { data: any }) {
                     <div
                       className={`truncate ${
                         payment.status === "Approved"
-                          ? "text-[#2E9B2E]"
+                          ? "text-[#2E9B2E]":  payment.status === "Rejected"
+                          
+                           
+                          ? "text-[#D70E0E]"
                           : "text-[#FF9131]"
                       }`}
                     >
-                      {payment.status}
+                      { payment.status === "Rejected"?"Disapproved":payment.status}
                     </div>
                   </td>
                   <td className="py-4   pr-6 font-[325px] text-text-dark text-sm w-[120px] max-w-[120px]">

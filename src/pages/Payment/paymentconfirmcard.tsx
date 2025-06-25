@@ -7,7 +7,7 @@ import { resetPaymentStatus } from "../../components/Redux/Payment/updatePayment
 
 interface PaymentByIdCardProps {
   paymentId?: string;
-    paymentId2?: any;
+  paymentId2?: any;
   amount?: string;
   additionalPayments?: string;
   bankName?: string;
@@ -19,6 +19,7 @@ interface PaymentByIdCardProps {
   onDisapprove?: () => void;
   fullReciept?: string;
   handleHistory?: any;
+  status?: number; // 0 = pending, 1 = approved, 2 = disapproved
 }
 
 interface ModalProps {
@@ -51,7 +52,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
 
 const PaymentCard: React.FC<PaymentByIdCardProps> = ({
   paymentId = "#35264898DJd7",
-    paymentId2 = "#35264898DJd7",
+  paymentId2 = "#35264898DJd7",
   amount = "₦6,000,000",
   additionalPayments = "",
   bankName = "",
@@ -63,6 +64,7 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
   onApprove,
   onDisapprove,
   handleHistory,
+  status = 0,
 }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -103,7 +105,7 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
     if (paymentId2) {
       dispatch(
         UpdatePaymentstatus({
-          paymentId:paymentId2,
+          paymentId: paymentId2,
           credentials: { status: 1 },
         })
       );
@@ -114,7 +116,7 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
     if (paymentId2) {
       dispatch(
         UpdatePaymentstatus({
-          paymentId:paymentId2,
+          paymentId: paymentId2,
           credentials: { status: 2 },
         })
       );
@@ -181,22 +183,32 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
               View
             </p>
           </div>
-          {/* button */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0 w-full sm:w-auto">
-            <button
-              className="bg-[#79B833] rounded-[60px] py-3 sm:py-[14px] px-6 sm:px-[44px] text-white text-sm font-bold w-full sm:w-auto text-center"
-              onClick={handleApprove}
-            >
-              Approve Payment
-            </button>
-
-            <p
-              className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] sm:pl-[45px] w-full sm:w-auto text-center sm:text-left cursor-pointer"
-              onClick={handleDisapprove}
-            >
-              Disapprove Payment
-            </p>
-          </div>
+          
+          {/* Status display or action buttons */}
+          {status === 1 ? (
+            <div className="text-[#79B833] text-sm font-bold py-3 sm:py-[14px] w-full text-center">
+              Approved
+            </div>
+          ) : status === 2 ? (
+            <div className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] w-full text-center">
+              Disapproved
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0 w-full sm:w-auto">
+              <button
+                className="bg-[#79B833] rounded-[60px] py-3 sm:py-[14px] px-6 sm:px-[44px] text-white text-sm font-bold w-full sm:w-auto text-center"
+                onClick={handleApprove}
+              >
+                Approve Payment
+              </button>
+              <p
+                className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] sm:pl-[45px] w-full sm:w-auto text-center sm:text-left cursor-pointer"
+                onClick={handleDisapprove}
+              >
+                Disapprove Payment
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
