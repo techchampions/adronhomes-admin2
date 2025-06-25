@@ -13,10 +13,10 @@ interface InvoiceProps {
     address: string;
     image: string;
     size: string;
-    hasStreetLights?: boolean; // make optional
-    hasGym?: boolean; // make optional
-    features?: string[]; // add features array
-    type: string;
+    // hasStreetLights?: boolean; // make optional
+    // hasGym?: boolean; // make optional
+    // features?: string[]; // add features array
+    // type: string;
   };
 }
 
@@ -33,9 +33,9 @@ export default function InvoiceCard({
     address: "34, Shimawa, Ogun State, Nigeria",
     image: "/land.svg",
     size: "648 Sq M",
-    hasStreetLights: true,
-    hasGym: true,
-    type: "Land",
+    // hasStreetLights: true,
+    // hasGym: true,
+    // type: "Land",
   },
 }: InvoiceProps) {
   return (
@@ -140,7 +140,7 @@ export default function InvoiceCard({
   </div>
 
   {/* Features - dynamically render based on what exists */}
-  {property.features?.slice(0, 2).map((feature, index) => (
+  {/* {property.features?.slice(0, 2).map((feature, index) => (
     <div key={index} className="flex items-center gap-1 md:gap-2">
       {feature.toLowerCase().includes('light') ? (
         <img src="/wand.svg" className="h-4 w-4 md:h-5 md:w-5" />
@@ -153,14 +153,14 @@ export default function InvoiceCard({
         {feature.length > 10 ? `${feature.substring(0, 10)}...` : feature}
       </span>
     </div>
-  ))}
+  ))} */}
 
   {/* Property Type */}
-  <div className="flex items-center">
+  {/* <div className="flex items-center">
     <span className="text-sm md:text-base truncate font-[325]">
       {property.type}
     </span>
-  </div>
+  </div> */}
 </div>
 
             {/* View Property Link */}

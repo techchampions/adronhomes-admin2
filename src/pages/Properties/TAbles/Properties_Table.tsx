@@ -293,7 +293,7 @@ const handleArrayInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       </div>
                     </td>
                     <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[120px]">
-                      ₦{property.total_amount?.toLocaleString()}
+                      ₦{property.price?.toLocaleString()}
                     </td>
                     <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[100px]">
                       {getPropertyType(property.type)}

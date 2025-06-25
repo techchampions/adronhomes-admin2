@@ -36,8 +36,8 @@ export interface User {
   lga: string;
   otp_verified_at: string;
   email_verified_at: string;
-  profile_picture: string;
-  gender: string;
+  profile_picture: string | null;
+  gender: string | null;
   notification_enabled: number;
   device_id: string;
   address: string;
@@ -71,7 +71,16 @@ export interface Transaction {
   updated_at: string;
   marketer_id: number;
   reference: string;
-  property: Property;
+  property: {
+    id: number;
+    name: string;
+    price: number;
+    size: string;
+    display_image: string;
+    lga: string;
+    state: string;
+    total_amount: number;
+  };
 }
 
 export interface PlanProperty {
@@ -89,8 +98,8 @@ export interface PlanProperty {
   updated_at: string;
   monthly_duration: string;
   payment_type: string;
-  end_date: string;
-  start_date: string;
+  end_date: string | null;
+  start_date: string | null;
   payment_method: string | null;
   repayment_schedule: string;
   next_payment_date: string;
@@ -103,6 +112,8 @@ export interface PlanProperty {
   remaining_other_balance: number;
   paid_infrastructure_amount: number;
   paid_other_amount: number;
+  contract_id: number | null;
+  number_of_unit: number;
   property: Property;
   user: User;
 }
