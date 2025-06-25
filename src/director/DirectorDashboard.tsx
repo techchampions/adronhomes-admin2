@@ -7,9 +7,10 @@ import DashCard from "./DashCard";
 import { FaUserShield } from "react-icons/fa6";
 import { useGetDirectorDashboard } from "../utils/hooks/query";
 import NotFound from "../components/NotFound";
+import { formatDate } from "../utils/formatdate";
 
 export default function DirectorsDashboard() {
-  const { data, isPending, isError } = useGetDirectorDashboard();
+  const { data, isLoading, isError } = useGetDirectorDashboard();
   const properties = data?.properties || [];
   const tabs = ["Properties"];
   const [activeTab, setActiveTab] = useState("Properties");
@@ -26,27 +27,31 @@ export default function DirectorsDashboard() {
             isHighlighted={true}
             valueText={data?.director.personnel}
             mainText={`${data?.director.first_name} ${data?.director.last_name}`}
-            mutedText={`Created at ${data?.director.created_at}`}
+            mutedText={`Created at ${formatDate(data?.director.created_at)}`}
             actionText="Account Settings"
             icon={<FaUserShield />}
+            isloading={isLoading}
           />
           <DashCard
             className=""
             mainText="Total Properties"
             valueText={data?.total_properties}
             mutedText="Includes all Properties"
+            isloading={isLoading}
           />
           <DashCard
             className=""
             mainText="Total Properties Available"
             valueText={data?.total_available}
             mutedText="All Properties Available"
+            isloading={isLoading}
           />
           <DashCard
             className=""
             mainText="Total Bought Properties"
             valueText={data?.total_sold}
             mutedText="Includes total bought Properties"
+            isloading={isLoading}
           />
         </div>
 
