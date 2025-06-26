@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../../general/Header";
 import PaymentCard from "./paymentconfirmcard";
 import ProfileCard from "../../general/SmallProfileCard";
-import InvoiceCard from "../../general/InvoiceCard";
+
 import PaymentListComponent from "../Customers/PaymentStatus";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,8 @@ import { useParams } from "react-router-dom";
 import { getUser } from "../../components/Redux/User/user_Thunk";
 import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
+import InvoiceCard from "../../general/invioceCardTwo";
+
 
 
 export default function PaymentById() {
@@ -20,7 +22,9 @@ export default function PaymentById() {
   const { payment, loading, error} = useSelector(
     (state: RootState) => state.paymentsById
   );
-    const {
+  // It seems like `user` data is fetched, but not directly used in the current render.
+  // Keeping it here in case it's needed elsewhere or for future features.
+  const {
     loading: userLoading,
     success: userSuccess,
     error: userError,
@@ -33,7 +37,7 @@ export default function PaymentById() {
       const id = Number(paymentId);
       if (!isNaN(id)) {
         dispatch(fetchPaymentById(id));
-            dispatch(getUser());
+        dispatch(getUser()); // Assuming getUser fetches the currently logged-in user or a specific user related to the payment.
       } else {
         console.error("Invalid paymentId in URL:", paymentId);
       }
@@ -45,9 +49,14 @@ export default function PaymentById() {
   }, [dispatch, paymentId]);
 
   // Format date for display
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString || dateString === 'N/A') return "N/A"; // Handle null, undefined, or 'N/A'
     try {
       const date = new Date(dateString);
+      // Check for 'Invalid Date'
+      if (isNaN(date.getTime())) {
+        return "Invalid date";
+      }
       return date.toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "2-digit",
@@ -62,7 +71,8 @@ export default function PaymentById() {
   };
 
   // Format currency for display
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | undefined) => {
+    if (amount === undefined || amount === null) return "₦0.00";
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
@@ -80,7 +90,6 @@ export default function PaymentById() {
           history={true}
         />
      <div className="flex items-center justify-center h-screen text-center "><LoadingAnimations loading={loading}/></div>;
-
       </div>
     );
   }
@@ -115,6 +124,20 @@ export default function PaymentById() {
     );
   }
 
+  // Helper function to get property type string
+  const getPropertyType = (type: number | undefined): string => {
+    switch (type) {
+      case 1:
+        return "Apartment";
+      case 2:
+        return "House";
+      case 3:
+        return "Land";
+      default:
+        return "Property";
+    }
+  };
+
   // Calculate progress percentage for the invoice card
   const calculateProgressPercentage = (): number => {
     if (payment.plan && payment.plan.total_amount > 0) {
@@ -138,15 +161,12 @@ export default function PaymentById() {
           paymentId2={payment.id}
           paymentId={payment.reference}
           amount={formatCurrency(payment.amount_paid)}
-          // additionalPayments="34 more payments" // This should probably be dynamic
           bankName={payment.bank_name || "N/A"}
-          // accountNumber="834993948393" // This should come from payment data if available
-          // accountName={payment.bank_name || "N/A"}
-          // This should come from payment data if available
           date={formatDate(payment.created_at)}
           receiptImage={payment.proof_of_payment || "/reciept.svg"}
           fullReciept={payment.proof_of_payment || "/fullreciept.svg"}
-          handleHistory={() => setIsPaymentListOpen(true)} id={Number(paymentId)}          // additionalPayments={payment. || "N/A"}
+          handleHistory={() => setIsPaymentListOpen(true)}
+          id={Number(paymentId)}
         />
 
         {payment.property && payment.plan && (
@@ -161,28 +181,49 @@ export default function PaymentById() {
               progressPercentage={calculateProgressPercentage()}
               duration={`${payment.plan.monthly_duration} Months`}
               nextPaymentDate={formatDate(payment.plan.next_payment_date)}
-              dueDate={formatDate(payment.plan.next_payment_date)} // Adjust if you have separate due date
+              dueDate={formatDate(payment.plan.next_payment_date)}
               property={{
                 name: payment.property.name,
                 address: payment.property.street_address,
                 image: payment.property.display_image || "/land.svg",
                 size: payment.property.size,
-                
-              
-              }}
-            />
-          </div>
-        )}
+       features: payment.property.features,
+          type: getPropertyType(payment.property.type), // Convert type number to string
+        }}
+        infrastructure={
+          // Corrected: Check `infrastructure_amount` for the condition
+          payment.plan.infrastructure_amount > 0 ?
+          {
+            // Corrected: Assign `infrastructure_percentage`
+            percentage: payment.plan.infrastructure_percentage,
+            amount: payment.plan.infrastructure_amount,
+            remainingBalance: payment.plan.remaining_infrastructure_balance,
+            paidAmount: payment.plan.paid_infrastructure_amount,
+          } : undefined
+        }
+        other={
+          payment.plan.other_amount > 0 ?
+          {
+            percentage: payment.plan.other_percentage,
+            amount: payment.plan.other_amount,
+            remainingBalance: payment.plan.remaining_other_balance,
+            paidAmount: payment.plan.paid_other_amount,
+          } : undefined
+        }
+      />
+    </div>
+  )}
 
         <div>
           <p className="text-[20px] font-[325] text-dark mb-[20px]">Customer</p>
           <ProfileCard
-            imageUrl={payment?.user.profile_picture ?? "/profile.svg"} // This should come from user data
+            imageUrl={payment?.user?.profile_picture ?? "/profile.svg"}
             name={`${capitalize(payment?.user?.first_name) || "N/A"} ${capitalize(payment?.user?.last_name) || "N/A"}`}
-            dateJoined={formatDate(payment?.user.email_verified_at ?? 'N/A')}
-             customerId={`/customers/${payment.user.id}`}          />
+            dateJoined={formatDate(payment?.user?.email_verified_at)}
+            customerId={`/customers/${payment.user.id}`}
+          />
         </div>
-      </div> 
+      </div>
 
       {isPaymentListOpen && paymentId && (
         <PaymentListComponent
@@ -192,18 +233,4 @@ export default function PaymentById() {
       )}
     </div>
   );
-}
-
-// Helper function to convert property type number to string
-function getPropertyType(type: number): string {
-  switch (type) {
-    case 1:
-      return "Apartment";
-    case 2:
-      return "House";
-    case 3:
-      return "Land";
-    default:
-      return "Property";
-  }
 }

@@ -42,18 +42,26 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
   };
 
   // Convert table transaction data to modal transaction data format
-  const getModalTransactionData = (transaction: TransactionData) => {
+  const getModalTransactionData = (transaction: any) => {
     return {
       from: transaction.customerName,
-      description: "Property Investment", // You can customize this
-      type: "Wallet Funding", // You can customize this
-      method: "Bank Transfer", // You can customize this
-      fees: "N0.00", // You can customize this
-      reference: transaction.id,
+      description:transaction.description, // You can customize this
+      type:transaction.description, // You can customize this
+      method:transaction.transaction_method, // You can customize this
+      fees: transaction.amount, // You can customize this
+      reference: transaction.reference,
       status: transaction.status === "Rejected" ? "Failed" : transaction.status,
       bankIcon: "/bank.svg", // You can customize this
     };
   };
+
+
+
+
+
+
+
+  
 
   return (
     <>

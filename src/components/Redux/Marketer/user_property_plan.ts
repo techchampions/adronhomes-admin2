@@ -44,7 +44,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   personnel: string;
-  contract_id: number | null;
+  contract_id: string;
 }
 
 export interface NextRepayment {
@@ -83,6 +83,26 @@ export interface Transaction {
   };
 }
 
+export interface InfrastructureBreakdown {
+  id: number;
+  name: string;
+  value: number;
+  property_id: number;
+  created_at: string;
+  updated_at: string;
+  type: string;
+}
+
+export interface OthersBreakdown {
+  id: number;
+  name: string;
+  value: number;
+  property_id: number;
+  created_at: string;
+  updated_at: string;
+  type: string;
+}
+
 export interface PlanProperty {
   id: number;
   property_id: number;
@@ -112,7 +132,7 @@ export interface PlanProperty {
   remaining_other_balance: number;
   paid_infrastructure_amount: number;
   paid_other_amount: number;
-  contract_id: number | null;
+  contract_id: string;
   number_of_unit: number;
   property: Property;
   user: User;
@@ -122,6 +142,8 @@ export interface PlanProperty {
 interface UserPropertyPlanResponse {
   success: boolean;
   plan_properties: PlanProperty;
+  infrastructure_breakdown: InfrastructureBreakdown[];
+  others_breakdown: OthersBreakdown[];
   next_repayment: NextRepayment;
   transactions: Transaction[];
 }
@@ -134,6 +156,8 @@ interface UserPropertyPlanParams {
 interface UserPropertyPlanState {
   data: {
     planProperties: PlanProperty | null;
+    infrastructureBreakdown: InfrastructureBreakdown[] | null;
+    othersBreakdown: OthersBreakdown[] | null;
     nextRepayment: NextRepayment | null;
     transactions: Transaction[] | null;
   };
@@ -144,6 +168,8 @@ interface UserPropertyPlanState {
 const initialState: UserPropertyPlanState = {
   data: {
     planProperties: null,
+    infrastructureBreakdown: null,
+    othersBreakdown: null,
     nextRepayment: null,
     transactions: null,
   },
@@ -214,6 +240,8 @@ const userPropertyPlanSlice = createSlice({
     clearUserPropertyPlan: (state) => {
       state.data = {
         planProperties: null,
+        infrastructureBreakdown: null,
+        othersBreakdown: null,
         nextRepayment: null,
         transactions: null,
       };
@@ -230,10 +258,12 @@ const userPropertyPlanSlice = createSlice({
       .addCase(
         fetchUserPropertyPlan.fulfilled,
         (state, action: PayloadAction<UserPropertyPlanResponse>) => {
-          const { plan_properties, next_repayment, transactions } = action.payload;
+          const { plan_properties, infrastructure_breakdown, others_breakdown, next_repayment, transactions } = action.payload;
           state.loading = false;
           state.data = {
             planProperties: plan_properties,
+            infrastructureBreakdown: infrastructure_breakdown,
+            othersBreakdown: others_breakdown,
             nextRepayment: next_repayment,
             transactions,
           };
@@ -244,6 +274,8 @@ const userPropertyPlanSlice = createSlice({
         state.loading = false;
         state.data = {
           planProperties: null,
+          infrastructureBreakdown: null,
+          othersBreakdown: null,
           nextRepayment: null,
           transactions: null,
         };

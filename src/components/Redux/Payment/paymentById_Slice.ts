@@ -37,6 +37,14 @@ interface Property {
 }
 
 interface PaymentPlan {
+  infrastructure_amount: number;
+  infrastructure_percentage: number;
+  remaining_infrastructure_balance: number;
+  paid_infrastructure_amount: number;
+  other_amount: number;
+  other_percentage: number;
+  remaining_other_balance: number;
+  paid_other_amount: number;
   id: number;
   payment_percentage: number;
   repayment_schedule: string;

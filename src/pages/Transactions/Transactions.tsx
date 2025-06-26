@@ -25,6 +25,10 @@ export default function Transactions() {
     (state: RootState) => state.transactions
   );
 
+
+
+
+
  const transformTransactionData = (): TransactionData[] => {
   if (!data?.data?.transactions?.list?.data) return [];
 
@@ -53,6 +57,9 @@ export default function Transactions() {
           ? "Rejected"
           : ("Pending" as const),
       paymentDate: formatDate(transaction.created_at),
+      reference:transaction.reference,
+      description: transaction.description,
+      transaction_method:transaction.transaction_method
     }));
 };
   const filteredData = transformTransactionData();

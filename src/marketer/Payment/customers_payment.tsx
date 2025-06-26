@@ -28,7 +28,7 @@ export default function MarketerInvoice() {
 
   // Get data from Redux store
   const {
-    data: { planProperties, nextRepayment, transactions },
+    data: { planProperties, nextRepayment, transactions ,infrastructureBreakdown,othersBreakdown},
     loading,
     error,
   } = useSelector((state: RootState) => state.marketerUserPropertyPlan);
@@ -164,13 +164,23 @@ if(plan_id && user_id){
           year: "numeric",
         })} customerId={undefined}      />
 
+
  <InvoiceCard
    other={
      planProperties.other_amount > 0 ? {
        percentage: planProperties.other_percentage,
        amount: planProperties.other_amount,
        remainingBalance: planProperties.remaining_other_balance,
-       paidAmount: planProperties.paid_other_amount
+       paidAmount: planProperties.paid_other_amount,
+
+         ...(Array.isArray(othersBreakdown) && othersBreakdown.length > 0 && {
+      breakdown: othersBreakdown.map(item => ({
+        id: item.id,
+        name: item.name,
+        value: item.value,
+        type: item.type
+      }))
+    })
      } : undefined
    }
    invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`}
@@ -199,16 +209,28 @@ if(plan_id && user_id){
      features: planProperties.property?.features || [],
      type: getPropertyType(planProperties.property_type),
    }}
-   infrastructure={
-     planProperties.infrastructure_amount > 0 ? {
-       percentage: planProperties.infrastructure_percentage,
-       amount: planProperties.infrastructure_amount,
-       remainingBalance: planProperties.remaining_infrastructure_balance,
-       paidAmount: planProperties.paid_infrastructure_amount
-     } : undefined
-   }
- />
+ infrastructure={
+  planProperties.infrastructure_amount > 0 ? {
+    percentage: planProperties.infrastructure_percentage,
+    amount: planProperties.infrastructure_amount,
+    remainingBalance: planProperties.remaining_infrastructure_balance,
+    paidAmount: planProperties.paid_infrastructure_amount,
+    
+    ...(Array.isArray(infrastructureBreakdown) && infrastructureBreakdown.length > 0 && {
+      breakdown: infrastructureBreakdown.map(item => ({
+        id: item.id,
+        name: item.name,
+        value: item.value,
+        type: item.type
+      }))
+    })
+  } : undefined
+}
 
+
+
+
+ />
       <PaymentListCard
         title="Payment Schedule"
         description="View all upcoming payments for your property plan."

@@ -154,7 +154,7 @@ const handleDownload = () => {
         </div>
 
         {/* Transaction Type */}
-        <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
+        {/* <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
           <div>
             <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
               Transaction Type
@@ -163,7 +163,7 @@ const handleDownload = () => {
               {transactionData.type}
             </h1>
           </div>
-        </div>
+        </div> */}
 
         {/* Payment Method */}
         <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">

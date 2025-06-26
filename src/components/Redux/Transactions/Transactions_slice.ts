@@ -13,6 +13,7 @@ interface Transaction {
   created_at: string;
   updated_at: string;
   marketer_id: number | null;
+  reference:any
   user: {
     first_name: string;
     last_name: string;
