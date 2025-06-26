@@ -8,6 +8,7 @@ import { FaUserShield } from "react-icons/fa6";
 import { useGetDirectorDashboard } from "../utils/hooks/query";
 import NotFound from "../components/NotFound";
 import { formatDate } from "../utils/formatdate";
+import DirectorProperttList from "./DirectorProperttList";
 
 export default function DirectorsDashboard() {
   const { data, isLoading, isError } = useGetDirectorDashboard();
@@ -62,7 +63,11 @@ export default function DirectorsDashboard() {
             activeTab={activeTab}
             onTabChange={setActiveTab}
           >
-            {properties.length < 1 && <NotFound />}
+            {properties.length < 1 ? (
+              <NotFound />
+            ) : (
+              <DirectorProperttList data={properties} />
+            )}
           </ReusableTable>
 
           {showModal && <ReferralModal onClose={() => setShowModal(false)} />}
