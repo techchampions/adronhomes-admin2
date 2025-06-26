@@ -108,8 +108,8 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
       email: user.Email,
       role:user.Role,
       joinDate: user.Created,
-      lastActive: new Date().toISOString(), // You might want to get this from your API
-      status: "Active", // You might want to get this from your API
+      // lastActive: new Date().toISOString(), // You might want to get this from your API
+      // status: "Active", // You might want to get this from your API
       avatar: "/default-avatar.png",
     };
   };

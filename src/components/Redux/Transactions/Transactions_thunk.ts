@@ -19,6 +19,7 @@ export interface Transaction {
   transaction_method: string;
   created_at: string;
   updated_at: string;
+  reference:any
   marketer_id: number | null;
   user: {
     first_name: string;

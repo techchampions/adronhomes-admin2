@@ -24,6 +24,8 @@ interface PersonnelModalProps {
 }
 
 const PersonnelModal: React.FC<PersonnelModalProps> = ({
+
+
   isOpen,
   onClose,
   personnelData = {
@@ -32,8 +34,7 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
     email: "john.doe@example.com",
     role: "Administrator",
     joinDate: "2023-10-15",
-    lastActive: "2024-02-20 14:30:45",
-    status: "Active",
+   
     avatar: "/default-avatar.png",
   },
 }) => {
@@ -52,44 +53,27 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
       });
   };
 
-  const handleDownload = () => {
-    const personnelText = `
-      Personnel Details
-      ------------------
-      ID: ${personnelData.id}
-      Full Name: ${personnelData.fullName}
-      Email: ${personnelData.email}
-      Role: ${personnelData.role}
-      Join Date: ${personnelData.joinDate}
-      Last Active: ${personnelData.lastActive}
-      Status: ${personnelData.status}
-    `;
 
-    const blob = new Blob([personnelText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `personnel_${personnelData.id}.txt`;
-    link.href = url;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+// Generate initials from full name
+const getInitials = (fullName: string) => {
+  const names = fullName.split(' ');
+  const first = names[0]?.charAt(0).toUpperCase() || '';
+  const last = names[names.length - 1]?.charAt(0).toUpperCase() || '';
+  return first + last;
+};
 
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Personnel Details',
-          text: `Personnel ID: ${personnelData.id}`,
-          url: window.location.href,
-        });
-      } else {
-        handleCopy(window.location.href);
-        alert('Link copied to clipboard!');
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
-  };
+// Generate a consistent color from a string
+const stringToColor = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const color = '#' + ((hash >> 24) & 0xff).toString(16).padStart(2, '0') +
+                      ((hash >> 16) & 0xff).toString(16).padStart(2, '0') +
+                      ((hash >> 8) & 0xff).toString(16).padStart(2, '0');
+  return color.slice(0, 7);
+};
+
 
   if (!isOpen) return null;
 
@@ -125,15 +109,25 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
         {/* Profile Header */}
         <div className="flex flex-col items-center mb-6 sm:mb-8">
           <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-3">
-            {personnelData.avatar ? (
-              <img 
-                src={personnelData.avatar} 
-                alt={`${personnelData.fullName}'s avatar`}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <FaRegUser className="w-8 h-8 text-gray-500" />
-            )}
+            {/* {personnelData.avatar 
+            ? (
+  <img 
+    src={personnelData.avatar} 
+    alt={`${personnelData.fullName}'s avatar`}
+    className="w-full h-full object-cover"
+  />
+) :
+ */}
+
+{(
+  <div
+    className="w-full h-full flex items-center justify-center text-white text-xl font-semibold"
+    style={{ backgroundColor: stringToColor(personnelData.fullName) }}
+  >
+    {getInitials(personnelData.fullName)}
+  </div>
+)}
+
           </div>
           <h2 className="font-semibold text-lg sm:text-xl text-center">{personnelData.fullName}</h2>
           <p className="text-gray-600 text-sm sm:text-base">{personnelData.role}</p>
@@ -200,7 +194,7 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
           </div>
         </div>
 
-        {/* Last Active */}
+        {/* Last Active
         <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
           <div>
             <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600 flex items-center">
@@ -216,10 +210,10 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
               })}
             </h1>
           </div>
-        </div>
+        </div> */}
 
         {/* Status */}
-        <div className="grid grid-cols-1 py-3 sm:py-4 w-full items-center">
+        {/* <div className="grid grid-cols-1 py-3 sm:py-4 w-full items-center">
           <div>
             <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">Status</p>
             <div className="flex items-center">
@@ -232,7 +226,7 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
               </h1>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Actions */}
        {/* Actions: Cancel and Done */}

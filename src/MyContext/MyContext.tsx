@@ -435,7 +435,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("overview", landForm.overview);
         formPayload.append("description", landForm.description);
         formPayload.append("number_of_unit", landForm.unitsAvailable || "1");
-        formPayload.append("director_id", landForm.director_id || "1");
+        formPayload.append("director_id", landForm.director_id || '1');
       } else {
         formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
         formPayload.append(
