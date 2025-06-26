@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import Pagination from "../../components/Tables/Pagination";
 import { fetchTransactions } from "../../components/Redux/Transactions/Transactions_thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { selectTransactionsPagination, setCurrentPage } from "../../components/Redux/Transactions/Transactions_slice";
 import { AppDispatch } from "../../components/Redux/store";
+import TransactionModal from "../../components/Modals/Transaction";
+
 
 export interface TransactionData {
   id: string;
@@ -13,6 +15,7 @@ export interface TransactionData {
   status: "Approved" | "Pending" | "Rejected";
   paymentDate: string;
 }
+
 interface TransactionDatas {
   data: TransactionData[];
 }
@@ -20,10 +23,36 @@ interface TransactionDatas {
 export default function TransactionTableComponent({ data }: TransactionDatas) {
   const dispatch = useDispatch<AppDispatch>();
   const pagination = useSelector(selectTransactionsPagination);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
     await dispatch(fetchTransactions());
+  };
+
+  const handleRowClick = (transaction: TransactionData) => {
+    setSelectedTransaction(transaction);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  // Convert table transaction data to modal transaction data format
+  const getModalTransactionData = (transaction: TransactionData) => {
+    return {
+      from: transaction.customerName,
+      description: "Property Investment", // You can customize this
+      type: "Wallet Funding", // You can customize this
+      method: "Bank Transfer", // You can customize this
+      fees: "N0.00", // You can customize this
+      reference: transaction.id,
+      status: transaction.status === "Rejected" ? "Failed" : transaction.status,
+      bankIcon: "/bank.svg", // You can customize this
+    };
   };
 
   return (
@@ -55,7 +84,11 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
             </thead>
             <tbody>
               {data.map((transaction, index) => (
-                <tr key={`transaction-${index}`}>
+                <tr 
+                  key={`transaction-${index}`}
+                  onClick={() => handleRowClick(transaction)}
+                  className="cursor-pointer hover:bg-gray-50 transition-colors"
+                >
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
                     <div className="truncate">{transaction.id}</div>
                   </td>
@@ -69,12 +102,10 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
                     <div className="truncate">{transaction.amount}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">
-                  <div
+                    <div
                       className={`truncate ${
                         transaction.status === "Approved"
                           ? "text-[#2E9B2E]":  transaction.status === "Rejected"
-                          
-                           
                           ? "text-[#D70E0E]"
                           : "text-[#FF9131]"
                       }`}
@@ -98,6 +129,15 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
           className="mt-8 mb-4"
         />
       </div>
+
+      {/* Transaction Modal */}
+      {selectedTransaction && (
+        <TransactionModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          transactionData={getModalTransactionData(selectedTransaction)}
+        />
+      )}
     </>
   );
 }

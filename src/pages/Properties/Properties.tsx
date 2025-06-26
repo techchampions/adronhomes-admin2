@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import Header from "../../general/Header";
-import PropertyTableComponent from "./TAbles/Properties_Table";
+import PropertyTableComponent, { PropertyData } from "./TAbles/Properties_Table";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import PropertyTableComponentActivePlan from "./TAbles/Properties_Table_ActivePlans";
 import PropertyTableComponentsold from "./TAbles/Properties_Table_Sold";
@@ -12,6 +12,7 @@ import LoadingAnimations from "../../components/LoadingAnimations";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesModal";
 import { PropertyContext } from "../../MyContext/MyContext";
+import PropertyModal from "./PropertyModal";
 
 const tabs = ['All', 'On sale', 'Active Plans', 'Sold'];
 
@@ -100,7 +101,9 @@ export default function Properties() {
           )}
         </ReusableTable>
       </div>
-   
+  
     </div>
+
+    
   );
 }

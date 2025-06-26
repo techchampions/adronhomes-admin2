@@ -434,7 +434,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         );
         formPayload.append("overview", landForm.overview);
         formPayload.append("description", landForm.description);
-        formPayload.append("units_available", landForm.unitsAvailable || "1");
+        formPayload.append("number_of_unit", landForm.unitsAvailable || "1");
         formPayload.append("director_id", landForm.director_id || "1");
       } else {
         formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
@@ -451,7 +451,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("description", specifications.description);
         formPayload.append("year_built", specifications.yearBuilt || "");
         formPayload.append(
-          "units_available",
+          "number_of_unit",
           specifications.unitsAvailable || "1"
         );
         formPayload.append("director_id", specifications.director_id || "1");

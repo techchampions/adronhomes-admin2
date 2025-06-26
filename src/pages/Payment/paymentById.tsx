@@ -134,20 +134,19 @@ export default function PaymentById() {
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[40px]">
         <PaymentCard
-        status={payment.status}
-        paymentId2={payment.id}
+          status={payment.status}
+          paymentId2={payment.id}
           paymentId={payment.reference}
           amount={formatCurrency(payment.amount_paid)}
           // additionalPayments="34 more payments" // This should probably be dynamic
-          bankName={payment.bank_name || "N/A"} 
+          bankName={payment.bank_name || "N/A"}
           // accountNumber="834993948393" // This should come from payment data if available
           // accountName={payment.bank_name || "N/A"}
           // This should come from payment data if available
           date={formatDate(payment.created_at)}
           receiptImage={payment.proof_of_payment || "/reciept.svg"}
           fullReciept={payment.proof_of_payment || "/fullreciept.svg"}
-          handleHistory={() => setIsPaymentListOpen(true)}
-          // additionalPayments={payment. || "N/A"}
+          handleHistory={() => setIsPaymentListOpen(true)} id={Number(paymentId)}          // additionalPayments={payment. || "N/A"}
         />
 
         {payment.property && payment.plan && (

@@ -12,6 +12,7 @@ import { UpdateProperty } from "../../../components/Redux/addProperty/UpdateProp
 import { resetUpdatePropertyState } from "../../../components/Redux/addProperty/UpdateProperties/delete_slice";
 import { DeleteProperty } from "../../../components/Redux/addProperty/UpdateProperties/deleteThunk";
 import ConfirmationModal from "../../../components/Modals/delete";
+import PropertyModal from "../PropertyModal";
 
 export interface PropertyData {
 id: number;
@@ -243,6 +244,16 @@ const handleArrayInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     [name]: arrayValue
   });
 };
+
+const [selectedProperty, setSelectedProperty] = useState<PropertyData | null>(null);
+const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+
+// Add this handler
+const handlePropertyClick = (property: PropertyData) => {
+  setSelectedProperty(property);
+  setIsPropertyModalOpen(true);
+};
+
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -273,10 +284,10 @@ const handleArrayInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             <tbody>
               {data && data.length > 0 ? (
                 data.map((property) => (
-                  <tr key={`property-${property.id}`} className="">
+                  <tr key={`property-${property.id}`}   className="hover:bg-gray-50 cursor-pointer">
                     <td className="py-4 pr-6 text-dark text-sm max-w-[220px]">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100">
+                        <div className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"        onClick={() => handlePropertyClick(property)}>
                           <img 
                             src={property.display_image || '/default-property-image.jpg'} 
                             alt={property.name} 
@@ -284,24 +295,24 @@ const handleArrayInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
                           />
                         </div>
                         <div className="min-w-0">
-                          <div className="font-[350] truncate mb-[12px]">{property.name}</div>
-                          <div className="font-[325] text-[#757575] text-xs truncate flex">
+                          <div className="font-[350] truncate mb-[12px]"  onClick={() => handlePropertyClick(property)}>{property.name}</div>
+                          <div className="font-[325] text-[#757575] text-xs truncate flex"  onClick={() => handlePropertyClick(property)}>
                             <img src={'/location.svg'} className="mr-1"/> 
                             {property.street_address}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[120px]">
+                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[120px]"  onClick={() => handlePropertyClick(property)}>
                       ₦{property.price?.toLocaleString()}
                     </td>
-                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[100px]">
+                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[100px]"  onClick={() => handlePropertyClick(property)}>
                       {getPropertyType(property.type)}
                     </td>
-                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]">
+                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]"  onClick={() => handlePropertyClick(property)}>
                       {property.no_of_bedroom || 'N/A'}
                     </td>
-                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]">
+                    <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]"  onClick={() => handlePropertyClick(property)}>
                       {property.is_sold ? 'Sold' : property.is_active ? 'Active' : 'Available'}
                     </td>
                     <td className="py-4 pl-4 text-sm">
@@ -345,7 +356,13 @@ const handleArrayInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     cancelButtonText="Cancel"
   />
 )}
-
+ {isPropertyModalOpen && selectedProperty && (
+  <PropertyModal 
+    isOpen={isPropertyModalOpen} 
+    onClose={() => setIsPropertyModalOpen(false)} 
+    property={selectedProperty} 
+  />
+)}
     {/* // Update the form inside the modal with all fields */}
 {isModalOpen && editingProperty && (
   <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-4">
