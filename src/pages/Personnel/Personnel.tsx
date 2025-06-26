@@ -20,6 +20,8 @@ interface UsersTable {
 
 const getRoleName = (roleId: number) => {
   switch (roleId) {
+     case 0:
+      return "Customer";
     case 1:
       return "Admin";
     case 2:

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { UpdatePaymentstatus } from "../../components/Redux/Payment/payment_thunk";
+import { fetchPaymentById, UpdatePaymentstatus } from "../../components/Redux/Payment/payment_thunk";
 import { toast } from "react-toastify";
 import { resetPaymentStatus } from "../../components/Redux/Payment/updatePaymentStatus";
 
@@ -19,7 +19,8 @@ interface PaymentByIdCardProps {
   onDisapprove?: () => void;
   fullReciept?: string;
   handleHistory?: any;
-  status?: number; // 0 = pending, 1 = approved, 2 = disapproved
+  status?: number;
+  id:any
 }
 
 interface ModalProps {
@@ -65,6 +66,7 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
   onDisapprove,
   handleHistory,
   status = 0,
+  id
 }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -81,6 +83,7 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
       setIsApproveModalOpen(false);
       setIsDisapproveModalOpen(false);
       dispatch(resetPaymentStatus());
+       dispatch(fetchPaymentById(id));
     }
 
     if (error) {
