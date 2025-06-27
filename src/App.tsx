@@ -45,6 +45,7 @@ import { QueryProvider } from "./utils/hooks/MyQueryProvider";
 import AccountDetails from "./components/Settings/AddAccountSettings/AccountDetails";
 import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import DirectorsDashboard from "./director/DirectorDashboard";
+import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -127,6 +128,10 @@ const App = () => {
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
+                />
+                <Route
+                  path="/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
                 />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/settings" element={<Settings />} />

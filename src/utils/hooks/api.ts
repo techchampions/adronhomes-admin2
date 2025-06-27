@@ -21,20 +21,25 @@ import {
   EditOfficeLocationPayload,
   OfficeLocationsResponse,
 } from "../../pages/Properties/types/OfficeLocationsTypes";
+import {
+  PropertiesRequestResponse,
+  PropertyByIdRequestsResponse,
+} from "../../pages/Properties/types/PropertyRequestTypes";
 import { SliderByTypeRes } from "../../pages/Properties/types/SliderByTypeResponse";
+import { GetPropertyByIdResponse } from "../../pages/Properties/types/SoosarPropertyTypes";
 import {
   UploadSliderPayload,
   UploadSliderResponse,
 } from "../../pages/Properties/types/UploadSilderPayload";
-import apiClient from "./ApiClient";
-import openApiClient from "./GeneralApiClient";
+import adminApi from "./ApiClient";
+import adronApi from "./GeneralApiClient";
 
 //Get Sliders By Type
 export const getSliderByType = async (
   type: string
 ): Promise<SliderByTypeRes> => {
   const endpoint = `sliders?type=${type.toString()}`;
-  const response = await apiClient.get(endpoint);
+  const response = await adminApi.get(endpoint);
   return response.data;
 };
 
@@ -53,7 +58,7 @@ export const uploadSliderByType = async (
       formData.append("mobile_image", image);
     });
 
-  const res = await apiClient.post("/sliders/create", formData, {
+  const res = await adminApi.post("/sliders/create", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -69,13 +74,13 @@ export const deleteSliderById = async (
   id: number
 ): Promise<DeleteSliderResponse> => {
   const endpoint = `/sliders/delete/${id}`;
-  const response = await apiClient.delete(endpoint);
+  const response = await adminApi.delete(endpoint);
   return response.data;
 };
 
 // get Headers data
 export const getHeadersData = async (): Promise<HeadersResponse> => {
-  const response = await apiClient.get("/headers");
+  const response = await adminApi.get("/headers");
   return response.data;
 };
 
@@ -93,7 +98,7 @@ export const updateHeaderData = async (
       formData.append("list_description[]", list);
     });
   const endpoint = `/header/${payload.id}`;
-  const res = await apiClient.post(endpoint, formData, {
+  const res = await adminApi.post(endpoint, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -106,7 +111,7 @@ export const getLeadersData = async (
   page: number
 ): Promise<LeadershipResponse> => {
   const endpoint = `/leaderships?page=${page}`;
-  const response = await apiClient.get(endpoint);
+  const response = await adminApi.get(endpoint);
   return response.data;
 };
 
@@ -119,7 +124,7 @@ export const createLeaderData = async (
   if (payload.name) formData.append("name", payload.name);
   if (payload.description) formData.append("description", payload.description);
   if (payload.picture) formData.append("picture", payload.picture);
-  const response = await apiClient.post("/create-leader", formData, {
+  const response = await adminApi.post("/create-leader", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -135,15 +140,11 @@ export const editLeaderData = async (
   if (payload.name) formData.append("name", payload.name);
   if (payload.description) formData.append("description", payload.description);
   if (payload.picture) formData.append("picture", payload.picture);
-  const response = await apiClient.post(
-    `/edit-leader/${payload.id}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+  const response = await adminApi.post(`/edit-leader/${payload.id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 
@@ -152,14 +153,14 @@ export const deleteLeaderData = async (
   id: number
 ): Promise<DeleteLeadershipResponse> => {
   const endpoint = `/delete-leader/${id}`;
-  const response = await apiClient.delete(endpoint);
+  const response = await adminApi.delete(endpoint);
   return response.data;
 };
 
 //Get All Account Details
 export const getAllAccountDetails =
   async (): Promise<AccountDetailsResponse> => {
-    const response = await openApiClient.get("/account-details");
+    const response = await adronApi.get("/account-details");
     return response.data;
   };
 
@@ -175,7 +176,7 @@ export const createAccountDetails = async (
   if (payload.account_number)
     formData.append("account_number", payload.account_number);
 
-  const response = await apiClient.post("/create-account-details", formData, {
+  const response = await adminApi.post("/create-account-details", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -194,7 +195,7 @@ export const editAccountDetails = async (
   if (payload.account_number)
     formData.append("account_number", payload.account_number);
 
-  const response = await apiClient.post(
+  const response = await adminApi.post(
     `/update-account-details/${payload.id}`,
     formData,
     {
@@ -214,14 +215,14 @@ export const deleteAccount = async (
     throw new Error("id is required");
   }
   const endpoint = `/delete-account-details/${id}`;
-  const response = await apiClient.delete(endpoint);
+  const response = await adminApi.delete(endpoint);
   return response.data;
 };
 
 // Get Office Locations
 export const getOfficeLocations =
   async (): Promise<OfficeLocationsResponse> => {
-    const response = await openApiClient.get("/office-info");
+    const response = await adronApi.get("/office-info");
     return response.data;
   };
 
@@ -240,7 +241,7 @@ export const createOfficeLocation = async (
   if (payload.third_contact)
     formData.append("third_contact", payload.third_contact);
 
-  const response = await apiClient.post("/create-office-info", formData, {
+  const response = await adminApi.post("/create-office-info", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -262,7 +263,7 @@ export const editOfficeLocation = async (
   if (payload.third_contact)
     formData.append("third_contact", payload.third_contact);
 
-  const response = await apiClient.post(
+  const response = await adminApi.post(
     `/update-office-info/${payload.id}`,
     formData,
     {
@@ -282,13 +283,36 @@ export const deleteOfficeLoaction = async (
     throw new Error("id is required");
   }
   const endpoint = `/delete-office-info/${id}`;
-  const response = await apiClient.delete(endpoint);
+  const response = await adminApi.delete(endpoint);
   return response.data;
 };
 
 // get Directors Data
 export const getDirectorDashboardData =
   async (): Promise<DirectorDashboardResponse> => {
-    const response = await openApiClient.get("/director/dashboard");
+    const response = await adronApi.get("/director/dashboard");
     return response.data;
   };
+
+//Get All Property Requests
+export const getPropertyRequest = async (
+  page: number
+): Promise<PropertiesRequestResponse> => {
+  const response = await adminApi.get(`/properties-requests?page=${page}`);
+  return response.data;
+};
+//Get Requests for Property by ID
+export const getPropertyRequestByID = async (
+  id: number
+): Promise<PropertyByIdRequestsResponse> => {
+  const response = await adminApi.get(`/properties/${id}/requests`);
+  return response.data;
+};
+
+//Get Properties by ID Data
+export const getPropertyByID = async (
+  id?: number | string
+): Promise<GetPropertyByIdResponse> => {
+  const response = await adronApi.get(`/property/${id}`);
+  return response.data;
+};

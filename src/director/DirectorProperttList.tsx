@@ -1,4 +1,5 @@
 import React from "react";
+import LoadingAnimations from "../components/LoadingAnimations";
 export interface PropertyData {
   id: number;
   name: string;
@@ -39,6 +40,8 @@ export interface PropertyData {
   parking_space: string | null;
   number_of_bathroom: number | null;
   number_of_unit: number | null;
+  unit_sold: number | null;
+  unit_available: number | null;
   property_agreement: string | null;
   payment_type: string | null;
   location_type: string | null;
@@ -49,9 +52,16 @@ export interface PropertyData {
 
 interface PropertyTableProps {
   data: PropertyData[];
+  isLoading: boolean;
 }
 
-const DirectorProperttList: React.FC<PropertyTableProps> = ({ data }) => {
+const DirectorProperttList: React.FC<PropertyTableProps> = ({
+  data,
+  isLoading,
+}) => {
+  if (isLoading) {
+    return <LoadingAnimations loading={isLoading} />;
+  }
   return (
     <div className="w-full overflow-x-auto">
       <div className="min-w-[800px] md:min-w-0">
@@ -68,17 +78,20 @@ const DirectorProperttList: React.FC<PropertyTableProps> = ({ data }) => {
                 Property Type
               </th>
               <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                Bedrooms
+                total units
               </th>
               <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                Status
+                available units
+              </th>
+              <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
+                units sold
               </th>
             </tr>
           </thead>
           <tbody>
             {data && data.length > 0 ? (
               data.map((property) => (
-                <tr key={`property-${property.id}`} className="">
+                <tr key={`property-${property.id}`} className="cursor-pointer">
                   <td className="py-4 pr-6 text-dark text-sm max-w-[220px]">
                     <div className="flex items-center">
                       <div className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100">
@@ -106,17 +119,16 @@ const DirectorProperttList: React.FC<PropertyTableProps> = ({ data }) => {
                     ₦{property.price?.toLocaleString()}
                   </td>
                   <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[100px]">
-                    {property.type}
+                    {property.type === 1 ? "Land" : "Residential"}
                   </td>
                   <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]">
-                    {property.no_of_bedroom || "N/A"}
+                    {property.number_of_unit || "N/A"}
                   </td>
                   <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]">
-                    {property.is_sold
-                      ? "Sold"
-                      : property.is_active
-                      ? "Active"
-                      : "Available"}
+                    {property.unit_available}
+                  </td>
+                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]">
+                    {property.unit_sold}
                   </td>
                 </tr>
               ))

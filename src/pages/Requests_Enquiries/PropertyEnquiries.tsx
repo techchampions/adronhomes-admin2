@@ -1,18 +1,23 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useGetPropertyRequestByID } from "../../utils/hooks/query";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
-import PropertyTableComponent from "./Requests_Enquiries_Tables";
-import { useGetPropertyRequest } from "../../utils/hooks/query";
-import SoosarPagination from "../../components/SoosarPagination";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
+import SoosarPagination from "../../components/SoosarPagination";
+import PropertyEnquiriesList from "./PropertEnquiriesList";
+import PropertySummary from "./PropertySummary";
+import SmallLoader from "../../components/SmallLoader";
 
-export default function Requests_Enquiries() {
+const PropertyEnquiries = () => {
   const [page, setpage] = useState(1);
-  const { data, isLoading, isError } = useGetPropertyRequest(page);
-  const propertyData = data?.data.data || [];
+  const params = useParams();
+  const id = params?.id;
+  const { data, isLoading } = useGetPropertyRequestByID(Number(id));
   const totalPages = data?.data.last_page || 1;
-  const tab = ["All", "Pending Requests"];
+  const propertyData = data?.data.data || [];
+
   return (
     <div className="pb-[52px]">
       <Header
@@ -21,13 +26,20 @@ export default function Requests_Enquiries() {
         history={true}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        <ReusableTable activeTab={"All"} tabs={tab}>
+        {isLoading ? (
+          <SmallLoader classname="!h-[120px]" />
+        ) : (
+          <div className="mb-10">
+            <PropertySummary id={propertyData[0].property_id || 0} />
+          </div>
+        )}
+        <ReusableTable activeTab={"All"} tabs={[""]}>
           {isLoading ? (
             <LoadingAnimations loading={isLoading} />
           ) : propertyData.length < 1 ? (
             <NotFound />
           ) : (
-            <PropertyTableComponent data={propertyData} />
+            <PropertyEnquiriesList data={propertyData} />
           )}
         </ReusableTable>
         {/* Pagination */}
@@ -41,4 +53,6 @@ export default function Requests_Enquiries() {
       </div>
     </div>
   );
-}
+};
+
+export default PropertyEnquiries;
