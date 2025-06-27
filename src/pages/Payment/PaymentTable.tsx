@@ -17,29 +17,30 @@ export default function PaymentTableComponent({ data }: { data: any }) {
     await dispatch(payments());
   };
   const pagination = useSelector(selectPaymentsPagination);
+
   return (
     <>
       <div className="w-full overflow-x-auto">
         <div className="min-w-[800px] md:min-w-0">
-          <table className="w-full">
+          <table className="w-full table-auto"> {/* Added table-auto */}
             <thead>
               <tr className="text-left">
-                <th className="py-4   pr-6   font-[325]    text-[#757575] text-xs w-[180px] max-w-[180px]">
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   <div className="truncate">Payment ID</div>
                 </th>
-                <th className="py-4   pr-6   font-[325]    text-[#757575] text-xs w-[200px] max-w-[200px]">
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
+                  <div className="truncate">Description</div>
+                </th>
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   <div className="truncate">Customer's Name</div>
                 </th>
-                {/* <th className="py-4   pr-6   font-[325]    text-[#757575] text-xs w-[200px] max-w-[200px]">
-                  <div className="truncate">Marketer in Charge</div>
-                </th> */}
-                <th className="py-4   pr-6   font-[325]    text-[#757575] text-xs w-[150px] max-w-[150px]">
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   <div className="truncate">Amount</div>
                 </th>
-                <th className="py-4   pr-6   font-[325]    text-[#757575] text-xs w-[120px] max-w-[120px]">
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   <div className="truncate">Status</div>
                 </th>
-                <th className="py-4   pr-6   font-[325]    text-[#757575] text-xs w-[120px] max-w-[120px]">
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   <div className="truncate">Payment Date</div>
                 </th>
               </tr>
@@ -53,33 +54,32 @@ export default function PaymentTableComponent({ data }: { data: any }) {
                   }
                   className="cursor-pointer"
                 >
-                  <td className="py-4   pr-6 font-[325] text-dark text-sm w-[180px] max-w-[180px]">
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     <div className="truncate">{payment.id}</div>
                   </td>
-                  <td className="py-4   pr-6 font-[325] text-dark text-sm w-[200px] max-w-[200px]">
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
+                    <div className="truncate">{payment.description || "N/A"} </div>
+                  </td>
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     <div className="truncate">{payment.customerName}</div>
                   </td>
-                  {/* <td className="py-4   pr-6 font-[350] text-dark text-sm w-[200px] max-w-[200px]">
-                    <div className="truncate">{payment.marketerInCharge}</div>
-                  </td> */}
-                  <td className="py-4   pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     <div className="truncate">{payment.amount}</div>
                   </td>
-                  <td className="py-4   pr-6 font-[325] text-sm w-[120px] max-w-[120px]">
+                  <td className="py-4 pr-6 font-[325] text-sm">
                     <div
                       className={`truncate ${
                         payment.status === "Approved"
-                          ? "text-[#2E9B2E]":  payment.status === "Rejected"
-                          
-                           
+                          ? "text-[#2E9B2E]"
+                          : payment.status === "Rejected"
                           ? "text-[#D70E0E]"
                           : "text-[#FF9131]"
                       }`}
                     >
-                      { payment.status === "Rejected"?"Disapproved":payment.status}
+                      {payment.status === "Rejected" ? "Disapproved" : payment.status}
                     </div>
                   </td>
-                  <td className="py-4   pr-6 font-[325px] text-text-dark text-sm w-[120px] max-w-[120px]">
+                  <td className="py-4 pr-6 font-[325px] text-text-dark text-sm">
                     <div className="truncate">{payment.paymentDate}</div>
                   </td>
                 </tr>

@@ -9,38 +9,65 @@ export interface ErrorResponse {
   errors?: Record<string, string[]>;
 }
 
-export interface PaymentData {
+export interface PaymentItem {
+  id: number;
+  property_id: number | null;
+  user_id: number;
+  property_plan_id: number | null;
+  order_id: number | null;
+  amount_paid: number;
+  purpose: string;
+  payment_type: string;
+  status: number; // 0 = pending, 1 = approved, 2 = rejected
+  reference: string;
+  is_coupon: number;
+  created_at: string;
+  updated_at: string;
+  proof_of_payment: string | null;
+  bank_name: string | null;
+  description: string;
+  user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
+}
+
+export interface PaymentListData {
+  current_page: number;
+  data: PaymentItem[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
+export interface PaymentSummary {
   total: number;
   approved: number;
   pending: number;
   amount_total: number;
   amount_approved: number;
   amount_pending: number;
-  list: {
-    current_page: number;
-    data: any[];
-    first_page_url: string;
-    from: number | null;
-    last_page: number;
-    last_page_url: string;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number | null;
-    total: number;
-  };
+  list: PaymentListData;
 }
 
 export interface PaymentsResponse {
   success: boolean;
   data: {
-    payments: PaymentData;
+    payments: PaymentSummary;
   };
 }
 
@@ -54,12 +81,12 @@ export const payments = createAsyncThunk<
   "payments/fetch",
   async (_, { rejectWithValue, getState }) => {
     const token = Cookies.get('token');
-    const state = getState() as RootState;
+    const state = getState();
     const currentPage = state.payments?.pagination?.currentPage || 1; 
     
     if (!token) {
       return rejectWithValue({
-        message: "No authentication token found. Please login again.",
+        message: "Authentication required. Please login again.",
       });
     }
 
@@ -70,34 +97,49 @@ export const payments = createAsyncThunk<
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
-            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
-            device_id: "1010l0010l1",
+            "identifier": "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+            "device_id": "1010l0010l1",
           },
           params: {
-            page: currentPage 
+            page: currentPage,
+            per_page: 50 // Match the API's default pagination size
           }
         }
       );
+
+      // Validate response structure
+      if (!response.data?.data?.payments) {
+        return rejectWithValue({
+          message: "Invalid response structure from server",
+        });
+      }
+
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
 
       if (axiosError.response?.status === 401) {
         Cookies.remove('token');
+        return rejectWithValue({
+          message: "Session expired. Please login again.",
+        });
       }
 
       if (axiosError.response) {
         return rejectWithValue({
-          message: axiosError.response.data.message || "Failed to fetch payments data",
+          message: axiosError.response.data.message || "Failed to fetch payments",
           errors: axiosError.response.data.errors,
         });
-      } else if (axiosError.request) {
+      }
+
+      if (axiosError.request) {
         return rejectWithValue({
-          message: "No response from server. Please check your network connection.",
+          message: "Network error. Please check your internet connection.",
         });
       }
+
       return rejectWithValue({
-        message: "An unexpected error occurred. Please try again.",
+        message: "An unexpected error occurred. Please try again later.",
       });
     }
   }

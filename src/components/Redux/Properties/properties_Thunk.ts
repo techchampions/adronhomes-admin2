@@ -36,7 +36,7 @@ export interface Property {
   is_sold: number;
   is_active: number;
   property_duration_limit: number;
-  payment_schedule: string[] | string | null; // Can be array or stringified array
+  payment_schedule: string[] | string | null;
   category: string;
   is_discount: boolean;
   discount_name: string | null;
@@ -53,6 +53,8 @@ export interface Property {
   purpose: string | null;
   year_built: string | null;
   total_amount: number;
+  unit_available:any
+  unit_sold:any
 }
 
 export interface PropertiesResponse {

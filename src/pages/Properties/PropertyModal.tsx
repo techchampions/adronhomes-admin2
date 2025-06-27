@@ -5,6 +5,7 @@ import { FiMapPin, FiExternalLink, FiSquare, FiZap, FiActivity, FiCopy } from "r
 
 
 
+
 interface PropertyModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,6 +37,10 @@ interface PropertyModalProps {
     discount_units: any | null;
     discount_start_date: string | null;
     discount_end_date: string | null;
+
+  unit_sold: number;
+  unit_available: number;
+  
   };
 }
 
@@ -106,32 +111,42 @@ export default function PropertyModal({ isOpen, onClose, property }: PropertyMod
 
         <div className="p-6">
           {/* Header Stats */}
+
           <div className="flex justify-between items-center mb-8 text-sm text-gray-600">
-            <div className="flex space-x-8">
-              <div>
-                <div className="font-medium text-gray-800">Date Uploaded</div>
-                <div>{property.created_at ? new Date(property.created_at).toLocaleDateString() : 'N/A'}</div>
-              </div>
-              <div>
-                <div className="font-medium text-gray-800">Views</div>
-                <div>21</div>
-              </div>
-              <div>
-                <div className="font-medium text-gray-800">Units Sold</div>
-                <div>39</div>
-              </div>
-              <div>
-                <div className="font-medium text-gray-800">Units Available</div>
-                <div>101</div>
-              </div>
-              <div>
-                <div className="font-medium text-gray-800">Requests & Reviews</div>
-                <div>2,300</div>
-              </div>
-            </div>
-        <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition">
-  View Requests
+                       <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition w-full">
+  <div className="flex flex-wrap justify-between items-center w-full">
+    {/* Date Uploaded */}
+    <div className="flex-1 min-w-[150px] mb-2 md:mb-0">
+      <div className="font-medium text-gray-800">Date Uploaded</div>
+      <div>{property.created_at ? new Date(property.created_at).toLocaleDateString() : 'N/A'}</div>
+    </div>
+
+    {/* Views */}
+    <div className="flex-1 min-w-[100px] mb-2 md:mb-0">
+      <div className="font-medium text-gray-800">Views</div>
+      <div>21</div>
+    </div>
+
+    {/* Units Sold */}
+    <div className="flex-1 min-w-[100px] mb-2 md:mb-0">
+      <div className="font-medium text-gray-800">Units Sold</div>
+      <div>{property.unit_sold}</div>
+    </div>
+
+    {/* Units Available */}
+    <div className="flex-1 min-w-[100px] mb-2 md:mb-0">
+      <div className="font-medium text-gray-800">Units Available</div>
+      <div>{property.unit_available}</div>
+    </div>
+
+    {/* Requests & Reviews */}
+    <div className="flex-1 min-w-[150px]">
+      <div className="font-medium text-gray-800">Requests & Reviews</div>
+      <div>2,300</div>
+    </div>
+  </div>
 </button>
+
 
           </div>
 
