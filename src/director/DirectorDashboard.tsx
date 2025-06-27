@@ -9,6 +9,7 @@ import { useGetDirectorDashboard } from "../utils/hooks/query";
 import NotFound from "../components/NotFound";
 import { formatDate } from "../utils/formatdate";
 import DirectorProperttList from "./DirectorProperttList";
+import LoadingAnimations from "../components/LoadingAnimations";
 
 export default function DirectorsDashboard() {
   const { data, isLoading, isError } = useGetDirectorDashboard();
@@ -63,10 +64,12 @@ export default function DirectorsDashboard() {
             activeTab={activeTab}
             onTabChange={setActiveTab}
           >
-            {properties.length < 1 ? (
+            {isLoading ? (
+              <LoadingAnimations loading={isLoading} />
+            ) : properties.length < 1 ? (
               <NotFound />
             ) : (
-              <DirectorProperttList data={properties} />
+              <DirectorProperttList isLoading={isLoading} data={properties} />
             )}
           </ReusableTable>
 
