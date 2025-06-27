@@ -9,7 +9,7 @@ interface PaymentUser {
   email: string;
 }
 
-interface PaymentItem {
+export interface PaymentItem {
   id: number;
   property_id: number | null;
   user_id: number;
@@ -18,13 +18,20 @@ interface PaymentItem {
   amount_paid: number;
   purpose: string;
   payment_type: string;
-  status: number;
+  status: number; // 0 = pending, 1 = approved, 2 = rejected
   reference: string;
   is_coupon: number;
   created_at: string;
   updated_at: string;
   proof_of_payment: string | null;
-  user: PaymentUser;
+  bank_name: string | null;
+  description: string;
+  user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
 }
 
 interface PaymentList {

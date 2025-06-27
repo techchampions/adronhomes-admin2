@@ -57,6 +57,7 @@ export default function Payment() {
             ? "Rejected"
             : "Pending",
         paymentDate: formatDate(payment.created_at),
+        description:payment.description
       }));
   };
 

@@ -60,6 +60,8 @@ id: number;
   purpose: string | null;
   year_built: string | null;
   total_amount: number;
+  unit_available:any
+  unit_sold:any
 }
 
 interface PropertyTableProps {

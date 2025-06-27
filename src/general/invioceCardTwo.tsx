@@ -140,14 +140,24 @@ export default function InvoiceCard({
                 Invoice
               </h2>
 
-              <div className="mb-4 md:mb-6 grid grid-cols-3 gap-2 max-w-full">
-                <h1 className="text-3xl md:text-3xl lg:text-5xl font-[350] text-white truncate col-span-2">
-                  {invoiceAmount}
-                </h1>
-                <span className="text-lg md:text-xl lg:text-xl text-white self-end truncate">
-                  /{paidAmount}
-                </span>
-              </div>
+               <div className="mb-4 md:mb-6 flex items-end">
+        <h1
+          className="text-3xl md:text-3xl lg:text-5xl font-[350] text-white flex items-baseline relative group" // Added 'group' for tooltip
+          data-tooltip-content={`${invoiceAmount} / ${paidAmount}`} 
+        >
+          <span className="truncate max-w-[150px] sm:max-w-[200px] md:max-w-[250px]">
+            {invoiceAmount}
+          </span>
+          <span className="text-lg md:text-xl lg:text-xl text-white ml-1 truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px]">
+            /{paidAmount}
+          </span>
+
+          {/* Tooltip */}
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-gray-800 text-white text-sm  opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap rounded-4xl">
+            {invoiceAmount} / {paidAmount}
+          </div>
+        </h1>
+      </div>
 
               <div className="w-full bg-[#737373] rounded-full h-2 md:h-3 mb-4 md:mb-6">
                 <div
@@ -185,7 +195,7 @@ export default function InvoiceCard({
                   {/* Due Date */}
                   <div className="min-w-0">
                     <h3 className="text-base md:text-xl font-[325] mb-1 md:mb-2 break-words">
-                      {dueDate}
+                      {(dueDate)}
                     </h3>
                     <p className="font-[325] text-xs md:text-sm break-words">
                       Due Date
