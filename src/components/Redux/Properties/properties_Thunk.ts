@@ -17,7 +17,7 @@ export interface Property {
   type: number;
   no_of_bedroom: number | null;
   slug: string;
-  features: string[] | string; // Can be array or stringified array
+  features: string[] | string; 
   overview: string;
   description: string;
   street_address: string;
