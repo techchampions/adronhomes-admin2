@@ -14,8 +14,8 @@ import {
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/director" },
-  { label: "Notifications", icon: Icon8, path: "/notifications" },
-  { label: "Settings", icon: Icon9, path: "/settings" },
+  // { label: "Notifications", icon: Icon8, path: "/notifications" },
+  // { label: "Settings", icon: Icon9, path: "/settings" },
 ];
 
 export default function DirectorSideBar() {

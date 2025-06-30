@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 import axios, { AxiosInstance } from "axios";
 
-const openApiClient: AxiosInstance = axios.create({
+const adronApi: AxiosInstance = axios.create({
   baseURL: "https://adron.microf10.sg-host.com/api/",
   headers: {
     "Content-Type": "application/json",
@@ -11,11 +11,11 @@ const openApiClient: AxiosInstance = axios.create({
 });
 
 // Interceptor to attach token if available
-openApiClient.interceptors.request.use((config) => {
+adronApi.interceptors.request.use((config) => {
   const token = Cookies.get("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
-export default openApiClient;
+export default adronApi;
