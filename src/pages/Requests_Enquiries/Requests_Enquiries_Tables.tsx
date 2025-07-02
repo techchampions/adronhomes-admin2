@@ -40,7 +40,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                     <div className="flex items-center">
                       <div className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100">
                         <img
-                          src={"/default-property-image.jpg"}
+                          src={property.display_image}
                           alt={property.name}
                           className="w-full h-full object-cover"
                         />

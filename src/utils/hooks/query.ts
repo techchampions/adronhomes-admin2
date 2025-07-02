@@ -2,9 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { SliderByTypeRes } from "../../pages/Properties/types/SliderByTypeResponse";
 import {
   getAllAccountDetails,
+  getCustomers,
+  getCustomersAndProperties,
   getDirectorDashboardData,
+  getEnquiryByID,
   getHeadersData,
   getLeadersData,
+  getNotifications,
   getOfficeLocations,
   getPropertyByID,
   getPropertyRequest,
@@ -21,6 +25,9 @@ import {
   PropertyByIdRequestsResponse,
 } from "../../pages/Properties/types/PropertyRequestTypes";
 import { GetPropertyByIdResponse } from "../../pages/Properties/types/SoosarPropertyTypes";
+import { NotificationsResponse } from "../../pages/Properties/types/NotificationTypes";
+import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
+import { UsersAndPropertiesResponse } from "../../pages/Properties/types/UsersNPropertiesListTypes";
 
 // Query hook for properties and filtering
 export const useGetSlidersByType = (type: string) => {
@@ -84,5 +91,33 @@ export const useGetPropertyByID = (id?: number | string) => {
     queryKey: ["property", id], // include id in the key to avoid collisions
     queryFn: () => getPropertyByID(id),
     enabled: !!id, // prevents the query from running if id is undefined/null
+  });
+};
+export const useGetEnquryByID = (id?: number | string) => {
+  return useQuery<GetPropertyByIdResponse>({
+    queryKey: ["request", id], // include id in the key to avoid collisions
+    queryFn: () => getEnquiryByID(id),
+    enabled: !!id, // prevents the query from running if id is undefined/null
+  });
+};
+// Notifucation List
+export const useGetNotifications = (page: number) => {
+  return useQuery<NotificationsResponse>({
+    queryKey: ["notifications", page],
+    queryFn: () => getNotifications(page),
+  });
+};
+// CUSTOMER List
+export const useGetCustomers = (page: number) => {
+  return useQuery<CustomersResponse>({
+    queryKey: ["customers", page],
+    queryFn: () => getCustomers(page),
+  });
+};
+// CUSTOMER List
+export const useGetCustomersAndProperties = () => {
+  return useQuery<UsersAndPropertiesResponse>({
+    queryKey: ["customers and properties"],
+    queryFn: getCustomersAndProperties,
   });
 };

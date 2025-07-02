@@ -6,6 +6,7 @@ export interface PropertyRequest {
   state: string;
   lga: string;
   price: number;
+  display_image: string;
   total_requests: number;
   total_pending_requests: number;
 }
@@ -46,6 +47,7 @@ export interface Inquiry {
   name: string;
   phone: string;
   email: string; // note the API includes a trailing \r\n – trim in code if needed
+  display_image: string;
   property_id: number;
   interest_option: "rent" | "buy" | string; // widen if more options exist
   description: string;
