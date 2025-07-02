@@ -30,15 +30,10 @@ export default function HeaderTable() {
             <thead className="text-gray-600">
               <tr>
                 <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Slug</th>
                 <th className="px-4 py-2">Header</th>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Description</th>
-                <th className="px-4 py-2">Image</th>
                 <th className="px-4 py-2">Action_link</th>
-                <th className="px-4 py-2">List_description</th>
-                <th className="px-4 py-2">Created_at</th>
-                <th className="px-4 py-2">Updated_at</th>
                 <th className="px-4 py-2">Actions</th>
               </tr>
             </thead>
@@ -50,28 +45,17 @@ export default function HeaderTable() {
                 >
                   <td className="px-4 py-2 max-w-[150px] truncate">{row.id}</td>
                   <td className="px-4 py-2 max-w-[150px] truncate">
-                    {row.slug}
-                  </td>
-                  <td className="px-4 py-2 max-w-[150px] truncate">
                     {row.header}
                   </td>
                   <td className="px-4 py-2 max-w-[150px] truncate">
                     {row.name}
                   </td>
-                  <td className="px-4 py-2 truncate max-w-[150px]">
+                  <td className="px-4 py-2 truncate max-w-[300px]">
                     {row.description || "Empty"}
-                  </td>
-                  <td className="px-4 py-2 truncate max-w-[150px]">
-                    {/* {row.image} */}
                   </td>
                   <td className="px-4 py-2 truncate max-w-[150px]">
                     {row.action_link}
                   </td>
-                  <td className="px-4 truncate py-2 max-w-[300px]">
-                    {row.list_description ?? "Empty"}
-                  </td>
-                  <td className="px-4 py-2">{row.created_at ?? "Empty"}</td>
-                  <td className="px-4 py-2">{row.updated_at ?? "Empty"}</td>
                   <td className="px-4 py-2 flex space-x-2">
                     <IoPencil
                       className="w-4 h-4 text-gray-600 cursor-pointer"

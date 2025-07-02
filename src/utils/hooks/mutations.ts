@@ -10,6 +10,7 @@ import {
   editAccountDetails,
   editLeaderData,
   editOfficeLocation,
+  sendNotification,
   updateHeaderData,
   uploadSliderByType,
 } from "./api";
@@ -166,6 +167,19 @@ export const useDeleteOfficeLocation = () => {
       // Refetch relevant data if needed
       queryClient.invalidateQueries({
         queryKey: ["Office-locations"],
+      });
+    },
+  });
+};
+
+export const useSendNotification = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: sendNotification,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      queryClient.invalidateQueries({
+        queryKey: ["notifications"],
       });
     },
   });

@@ -32,7 +32,7 @@ const AccountDetails = () => {
             setShowAddModal(!showAddModal);
             setIsCancelState(false);
           }}
-          buttonText="Add Account"
+          buttonText={accounts.length < 4 ? `Add Account` : undefined}
         />
         <AddAccount
           isOpen={showAddModal}
@@ -112,11 +112,13 @@ const AccountDetails = () => {
                   </div>
                 )}
               </div>
-              <Button
-                label="Add Account"
-                className="!w-fit px-8 !bg-black mt-10"
-                onClick={() => setShowAddModal(true)}
-              />
+              {accounts.length < 4 && (
+                <Button
+                  label="Add Account"
+                  className="!w-fit px-8 !bg-black mt-10"
+                  onClick={() => setShowAddModal(true)}
+                />
+              )}
             </div>
           </div>
         </div>

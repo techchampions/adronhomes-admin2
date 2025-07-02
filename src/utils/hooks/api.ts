@@ -2,6 +2,7 @@ import {
   AccountDetailsResponse,
   CreateAccountPayload,
 } from "../../pages/Properties/types/AccountDetailsTypes";
+import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
   HeadersResponse,
@@ -16,6 +17,7 @@ import {
   LeadershipItem,
   LeadershipResponse,
 } from "../../pages/Properties/types/LeadershipDataTypes";
+import { NotificationsResponse } from "../../pages/Properties/types/NotificationTypes";
 import {
   CreateOfficeLocationPayload,
   EditOfficeLocationPayload,
@@ -31,6 +33,7 @@ import {
   UploadSliderPayload,
   UploadSliderResponse,
 } from "../../pages/Properties/types/UploadSilderPayload";
+import { UsersAndPropertiesResponse } from "../../pages/Properties/types/UsersNPropertiesListTypes";
 import adminApi from "./ApiClient";
 import adronApi from "./GeneralApiClient";
 
@@ -315,4 +318,42 @@ export const getPropertyByID = async (
 ): Promise<GetPropertyByIdResponse> => {
   const response = await adronApi.get(`/property/${id}`);
   return response.data;
+};
+export const getEnquiryByID = async (
+  id?: number | string
+): Promise<GetPropertyByIdResponse> => {
+  const response = await adminApi.get(`/requests/${id}`);
+  return response.data;
+};
+
+// GET NOTIFICATIONS
+export const getNotifications = async (
+  page: number
+): Promise<NotificationsResponse> => {
+  const res = await adminApi.get(`/admin-notifications?page=${page}`);
+  return res.data;
+};
+// GET CUSTOMERS
+export const getCustomers = async (
+  page: number
+): Promise<CustomersResponse> => {
+  const res = await adminApi.get(`/customers?page=${page}`);
+  return res.data;
+};
+// GET CUSTOMERS
+export const getCustomersAndProperties =
+  async (): Promise<UsersAndPropertiesResponse> => {
+    const res = await adminApi.get(`/users-and-properties`);
+    return res.data;
+  };
+
+interface NotificationPayload {
+  title: string;
+  content: string;
+  property_ids: number[];
+  user_ids: number[];
+}
+export const sendNotification = async (payload: NotificationPayload) => {
+  const res = await adminApi.post("/post-notification", payload);
+  return res.data;
 };
