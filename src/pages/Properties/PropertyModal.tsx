@@ -41,9 +41,12 @@ interface PropertyModalProps {
     discount_units: any | null;
     discount_start_date: string | null;
     discount_end_date: string | null;
-
+number_of_unit:any
     unit_sold: number;
     unit_available: number;
+
+    property_view: any;
+    property_requests: any;
   };
 }
 
@@ -152,13 +155,13 @@ export default function PropertyModal({
                 {/* Views */}
                 <div className="flex-1 min-w-[100px] mb-2 md:mb-0">
                   <div className="font-medium text-gray-800">Views</div>
-                  <div>21</div>
+                  <div>{property.property_view ?? 0}</div>
                 </div>
 
                 {/* Units Sold */}
                 <div className="flex-1 min-w-[100px] mb-2 md:mb-0">
                   <div className="font-medium text-gray-800">Units Sold</div>
-                  <div>{property.unit_sold}</div>
+                  <div>{property.unit_sold ?? 0}</div>
                 </div>
 
                 {/* Units Available */}
@@ -166,7 +169,7 @@ export default function PropertyModal({
                   <div className="font-medium text-gray-800">
                     Units Available
                   </div>
-                  <div>{property.unit_available}</div>
+                  <div>{property.unit_available ?? 0}</div>
                 </div>
 
                 {/* Requests & Reviews */}
@@ -174,7 +177,7 @@ export default function PropertyModal({
                   <div className="font-medium text-gray-800">
                     Requests & Reviews
                   </div>
-                  <div>2,300</div>
+                  <div>{property.property_requests ?? 0}</div>
                 </div>
               </div>
             </button>
@@ -259,7 +262,7 @@ export default function PropertyModal({
               <div className="text-sm text-gray-600">
                 {getPropertyType(property.type)}
               </div>
-              <div className="font-medium">Property Units: 101</div>
+              <div className="font-medium">Property Units: {property?.number_of_unit}</div>
             </div>
           </div>
 

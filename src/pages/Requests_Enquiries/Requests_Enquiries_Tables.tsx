@@ -70,7 +70,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                       onClick={() =>
                         navigate(`/requests-enquiries/${property.id}`)
                       }
-                      className="bg-[#272727] cursor-pointer text-white px-4 py-2 rounded-full xl:text-xs  text-xs font-[350] hover:bg-gray-800 transition-colors"
+                      className="bg-[#272727] cursor-pointer text-white px-4 py-2 rounded-full xl:text-sm  text-sm font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
                       aria-label="View requests"
                     >
                       View Requests

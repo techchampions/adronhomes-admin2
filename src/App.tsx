@@ -46,6 +46,7 @@ import AccountDetails from "./components/Settings/AddAccountSettings/AccountDeta
 import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import DirectorsDashboard from "./director/DirectorDashboard";
 import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
+import Customer from "./marketer/customer/customer";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -184,6 +185,7 @@ const App = () => {
                 <Route path="/marketer" element={<MarketersDashboard />} />
                 <Route path="/director" element={<DirectorsDashboard />} />
                 <Route path="marketer-settings" element={<SettingsPage />} />
+                 <Route path="/marketer-customers" element={<Customer />} />
                 <Route
                   path="/marketer-payment/:user_id/:plan_id"
                   element={<MarketerInvoice />}

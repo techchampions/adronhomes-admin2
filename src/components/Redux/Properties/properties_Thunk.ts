@@ -55,6 +55,8 @@ export interface Property {
   total_amount: number;
   unit_available:any
   unit_sold:any
+  property_view:any
+  property_requests:any
 }
 
 export interface PropertiesResponse {
