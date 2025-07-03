@@ -109,12 +109,12 @@ const SendNotification: React.FC<ModalProps> = ({
     notify(payload, {
       onSuccess(data, variables, context) {
         toast.success("Notification sent!");
+        onClose();
       },
       onError(error, variables, context) {
         toast.error("Failed to send notification");
       },
     });
-    onClose();
   };
 
   if (!isOpen) return null;

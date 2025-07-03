@@ -322,7 +322,7 @@ export const getPropertyByID = async (
 export const getEnquiryByID = async (
   id?: number | string
 ): Promise<GetPropertyByIdResponse> => {
-  const response = await adminApi.get(`/requests/${id}`);
+  const response = await adminApi.get(`/request/${id}`);
   return response.data;
 };
 
