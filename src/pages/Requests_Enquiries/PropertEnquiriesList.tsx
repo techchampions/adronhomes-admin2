@@ -40,11 +40,6 @@ export default function PropertyEnquiriesList({ data }: EnquiriesListProps) {
                   <td className="py-4 pr-6 text-dark text-sm max-w-[150px]">
                     <div className="flex items-center">
                       <div className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100">
-                        {/* <img
-                          src={enquiry.display_image}
-                          alt={enquiry.name}
-                          className="w-full h-full object-cover"
-                        /> */}
                         <IoPerson className="w-full h-full p-1" />
                       </div>
                       <div className="min-w-0">
