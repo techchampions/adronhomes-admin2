@@ -4,48 +4,143 @@ import { useParams } from "react-router-dom";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import ProfileCard from "../../general/ProfileCard";
-import TableCard from "../../general/TableCard";
-import { fetchCustomerById } from "../../components/Redux/customers/customerByid";
+import TableCard, { PaginationProps } from "../../general/TableCard";
+
+import {
+  fetchCustomerById,
+  setActivePlanCurrentPage,
+  setCompletedPropertyCurrentPage,
+  selectActivePlanPagination,
+  selectCompletedPropertyPagination,
+  selectCustomerActivePlans,
+  selectCustomerCompletedProperties,
+} from "../../components/Redux/customers/customerByid";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { formatDate } from "../../utils/formatdate";
 import { formatAsNaira } from "../../utils/formatcurrency";
 import LoadingAnimations from "../../components/LoadingAnimations";
+import { PlanData } from "../../components/Redux/customers/customerByid";
+import Modal from "./Modal";
+
+interface TableRowData {
+  id: number;
+  name: string;
+  location: string;
+  image: string;
+  price?: string;
+  amountPaid?: string;
+  amountLeft?: string;
+  duration?: string;
+  dueDate?: string;
+  Duration?: string;
+  StartDate?: string;
+  FinalPayment?: string;
+  property: any;
+  user_id?: number;
+  plan_id?: number;
+}
 
 export default function CustomerSinglePage() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
+
   const { data, loading, error } = useSelector(
     (state: RootState) => state.customerById
   );
-    const { loading:messagingcustomerloading} = useSelector(
+
+  const { loading: messagingcustomerloading } = useSelector(
     (state: RootState) => state.messagingcustomer
   );
 
-
-      const { loading:loadingdelete} = useSelector(
+  const { loading: loadingdelete } = useSelector(
     (state: RootState) => state.deleteUserSlice
   );
 
+  // Pagination states from Redux
+  const activePlanPagination = useSelector(selectActivePlanPagination);
+  const completedPropertyPagination = useSelector(
+    selectCompletedPropertyPagination
+  );
 
+  // Data arrays for tables (paginated data)
+  const activePlansData = useSelector(selectCustomerActivePlans);
+  const completedPropertiesData = useSelector(
+    selectCustomerCompletedProperties
+  );
 
-  
+  // State for modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+
+  const [modalData, setModalData] = useState<TableRowData[]>([]);
+
+  const [modalColumns, setModalColumns] = useState<any[]>([]);
+  const [modalPagination, setModalPagination] =
+    useState<PaginationProps | null>(null);
+
+  const [modalHandlePageChange, setModalHandlePageChange] = useState<
+    ((page: number) => void) | null
+  >(null);
+
+  // Handlers for main page table pagination
+  const handlePageChange = (page: number) => {
+    dispatch(setActivePlanCurrentPage(page));
+  };
+
+  const handlePageChange2 = (page: number) => {
+    dispatch(setCompletedPropertyCurrentPage(page));
+  };
+
   useEffect(() => {
     if (id) {
-      dispatch(fetchCustomerById(id));
+      dispatch(
+        fetchCustomerById({
+          customerId: Number(id),
+          activePage: activePlanPagination.currentPage,
+          completedPage: completedPropertyPagination.currentPage,
+        })
+      );
     }
-  }, [dispatch, id]);
+  }, [
+    dispatch,
+    id,
+    activePlanPagination.currentPage,
+    completedPropertyPagination.currentPage,
+  ]);
 
-  // Format active plans data for the table
+  const openModal = (
+    title: string,
+    data: TableRowData[],
+    columns: any[],
+    pagination: PaginationProps,
+    handlePageChangeFunc: (page: number) => void
+  ) => {
+    setModalTitle(title);
+    setModalData(data);
+    setModalColumns(columns);
+    setModalPagination(pagination);
+    setModalHandlePageChange(() => handlePageChangeFunc);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalTitle("");
+    setModalData([]);
+    setModalColumns([]);
+    setModalPagination(null);
+    setModalHandlePageChange(null);
+  };
+
+  // Data for the main page tables (limited by API response)
   const activePlans =
-    data?.active_plan.map((plan) => {
-      const property = data.list_property.find(
-        (p) => p.plan_id === plan.id
-      )?.property;
+    data?.limit_active_plan.map((plan) => {
+      const property = plan.property;
       return {
         id: plan.id,
         name: property?.name || "Unknown Property",
         location: property
-          ? `${property.street_address}, ${property.lga}, ${property.state}`
+          ? `${property.lga}, ${property.state}`
           : "Unknown Location",
         price: formatAsNaira(plan.total_amount),
         amountPaid: formatAsNaira(plan.paid_amount),
@@ -53,36 +148,75 @@ export default function CustomerSinglePage() {
         duration: plan.monthly_duration
           ? `${plan.monthly_duration} Months`
           : "One-time",
-        dueDate: plan.next_payment_date
-          ? formatDate(plan.next_payment_date)
-          : "N/A",
+        dueDate: plan.end_date ? formatDate(plan.end_date) : "N/A",
         image: property?.display_image || "/default-property.jpg",
         property,
-        user_id: plan.id,
-        plan_id: plan?.user_id,
+        user_id: plan.user_id,
+        plan_id: plan.id,
       };
     }) || [];
 
-  // Format properties data for the table
-  const properties =
-    data?.list_property.map((item) => {
+  const completedProperties =
+    data?.limit_completed_property.map((item) => {
+      const property = item.property;
       return {
         id: item.id,
-        name: item.property.name,
-        location: `${item.property.street_address}, ${item.property.lga}, ${item.property.state}`,
-        image: item.property.display_image || "/default-property.jpg",
-        price: formatAsNaira(item.property.price),
-        amountPaid: formatAsNaira(item.property.initial_deposit),
-        Duration: item.property.property_duration_limit
-          ? `${item.property.property_duration_limit} Months`
+        name: property.name,
+        location: `${property.lga}, ${property.state}`,
+        image: property.display_image || "/default-property.jpg",
+        price: formatAsNaira(property.price),
+        amountPaid: formatAsNaira(item.paid_amount),
+        Duration: item.monthly_duration
+          ? `${item.monthly_duration} Months`
           : "N/A",
-        StartDate: item.created_at ? formatDate(item.created_at) : "N/A",
-        FinalPayment: item.updated_at ? formatDate(item.updated_at) : "N/A",
+        StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
+        FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
         property: item.property,
       };
     }) || [];
 
-  // Define your columns configuration for active plans
+  const completedPropertiesAll =
+    completedPropertiesData.map((item) => {
+      const property = item.property;
+      return {
+        id: item.id,
+        name: property.name,
+        location: `${property.lga}, ${property.state}`,
+        image: property.display_image || "/default-property.jpg",
+        price: formatAsNaira(property.price),
+        amountPaid: formatAsNaira(item.paid_amount),
+        Duration: item.monthly_duration
+          ? `${item.monthly_duration} Months`
+          : "N/A",
+        StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
+        FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
+        property: item.property,
+      };
+    }) || [];
+
+  const activePlansAll =
+    activePlansData.map((plan) => {
+      const property = plan.property;
+      return {
+        id: plan.id,
+        name: property?.name || "Unknown Property",
+        location: property
+          ? `${property.lga}, ${property.state}`
+          : "Unknown Location",
+        price: formatAsNaira(plan.total_amount),
+        amountPaid: formatAsNaira(plan.paid_amount),
+        amountLeft: formatAsNaira(plan.remaining_balance),
+        duration: plan.monthly_duration
+          ? `${plan.monthly_duration} Months`
+          : "One-time",
+        dueDate: plan.end_date ? formatDate(plan.end_date) : "N/A",
+        image: property?.display_image || "/default-property.jpg",
+        property,
+        user_id: plan.user_id,
+        plan_id: plan.id,
+      };
+    }) || [];
+
   const activePlansColumns = [
     {
       key: "property",
@@ -114,8 +248,7 @@ export default function CustomerSinglePage() {
     { key: "dueDate", title: "Due Date", width: 120 },
   ];
 
-  // Define your columns configuration for properties
-  const propertiesColumns = [
+  const completedPropertiesColumns = [
     {
       key: "property",
       title: "Property",
@@ -147,15 +280,18 @@ export default function CustomerSinglePage() {
   ];
 
   if (loading) {
-    return     <div className="flex items-center justify-center h-screen text-center "><LoadingAnimations loading={loading}/></div>;
+    return (
+      <div className="flex items-center justify-center h-screen text-center">
+        <LoadingAnimations loading={loading} />
+      </div>
+    );
   }
 
   if (error) {
     return (
-    <div className="flex items-center justify-center h-screen text-center text-red-500">
-  Error: {error.message}
-</div>
-
+      <div className="flex items-center justify-center h-screen text-center text-red-500">
+        Error: {error.message}
+      </div>
     );
   }
 
@@ -173,15 +309,13 @@ export default function CustomerSinglePage() {
 
       <div className="grid md:grid-cols-3 gap-[20px]">
         <MatrixCardGreen
-          // currency={true}
           title="Total Amount Paid"
           value={formatAsNaira(parseInt(data.total_paid))}
           change="Includes total amount paid by this customer"
         />
         <MatrixCard
-          // currency={true}
           title="Total Pending Payments"
-          value={formatAsNaira(parseInt(data.pending_paid))}
+          value={formatAsNaira(data.pending_paid)}
           change="Includes total pending payments of this customer"
         />
         <MatrixCard
@@ -203,14 +337,20 @@ export default function CustomerSinglePage() {
           ownedProperties: data.owned_property,
         }}
         paymentInfo={{
-          amount: formatAsNaira(data.total_paid),
+          amount: formatAsNaira(parseInt(data.total_paid)),
           date: formatDate(data.customer.updated_at),
         }}
         marketerName={data.customer.referral_code || "Unknown Marketer"}
         buttonTexts={{
           sendMessage: "Send Message",
           removeClient: "Remove Client",
-        }} userId={data.customer.id} userNmae={`${data.customer.first_name} ${data.customer.last_name}`} userImage={data.customer.profile_picture} loading={messagingcustomerloading} loadingdelete={loadingdelete}      />
+        }}
+        userId={data.customer.id}
+        userNmae={`${data.customer.first_name} ${data.customer.last_name}`}
+        userImage={data.customer.profile_picture}
+        loading={messagingcustomerloading}
+        loadingdelete={loadingdelete}
+      />
 
       <TableCard
         title="Active Plans"
@@ -219,16 +359,52 @@ export default function CustomerSinglePage() {
         viewAllText="View All"
         rowKey="id"
         className=""
+        onViewAllClick={() =>
+          openModal(
+            "All Active Plans",
+            activePlansAll,
+            activePlansColumns,
+            activePlanPagination,
+            handlePageChange
+          )
+        }
       />
 
       <TableCard
-        title="Properties"
-        data={properties}
-        columns={propertiesColumns}
+        title="Completed Properties"
+        data={completedProperties}
+        columns={completedPropertiesColumns}
         viewAllText="View All"
         rowKey="id"
         className=""
+        onViewAllClick={() =>
+          openModal(
+            "All Completed Properties",
+            completedPropertiesAll,
+            completedPropertiesColumns,
+            completedPropertyPagination,
+            handlePageChange2
+          )
+        }
       />
+
+      {/* Modal Component */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={modalTitle}
+        className="min-w-[80vw]"
+      >
+        <TableCard
+          data={modalData}
+          columns={modalColumns}
+          viewAllText={null}
+          rowKey="id"
+          className="shadow-none p-0"
+          onPageChange={modalHandlePageChange || undefined}
+          pagination={modalPagination || undefined}
+        />
+      </Modal>
     </div>
   );
 }

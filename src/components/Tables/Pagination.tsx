@@ -9,7 +9,7 @@ export interface Pagination {
 
 export interface PaginationProps {
   pagination: Pagination;
-  onPageChange: (page: number) => void;
+  onPageChange: (page: any) => void;
   className?: string;
 }
 const Pagination: React.FC<PaginationProps> = ({ 

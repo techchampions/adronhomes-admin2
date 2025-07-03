@@ -57,10 +57,10 @@ export default function PaymentTableComponent({ data }: { data: any }) {
                   <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     <div className="truncate">{payment.id}</div>
                   </td>
-                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
-                    <div className="truncate">{payment.description || "N/A"} </div>
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm max-w-[220px]">
+                    <div className="truncate  ">{payment.description || "N/A"} </div>
                   </td>
-                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm max-w-[100px]">
                     <div className="truncate">{payment.customerName}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm">

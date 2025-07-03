@@ -1,5 +1,15 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+// src/general/TableCard.tsx (or wherever your TableCard is located)
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import Pagination from "../components/Tables/Pagination";
+
+// New type for pagination props
+export type PaginationProps = {
+  currentPage: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+};
 
 type ColumnConfig<T = any> = {
   key: string;
@@ -15,24 +25,32 @@ type TableCardProps<T = any> = {
   viewAllText?: string | null;
   rowKey?: string | ((row: T) => string);
   className?: string;
+
+  onViewAllClick?: () => void;
+  pagination?: PaginationProps;
+  onPageChange?: (page: number) => void;
 };
 
 const DEFAULT_COLUMN_WIDTH = 180;
-const IMAGE_COLUMN_WIDTH = 250;
+// const IMAGE_COLUMN_WIDTH = 250; // Not used in the provided snippet
 
 const TableCard = <T extends Record<string, any>>({
   data,
   columns,
-  title = 'Table',
-  viewAllText = 'View All',
-  rowKey = 'id',
-  className = '',
+  title = "Table",
+  viewAllText = "View All",
+  rowKey = "id",
+  className = "",
+  onViewAllClick,
+  pagination,
+  onPageChange,
 }: TableCardProps<T>) => {
   const getRowKey = (row: T, index: number) => {
-    if (typeof rowKey === 'function') return rowKey(row);
+    if (typeof rowKey === "function") return rowKey(row);
     return row[rowKey] || index;
   };
-const navigate=useNavigate()
+  const navigate = useNavigate();
+
   const getWidthStyle = (width?: number) => ({
     width: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
     minWidth: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
@@ -45,7 +63,10 @@ const navigate=useNavigate()
         <div className="w-full flex justify-between items-center mb-6">
           {title && <h2 className="text-xl font-[350] text-dark">{title}</h2>}
           {viewAllText && (
-            <button className="text-sm font-bold text-dark">
+            <button
+              className="text-sm font-bold text-dark hover:text-blue-600 transition-colors"
+              onClick={onViewAllClick}
+            >
               {viewAllText}
             </button>
           )}
@@ -71,8 +92,10 @@ const navigate=useNavigate()
             {data.map((row, index) => (
               <tr
                 key={getRowKey(row, index)}
-                className="text-sm text-dark font-[325] cursor-pointer"
-          onClick={() => navigate(`/customers/payment/${row.plan_id}/${row.user_id}`)}
+                className="text-sm text-dark font-[325] cursor-pointer hover:bg-gray-50"
+                onClick={() =>
+                  navigate(`/customers/payment/${row.user_id}/${row.plan_id}`)
+                }
               >
                 {columns.map((column) => {
                   const cellValue = row[column.key];
@@ -82,18 +105,21 @@ const navigate=useNavigate()
 
                   return (
                     <td
-                    key={`${getRowKey(row, index)}-${column.key}`}
-                    className="py-4"
-                    title={typeof cellContent === 'string' ? cellContent : undefined}
-                  >
-                    <div 
-                      className="truncate"
-                      style={getWidthStyle(column.width)}
+                      key={`${getRowKey(row, index)}-${column.key}`}
+                      className="py-4"
+                      title={
+                        typeof cellContent === "string"
+                          ? cellContent
+                          : undefined
+                      }
                     >
-                      {cellContent}
-                    </div>
-                  </td>
-                  
+                      <div
+                        className="truncate"
+                        style={getWidthStyle(column.width)}
+                      >
+                        {cellContent}
+                      </div>
+                    </td>
                   );
                 })}
               </tr>
@@ -101,6 +127,40 @@ const navigate=useNavigate()
           </tbody>
         </table>
       </div>
+      {pagination && onPageChange && (
+        <Pagination
+          className="mt-8 mb-4"
+          pagination={pagination}
+          onPageChange={onPageChange}
+        />
+      )}
+
+      {/* Optional: Add pagination controls here if you want them within TableCard */}
+      {/*
+      {pagination && onPageChange && pagination.totalPages > 1 && (
+        <div className="w-full mt-4 flex justify-center">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => onPageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span>
+              Page {pagination.currentPage} of {pagination.totalPages}
+            </span>
+            <button
+              onClick={() => onPageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage === pagination.totalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+      */}
     </div>
   );
 };
