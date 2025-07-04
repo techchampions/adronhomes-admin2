@@ -39,7 +39,7 @@ const navigate=useNavigate()
                   Customer's Name
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                  Date Joined
+                Start Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Next Payment
