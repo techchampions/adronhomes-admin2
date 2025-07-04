@@ -78,13 +78,13 @@ const DirectorProperttList: React.FC<PropertyTableProps> = ({
                 Property Type
               </th>
               <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                total units
+                Total units
               </th>
               <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                available units
+                Available units
               </th>
               <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                units sold
+                Units sold
               </th>
             </tr>
           </thead>
