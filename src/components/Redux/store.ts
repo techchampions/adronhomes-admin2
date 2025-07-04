@@ -28,6 +28,8 @@ import propertyPlanPaymentsReducer from './Marketer/PaymentList'
 import customerByIdReducer   from './customers/customerByid'
 import messageSliceReducer from './customers/send_message'
 import deleteUserSliceReducer from './customers/delete_customers'
+import careerDashboardReducer from './Marketer/careerDashboardSlice'
+import savedPropertyUserReducer from './SavedPropertyUser_slice'
 
 
 
@@ -60,7 +62,9 @@ export const store = configureStore({
    propertyPlanPayments:propertyPlanPaymentsReducer,
    customerById:customerByIdReducer,
    messagingcustomer: messageSliceReducer,
-   deleteUserSlice:deleteUserSliceReducer
+   deleteUserSlice:deleteUserSliceReducer,
+   careerDashboard:careerDashboardReducer,
+   savedPropertyUser:savedPropertyUserReducer
   },
 });
 

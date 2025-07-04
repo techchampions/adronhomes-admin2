@@ -219,6 +219,7 @@ export default function MarketerInvoice() {
       paidAmount: planProperties.paid_infrastructure_amount
     } : undefined
   }
+  number_of_unit={ planProperties.number_of_unit}
 />
 
       <PaymentListCard

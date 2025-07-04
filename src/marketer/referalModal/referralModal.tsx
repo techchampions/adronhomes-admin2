@@ -17,7 +17,7 @@ export default function ReferralModal({ onClose }: { onClose: () => void }) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const dispatch = useDispatch<AppDispatch>();
 
-  const { error, loading, total_expected, total_paid, monthly_stats } = useSelector(
+  const { error, loading, total_paid_per_month, total_paid, monthly_stats } = useSelector(
     (state: RootState) => state.marketerMonthlyStats
   );
 
@@ -70,7 +70,7 @@ export default function ReferralModal({ onClose }: { onClose: () => void }) {
             />
             <MatrixCard
               title="Total Amount for this month"
-              value={total_expected.toLocaleString()}
+              value={total_paid_per_month.toLocaleString()}
               change="Includes all customers on a property plan"
             />
           </div>

@@ -37,7 +37,7 @@ const DEFAULT_COLUMN_WIDTH = 180;
 const TableCard = <T extends Record<string, any>>({
   data,
   columns,
-  title = "Table",
+  title = "",
   viewAllText = "View All",
   rowKey = "id",
   className = "",

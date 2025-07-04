@@ -28,7 +28,7 @@ import Notifications from "./components/Notifications/Notifications";
 import Settings from "./components/Settings/Settings";
 import CustomerSinglePage from "./pages/Customers/CustomerSinglePage";
 import CustomersPayment from "./marketer/Payment/customers_payment";
-import CustomersSinglePayment from "./pages/Customers/customers_singlepayment";
+// import CustomersSinglePayment from "./pages/Customers/customers_singlepayment";
 import General from "./pages/Properties/General";
 import { getUser } from "./components/Redux/User/user_Thunk";
 import PaymentListComponent from "./pages/Customers/PaymentStatus";
@@ -45,8 +45,7 @@ import { QueryProvider } from "./utils/hooks/MyQueryProvider";
 import AccountDetails from "./components/Settings/AddAccountSettings/AccountDetails";
 import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import DirectorsDashboard from "./director/DirectorDashboard";
-import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
-import Customer from "./marketer/customer/customer";
+import MarketerCustomer from "./marketer/customer/customer";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -130,10 +129,6 @@ const App = () => {
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
                 />
-                <Route
-                  path="/requests-enquiries/:id"
-                  element={<PropertyEnquiries />}
-                />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/settings/sliders" element={<SliderSettings />} />
@@ -166,15 +161,15 @@ const App = () => {
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
                 />
-                <Route
+                {/* <Route
                   path="/customers/singlepage/singlepayment"
                   element={<CustomersSinglePayment />}
-                />
+                /> */}
                 <Route path="/properties/form" element={<General />} />
-                <Route
+                {/* <Route
                   path="/customers/singlepage/singlepayment"
                   element={<CustomersSinglePayment />}
-                />
+                /> */}
                 <Route
                   path="/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
@@ -183,11 +178,12 @@ const App = () => {
 
                 {/* Marketer Routes */}
                 <Route path="/marketer" element={<MarketersDashboard />} />
+                 <Route path="/marketer-customer" element={<MarketerCustomer/>} />
+               
                 <Route path="/director" element={<DirectorsDashboard />} />
                 <Route path="marketer-settings" element={<SettingsPage />} />
-                 <Route path="/marketer-customers" element={<Customer />} />
                 <Route
-                  path="/marketer-payment/:user_id/:plan_id"
+                  path="/marketer-payment/:plan_id/:user_id"
                   element={<MarketerInvoice />}
                 />
               </Route>

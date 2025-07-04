@@ -35,41 +35,68 @@ const navigate=useNavigate()
                   Customer's Name
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                  Date Joined
+                  Start Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Next Payment
                 </th>
+
+                <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
+                 Next Amount
+                </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                  Paid Amount
                 </th>
-                <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
+                {/* <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
                   Phone Number
-                </th>
+                </th> */}
               </tr>
             </thead>
-            <tbody>
-              {customerData.map((row: any) => (
-                <tr key={row.id} className="cursor-pointer" onClick={() => navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)}
->
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.name ?? 'N/A'}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {formatDate(row.dateJoined )}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {formatDate(row.nextPayment)}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
-                    {formatAsNaira(row.paid_amount )?? 'N/A'}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.phoneNumber ?? 'N/A'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+          <tbody>
+  {customerData.map((row: any) => (
+    <tr
+      key={row.id}
+      className="cursor-pointer"
+      onClick={() =>
+        navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)
+      }
+    >
+      <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {row.name ?? "N/A"}
+        </div>
+      </td>
+      <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {formatDate(row.StartDate )?? "N/A"}
+        </div>
+      </td>
+      <td className="pr-2 max-w-[130px]">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {formatDate(row.nextPayment) ?? "N/A"}
+        </div>
+      </td>
+      
+      <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {formatAsNaira(row.nextPaymentAmount)}
+        </div>
+      </td>
+     
+      <td className="pr-2 whitespace-nowrap">
+        <div className="pb-8 font-[325] text-dark text-sm">
+          {formatAsNaira(row.paid_amount) ?? "N/A"}
+        </div>
+      </td>
+      {/* <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {row.phoneNumber ?? "N/A"}
+        </div>
+      </td> */}
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
       </div>

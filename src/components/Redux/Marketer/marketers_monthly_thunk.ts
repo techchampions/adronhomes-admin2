@@ -18,7 +18,7 @@ export interface MonthlyStat {
 export interface MonthlyStatsResponse {
   success: boolean;
   message: string;
-  total_expected: number;
+  total_paid_per_month: number;
   total_paid: number;
   monthly_stats: MonthlyStat[];
 }

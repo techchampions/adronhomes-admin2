@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FiMapPin,
   FiExternalLink,
@@ -9,6 +9,14 @@ import {
   FiActivity,
   FiCopy,
 } from "react-icons/fi";
+import Pagination from "../../components/Tables/Pagination";
+import { useDispatch, useSelector } from "react-redux";
+import { selectSavedPropertyUsers, selectSavedPropertyUsersError, selectSavedPropertyUsersLoading, selectSavedPropertyUsersPagination, setSavedPropertyUsersCurrentPage } from "../../components/Redux/SavedPropertyUser_slice";
+import { fetchSavedPropertyUsers } from "../../components/Redux/SavedPropertyUser_thunk";
+import { AppDispatch } from "../../components/Redux/store";
+import LoadingAnimations from "../../components/LoadingAnimations";
+
+
 
 interface PropertyModalProps {
   isOpen: boolean;
@@ -41,10 +49,9 @@ interface PropertyModalProps {
     discount_units: any | null;
     discount_start_date: string | null;
     discount_end_date: string | null;
-number_of_unit:any
+    number_of_unit: any;
     unit_sold: number;
     unit_available: number;
-
     property_view: any;
     property_requests: any;
   };
@@ -56,8 +63,26 @@ export default function PropertyModal({
   property,
 }: PropertyModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const dispatch = useDispatch<AppDispatch>();
 
-  if (!isOpen) return null;
+  // Get saved property users data from Redux store
+  const savedUsers = useSelector(selectSavedPropertyUsers);
+  const loading = useSelector(selectSavedPropertyUsersLoading);
+  const pagination = useSelector(selectSavedPropertyUsersPagination);
+  const error = useSelector(selectSavedPropertyUsersError);
+
+  // Handle page change
+const handlePageChange = (page: number) => {
+  dispatch(setSavedPropertyUsersCurrentPage(page));
+  dispatch(fetchSavedPropertyUsers({ propertyId: property.id, page })); 
+};
+
+// Fetch saved users when modal opens and property changes
+useEffect(() => {
+  if (isOpen && property.id) {
+    dispatch(fetchSavedPropertyUsers({ propertyId: property.id, page: 1 })); 
+  }
+}, [isOpen, property.id, dispatch]);
 
   const propertyImages =
     property.photos.length > 0
@@ -74,30 +99,6 @@ export default function PropertyModal({
     );
   };
 
-  const clientViews = [
-    {
-      name: "Bolu Abingbile",
-      email: "simonbill@yahoo.com",
-      phone: "09097574438",
-      viewedDate: "March 18th, 20:00",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      name: "Bolu Abingbile",
-      email: "simonbill@yahoo.com",
-      phone: "09097574438",
-      viewedDate: "March 18th, 20:00",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      name: "Bolu Abingbile",
-      email: "simonbill@yahoo.com",
-      phone: "09097574438",
-      viewedDate: "March 18th, 20:00",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-  ];
-
   const getPropertyType = (type: number) => {
     switch (type) {
       case 1:
@@ -110,6 +111,26 @@ export default function PropertyModal({
         return "Other";
     }
   };
+
+  // Format saved users data for display
+  const formatSavedUsers = () => {
+    if (!savedUsers || savedUsers.length === 0) return [];
+    
+    return savedUsers.map((user) => ({
+      name: `${user.saved_user.first_name} ${user.saved_user.last_name || ''}`.trim(),
+      email: user.saved_user.email,
+      phone: user.saved_user.phone_number,
+      viewedDate: new Date(user.created_at).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      avatar: null
+    }));
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
@@ -138,7 +159,6 @@ export default function PropertyModal({
 
         <div className="p-6">
           {/* Header Stats */}
-
           <div className="flex justify-between items-center mb-8 text-sm text-gray-600">
             <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition w-full">
               <div className="flex flex-wrap justify-between items-center w-full">
@@ -359,63 +379,66 @@ export default function PropertyModal({
             </div>
           )}
 
-          {/* Client Views */}
+          {/* Saved By Users */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Client Views
+              Saved By Users
             </h3>
-            <div className="space-y-4">
-              {clientViews.map((client, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-sm font-semibold text-gray-700">
-                      {client.avatar ? (
-                        <img
-                          src={client.avatar}
-                          alt={client.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        client.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {client.name}
+            
+            {error ? (
+              <div className="text-center py-8 text-red-500">
+                Error loading saved users: {error}
+              </div>
+            ) : loading ? (
+              <div className="flex justify-center items-center p-8">
+               <LoadingAnimations loading={loading}/>
+              </div>
+            ) : savedUsers.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No users have saved this property yet.
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  {formatSavedUsers().map((client, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-sm font-semibold text-gray-700">
+                          {client.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {client.name}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Saved on {client.viewedDate}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        Viewed {client.viewedDate}
+                      <div className="text-right text-sm text-gray-600">
+                        <div>{client.email}</div>
+                        <div>{client.phone}</div>
                       </div>
                     </div>
-                  </div>
-                  <div className="text-right text-sm text-gray-600">
-                    <div>{client.email}</div>
-                    <div>{client.phone}</div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Pagination dots */}
-            <div className="flex justify-center space-x-2 mt-6">
-              <button className="w-2 h-2 bg-gray-300 rounded-full"></button>
-              <button className="w-2 h-2 bg-gray-800 rounded-full"></button>
-              <button className="w-2 h-2 bg-gray-300 rounded-full"></button>
-              <button className="w-2 h-2 bg-gray-300 rounded-full"></button>
-            </div>
-          </div>
-
-          {/* Latest button */}
-          <div className="flex justify-end">
-            <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition">
-              Latest
-            </button>
+                {/* Pagination */}
+                <div className="flex justify-center space-x-2 mt-6">
+                  <Pagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                    className="mt-8 mb-4"
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
