@@ -48,6 +48,7 @@ export default function MarketersDashboard() {
     return data.completed_property_plans.data.map((item) => ({
       name: item.user ? `${item.user.first_name} ${item.user.last_name}` : "N/A",
       StartDate: item.start_date,
+      EndDate: item.start_date,
       paymentCompletedAt: item.payment_completed_at, 
       totalAmount: item.total_amount,
       paid_amount: item.paid_amount,
