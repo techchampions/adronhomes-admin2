@@ -10,6 +10,7 @@ interface InvoiceProps {
   duration?: string;
   nextPaymentDate?: string;
   dueDate?: string;
+  number_of_unit:any
   property?: {
     name: string;
     address: string;
@@ -33,6 +34,7 @@ interface InvoiceProps {
 }
 
 export default function InvoiceCard({
+  number_of_unit='N/A',
   invoiceAmount = "₦56,000,000",
   paidAmount = "₦36,000,000",
   paymentSchedule = "Weekly",
@@ -49,7 +51,7 @@ export default function InvoiceCard({
     type: "Land",
   },
   infrastructure,
-  other
+  other,
 }: InvoiceProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = ["property", "infrastructure", "other"];
@@ -71,24 +73,26 @@ export default function InvoiceCard({
   // Generate default breakdown items based on the percentage and amount
   const generateBreakdown = (section: typeof infrastructure | typeof other) => {
     if (!section) return [];
-    
+
     return [
       {
         name: "Base Amount",
-        value: section.amount * (1 - (section.percentage / 100))
+        value: section.amount * (1 - section.percentage / 100),
       },
       {
         name: `Fees (${section.percentage}%)`,
-        value: section.amount * (section.percentage / 100)
-      }
+        value: section.amount * (section.percentage / 100),
+      },
     ];
   };
 
   // Render breakdown items
-  const renderBreakdownItems = (items: Array<{name: string, value: number}>) => {
+  const renderBreakdownItems = (
+    items: Array<{ name: string; value: number }>
+  ) => {
     return (
       <div className="mt-4 space-y-3 pb-9">
-        <h3 className="text-sm md:text-base font-[325] text-gray-300 mb-2" >
+        <h3 className="text-sm md:text-base font-[325] text-gray-300 mb-2">
           Breakdown:
         </h3>
         <ul className="space-y-2">
@@ -129,35 +133,44 @@ export default function InvoiceCard({
           </button>
 
           {/* Slides container with a consistent height */}
-          <div className="relative h-full" style={{ minHeight: '350px' }}> {/* Adjust this value as needed */}
+          <div className="relative h-full" style={{ minHeight: "350px" }}>
             {/* Invoice Details Slide */}
             <div
               className={`absolute inset-0 transition-opacity duration-300 ${
-                currentSlide === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
+                currentSlide === 0
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none"
               }`}
             >
-              <h2 className="text-[#FFFFFF] text-sm font-[325] mb-3 md:mb-[14px]">
+            <div className="flex flex-row w-full justify-between">
+                <h2 className="text-[#FFFFFF] text-sm font-[325] mb-3 md:mb-[14px]">
                 Invoice
               </h2>
+                 <h2 className="text-[#FFFFFF] text-sm font-[325] mb-3 md:mb-[14px]  bg-gray-800  whitespace-nowrap  rounded-2xl py-1 px-4">
+                <div>
+       {number_of_unit} {number_of_unit === 1 ? 'Unit' : 'Units'}
+    </div>
+              </h2>
+            </div>
 
-               <div className="mb-4 md:mb-6 flex items-end">
-        <h1
-          className="text-3xl md:text-3xl lg:text-5xl font-[350] text-white flex items-baseline relative group" // Added 'group' for tooltip
-          data-tooltip-content={`${invoiceAmount} / ${paidAmount}`} 
-        >
-          <span className="truncate max-w-[150px] sm:max-w-[200px] md:max-w-[250px]">
-            {invoiceAmount}
-          </span>
-          <span className="text-lg md:text-xl lg:text-xl text-white ml-1 truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px]">
-            /{paidAmount}
-          </span>
+              <div className="mb-4 md:mb-6 flex items-end">
+                <h1
+                  className="text-3xl md:text-3xl lg:text-5xl font-[350] text-white flex items-baseline relative group"
+                  data-tooltip-content={`${invoiceAmount} / ${paidAmount}`}
+                >
+                  <span className="truncate max-w-[150px] sm:max-w-[200px] md:max-w-[250px]">
+                    {invoiceAmount}
+                  </span>
+                  <span className="text-lg md:text-xl lg:text-xl text-white ml-1 truncate max-w-[100px] sm:max-w-[150px] md:max-w-[200px]">
+                    /{paidAmount}
+                  </span>
 
-          {/* Tooltip */}
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-gray-800 text-white text-sm  opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap rounded-4xl">
-            {invoiceAmount} / {paidAmount}
-          </div>
-        </h1>
-      </div>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-gray-800 text-white text-sm  opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap  rounded-4xl">
+                    {invoiceAmount} / {paidAmount}
+                  </div>
+                </h1>
+              </div>
 
               <div className="w-full bg-[#737373] rounded-full h-2 md:h-3 mb-4 md:mb-6">
                 <div
@@ -195,7 +208,7 @@ export default function InvoiceCard({
                   {/* Due Date */}
                   <div className="min-w-0">
                     <h3 className="text-base md:text-xl font-[325] mb-1 md:mb-2 break-words">
-                      {(dueDate)}
+                      {dueDate}
                     </h3>
                     <p className="font-[325] text-xs md:text-sm break-words">
                       Due Date
@@ -208,13 +221,15 @@ export default function InvoiceCard({
             {/* Infrastructure Details Slide */}
             <div
               className={`absolute inset-0 p-3 md:p-4 transition-opacity duration-300 ${
-                currentSlide === 1 ? "opacity-100" : "opacity-0 pointer-events-none"
+                currentSlide === 1
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none"
               }`}
             >
               <h2 className="text-lg md:text-2xl font-[350] mb-3 md:mb-4">
                 Infrastructure Details
               </h2>
-              
+
               {infrastructure && infrastructure.amount > 0 ? (
                 <div className="space-y-3 md:space-y-4">
                   <div>
@@ -233,17 +248,26 @@ export default function InvoiceCard({
                     <div className="w-full bg-gray-600 rounded-full h-2">
                       <div
                         className="bg-white h-2 rounded-full"
-                        style={{ 
-                          width: `${infrastructure.paidAmount > 0 ? 
-                            (infrastructure.paidAmount / infrastructure.amount) * 100 : 
-                            0}%` 
+                        style={{
+                          width: `${
+                            infrastructure.paidAmount > 0
+                              ? (infrastructure.paidAmount /
+                                  infrastructure.amount) *
+                                100
+                              : 0
+                          }%`,
                         }}
                       ></div>
                     </div>
                     <p className="text-base md:text-lg font-[350] mt-1">
-                      {infrastructure.paidAmount > 0 ? 
-                        Math.round((infrastructure.paidAmount / infrastructure.amount) * 100) : 
-                        0}% Paid
+                      {infrastructure.paidAmount > 0
+                        ? Math.round(
+                            (infrastructure.paidAmount /
+                              infrastructure.amount) *
+                              100
+                          )
+                        : 0}
+                      % Paid
                     </p>
                   </div>
 
@@ -276,13 +300,15 @@ export default function InvoiceCard({
             {/* Other Costs Slide */}
             <div
               className={`absolute inset-0 p-3 md:p-4 transition-opacity duration-300 ${
-                currentSlide === 2 ? "opacity-100" : "opacity-0 pointer-events-none"
+                currentSlide === 2
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none"
               }`}
             >
               <h2 className="text-lg md:text-2xl font-[350] mb-3 md:mb-4">
                 Other Costs
               </h2>
-              
+
               {other && other.amount > 0 ? (
                 <div className="space-y-3 md:space-y-4">
                   <div>
@@ -301,17 +327,20 @@ export default function InvoiceCard({
                     <div className="w-full bg-gray-600 rounded-full h-2">
                       <div
                         className="bg-white h-2 rounded-full"
-                        style={{ 
-                          width: `${other.paidAmount > 0 ? 
-                            (other.paidAmount / other.amount) * 100 : 
-                            0}%` 
+                        style={{
+                          width: `${
+                            other.paidAmount > 0
+                              ? (other.paidAmount / other.amount) * 100
+                              : 0
+                          }%`,
                         }}
                       ></div>
                     </div>
                     <p className="text-base md:text-lg font-[350] mt-1">
-                      {other.paidAmount > 0 ? 
-                        Math.round((other.paidAmount / other.amount) * 100) : 
-                        0}% Paid
+                      {other.paidAmount > 0
+                        ? Math.round((other.paidAmount / other.amount) * 100)
+                        : 0}
+                      % Paid
                     </p>
                   </div>
 
@@ -375,9 +404,9 @@ export default function InvoiceCard({
               </h2>
 
               <div className="items-center mb-3 md:mb-4 flex gap-2">
-                <img 
-                  src="/locate.svg" 
-                  className="h-4 w-4 md:h-5 md:w-5" 
+                <img
+                  src="/locate.svg"
+                  className="h-4 w-4 md:h-5 md:w-5"
                   alt="Location icon"
                 />
                 <span className="text-xs md:text-base font-[325] break-words">
@@ -387,9 +416,9 @@ export default function InvoiceCard({
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-3 md:mb-4">
                 <div className="flex items-center gap-1 md:gap-2">
-                  <img 
-                    src="/ruler.svg" 
-                    className="h-4 w-4 md:h-5 md:w-5" 
+                  <img
+                    src="/ruler.svg"
+                    className="h-4 w-4 md:h-5 md:w-5"
                     alt="Ruler icon"
                   />
                   <span className="text-xs md:text-base break-words font-[325]">
@@ -399,18 +428,18 @@ export default function InvoiceCard({
 
                 {property.features?.slice(0, 2).map((feature, index) => (
                   <div key={index} className="flex items-center gap-1 md:gap-2">
-                    {feature.toLowerCase().includes('light') ? (
-                      <img 
-                        src="/wand.svg" 
-                        className="h-4 w-4 md:h-5 md:w-5" 
+                    {feature.toLowerCase().includes("light") ? (
+                      <img
+                        src="/wand.svg"
+                        className="h-4 w-4 md:h-5 md:w-5"
                         alt="Feature icon"
                       />
-                    ) : feature.toLowerCase().includes('gym') ? (
+                    ) : feature.toLowerCase().includes("gym") ? (
                       <BiDumbbell className="h-4 w-4 md:h-5 md:w-5" />
                     ) : (
-                      <img 
-                        src="/dot.svg" 
-                        className="h-4 w-4 md:w-5 md:h-5" 
+                      <img
+                        src="/dot.svg"
+                        className="h-4 w-4 md:w-5 md:h-5"
                         alt="Feature icon"
                       />
                     )}
@@ -455,13 +484,6 @@ export default function InvoiceCard({
     </div>
   );
 }
-
-
-
-
-
-
-
 
 // import { useState } from "react";
 // import { BiDumbbell } from "react-icons/bi";
@@ -546,7 +568,7 @@ export default function InvoiceCard({
 //   // Generate default breakdown items based on the percentage and amount
 //   const generateBreakdown = (section: typeof infrastructure | typeof other) => {
 //     if (!section) return [];
-    
+
 //     return [
 //       {
 //         name: "Base Amount",
@@ -689,7 +711,7 @@ export default function InvoiceCard({
 //               <h2 className="text-lg md:text-2xl font-[350] mb-4 md:mb-6">
 //                 Infrastructure Details
 //               </h2>
-              
+
 //               {infrastructure && infrastructure.amount > 0 ? (
 //                 <div className="space-y-6">
 //                   <div>
@@ -708,16 +730,16 @@ export default function InvoiceCard({
 //                     <div className="w-full bg-gray-600 rounded-full h-2 md:h-3 mb-1">
 //                       <div
 //                         className="bg-white h-2 md:h-3 rounded-full"
-//                         style={{ 
-//                           width: `${infrastructure.paidAmount > 0 ? 
-//                             (infrastructure.paidAmount / infrastructure.amount) * 100 : 
-//                             0}%` 
+//                         style={{
+//                           width: `${infrastructure.paidAmount > 0 ?
+//                             (infrastructure.paidAmount / infrastructure.amount) * 100 :
+//                             0}%`
 //                         }}
 //                       ></div>
 //                     </div>
 //                     <p className="text-base md:text-lg font-[350]">
-//                       {infrastructure.paidAmount > 0 ? 
-//                         Math.round((infrastructure.paidAmount / infrastructure.amount) * 100) : 
+//                       {infrastructure.paidAmount > 0 ?
+//                         Math.round((infrastructure.paidAmount / infrastructure.amount) * 100) :
 //                         0}% Paid
 //                     </p>
 //                   </div>
@@ -761,7 +783,7 @@ export default function InvoiceCard({
 //               <h2 className="text-lg md:text-2xl font-[350] mb-4 md:mb-6">
 //                 Other Costs
 //               </h2>
-              
+
 //               {other && other.amount > 0 ? (
 //                 <div className="space-y-6">
 //                   <div>
@@ -780,16 +802,16 @@ export default function InvoiceCard({
 //                     <div className="w-full bg-gray-600 rounded-full h-2 md:h-3 mb-1">
 //                       <div
 //                         className="bg-white h-2 md:h-3 rounded-full"
-//                         style={{ 
-//                           width: `${other.paidAmount > 0 ? 
-//                             (other.paidAmount / other.amount) * 100 : 
-//                             0}%` 
+//                         style={{
+//                           width: `${other.paidAmount > 0 ?
+//                             (other.paidAmount / other.amount) * 100 :
+//                             0}%`
 //                         }}
 //                       ></div>
 //                     </div>
 //                     <p className="text-base md:text-lg font-[350]">
-//                       {other.paidAmount > 0 ? 
-//                         Math.round((other.paidAmount / other.amount) * 100) : 
+//                       {other.paidAmount > 0 ?
+//                         Math.round((other.paidAmount / other.amount) * 100) :
 //                         0}% Paid
 //                     </p>
 //                   </div>
@@ -858,9 +880,9 @@ export default function InvoiceCard({
 //               </h2>
 
 //               <div className="items-center mb-3 md:mb-4 flex gap-2">
-//                 <img 
-//                   src="/locate.svg" 
-//                   className="h-4 w-4 md:h-5 md:w-5" 
+//                 <img
+//                   src="/locate.svg"
+//                   className="h-4 w-4 md:h-5 md:w-5"
 //                   alt="Location icon"
 //                 />
 //                 <span className="text-xs md:text-base font-[325] break-words">
@@ -870,9 +892,9 @@ export default function InvoiceCard({
 
 //               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
 //                 <div className="flex items-center gap-1 md:gap-2">
-//                   <img 
-//                     src="/ruler.svg" 
-//                     className="h-4 w-4 md:h-5 md:w-5" 
+//                   <img
+//                     src="/ruler.svg"
+//                     className="h-4 w-4 md:h-5 md:w-5"
 //                     alt="Ruler icon"
 //                   />
 //                   <span className="text-xs md:text-base break-words font-[325]">
@@ -883,17 +905,17 @@ export default function InvoiceCard({
 //                 {property.features?.slice(0, 2).map((feature, index) => (
 //                   <div key={index} className="flex items-center gap-1 md:gap-2">
 //                     {feature.toLowerCase().includes('light') ? (
-//                       <img 
-//                         src="/wand.svg" 
-//                         className="h-4 w-4 md:h-5 md:w-5" 
+//                       <img
+//                         src="/wand.svg"
+//                         className="h-4 w-4 md:h-5 md:w-5"
 //                         alt="Feature icon"
 //                       />
 //                     ) : feature.toLowerCase().includes('gym') ? (
 //                       <BiDumbbell className="h-4 w-4 md:h-5 md:w-5" />
 //                     ) : (
-//                       <img 
-//                         src="/dot.svg" 
-//                         className="h-4 w-4 md:w-5 md:h-5" 
+//                       <img
+//                         src="/dot.svg"
+//                         className="h-4 w-4 md:w-5 md:h-5"
 //                         alt="Feature icon"
 //                       />
 //                     )}
@@ -922,13 +944,13 @@ export default function InvoiceCard({
 //                 <h2 className="text-lg md:text-2xl font-[350] mb-4 md:mb-6">
 //                   {currentSlide === 1 ? "Infrastructure" : "Other Costs"} Details
 //                 </h2>
-                
+
 //                 <div className="mb-6">
 //                   <h3 className="text-xs md:text-sm font-[325] text-gray-300 mb-2">
 //                     Description
 //                   </h3>
 //                   <p className="text-sm md:text-base font-[325]">
-//                     {currentSlide === 1 
+//                     {currentSlide === 1
 //                       ? "These are the infrastructure development costs associated with the property."
 //                       : "These are additional costs including taxes, legal fees, and other expenses."}
 //                   </p>
@@ -939,7 +961,7 @@ export default function InvoiceCard({
 //                     Payment Terms
 //                   </h3>
 //                   <p className="text-sm md:text-base font-[325]">
-//                     {currentSlide === 1 
+//                     {currentSlide === 1
 //                       ? "Infrastructure costs are typically paid in installments along with property payments."
 //                       : "Other costs may be paid upfront or included in the payment schedule."}
 //                   </p>

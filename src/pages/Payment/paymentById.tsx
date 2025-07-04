@@ -47,7 +47,7 @@ export default function PaymentById() {
 
   // Format date for display
   const formatDate = (dateString: string | undefined | null) => {
-    if (!dateString || dateString === "N/A") return "N/A";
+    if (!dateString || dateString === "Payment completed") return "Payment completed";
     try {
       const date = new Date(dateString);
       // Check for 'Invalid Date'
@@ -176,10 +176,10 @@ export default function PaymentById() {
             </p>
             <InvoiceCard
               invoiceAmount={formatCurrency(payment.plan.paid_amount)}
-              paidAmount={formatCurrency( payment.property.total_amount)}
+              paidAmount={formatCurrency(payment.plan.total_amount)}
               paymentSchedule={payment.plan.repayment_schedule}
               progressPercentage={calculateProgressPercentage()}
-              duration={`${payment.plan.monthly_duration} Months`}
+              duration={`${payment.plan.monthly_duration ?? 'One Time Payment'}`}
               nextPaymentDate={formatDate(payment.plan.next_payment_date)}
               dueDate={formatDate(payment.plan.next_payment_date)}
               property={{
@@ -188,30 +188,24 @@ export default function PaymentById() {
                 image: payment.property.display_image || "/land.svg",
                 size: payment.property.size,
                 features: payment.property.features,
-                type: getPropertyType(payment.property.type), 
+                type: getPropertyType(payment.property.type),
               }}
-              infrastructure={
-                payment.plan.infrastructure_amount > 0
-                  ? {
-                      percentage: payment.plan.infrastructure_percentage,
-                      amount: payment.plan.infrastructure_amount,
-                      remainingBalance:
-                        payment.plan.remaining_infrastructure_balance,
-                      paidAmount: payment.plan.paid_infrastructure_amount,
-                    }
-                  : undefined
-              }
-              other={
-                payment.plan.other_amount > 0
-                  ? {
-                      percentage: payment.plan.other_percentage,
-                      amount: payment.plan.other_amount,
-                      remainingBalance: payment.plan.remaining_other_balance,
-                      paidAmount: payment.plan.paid_other_amount,
-                    }
-                  : undefined
-              }
-            />
+              infrastructure={payment.plan.infrastructure_amount > 0
+                ? {
+                  percentage: payment.plan.infrastructure_percentage,
+                  amount: payment.plan.infrastructure_amount,
+                  remainingBalance: payment.plan.remaining_infrastructure_balance,
+                  paidAmount: payment.plan.paid_infrastructure_amount,
+                }
+                : undefined}
+              other={payment.plan.other_amount > 0
+                ? {
+                  percentage: payment.plan.other_percentage,
+                  amount: payment.plan.other_amount,
+                  remainingBalance: payment.plan.remaining_other_balance,
+                  paidAmount: payment.plan.paid_other_amount,
+                }
+                : undefined} number_of_unit={payment.plan.number_of_unit}            />
           </div>
         )}
 

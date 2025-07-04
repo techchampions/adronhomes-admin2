@@ -7,24 +7,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../components/Redux/store";
 import {
   selectActivePlansPagination,
-
-  selectUpcomingPaymentsPagination,
+  selectCompletedPlansPagination,
   setActivePlansCurrentPage,
-  setUpcomingPaymentsCurrentPage,
-
+  setCompletedPlansCurrentPage,
 } from "../../components/Redux/Marketer/Dashboard_slice";
 import { formatDate } from "../../utils/formatdate";
 import { formatAsNaira } from "../../utils/formatcurrency";
 import { useNavigate } from "react-router-dom";
 
-const Upcomingdata  = ({ customerData }: { customerData?: any }) => {
+const CompletedPlans = ({ customerData }: { customerData?: any }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const pagination = useSelector(selectUpcomingPaymentsPagination);
+  const pagination = useSelector(selectCompletedPlansPagination);
 
   // Use the sample data from image if no customerData is provided
 const navigate=useNavigate()
   const handlePageChange = (page: number) => {
-    dispatch(setUpcomingPaymentsCurrentPage(page));
+    dispatch(setCompletedPlansCurrentPage(page));
     dispatch(fetchMarketerDashboard({ currentpage: page }));
   };
 
@@ -39,41 +37,58 @@ const navigate=useNavigate()
                   Customer's Name
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                  Date Joined
+                  Start Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                  Next Payment
+               End Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                Upcoming Payment
+                 Paid Amount
                 </th>
                 {/* <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
                   Phone Number
                 </th> */}
               </tr>
             </thead>
-            <tbody>
-              {customerData.map((row: any) => (
-                <tr key={row.id} className="cursor-pointer" onClick={() => navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)}
->
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.name ?? 'N/A'}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {formatDate(row.StartDate )}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {formatDate(row.nextPayment)}
-                  </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
-                    {formatAsNaira(row.paid_amount )?? 'N/A'}
-                  </td>
-                  {/* <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {row.phoneNumber ?? 'N/A'}
-                  </td> */}
-                </tr>
-              ))}
-            </tbody>
+          <tbody>
+  {customerData.map((row: any) => (
+    <tr
+      key={row.id}
+      className="cursor-pointer"
+      onClick={() =>
+        navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)
+      }
+    >
+     
+      <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {row.name ?? "N/A"}
+        </div>
+      </td>
+      <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {formatDate(row.StartDate)}
+        </div>
+      </td>
+      <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {formatDate(row.EndDate)}
+        </div>
+      </td>
+      <td className="pr-2 whitespace-nowrap">
+        <div className="pb-8 font-[325] text-dark text-sm">
+          {formatAsNaira(row.paid_amount) ?? "N/A"}
+        </div>
+      </td>
+      {/* <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {row.phoneNumber ?? "N/A"}
+        </div>
+      </td> */}
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
       </div>
@@ -86,4 +101,4 @@ const navigate=useNavigate()
   );
 };
 
-export default Upcomingdata ;
+export default CompletedPlans;

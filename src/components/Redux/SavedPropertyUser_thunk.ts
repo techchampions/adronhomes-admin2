@@ -1,24 +1,15 @@
-// customers_thunk.ts
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
-import { RootState } from "../store";
+import { RootState } from "./store";
+
 
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
 }
 
-// New interface for Marketer
-export interface Marketer {
-  id: number;
-  first_name: string;
-  last_name: string;
-  laravel_through_key: number;
-}
-
-export interface Customer {
+export interface SavedUser {
   id: number;
   email: string;
   phone_number: string;
@@ -37,27 +28,35 @@ export interface Customer {
   notification_enabled: number;
   device_id: string;
   address: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+  created_at: string;
+  updated_at: string;
   personnel: string;
-  property_plan_total: number;
-  saved_property_total: number;
-  // Updated marketer type
-  marketer: Marketer;
+  contract_id: string;
 }
 
-export interface CustomersList {
+export interface SavedPropertyUser {
+  id: number;
+  property_id: number;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
+  saved_user: SavedUser;
+}
+
+export interface PaginationLinks {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface PaginatedSavedPropertyUsers {
   current_page: number;
-  data: Customer[];
+  data: SavedPropertyUser[];
   first_page_url: string;
   from: number;
   last_page: number;
   last_page_url: string;
-  links: Array<{
-    url: string | null;
-    label: string;
-    active: boolean;
-  }>;
+  links: PaginationLinks[];
   next_page_url: string | null;
   path: string;
   per_page: number;
@@ -66,33 +65,26 @@ export interface CustomersList {
   total: number;
 }
 
-export interface CustomersData {
-  total: number;
-  active_plan: number;
-  active_customer: number;
-  list: CustomersList;
-}
-
-export interface CustomersResponse {
-  success: boolean;
-  data: {
-    customers: CustomersData;
-  };
+export interface SavedPropertyUserResponse {
+  status: string;
+  message: string;
+  saved_property_user: PaginatedSavedPropertyUsers;
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const customer = createAsyncThunk<
-  CustomersResponse,
-  void,
-  { rejectValue: ErrorResponse; state: RootState }
+export const fetchSavedPropertyUsers = createAsyncThunk<
+  SavedPropertyUserResponse,
+  { propertyId: number; page?: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
 >(
-  "customers/fetch",
-  async (_, { rejectWithValue, getState }) => {
-    const token = Cookies.get('token');
-    const state = getState() as RootState;
-    const currentPage = state.customers.pagination.currentPage;
-    
+  "savedPropertyUsers/fetchSavedPropertyUsers",
+  async ({ propertyId, page = 1 }, { rejectWithValue }) => {
+    const token = Cookies.get("token");
+
     if (!token) {
       return rejectWithValue({
         message: "No authentication token found. Please login again.",
@@ -100,38 +92,37 @@ export const customer = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<CustomersResponse>(
-        `${BASE_URL}/api/admin/customers`,
+      const response = await axios.get<SavedPropertyUserResponse>(
+        `${BASE_URL}/api/admin/property-saved-user/${propertyId}`,
         {
-          headers: {
+           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
             identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
             device_id: "1010l0010l1",
           },
           params: {
-            page: currentPage 
-          }
+            page,
+          },
         }
       );
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
+      console.error('API Error:', axiosError.response?.data); // Log detailed error
 
       if (axiosError.response?.status === 401) {
-        Cookies.remove('token');
+        Cookies.remove("token");
       }
 
       if (axiosError.response) {
         return rejectWithValue({
-          message: axiosError.response.data.message || "Failed to fetch dashboard data",
+          message:
+            axiosError.response.data.message || "Failed to fetch saved property users",
           errors: axiosError.response.data.errors,
         });
-      } else if (axiosError.request) {
-        return rejectWithValue({
-          message: "No response from server. Please check your network connection.",
-        });
       }
+      
       return rejectWithValue({
         message: "An unexpected error occurred. Please try again.",
       });

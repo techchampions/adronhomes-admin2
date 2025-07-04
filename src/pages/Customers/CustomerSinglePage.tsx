@@ -159,6 +159,11 @@ export default function CustomerSinglePage() {
   const completedProperties =
     data?.limit_completed_property.map((item) => {
       const property = item.property;
+         const getDurationLabel = (type: any) => {
+        if (type === "2") return "Installment Payment";
+        if (type === "1") return "One-Time Payment";
+        return "N/A";
+      };
       return {
         id: item.id,
         name: property.name,
@@ -166,9 +171,7 @@ export default function CustomerSinglePage() {
         image: property.display_image || "/default-property.jpg",
         price: formatAsNaira(property.price),
         amountPaid: formatAsNaira(item.paid_amount),
-        Duration: item.monthly_duration
-          ? `${item.monthly_duration} Months`
-          : "N/A",
+          Duration: getDurationLabel(item.payment_type),
         StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
         FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
         property: item.property,
@@ -178,6 +181,13 @@ export default function CustomerSinglePage() {
   const completedPropertiesAll =
     completedPropertiesData.map((item) => {
       const property = item.property;
+
+      const getDurationLabel = (type: any) => {
+        if (type === "2") return "Installment Payment";
+        if (type === "1") return "One-Time Payment";
+        return "N/A";
+      };
+
       return {
         id: item.id,
         name: property.name,
@@ -185,9 +195,7 @@ export default function CustomerSinglePage() {
         image: property.display_image || "/default-property.jpg",
         price: formatAsNaira(property.price),
         amountPaid: formatAsNaira(item.paid_amount),
-        Duration: item.monthly_duration
-          ? `${item.monthly_duration} Months`
-          : "N/A",
+        Duration: getDurationLabel(item.payment_type),
         StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
         FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
         property: item.property,

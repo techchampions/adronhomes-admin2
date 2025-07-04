@@ -23,7 +23,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(personnels("4"));
+    dispatch(personnels());
   }, [dispatch]);
 
   const { loading: userLoading, error: userError, data } = useSelector(

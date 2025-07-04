@@ -20,7 +20,7 @@ const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsPro
   const dispatch = useDispatch<AppDispatch>();
   
   useEffect(() => {
-    dispatch(personnels("4"));
+    dispatch(personnels());
   }, [dispatch]);
 
   const {

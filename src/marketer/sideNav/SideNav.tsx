@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/marketer" },
-  { label: 'Customers', icon: Icon2, path: '/marketer-customers' },
+  { label: 'Customers', icon: Icon2, path: '/marketer-customer' },
   // { label: 'Notifications', icon: Icon8, path: '/notifications' },
   { label: "Settings", icon: Icon9, path: "/marketer-settings" },
 ];
@@ -39,7 +39,7 @@ export default function SideBar() {
 
   // Desktop Sidebar Component
   const DesktopSidebar = () => (
-    <div className="hidden lg:block pl-4 md:pl-[40px] pt-12 md:pt-[52px] pr-[20px] bg-white max-h-screen w-[280px]">
+    <div className="hidden lg:block pl-4 md:pl-[20px] pt-12 md:pt-[52px] pr-[20px] bg-white max-h-screen w-[200px]">
       <img
         src="/andron.svg"
         alt="andron"
