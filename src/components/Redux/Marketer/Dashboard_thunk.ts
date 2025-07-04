@@ -81,6 +81,7 @@ export interface PropertyPlan {
   paid_infrastructure_amount: number;
   paid_other_amount: number;
   user?: User;
+    next_repayment_data:NextRepaymentData
   contract_id: string | null;
   number_of_unit: number;
   next_repayment_amount?: NextRepaymentAmount;
@@ -116,6 +117,17 @@ export interface ActivePropertyPlansData {
   prev_page_url: string | null;
   to: number;
   total: number;
+
+}
+interface NextRepaymentData {
+  id: number;
+  property_id: number;
+  plan_id: number;
+  status: number;
+  amount: number;
+  due_date: string;    
+  created_at: string;    
+  updated_at: string;    
 }
 
 export interface UpcomingPayment {
@@ -139,6 +151,7 @@ export interface UpcomingPayment {
     status: number;
     monthly_duration: string;
     user: User;
+    
   };
 }
 
@@ -156,6 +169,7 @@ export interface UpcomingPaymentsData {
   prev_page_url: string | null;
   to: number;
   total: number;
+
 }
 
 export interface MarketerDashboardResponse {
