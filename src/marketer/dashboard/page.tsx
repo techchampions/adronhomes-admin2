@@ -118,7 +118,7 @@ export default function MarketersDashboard() {
           />
         </div>
 
-        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] max-w-7xl pr-[15px] mt-[26px]">
+        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[26px]">
           <ReusableTable
             tabs={tabs}
             searchPlaceholder="Search Customer"
