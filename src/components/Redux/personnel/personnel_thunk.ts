@@ -86,7 +86,7 @@ export const personnels = createAsyncThunk<
 
     try {
       const response = await axios.get<PersonnelsResponse>(
-        `${BASE_URL}/api/admin/personnels`,
+        `${BASE_URL}/api/admin/personnels?role=4`,
         {
           headers: {
             "Content-Type": "application/json",
