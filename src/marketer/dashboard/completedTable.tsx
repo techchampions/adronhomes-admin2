@@ -7,20 +7,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../components/Redux/store";
 import {
   selectActivePlansPagination,
+  selectCompletedPlansPagination,
   setActivePlansCurrentPage,
+  setCompletedPlansCurrentPage,
 } from "../../components/Redux/Marketer/Dashboard_slice";
 import { formatDate } from "../../utils/formatdate";
 import { formatAsNaira } from "../../utils/formatcurrency";
 import { useNavigate } from "react-router-dom";
 
-const CustomersTableAllActive = ({ customerData }: { customerData?: any }) => {
+const CompletedPlans = ({ customerData }: { customerData?: any }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const pagination = useSelector(selectActivePlansPagination);
+  const pagination = useSelector(selectCompletedPlansPagination);
 
   // Use the sample data from image if no customerData is provided
 const navigate=useNavigate()
   const handlePageChange = (page: number) => {
-    dispatch(setActivePlansCurrentPage(page));
+    dispatch(setCompletedPlansCurrentPage(page));
     dispatch(fetchMarketerDashboard({ currentpage: page }));
   };
 
@@ -38,11 +40,7 @@ const navigate=useNavigate()
                   Start Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                  Next Payment
-                </th>
-
-                <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                 Next Amount
+               End Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                  Paid Amount
@@ -61,6 +59,7 @@ const navigate=useNavigate()
         navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)
       }
     >
+     
       <td className="pr-2 max-w-xs">
         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
           {row.name ?? "N/A"}
@@ -68,21 +67,14 @@ const navigate=useNavigate()
       </td>
       <td className="pr-2 max-w-xs">
         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
-          {formatDate(row.StartDate )?? "N/A"}
+          {formatDate(row.StartDate)}
         </div>
       </td>
-      <td className="pr-2 max-w-[130px]">
-        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
-          {formatDate(row.nextPayment) ?? "N/A"}
-        </div>
-      </td>
-      
       <td className="pr-2 max-w-xs">
         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
-          {formatAsNaira(row.nextPaymentAmount)}
+          {formatDate(row.EndDate)}
         </div>
       </td>
-     
       <td className="pr-2 whitespace-nowrap">
         <div className="pb-8 font-[325] text-dark text-sm">
           {formatAsNaira(row.paid_amount) ?? "N/A"}
@@ -109,4 +101,4 @@ const navigate=useNavigate()
   );
 };
 
-export default CustomersTableAllActive;
+export default CompletedPlans;

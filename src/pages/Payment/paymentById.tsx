@@ -14,16 +14,13 @@ import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import InvoiceCard from "../../general/invioceCardTwo";
 
-
-
 export default function PaymentById() {
   const [isPaymentListOpen, setIsPaymentListOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { payment, loading, error} = useSelector(
+  const { payment, loading, error } = useSelector(
     (state: RootState) => state.paymentsById
   );
-  // It seems like `user` data is fetched, but not directly used in the current render.
-  // Keeping it here in case it's needed elsewhere or for future features.
+
   const {
     loading: userLoading,
     success: userSuccess,
@@ -37,7 +34,7 @@ export default function PaymentById() {
       const id = Number(paymentId);
       if (!isNaN(id)) {
         dispatch(fetchPaymentById(id));
-        dispatch(getUser()); // Assuming getUser fetches the currently logged-in user or a specific user related to the payment.
+        dispatch(getUser());
       } else {
         console.error("Invalid paymentId in URL:", paymentId);
       }
@@ -50,7 +47,7 @@ export default function PaymentById() {
 
   // Format date for display
   const formatDate = (dateString: string | undefined | null) => {
-    if (!dateString || dateString === 'N/A') return "N/A"; // Handle null, undefined, or 'N/A'
+    if (!dateString || dateString === "Payment completed") return "Payment completed";
     try {
       const date = new Date(dateString);
       // Check for 'Invalid Date'
@@ -89,7 +86,10 @@ export default function PaymentById() {
           subtitle="Manage the list of payments made by customers"
           history={true}
         />
-     <div className="flex items-center justify-center h-screen text-center "><LoadingAnimations loading={loading}/></div>;
+        <div className="flex items-center justify-center h-screen text-center ">
+          <LoadingAnimations loading={loading} />
+        </div>
+        ;
       </div>
     );
   }
@@ -175,11 +175,11 @@ export default function PaymentById() {
               Payment Plan
             </p>
             <InvoiceCard
-              invoiceAmount={formatCurrency(payment.property.total_amount)}
-              paidAmount={formatCurrency(payment.plan.paid_amount)}
+              invoiceAmount={formatCurrency(payment.plan.paid_amount)}
+              paidAmount={formatCurrency(payment.plan.total_amount)}
               paymentSchedule={payment.plan.repayment_schedule}
               progressPercentage={calculateProgressPercentage()}
-              duration={`${payment.plan.monthly_duration} Months`}
+              duration={`${payment.plan.monthly_duration ?? 'One Time Payment'}`}
               nextPaymentDate={formatDate(payment.plan.next_payment_date)}
               dueDate={formatDate(payment.plan.next_payment_date)}
               property={{
@@ -187,38 +187,35 @@ export default function PaymentById() {
                 address: payment.property.street_address,
                 image: payment.property.display_image || "/land.svg",
                 size: payment.property.size,
-       features: payment.property.features,
-          type: getPropertyType(payment.property.type), // Convert type number to string
-        }}
-        infrastructure={
-          // Corrected: Check `infrastructure_amount` for the condition
-          payment.plan.infrastructure_amount > 0 ?
-          {
-            // Corrected: Assign `infrastructure_percentage`
-            percentage: payment.plan.infrastructure_percentage,
-            amount: payment.plan.infrastructure_amount,
-            remainingBalance: payment.plan.remaining_infrastructure_balance,
-            paidAmount: payment.plan.paid_infrastructure_amount,
-          } : undefined
-        }
-        other={
-          payment.plan.other_amount > 0 ?
-          {
-            percentage: payment.plan.other_percentage,
-            amount: payment.plan.other_amount,
-            remainingBalance: payment.plan.remaining_other_balance,
-            paidAmount: payment.plan.paid_other_amount,
-          } : undefined
-        }
-      />
-    </div>
-  )}
+                features: payment.property.features,
+                type: getPropertyType(payment.property.type),
+              }}
+              infrastructure={payment.plan.infrastructure_amount > 0
+                ? {
+                  percentage: payment.plan.infrastructure_percentage,
+                  amount: payment.plan.infrastructure_amount,
+                  remainingBalance: payment.plan.remaining_infrastructure_balance,
+                  paidAmount: payment.plan.paid_infrastructure_amount,
+                }
+                : undefined}
+              other={payment.plan.other_amount > 0
+                ? {
+                  percentage: payment.plan.other_percentage,
+                  amount: payment.plan.other_amount,
+                  remainingBalance: payment.plan.remaining_other_balance,
+                  paidAmount: payment.plan.paid_other_amount,
+                }
+                : undefined} number_of_unit={payment.plan.number_of_unit}            />
+          </div>
+        )}
 
         <div>
           <p className="text-[20px] font-[325] text-dark mb-[20px]">Customer</p>
           <ProfileCard
             imageUrl={payment?.user?.profile_picture ?? "/profile.svg"}
-            name={`${capitalize(payment?.user?.first_name) || "N/A"} ${capitalize(payment?.user?.last_name) || "N/A"}`}
+            name={`${capitalize(payment?.user?.first_name) || "N/A"} ${
+              capitalize(payment?.user?.last_name) || "N/A"
+            }`}
             dateJoined={formatDate(payment?.user?.email_verified_at)}
             customerId={`/customers/${payment.user.id}`}
           />

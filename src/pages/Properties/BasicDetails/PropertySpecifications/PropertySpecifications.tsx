@@ -27,7 +27,7 @@ interface PropertySpecificationsFormValues {
   unitsAvailable: string;
   description: string;
   overview: string;
-  documents: File[];
+   documents: string;
   director_id: string; // Add this field
 }
 interface DropdownOption {
@@ -67,25 +67,28 @@ const labels: DropdownOption[] = Array.isArray(data)
     });
 
 
-  const formik = useFormik<PropertySpecificationsFormValues>({
-    initialValues: {
-      bedrooms: formData.specifications?.bedrooms || "",
-      bathrooms: formData.specifications?.bathrooms || "",
-      propertySize: formData.specifications?.propertySize || "",
-      landSize: formData.specifications?.landSize || "",
-      parkingSpaces: formData.specifications?.parkingSpaces || "",
-      yearBuilt: formData.specifications?.yearBuilt || "",
-      unitsAvailable: formData.specifications?.unitsAvailable || "",
-      description: formData.specifications?.description || "",
-      overview: formData.specifications?.overview || "",
-      documents: formData.specifications?.documents || [],
-      director_id: formData.specifications?.director_id || "",
-    },
-    validationSchema,
-    onSubmit: (values) => {
-      setSpecifications(values);
-    },
-  });
+ const formik = useFormik<PropertySpecificationsFormValues>({
+  initialValues: {
+    bedrooms: formData.specifications?.bedrooms || "",
+    bathrooms: formData.specifications?.bathrooms || "",
+    propertySize: formData.specifications?.propertySize || "",
+    landSize: formData.specifications?.landSize || "",
+    parkingSpaces: formData.specifications?.parkingSpaces || "",
+    yearBuilt: formData.specifications?.yearBuilt || "",
+    unitsAvailable: formData.specifications?.unitsAvailable || "",
+    description: formData.specifications?.description || "",
+    overview: formData.specifications?.overview || "",
+    documents: Array.isArray(formData.specifications?.documents)
+      ? formData.specifications?.documents.map((file) => file.name).join(", ")
+      : (formData.specifications?.documents as string) || "",
+    director_id: formData.specifications?.director_id || "",
+  },
+  validationSchema,
+  onSubmit: (values) => {
+    setSpecifications(values);
+  },
+});
+
 
 
   const validateAndSubmit = useCallback(async () => {
@@ -290,12 +293,16 @@ const labels: DropdownOption[] = Array.isArray(data)
           }
         />
 
-        <FileUploadField
-          label="Upload Document"
-          placeholder=" Upload Property Agreement"
-          onChange={(files) => formik.setFieldValue("documents", files)}
-          accept=".pdf,.doc,.docx"
-        />
+  <InputAreaField
+  label="Property Agreement"
+  placeholder="Enter details of the Property Agreement"
+  name="documents"
+  value={formik.values.documents}
+  onChange={(e) => formik.setFieldValue("documents", e.target.value)}
+  rows={6}
+/>
+
+
       </form>
     );
   }

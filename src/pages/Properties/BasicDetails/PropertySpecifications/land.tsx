@@ -30,8 +30,8 @@ interface LandFormValues {
   unitsAvailable: string;
   description: string;
   overview: string;
-  documents: File[];
-  director_id: string; // Add this field
+documents: string; 
+  director_id: string; 
 }
 interface DropdownOption {
   label: string;
@@ -256,12 +256,15 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
         }
       />
 
-      <FileUploadField
-        label="Upload Property Agreement"
-        placeholder="Click to Upload Property Agreement"
-        onChange={(files) => formik.setFieldValue("documents", files)}
-        accept=".pdf,.doc,.docx"
-      />
+     <InputAreaField
+  label="Property Agreement"
+  placeholder="Enter Property Agreement details"
+  name="documents"
+  value={formik.values.documents as unknown as string}
+  onChange={(e) => formik.setFieldValue("documents", e.target.value)}
+  rows={6}
+/>
+
     </form>
   );
 });

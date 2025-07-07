@@ -5,18 +5,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../components/Redux/store";
 
 import { fetchMarketerDashboard } from "../../components/Redux/Marketer/Dashboard_thunk";
-import { selectReferredUsersPagination, setReferredUsersCurrentPage } from "../../components/Redux/Marketer/Dashboard_slice";
+
 import Pagination from "../../components/Tables/Pagination";
 import { formatDate } from "../../utils/formatdate";
+import { selectCompletedPlansPagination, setCompletedPlansCurrentPage } from "../../components/Redux/Marketer/Dashboard_slice";
 
 const CustomersTableAll = ({currentItems}:{currentItems:any}) => {
 
   const dispatch = useDispatch<AppDispatch>();
-  const pagination = useSelector(selectReferredUsersPagination);
+  const pagination = useSelector(selectCompletedPlansPagination);
   // const activePlans = useSelector(selectActivePlans);
 
   const handlePageChange = (page: number) => {
-    dispatch(setReferredUsersCurrentPage(page));
+    dispatch(setCompletedPlansCurrentPage(page));
     dispatch(fetchMarketerDashboard({ currentpage: page }));
   };
 
@@ -41,9 +42,9 @@ const CustomersTableAll = ({currentItems}:{currentItems:any}) => {
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Saved Properties
                 </th>
-                <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
+                {/* <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
                   Phone Number
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -62,9 +63,9 @@ const CustomersTableAll = ({currentItems}:{currentItems:any}) => {
                   <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
                     {row.savedProperties ?? 'N/A'}
                   </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                  {/* <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.phoneNumber ?? 'N/A'}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

@@ -1,12 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchMarketerDashboard, MarketerDashboardResponse, ReferredUser, UpcomingPaymentCustomer } from "./Dashboard_thunk";
+import {
+  fetchMarketerDashboard,
+  MarketerDashboardResponse,
+  PropertyPlan,
+  UpcomingPayment,
+} from "./Dashboard_thunk";
 import { RootState } from "../store";
 
 interface DashboardState {
   data: MarketerDashboardResponse["data"] | null;
   loading: boolean;
   error: string | null;
-  referredUsersPagination: {
+
+  completedPlansPagination: {
     currentPage: number;
     perPage: number;
     totalItems: number;
@@ -30,7 +36,7 @@ const initialState: DashboardState = {
   data: null,
   loading: false,
   error: null,
-  referredUsersPagination: {
+  completedPlansPagination: {
     currentPage: 1,
     perPage: 10,
     totalItems: 0,
@@ -51,19 +57,21 @@ const initialState: DashboardState = {
 };
 
 const marketerdashboardSlice = createSlice({
-  name: "marketerDashboard",
+  name: "marketerdashboard",
   initialState,
   reducers: {
     clearDashboardData: (state) => {
       state.data = null;
       state.error = null;
       state.loading = false;
-      state.referredUsersPagination = initialState.referredUsersPagination;
+      state.completedPlansPagination = initialState.completedPlansPagination;
       state.activePlansPagination = initialState.activePlansPagination;
-      state.upcomingPaymentsPagination = initialState.upcomingPaymentsPagination;
+      state.upcomingPaymentsPagination =
+        initialState.upcomingPaymentsPagination;
     },
-    setReferredUsersCurrentPage: (state, action: PayloadAction<number>) => {
-      state.referredUsersPagination.currentPage = action.payload;
+
+    setCompletedPlansCurrentPage: (state, action: PayloadAction<number>) => {
+      state.completedPlansPagination.currentPage = action.payload;
     },
     setActivePlansCurrentPage: (state, action: PayloadAction<number>) => {
       state.activePlansPagination.currentPage = action.payload;
@@ -71,23 +79,42 @@ const marketerdashboardSlice = createSlice({
     setUpcomingPaymentsCurrentPage: (state, action: PayloadAction<number>) => {
       state.upcomingPaymentsPagination.currentPage = action.payload;
     },
-    updateReferredUser: (state, action: PayloadAction<ReferredUser>) => {
-      if (state.data?.referred_users.data) {
-        const index = state.data.referred_users.data.findIndex(
-          (user) => user.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.data.referred_users.data[index] = action.payload;
-        }
-      }
-    },
-    updateUpcomingPaymentCustomer: (state, action: PayloadAction<UpcomingPaymentCustomer>) => {
+
+    updateUpcomingPayment: (
+      state,
+      action: PayloadAction<UpcomingPayment>
+    ) => {
       if (state.data?.upcoming_payment_customers.data) {
         const index = state.data.upcoming_payment_customers.data.findIndex(
-          (user) => user.id === action.payload.id
+          (payment) => payment.id === action.payload.id
         );
         if (index !== -1) {
           state.data.upcoming_payment_customers.data[index] = action.payload;
+        }
+      }
+    },
+
+    updateCompletedPropertyPlan: (
+      state,
+      action: PayloadAction<PropertyPlan>
+    ) => {
+      if (state.data?.completed_property_plans?.data) {
+        const index = state.data.completed_property_plans.data.findIndex(
+          (plan) => plan.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.data.completed_property_plans.data[index] = action.payload;
+        }
+      }
+    },
+
+    updateActivePropertyPlan: (state, action: PayloadAction<PropertyPlan>) => {
+      if (state.data?.active_property_plans?.data) {
+        const index = state.data.active_property_plans.data.findIndex(
+          (plan) => plan.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.data.active_property_plans.data[index] = action.payload;
         }
       }
     },
@@ -103,78 +130,90 @@ const marketerdashboardSlice = createSlice({
         (state, action: PayloadAction<MarketerDashboardResponse>) => {
           state.loading = false;
           state.data = action.payload.data;
-          
-          // Update referred users pagination
-          if (action.payload.data.referred_users) {
-            state.referredUsersPagination = {
-              currentPage: action.payload.data.referred_users.current_page,
-              perPage: action.payload.data.referred_users.per_page,
-              totalItems: action.payload.data.referred_users.total,
-              totalPages: action.payload.data.referred_users.last_page,
+
+          // Update completed property plans pagination
+          if (action.payload.data.completed_property_plans) {
+            state.completedPlansPagination = {
+              currentPage:
+                action.payload.data.completed_property_plans.current_page,
+              perPage: action.payload.data.completed_property_plans.per_page,
+              totalItems: action.payload.data.completed_property_plans.total,
+              totalPages:
+                action.payload.data.completed_property_plans.last_page,
             };
           }
-          
-          // Update active plans pagination
-          if (action.payload.data.active_plan) {
+
+          // Update active property plans pagination
+          if (action.payload.data.active_property_plans) {
             state.activePlansPagination = {
-              currentPage: action.payload.data.active_plan.current_page,
-              perPage: action.payload.data.active_plan.per_page,
-              totalItems: action.payload.data.active_plan.total,
-              totalPages: action.payload.data.active_plan.last_page,
+              currentPage:
+                action.payload.data.active_property_plans.current_page,
+              perPage: action.payload.data.active_property_plans.per_page,
+              totalItems: action.payload.data.active_property_plans.total,
+              totalPages: action.payload.data.active_property_plans.last_page,
             };
           }
 
           // Update upcoming payments pagination
           if (action.payload.data.upcoming_payment_customers) {
             state.upcomingPaymentsPagination = {
-              currentPage: action.payload.data.upcoming_payment_customers.current_page,
+              currentPage:
+                action.payload.data.upcoming_payment_customers.current_page,
               perPage: action.payload.data.upcoming_payment_customers.per_page,
               totalItems: action.payload.data.upcoming_payment_customers.total,
-              totalPages: action.payload.data.upcoming_payment_customers.last_page,
+              totalPages:
+                action.payload.data.upcoming_payment_customers.last_page,
             };
           }
         }
       )
       .addCase(fetchMarketerDashboard.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch dashboard data";
+        state.error =
+          action.payload?.message || "Failed to fetch dashboard data";
         state.data = null;
       });
   },
 });
 
-export const { 
-  clearDashboardData, 
-  updateReferredUser,
-  updateUpcomingPaymentCustomer,
-  setReferredUsersCurrentPage,
+export const {
+  clearDashboardData,
+  updateUpcomingPayment,
+  setCompletedPlansCurrentPage,
   setActivePlansCurrentPage,
-  setUpcomingPaymentsCurrentPage
+  setUpcomingPaymentsCurrentPage,
+  updateCompletedPropertyPlan,
+  updateActivePropertyPlan,
 } = marketerdashboardSlice.actions;
 
-export const selectDashboardLoading = (state: { marketerDashboard: DashboardState }) => 
-  state.marketerDashboard.loading;
-export const selectDashboardError = (state: { marketerDashboard: DashboardState }) => 
-  state.marketerDashboard.error;
-export const selectDashboardData = (state: { marketerDashboard: DashboardState }) => 
-  state.marketerDashboard.data;
-export const selectReferredUsers = (state: { marketerDashboard: DashboardState }) => 
-  state.marketerDashboard.data?.referred_users.data || [];
-export const selectActivePlans = (state: { marketerDashboard: DashboardState }) =>
-  state.marketerDashboard.data?.active_plan.data || [];
-export const selectUpcomingPaymentCustomers = (state: { marketerDashboard: DashboardState }) =>
-  state.marketerDashboard.data?.upcoming_payment_customers.data || [];
-export const selectMarketerInfo = (state: { marketerDashboard: DashboardState }) =>
-  state.marketerDashboard.data?.marketer || null;
-export const selectDashboardTotals = (state: { marketerDashboard: DashboardState }) => ({
-  totalReferredUsers: state.marketerDashboard.data?.total_referred_users || 0,
-  totalPropertyPlans: state.marketerDashboard.data?.total_property_plans || 0,
-  totalPaidAmount: state.marketerDashboard.data?.total_paid_amount || 0,
-  totalAmount: state.marketerDashboard.data?.total_amount || 0,
-  expectedPaymentCount: state.marketerDashboard.data?.expected_payment_count || 0,
+export const selectDashboardLoading = (state: RootState) =>
+  state.marketerdashboard.loading;
+export const selectDashboardError = (state: RootState) =>
+  state.marketerdashboard.error;
+export const selectDashboardData = (state: RootState) =>
+  state.marketerdashboard.data;
+
+export const selectCompletedPropertyPlans = (state: RootState) =>
+  state.marketerdashboard.data?.completed_property_plans?.data || [];
+export const selectActivePropertyPlans = (state: RootState) =>
+  state.marketerdashboard.data?.active_property_plans?.data || [];
+
+export const selectUpcomingPayments = (state: RootState) =>
+  state.marketerdashboard.data?.upcoming_payment_customers?.data || [];
+export const selectMarketerInfo = (state: RootState) =>
+  state.marketerdashboard.data?.marketer || null;
+export const selectDashboardTotals = (state: RootState) => ({
+  totalPaidAmount: state.marketerdashboard.data?.total_paid_amount || 0,
+  totalCompletedPropertyPlans:
+    state.marketerdashboard.data?.total_completed_property_plans || 0,
+  totalActivePropertyPlans:
+    state.marketerdashboard.data?.total_active_property_plans || 0,
+  upcomingPaymentCount:
+    state.marketerdashboard.data?.upcoming_payment_count || 0,
 });
-export const selectReferredUsersPagination = (state: RootState) =>
-  state.marketerdashboard.referredUsersPagination;
+
+export const selectCompletedPlansPagination = (state: RootState) =>
+  state.marketerdashboard.completedPlansPagination;
 export const selectActivePlansPagination = (state: RootState) =>
   state.marketerdashboard.activePlansPagination;
 export const selectUpcomingPaymentsPagination = (state: RootState) =>

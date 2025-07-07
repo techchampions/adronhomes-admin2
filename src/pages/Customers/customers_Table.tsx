@@ -1,3 +1,5 @@
+// CustomersTableComponent.tsx
+
 import React from "react";
 import { IoCaretBack, IoCaretForward } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,7 +9,7 @@ import {
   selectCustomersPagination,
   setCustomersPage,
 } from "../../components/Redux/customers/customers_slice";
-import { customer } from "../../components/Redux/customers/customers_thunk";
+import { customer, Marketer } from "../../components/Redux/customers/customers_thunk"; // Import Marketer interface
 import { formatDate } from "../../utils/formatdate";
 import { useNavigate, useNavigation } from "react-router-dom";
 
@@ -15,7 +17,7 @@ interface CustomersTable {
   id: any;
   first_name: any;
   last_name: any;
-  marketer: any;
+  marketer: Marketer; // Change 'any' to 'Marketer'
   created_at: any;
   property_plan_total: any;
   saved_property_total: any;
@@ -34,7 +36,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
     await dispatch(setCustomersPage(page));
     await dispatch(customer());
   };
-const navigate=useNavigate()
+  const navigate = useNavigate();
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -64,7 +66,11 @@ const navigate=useNavigate()
             </thead>
             <tbody>
               {data.map((row) => (
-                <tr key={row.id} className="cursor-pointer" onClick={()=> navigate(`/customers/${row.id}`)}>
+                <tr
+                  key={row.id}
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/customers/${row.id}`)}
+                >
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[72px] truncate whitespace-nowrap pr-4"
                     title={
@@ -85,12 +91,19 @@ const navigate=useNavigate()
                   <td
                     className="pb-[31px] font-gotham font-[350] text-dark text-sm max-w-[85px] truncate whitespace-nowrap pr-4"
                     title={
-                      typeof row.marketer === "string"
-                        ? row.marketer
+                      row.marketer
+                        ? `${row.marketer.first_name || ""} ${
+                            row.marketer.last_name || ""
+                          }`.trim()
                         : undefined
                     }
                   >
-                    {row.marketer ?? "N/A"}
+                    {/* Access marketer's first_name and last_name */}
+                    {row.marketer
+                      ? `${row.marketer.first_name || ""} ${
+                          row.marketer.last_name || ""
+                        }`.trim()
+                      : "N/A"}
                   </td>
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[73px] truncate whitespace-nowrap pr-4"
