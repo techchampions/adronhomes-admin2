@@ -90,7 +90,7 @@ interface Property {
 // Thunk
 export const fetchPropertyPlanPayments = createAsyncThunk<
   PropertyPlanPaymentsResponse,
-  number, // plan_id as parameter
+  number, 
   {
     state: RootState;
     rejectValue: ErrorResponse;

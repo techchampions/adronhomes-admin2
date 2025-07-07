@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { GreenCardMarketer, MatrixCard, StatsCard } from '../../components/firstcard'
 import { ReusableTable } from '../../components/Tables/Table_one'
 
-import Header from '../Header/Hearder'
+
 import SettingsCard from '../SettingsCard'
+import Header from '../../general/Header'
 
 export default function SettingsPage() {
   const tabs = ['Registered Customers', 'Active Plans']
@@ -19,8 +20,8 @@ export default function SettingsPage() {
       <div className="space-y-[30px]">
         <div className="grid lg:grid-cols-4 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
           <GreenCardMarketer
-            role="Marketer"
-            iconSrc="/material.svg"
+            // role="Marketer"
+            // iconSrc="/material.svg"
           />
           <MatrixCard
             title="Referred Customers"

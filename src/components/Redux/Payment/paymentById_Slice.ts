@@ -54,6 +54,7 @@ interface PaymentPlan {
   remaining_balance: number;
   status: number;
   monthly_duration: string;
+  number_of_unit:any
 }
 
 interface PaymentData {

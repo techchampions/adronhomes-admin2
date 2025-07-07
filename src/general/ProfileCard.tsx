@@ -10,16 +10,16 @@ import { deleteUser } from "../components/Redux/customers/delete_customers";
 import { useNavigate, useNavigation } from "react-router-dom";
 
 interface ProfileCardProps {
-  loadingdelete:any
-  loading:any
+  loadingdelete: any;
+  loading: any;
   profileImage: string;
-  userId:any
+  userId: any;
   name: string;
   dateJoined: string;
   email: string;
   phone: string;
-  userNmae:any;
-  userImage:any
+  userNmae: any;
+  userImage: any;
   stats: {
     viewedProperties: number;
     savedProperties: number;
@@ -48,17 +48,19 @@ export default function ProfileCard({
   buttonTexts,
   userId,
   userNmae,
-  userImage,loading,loadingdelete
+  userImage,
+  loading,
+  loadingdelete,
 }: ProfileCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-    const [isOpendelete, setIsOpendelete] = useState(false);
-      const [message, setMessage] = useState("")
-        const dispatch = useDispatch<AppDispatch>();
+  const [isOpendelete, setIsOpendelete] = useState(false);
+  const [message, setMessage] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
 
-        const navigate=useNavigate()
+  const navigate = useNavigate();
   const handleSend = async () => {
     console.log("Sending message:", message);
-    
+
     if (!message.trim()) {
       toast.error("Message cannot be empty");
       return;
@@ -69,16 +71,16 @@ export default function ProfileCard({
       return;
     }
 
-    
     try {
       const result = await dispatch(sendMessage({ userId, message }));
-      
+
       if (sendMessage.fulfilled.match(result)) {
         // toast.success(result.payload.message || "Message sent successfully");
         setIsOpen(false);
         setMessage(""); // Clear the message input
       } else if (sendMessage.rejected.match(result)) {
-        const errorMessage = result.payload?.message || "Failed to send message";
+        const errorMessage =
+          result.payload?.message || "Failed to send message";
         // toast.error(errorMessage);
       }
     } catch (error) {
@@ -87,15 +89,14 @@ export default function ProfileCard({
     }
   };
 
-
   const handleDelete = async () => {
     try {
       const result = await dispatch(deleteUser(userId));
-      
+
       if (deleteUser.fulfilled.match(result)) {
         // toast.success(result.payload.message || "User deleted successfully");
-              setIsOpendelete(false);
-              navigate("/customers")
+        setIsOpendelete(false);
+        navigate("/customers");
       } else if (deleteUser.rejected.match(result)) {
         const errorMessage = result.payload?.message || "Failed to delete user";
         // toast.error(errorMessage);
@@ -107,7 +108,6 @@ export default function ProfileCard({
       setIsOpendelete(false);
     }
   };
-
 
   return (
     <>
@@ -132,37 +132,37 @@ export default function ProfileCard({
 
         <div className="flex flex-col w-full">
           <div className="bg-[#F5F5F5] px-4 md:px-[48px] pt-[31px] pb-[34px] flex flex-col sm:flex-row justify-between gap-4 rounded-b-[40px] rounded-t-[40px] lg:rounded-t-none lg:rounded-b-[40px] mb-[20px]">
-          <div className="grid lg:grid-cols-3 gap-4 w-full">
-  {/* Viewed Properties */}
-  <div className="flex flex-col items-center max-w-full">
-    <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
-      {stats.viewedProperties}
-    </p>
-    <h1 className="text-sm font-[300] truncate w-full text-center">
-      Viewed Properties
-    </h1>
-  </div>
+            <div className="grid lg:grid-cols-3 gap-4 w-full">
+              {/* Viewed Properties */}
+              <div className="flex flex-col items-center max-w-full">
+                <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
+                  {stats.viewedProperties}
+                </p>
+                <h1 className="text-sm font-[300] truncate w-full text-center">
+                  Viewed Properties
+                </h1>
+              </div>
 
-  {/* Saved Properties */}
-  <div className="flex flex-col items-center max-w-full">
-    <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
-      {stats.savedProperties}
-    </p>
-    <h1 className="text-sm font-[300] truncate w-full text-center">
-      Saved Properties
-    </h1>
-  </div>
+              {/* Saved Properties */}
+              <div className="flex flex-col items-center max-w-full">
+                <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
+                  {stats.savedProperties}
+                </p>
+                <h1 className="text-sm font-[300] truncate w-full text-center">
+                  Saved Properties
+                </h1>
+              </div>
 
-  {/* Owned Properties */}
-  <div className="flex flex-col items-center max-w-full">
-    <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
-      {stats.ownedProperties}
-    </p>
-    <h1 className="text-sm font-[300] truncate w-full text-center">
-      Owned Properties
-    </h1>
-  </div>
-</div>
+              {/* Owned Properties */}
+              <div className="flex flex-col items-center max-w-full">
+                <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
+                  {stats.ownedProperties}
+                </p>
+                <h1 className="text-sm font-[300] truncate w-full text-center">
+                  Owned Properties
+                </h1>
+              </div>
+            </div>
           </div>
 
           <div className="w-full justify-center flex flex-col items-center text-center md:text-left">
@@ -178,14 +178,13 @@ export default function ProfileCard({
               </div>
             </div>
             <div className="grid grid-cols-2  max-w-full mb-4">
-  <span className="text-[#767676] font-[325] md:text-base text-sm truncate">
-    Marketer in charge:
-  </span>
-  <span className="text-dark font-[350] md:text-base text-sm truncate">
-    {marketerName}
-    
-  </span>
-</div>
+              <span className="text-[#767676] font-[325] md:text-base text-sm truncate">
+                Marketer in charge:
+              </span>
+              <span className="text-dark font-[350] md:text-base text-sm truncate">
+                {marketerName}
+              </span>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 mt-5">
               <button
                 className="bg-[#272727] text-white font-bold text-sm rounded-[30px] py-[14px] px-[44px]"
@@ -193,14 +192,33 @@ export default function ProfileCard({
               >
                 {buttonTexts.sendMessage}
               </button>
-              <button className="bg-white text-[#D70E0E] font-bold text-sm rounded-[30px] py-[14px] px-[44px] border border-[#D70E0E]"  onClick={()=>setIsOpendelete(true) }>
+              <button
+                className="bg-white text-[#D70E0E] font-bold text-sm rounded-[30px] py-[14px] px-[44px] border border-[#D70E0E]"
+                onClick={() => setIsOpendelete(true)}
+              >
                 {buttonTexts.removeClient}
               </button>
             </div>
           </div>
         </div>
-        <MessageModal isOpen={isOpen} setIsOpen={setIsOpen} handleSend={() => handleSend()} message={message} setMessage={setMessage} userImage={userImage} userNmae={userNmae} loading={loading} />
-          <ConfirmationModal isOpen={isOpendelete} title={"Delete User"} description={`Are you sure you want to delete ${name}`} onClose={()=>setIsOpendelete(false) } onConfirm={handleDelete} loading={loadingdelete} />
+        <MessageModal
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          handleSend={() => handleSend()}
+          message={message}
+          setMessage={setMessage}
+          userImage={userImage}
+          userNmae={userNmae}
+          loading={loading}
+        />
+        <ConfirmationModal
+          isOpen={isOpendelete}
+          title={"Delete User"}
+          description={`Are you sure you want to delete ${name}`}
+          onClose={() => setIsOpendelete(false)}
+          onConfirm={handleDelete}
+          loading={loadingdelete}
+        />
       </div>
     </>
   );

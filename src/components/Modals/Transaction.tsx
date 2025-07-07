@@ -132,13 +132,13 @@ const handleDownload = () => {
               {transactionData.from}
             </h1>
           </div>
-          <div className="w-full flex justify-end">
+          {/* <div className="w-full flex justify-end">
             <img
               src={transactionData.bankIcon}
               className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
               alt="Bank icon"
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Description */}

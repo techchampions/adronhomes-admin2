@@ -4,7 +4,7 @@ import { fetchMonthlyStats, MonthlyStat } from "./marketers_monthly_thunk";
 interface MonthlyStatsState {
   loading: boolean;
   error: string | null;
-  total_expected: number;
+  total_paid_per_month: number;
   total_paid: number;
   monthly_stats: MonthlyStat[];
 }
@@ -12,7 +12,7 @@ interface MonthlyStatsState {
 const initialState: MonthlyStatsState = {
   loading: false,
   error: null,
-  total_expected: 0,
+  total_paid_per_month: 0,
   total_paid: 0,
   monthly_stats: [],
 };
@@ -29,7 +29,7 @@ const monthlyStatsSlice = createSlice({
       })
       .addCase(fetchMonthlyStats.fulfilled, (state, action) => {
         state.loading = false;
-        state.total_expected = action.payload.total_expected;
+        state.total_paid_per_month = action.payload.total_paid_per_month;
         state.total_paid = action.payload.total_paid;
         state.monthly_stats = action.payload.monthly_stats;
         state.error = null;

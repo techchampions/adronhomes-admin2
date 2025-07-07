@@ -17,7 +17,7 @@ export interface Property {
   type: number;
   no_of_bedroom: number | null;
   slug: string;
-  features: string[] | string; // Can be array or stringified array
+  features: string[] | string; 
   overview: string;
   description: string;
   street_address: string;
@@ -55,6 +55,8 @@ export interface Property {
   total_amount: number;
   unit_available:any
   unit_sold:any
+  property_view:any
+  property_requests:any
 }
 
 export interface PropertiesResponse {

@@ -7,10 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../components/Redux/store";
 import {
   selectActivePlansPagination,
-  selectReferredUsersPagination,
+
   selectUpcomingPaymentsPagination,
   setActivePlansCurrentPage,
-  setReferredUsersCurrentPage,
+  setUpcomingPaymentsCurrentPage,
+
 } from "../../components/Redux/Marketer/Dashboard_slice";
 import { formatDate } from "../../utils/formatdate";
 import { formatAsNaira } from "../../utils/formatcurrency";
@@ -23,7 +24,7 @@ const Upcomingdata  = ({ customerData }: { customerData?: any }) => {
   // Use the sample data from image if no customerData is provided
 const navigate=useNavigate()
   const handlePageChange = (page: number) => {
-    dispatch(setReferredUsersCurrentPage(page));
+    dispatch(setUpcomingPaymentsCurrentPage(page));
     dispatch(fetchMarketerDashboard({ currentpage: page }));
   };
 
@@ -38,7 +39,7 @@ const navigate=useNavigate()
                   Customer's Name
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
-                  Date Joined
+                Start Date
                 </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                   Next Payment
@@ -46,9 +47,9 @@ const navigate=useNavigate()
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px]">
                 Upcoming Payment
                 </th>
-                <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
+                {/* <th className="pb-6 font-[325] text-[#757575]  whitespace-nowrap text-[12px]">
                   Phone Number
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -59,7 +60,7 @@ const navigate=useNavigate()
                     {row.name ?? 'N/A'}
                   </td>
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
-                    {formatDate(row.dateJoined )}
+                    {formatDate(row.StartDate )}
                   </td>
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {formatDate(row.nextPayment)}
@@ -67,9 +68,9 @@ const navigate=useNavigate()
                   <td className="pb-8 font-[325]  text-dark text-sm whitespace-nowrap">
                     {formatAsNaira(row.paid_amount )?? 'N/A'}
                   </td>
-                  <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                  {/* <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.phoneNumber ?? 'N/A'}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

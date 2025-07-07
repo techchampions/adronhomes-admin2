@@ -57,7 +57,7 @@ interface PropertySpecificationsFormValues {
   unitsAvailable: string;
   description: string;
   overview: string;
-  documents: File[];
+  documents: string;
   director_id: any;
 }
 
@@ -72,7 +72,7 @@ interface LandFormValues {
   unitsAvailable: string;
   description: string;
   overview: string;
-  documents: File[];
+documents: string; 
 }
 
 interface FeaturesFormValues {
@@ -192,7 +192,7 @@ const initialFormData: PropertyFormData = {
     unitsAvailable: "",
     description: "",
     overview: "",
-    documents: [],
+      documents: "",
   },
   landForm: {
     director_id: "",
@@ -205,7 +205,7 @@ const initialFormData: PropertyFormData = {
     unitsAvailable: "",
     description: "",
     overview: "",
-    documents: [],
+    documents: '',
   },
   features: {
     features: ["Gym", "Swimming Pool", "Drainage", "Super Market"],
@@ -503,16 +503,16 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("is_discount", "0");
       }
 
-      const docs = isLandProperty
-        ? landForm.documents
-        : specifications.documents;
-      if (Array.isArray(docs)) {
-        docs.forEach((doc, index) => {
-          if (doc instanceof File) {
-            formPayload.append(`property_agreement[${index}]`, doc);
-          }
-        });
-      }
+     if (isLandProperty) {    formPayload.append(`property_agreement`, landForm.documents);}
+         else {formPayload.append(`property_agreement`,   specifications.documents)}
+    
+      // if (Array.isArray(docs)) {
+      //   docs.forEach((doc, index) => {
+      //     if (doc instanceof File) {
+      //       formPayload.append(`property_agreement[${index}]`, doc);
+      //     }
+      //   });
+      // }
 
       formPayload.append("is_active", "1");
       formPayload.append("status", "available");
