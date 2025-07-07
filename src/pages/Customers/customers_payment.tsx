@@ -233,7 +233,7 @@ export default function MarketerInvoice() {
 
       <ReusableTable activeTab={"All"} tabs={tabs} sortButtonText="Latest">
         <div className="w-full overflow-x-auto">
-          invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`}
+          {/* invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`} */}
           <div className="space-y-[10px]">
             {paginatedPayments.map((payment, index) => (
               <PaymentCard

@@ -456,9 +456,9 @@ export default function InvoiceCard({
                 </div>
               </div>
 
-              <p className="mt-3 md:mt-[10px] text-xs md:text-base break-words font-[350]">
+              {/* <p className="mt-3 md:mt-[10px] text-xs md:text-base break-words font-[350]">
                 View Property
-              </p>
+              </p> */}
             </>
           )}
 
