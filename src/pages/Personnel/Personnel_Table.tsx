@@ -25,6 +25,7 @@ export interface UsersTable {
   Created: string;
   id: any;
   user: User; // Add the full user object
+  referral_code:any
 }
 
 interface UsersTableProps {
@@ -108,6 +109,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
       email: user.Email,
       role:user.Role,
       joinDate: user.Created,
+      referral_code:user.referral_code,
       // lastActive: new Date().toISOString(), // You might want to get this from your API
       // status: "Active", // You might want to get this from your API
       avatar: "/default-avatar.png",

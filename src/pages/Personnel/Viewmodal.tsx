@@ -15,6 +15,7 @@ interface PersonnelData {
   lastActive: string;
   status: "Active" | "Inactive" | "Suspended";
   avatar?: string;
+  referral_code?:string
 }
 
 interface PersonnelModalProps {
@@ -34,7 +35,7 @@ const PersonnelModal: React.FC<PersonnelModalProps> = ({
     email: "john.doe@example.com",
     role: "Administrator",
     joinDate: "2023-10-15",
-   
+   referral_code:"N/A",
     avatar: "/default-avatar.png",
   },
 }) => {
@@ -137,15 +138,15 @@ const stringToColor = (str: string) => {
         <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">
           <div>
             <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600 flex items-center">
-              <MdEmail className="mr-2" /> Personnel ID
+              <MdEmail className="mr-2" />    Referral ID
             </p>
             <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base truncate pr-1 sm:pr-2">
-              {personnelData.id}
+              {personnelData?.referral_code??'N/A'}
             </h1>
           </div>
           <div className="w-full flex justify-end">
             <button
-              onClick={() => handleCopy(personnelData.id)}
+              onClick={() => handleCopy(personnelData?.referral_code??'N/A')}
               className="flex items-center hover:bg-gray-100 p-1 sm:px-2 rounded transition-colors text-xs sm:text-sm"
             >
               <IoCopyOutline className="mr-1" size={14} />

@@ -16,11 +16,12 @@ interface UsersTable {
   Role: string;
   Created: string;
   user: User;
+  referral_code:any
 }
 
 const getRoleName = (roleId: number) => {
   switch (roleId) {
-     case 0:
+    case 0:
       return "Customer";
     case 1:
       return "Admin";
@@ -38,6 +39,7 @@ const getRoleName = (roleId: number) => {
 export default function Personnel() {
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const { data, error, loading } = useSelector(
     (state: RootState) => state.getpersonnel
@@ -56,6 +58,7 @@ export default function Personnel() {
       Email: item.email,
       Role: getRoleName(item.role),
       Created: item.created_at,
+      referral_code:item.referral_code,
       user: {
         ...item,
         country: item.country || "",
@@ -63,8 +66,23 @@ export default function Personnel() {
     }));
   };
 
-  const filteredData = personnelData();
+  const allData = personnelData();
+  
+  // Filter data based on search term
+  const filteredData = allData.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.User.toLowerCase().includes(searchLower) ||
+      item.Email.toLowerCase().includes(searchLower) ||
+      item.Role.toLowerCase().includes(searchLower)
+    );
+  });
+
   const isEmpty = filteredData.length === 0;
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
 
   return (
     <div className="mb-[52px]">
@@ -78,6 +96,8 @@ export default function Personnel() {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          searchPlaceholder="search for personnel"
+          onSearch={handleSearch}
         >
           {loading ? (
             <div className=" w-full flex items-center justify-center">
