@@ -261,6 +261,7 @@ export const SliderSection: React.FC<SliderSectionProps> = ({
             setExistingSliders((prev) => [...prev, ...response.data]);
           }
           setPendingSliders([]);
+          location.reload();
         },
         onError: (error) => {
           toast.error(`Failed to upload sliders: ${error.message}`);

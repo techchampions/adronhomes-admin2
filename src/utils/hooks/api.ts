@@ -42,7 +42,7 @@ export const getSliderByType = async (
   type: string
 ): Promise<SliderByTypeRes> => {
   const endpoint = `sliders?type=${type.toString()}`;
-  const response = await adminApi.get(endpoint);
+  const response = await adronApi.get(endpoint);
   return response.data;
 };
 
