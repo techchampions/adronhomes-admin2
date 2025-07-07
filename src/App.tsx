@@ -46,6 +46,7 @@ import AccountDetails from "./components/Settings/AddAccountSettings/AccountDeta
 import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import DirectorsDashboard from "./director/DirectorDashboard";
 import MarketerCustomer from "./marketer/customer/customer";
+import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -129,6 +130,10 @@ const App = () => {
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
                 />
+                <Route
+                  path="/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
+                />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/settings/sliders" element={<SliderSettings />} />
@@ -178,8 +183,11 @@ const App = () => {
 
                 {/* Marketer Routes */}
                 <Route path="/marketer" element={<MarketersDashboard />} />
-                 <Route path="/marketer-customer" element={<MarketerCustomer/>} />
-               
+                <Route
+                  path="/marketer-customer"
+                  element={<MarketerCustomer />}
+                />
+
                 <Route path="/director" element={<DirectorsDashboard />} />
                 <Route path="marketer-settings" element={<SettingsPage />} />
                 <Route
