@@ -14,6 +14,7 @@ import {
   getPropertyRequest,
   getPropertyRequestByID,
   getSliderByType,
+  getUser,
 } from "./api";
 import { HeadersResponse } from "../../pages/Properties/types/HeaderDataTypes";
 import { LeadershipResponse } from "../../pages/Properties/types/LeadershipDataTypes";
@@ -28,6 +29,7 @@ import { GetPropertyByIdResponse } from "../../pages/Properties/types/SoosarProp
 import { NotificationsResponse } from "../../pages/Properties/types/NotificationTypes";
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { UsersAndPropertiesResponse } from "../../pages/Properties/types/UsersNPropertiesListTypes";
+import { GetUserResponse } from "../../pages/Properties/types/UserProfileTypes";
 
 // Query hook for properties and filtering
 export const useGetSlidersByType = (type: string) => {
@@ -119,5 +121,13 @@ export const useGetCustomersAndProperties = () => {
   return useQuery<UsersAndPropertiesResponse>({
     queryKey: ["customers and properties"],
     queryFn: getCustomersAndProperties,
+  });
+};
+
+// Query hook for Getting User
+export const useGetUser = () => {
+  return useQuery<GetUserResponse>({
+    queryKey: ["user-profile"],
+    queryFn: getUser,
   });
 };

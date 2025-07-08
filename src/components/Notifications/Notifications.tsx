@@ -26,7 +26,8 @@ export default function Notifications() {
         <ReusableTable
           activeTab={"Notifications"}
           tabs={tab}
-          sortButtonText="Latest"
+          searchPlaceholder="Search Notifications..."
+          // sortButtonText="Latest"
         >
           <Notifications_table />{" "}
         </ReusableTable>

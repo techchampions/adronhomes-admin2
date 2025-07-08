@@ -12,7 +12,7 @@ export default function Requests_Enquiries() {
   const { data, isLoading, isError } = useGetPropertyRequest(page);
   const propertyData = data?.data.data || [];
   const totalPages = data?.data.last_page || 1;
-  const tab = ["All", "Pending Requests"];
+  const tab = ["Requests"];
   return (
     <div className="pb-[52px]">
       <Header
@@ -21,7 +21,11 @@ export default function Requests_Enquiries() {
         history={true}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        <ReusableTable activeTab={"All"} tabs={tab}>
+        <ReusableTable
+          activeTab={tab[0]}
+          tabs={tab}
+          searchPlaceholder="Search Requests..."
+        >
           {isLoading ? (
             <LoadingAnimations loading={isLoading} />
           ) : propertyData.length < 1 ? (

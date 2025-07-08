@@ -100,13 +100,13 @@ export default function Header({
             <>
               <p
                 onClick={() => navigate(-1)}
-                className="text-dark font-meduim text-base lg:flex items-center mt-4 hidden"
+                className="cursor-pointer text-dark font-meduim text-base lg:flex items-center mt-4 hidden"
               >
                 <IoMdArrowBack className="mr-2" /> Back
               </p>
               <p
                 onClick={() => navigate(-1)}
-                className="text-dark font-meduim text-base lg:hidden absolute top-0 right-10 items-center mt-4 flex"
+                className="cursor-pointer text-dark font-meduim text-base lg:hidden absolute top-0 right-10 items-center mt-4 flex"
               >
                 <IoMdArrowBack className="mr-2" /> Back
               </p>
