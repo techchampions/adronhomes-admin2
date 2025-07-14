@@ -20,7 +20,7 @@
 //         subtitle="Manage the list of registered customers"
 //       />
 //       <ProfileCard
-//         imageUrl="/profile.svg"
+//         imageUrl="/unknown.png"
 //         name="Ahmed Musa"
 //         dateJoined="12th May 2025"
 //         className="custom-class-if-needed" customerId={undefined}      />

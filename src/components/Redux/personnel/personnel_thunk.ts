@@ -66,14 +66,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const personnels = createAsyncThunk<
   PersonnelsResponse, 
-   void,        
+  { role: number },  
   {
     state: RootState;
     rejectValue: ErrorResponse;
   }
 >(
   "personnels/fetch",
-  async (_, { rejectWithValue, getState }) => {
+  async ({ role }, { rejectWithValue, getState }) => { // Destructure role from the first argument
     const token = Cookies.get("token");
     const state = getState();
     const currentPage = state.getpersonnel?.data?.current_page || 1;
@@ -86,7 +86,7 @@ export const personnels = createAsyncThunk<
 
     try {
       const response = await axios.get<PersonnelsResponse>(
-        `${BASE_URL}/api/admin/personnels?role=4`,
+        `${BASE_URL}/api/admin/personnels`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -96,6 +96,7 @@ export const personnels = createAsyncThunk<
           },
           params: {
             page: currentPage,
+            role: role, // Pass the role from the parameters
           },
         }
       );

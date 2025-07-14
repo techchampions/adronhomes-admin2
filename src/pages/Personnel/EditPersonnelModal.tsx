@@ -1,5 +1,5 @@
 // EditPersonnelModal.tsx
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import InputField from "../../components/input/inputtext";
@@ -9,6 +9,7 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { toast } from "react-toastify";
 import { Edithpersonel, User } from "../../components/Redux/personnel/edithPersonelle";
 import { personnels } from "../../components/Redux/personnel/personnel_thunk";
+import { PropertyContext } from "../../MyContext/MyContext";
 
 interface EditPersonnelModalProps {
   isOpen: boolean;
@@ -60,6 +61,10 @@ export default function EditPersonnelModal({
     (state: RootState) => state.Edithpersonel
   );
 
+    const {
+option,
+setOption
+  } = useContext(PropertyContext)!;
   const handleSubmit = async (
     values: EditPersonnelFormValues,
     { setSubmitting }: FormikHelpers<EditPersonnelFormValues>
@@ -84,7 +89,7 @@ export default function EditPersonnelModal({
       );
 
       if (Edithpersonel.fulfilled.match(resultAction)) {
-        dispatch(personnels())
+        dispatch(personnels({ role: option.value }));
         onClose();
       } else if (Edithpersonel.rejected.match(resultAction)) {
         const errorMessage = resultAction.payload?.message || 'Failed to update personnel.';
