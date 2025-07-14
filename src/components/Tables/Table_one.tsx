@@ -140,7 +140,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
         )}
       </div>
 
-      {/* Table Body */}
+
       <div className="w-full overflow-x-auto">{children}</div>
     </div>
   );
