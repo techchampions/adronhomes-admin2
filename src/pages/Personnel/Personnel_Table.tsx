@@ -1,5 +1,5 @@
 // Personnel_Table.tsx
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import Pagination from "../../components/Tables/Pagination";
 import { personnels } from "../../components/Redux/personnel/personnel_thunk";
@@ -17,6 +17,7 @@ import { DeletePersonel } from "../../components/Redux/personnel/deleteThunk";
 import { resetUpdatePropertyState } from "../../components/Redux/personnel/delete_slice";
 import { toast } from "react-toastify";
 import PersonnelModal from "./Viewmodal";
+import { PropertyContext } from "../../MyContext/MyContext";
 
 export interface UsersTable {
   User: string;
@@ -32,6 +33,7 @@ interface UsersTableProps {
   userData: UsersTable[];
 }
 
+
 export default function UsersTableComponent({ userData }: UsersTableProps) {
   const pagination = useSelector(selectPersonnelPagination);
   const dispatch = useDispatch<AppDispatch>();
@@ -39,6 +41,10 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
   const [editingPersonnel, setEditingPersonnel] = useState<User | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [personelToDelete, setPersonelToDelete] = useState<User | null>(null);
+    const {
+option,
+setOption
+  } = useContext(PropertyContext)!;
   const {
     loading: deleteloading,
     success: deletesuccess,
@@ -50,7 +56,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
   useEffect(() => {
     if (deletesuccess && personelToDelete) {
       toast.success("Property deleted successfully!");
-      dispatch(personnels());
+  dispatch(personnels({ role: option.value }));
       handleCloseDeleteModal();
     }
 
@@ -60,7 +66,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
   }, [deletesuccess, deleteerror, dispatch, personelToDelete]);
   const handlePageChange = async (page: number) => {
     dispatch(setCurrentPage(page));
-    dispatch(personnels());
+  dispatch(personnels({ role: option.value }));
   };
 
   const handleEditPersonnel = (user: User) => {

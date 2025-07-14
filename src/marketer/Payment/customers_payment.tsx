@@ -182,7 +182,7 @@ export default function MarketerInvoice() {
       />
 
       <ProfileCard
-        imageUrl={planProperties.user?.profile_picture || "/profile.svg"}
+        imageUrl={planProperties.user?.profile_picture || "/unknown.png"}
         name={`${planProperties.user?.first_name} ${planProperties.user?.last_name}`}
         dateJoined={new Date(
           planProperties.user?.created_at
@@ -273,7 +273,7 @@ export default function MarketerInvoice() {
 
       <p className="md:text-[20px] font-[325] text-base text-dark">Payments</p>
 
-      <ReusableTable activeTab={"All"} tabs={tabs} sortButtonText="Latest">
+      <ReusableTable activeTab={"All"} tabs={tabs}>
         <div className="w-full overflow-x-auto">
           <div className="space-y-[10px]">
             {paginatedPayments.map((payment, index) => (

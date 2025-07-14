@@ -46,6 +46,9 @@ import AccountDetails from "./components/Settings/AddAccountSettings/AccountDeta
 import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import DirectorsDashboard from "./director/DirectorDashboard";
 import MarketerCustomer from "./marketer/customer/customer";
+import HRDashboard from "./hr/page";
+import CarrerSideBar from "./hr/sideNav";
+import Contract from "./pages/contract/Contract";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -73,7 +76,8 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
-  const isMarketerRoute = location.pathname.startsWith("/marketer");
+  const isCareerPage = location.pathname.startsWith("/human-resources");
+    const isMarketerRoute = location.pathname.startsWith("/marketer");
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
 
@@ -81,7 +85,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     <div className="flex">
       {shouldShowSidebar && (
         <div className="min-h-screen bg-white">
-          {isMarketerRoute ? (
+          {isCareerPage ? (
+            <CarrerSideBar />
+          ) :isMarketerRoute ? (
             <SideBar />
           ) : isDirectorRoute ? (
             <DirectorSideBar />
@@ -125,6 +131,7 @@ const App = () => {
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
+                   <Route path="/contracts" element={<Contract />} />
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
@@ -166,10 +173,7 @@ const App = () => {
                   element={<CustomersSinglePayment />}
                 /> */}
                 <Route path="/properties/form" element={<General />} />
-                {/* <Route
-                  path="/customers/singlepage/singlepayment"
-                  element={<CustomersSinglePayment />}
-                /> */}
+             
                 <Route
                   path="/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
@@ -187,6 +191,11 @@ const App = () => {
                   element={<MarketerInvoice />}
                 />
               </Route>
+
+                 <Route
+                  path="/human-resources"
+                  element={<HRDashboard />}
+                />
             </Routes>
           </AppLayout>
           {isInfrastructure && (

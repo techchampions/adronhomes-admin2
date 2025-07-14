@@ -41,7 +41,7 @@ export const PasswordFormField = ({
   name,
   placeholder,
 }: FormFieldProps) => {
-  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

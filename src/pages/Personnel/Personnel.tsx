@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import UsersTableComponent from "./Personnel_Table";
@@ -8,6 +8,7 @@ import { personnels } from "../../components/Redux/personnel/personnel_thunk";
 import { User } from "../../components/Redux/personnel/edithPersonelle";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
+import { PropertyContext } from "../../MyContext/MyContext";
 
 interface UsersTable {
   id: number;
@@ -37,17 +38,33 @@ const getRoleName = (roleId: number) => {
 };
 
 export default function Personnel() {
+
+  const sortOptions = [
+  { value: 2, name: "Marketer" },
+  { value: 3, name: "Director" },
+  { value: 4, name: "Accountant" },
+  { value: 1, name: "Admin" }
+];
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
+
+
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const { data, error, loading } = useSelector(
     (state: RootState) => state.getpersonnel
   );
 
-  useEffect(() => {
-    dispatch(personnels());
-  }, [dispatch]);
+  const {
+option,
+setOption
+  } = useContext(PropertyContext)!;
+
+
+useEffect(() => {
+  // const roleValues = sortOptions.map(option => option.value);
+  dispatch(personnels({ role: option.value }));
+}, [dispatch,option]);
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
@@ -98,6 +115,10 @@ export default function Personnel() {
           onTabChange={setActiveTab}
           searchPlaceholder="search for personnel"
           onSearch={handleSearch}
+          sortOptions={sortOptions}
+          onSortChange={setOption}
+      defaultSort={option.value}
+          
         >
           {loading ? (
             <div className=" w-full flex items-center justify-center">

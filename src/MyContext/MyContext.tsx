@@ -147,6 +147,8 @@ interface PropertyContextType {
   isSubmitting: boolean;
   setIsSubmitting: (isSubmitting: boolean) => void;
   resetFormData: () => void;
+  option:any,
+   setOption: (option:any) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(undefined);
@@ -245,6 +247,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [isCancelState, setIsCancelState] = useState(false);
   const [isInfrastructure, setIsCancelInfrastructure] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [option, setOption] = useState(2);
   const [fees, setFees] = useState<Fee[]>([
     {
       id: 1,
@@ -627,6 +630,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         isSubmitting,
         setIsSubmitting,
         resetFormData,
+        option, 
+        setOption
       }}
     >
       {children}

@@ -21,9 +21,13 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const [initialLoad, setInitialLoad] = useState(true);
 
   const dispatch = useDispatch<AppDispatch>();
+    const {
+option,
+setOption
+  } = useContext(PropertyContext)!;
 
   useEffect(() => {
-    dispatch(personnels());
+    dispatch(personnels({ role: 4}));
   }, [dispatch]);
 
   const { loading: userLoading, error: userError, data } = useSelector(
