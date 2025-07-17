@@ -33,6 +33,7 @@ import {
   UploadSliderPayload,
   UploadSliderResponse,
 } from "../../pages/Properties/types/UploadSilderPayload";
+import { GetUserResponse } from "../../pages/Properties/types/UserProfileTypes";
 import { UsersAndPropertiesResponse } from "../../pages/Properties/types/UsersNPropertiesListTypes";
 import adminApi from "./ApiClient";
 import adronApi from "./GeneralApiClient";
@@ -356,4 +357,10 @@ interface NotificationPayload {
 export const sendNotification = async (payload: NotificationPayload) => {
   const res = await adminApi.post("/post-notification", payload);
   return res.data;
+};
+
+// Get User Profile
+export const getUser = async (): Promise<GetUserResponse> => {
+  const response = await adronApi.get("/user-profile");
+  return response.data;
 };

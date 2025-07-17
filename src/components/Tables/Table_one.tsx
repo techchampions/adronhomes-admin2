@@ -103,7 +103,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
                 placeholder={searchPlaceholder}
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full h-full px-[40px] py-0 border-none bg-transparent text-[#757575] text-[14px] font-[400] focus:outline-none placeholder:text-[#878787]"
+                className="w-full h-full italic px-[40px] py-0 border-none bg-transparent text-[#757575] text-[14px] font-[400] focus:outline-none placeholder:text-[#878787]"
               />
               <div className="absolute top-3 left-3 text-[#757575]">
                 <IoSearch />
