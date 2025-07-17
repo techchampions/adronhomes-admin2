@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 
@@ -20,7 +20,7 @@ interface ReusableTableProps {
   onSortChange?: (sortOption: SortOption) => void;
   sort?: boolean;
   // New prop to control visibility of tabs
-  showTabs?: boolean; 
+  showTabs?: boolean;
 }
 
 export const ReusableTable: React.FC<ReusableTableProps> = ({
@@ -38,21 +38,13 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
   onSortChange,
   sort = true,
   // Set default to true so it displays by default
-  showTabs = true, 
+  showTabs = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<SortOption>(
     sortOptions.find((opt) => opt.value === defaultSort) || sortOptions[0]
   );
   const [isSortOpen, setIsSortOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Update selectedSort if defaultSort changes
-    const defaultOption = sortOptions.find((opt) => opt.value === defaultSort);
-    if (defaultOption) {
-      setSelectedSort(defaultOption);
-    }
-  }, [defaultSort, sortOptions]);
 
   const handleTabClick = (tab: string) => {
     onTabChange?.(tab);
@@ -112,14 +104,13 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
 
             {/* Sort Dropdown */}
             <div className="w-full lg:w-auto flex-1/3 relative">
-              <button 
+              <button
                 className="lg:w-[130px] h-[42px] py-[13px] pr-[17px] pl-[20px] border border-[#272727] rounded-[50px] flex justify-center items-center text-sm text-dark"
                 onClick={() => setIsSortOpen(!isSortOpen)}
               >
                 {selectedSort.name}
                 <FaCaretDown className={`w-[20px] h-[20px] ml-2 transition-transform ${isSortOpen ? "transform rotate-180" : ""}`} />
               </button>
-              
               {isSortOpen && (
                 <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1">
                   {sortOptions.map((option) => (
@@ -139,7 +130,6 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
           </div>
         )}
       </div>
-
 
       <div className="w-full overflow-x-auto">{children}</div>
     </div>
