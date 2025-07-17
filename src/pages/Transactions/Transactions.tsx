@@ -17,9 +17,9 @@ export default function Transactions() {
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
-  useEffect(() => {
-    dispatch(fetchTransactions());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchTransactions());
+  // }, [dispatch]);
 
   const { data, loading, error, pagination } = useSelector(
     (state: RootState) => state.transactions

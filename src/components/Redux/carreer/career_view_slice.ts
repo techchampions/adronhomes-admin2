@@ -1,10 +1,10 @@
 // career_view_slice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchCareerById, CareerDetail, CareerViewResponse } from "./career_view_thunk"; // Import types and thunk
+import { fetchCareerById, CareerDetail, CareerViewResponse } from "./career_view_thunk";
 
 // Interface for the overall career view state
 interface CareerViewState {
-  career: CareerDetail | null; // Stores the detailed career object
+  career: CareerDetail | null;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -30,17 +30,17 @@ const careerViewSlice = createSlice({
     builder
       // Handle pending state of fetchCareerById thunk
       .addCase(fetchCareerById.pending, (state) => {
-        state.loading = true; // Set loading to true
-        state.error = null; // Clear any previous errors
-        state.success = false; // Set success to false
+        state.loading = true; 
+        state.error = null; 
+        state.success = false; 
       })
       // Handle fulfilled state of fetchCareerById thunk
       .addCase(
         fetchCareerById.fulfilled,
         (state, action: PayloadAction<CareerViewResponse>) => {
-          state.loading = false; // Set loading to false
-          state.success = action.payload.success; // Set success based on API response
-          state.career = action.payload.career; // Store the detailed career object
+          state.loading = false; 
+          state.success = action.payload.success; 
+          state.career = action.payload.career; 
         }
       )
       // Handle rejected state of fetchCareerById thunk

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -7,49 +7,88 @@ import { useDispatch, useSelector } from "react-redux";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import ContractsTableComponent from "./ContractTable";
 import { formatAsNaira } from "../../utils/formatcurrency";
-import { 
-  selectContractList, 
-  selectContractPagination, 
-  selectTotalContracts, 
-  selectTotalInvoice, 
-  selectTotalPaidContract, 
-  selectTotalUnpaidContract, 
-  setCurrentPage 
+import {
+  selectContractList,
+  selectContractPagination,
+  selectTotalContracts,
+  selectTotalInvoice,
+  selectTotalPaidContract,
+  selectTotalUnpaidContract,
+  setCurrentPage,
+  setStatusFilter,
+  setSearchFilter,
 } from "../../components/Redux/Contract/contracts_slice";
 import { fetchContracts } from "../../components/Redux/Contract/contracts_thunk";
+import NotFound from "../../components/NotFound";
 
 export default function Contract() {
   const dispatch = useDispatch<AppDispatch>();
+  const [activeTab, setActiveTab] = useState("Active");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    dispatch(fetchContracts({ page: 1 }));
-  }, [dispatch]);
-
-  // Selectors for summary data
   const totalContracts = useSelector(selectTotalContracts);
   const totalInvoice = useSelector(selectTotalInvoice);
   const totalPaidContract = useSelector(selectTotalPaidContract);
   const totalUnpaidContract = useSelector(selectTotalUnpaidContract);
-
-  // Selectors for contract list and pagination
   const contractList = useSelector(selectContractList);
   const contractPagination = useSelector(selectContractPagination);
-
   const loading = useSelector((state: RootState) => state.getcontracts.loading);
   const error = useSelector((state: RootState) => state.getcontracts.error);
 
+  const getStatusNumber = useCallback((tab: string) => {
+    return tab === "Active" ? 1 : 2;
+  }, []);
+
+  useEffect(() => {
+    const status = getStatusNumber(activeTab);
+    dispatch(setStatusFilter(status));
+    dispatch(fetchContracts({ page: 1, status, search: searchQuery }));
+  }, [dispatch, activeTab, getStatusNumber]);
+
   const handlePageChange = async (page: number) => {
-    await dispatch(setCurrentPage(page)); 
-    await dispatch(fetchContracts({ page })); 
+    const status = getStatusNumber(activeTab);
+    await dispatch(setCurrentPage(page));
+    await dispatch(fetchContracts({ page, status, search: searchQuery }));
   };
+
+  // const debounce = (func: (...args: any[]) => void, delay: number) => {
+  //   let timeout: NodeJS.Timeout;
+  //   return (...args: any[]) => {
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(() => func(...args), delay);
+  //   };
+  // };
+
+  // const handleSearch = useCallback(
+  //   debounce((query: string) => {
+  //     setSearchQuery(query);
+  //     const status = getStatusNumber(activeTab);
+  //     dispatch(setSearchFilter(query));
+  //     dispatch(fetchContracts({ page: 1, status, search: query }));
+  //   }, 500),
+  //   [dispatch, activeTab, getStatusNumber]
+  // );
+
+   const handleSearch = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      const status = getStatusNumber(activeTab);
+      dispatch(setSearchFilter(query));
+      dispatch(fetchContracts({ page: 1, status, search: query }));
+    },
+    [dispatch, activeTab, getStatusNumber]
+  );
 
   const getStatusText = (status: number) => {
     switch (status) {
-      case 0: return "Inactive";
-      case 1: return "Active";
-      case 2: return "Completed";
-      case 3: return "Pending";
-      default: return "Unknown";
+      case 1:
+        return "Active";
+      case 2:
+        return "Completed";
+      case 3:
+        return "Pending";
+      default:
+        return "Unknown";
     }
   };
 
@@ -75,41 +114,63 @@ export default function Contract() {
         />
         <MatrixCard
           title="Total Invoice"
-          value={totalInvoice !== null ? formatAsNaira(totalInvoice) : formatAsNaira(0)}
+          value={
+            totalInvoice !== null
+              ? formatAsNaira(totalInvoice)
+              : formatAsNaira(0)
+          }
           change="includes all contracts on a property plan"
         />
         <MatrixCard
           title="Total Amount Paid"
-          value={totalPaidContract !== null ? formatAsNaira(totalPaidContract) : formatAsNaira(0)}
+          value={
+            totalPaidContract !== null
+              ? formatAsNaira(totalPaidContract)
+              : formatAsNaira(0)
+          }
           change="Includes all paid contract amounts"
         />
         <MatrixCard
           title="Total Amount Unpaid"
-          value={totalUnpaidContract !== null ? formatAsNaira(totalUnpaidContract) : formatAsNaira(0)}
+          value={
+            totalUnpaidContract !== null
+              ? formatAsNaira(totalUnpaidContract)
+              : formatAsNaira(0)
+          }
           change="Includes all unpaid contract amounts"
         />
       </div>
-      {loading && (!contractList || contractList.length === 0) ? ( 
-        <div className="absolute top-96 left-1/2 -translate-x-1/2">
-          <LoadingAnimations loading={loading} />
-        </div>
-      ) : (
-        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-          <ReusableTable
-            tabs={[]}
-            searchPlaceholder={"Search by contract Id or email"}
-            activeTab={""}
-            showTabs={false}
-          >
+
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+        <ReusableTable
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabs={["Active", "Completed"]}
+          searchPlaceholder={"Search by contract ID or email"}
+          showTabs={true}
+          onSearch={handleSearch}
+        >
+          {loading ? (
+            <div className="w-full flex items-center justify-center">
+              <LoadingAnimations loading={loading} />
+            </div>
+          ) : !loading && (!contractList || contractList.length === 0) ? (
+            <div className="max-h-screen">
+              <p className="text-center font-normal text-[#767676]">
+                No data found
+              </p>
+              <NotFound />
+            </div>
+          ) : (
             <ContractsTableComponent
               data={contractList || []}
               pagination={contractPagination}
               onPageChange={handlePageChange}
               getStatusText={getStatusText}
             />
-          </ReusableTable>
-        </div>
-      )}
+          )}
+        </ReusableTable>
+      </div>
     </div>
   );
 }

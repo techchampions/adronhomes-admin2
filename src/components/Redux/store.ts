@@ -76,7 +76,8 @@ export const store = configureStore({
     editjob: editJobReducer,
     deletejob: deleteJobReducer,
     savedPropertyUser: savedPropertyUserReducer,
-    getcontracts:contractsReducer
+    getcontracts:contractsReducer,
+    // contracts:contractsReducer
   },
 });
 

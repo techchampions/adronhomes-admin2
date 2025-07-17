@@ -1,11 +1,9 @@
-// contracts_thunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
-import { RootState } from "../store"; // Assuming your store is at ../store
+import { RootState } from "../store";
 import { toast } from "react-toastify";
 
-// Define interfaces for the API response
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
@@ -15,13 +13,38 @@ export interface PropertyDetail {
   id: number;
   name: string;
   type: number;
-  features: string[]; // Added features array as it's present in the new response
+  features: string[];
   price: number;
   size: string;
   display_image: string;
   lga: string;
   state: string;
   total_amount: number;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  phone_number: string;
+  referral_code: string;
+  name: string | null;
+  first_name: string;
+  last_name: string;
+  role: number;
+  country: string | null;
+  state: string | null;
+  lga: string | null;
+  otp_verified_at: string;
+  email_verified_at: string;
+  profile_picture: string | null;
+  gender: string | null;
+  notification_enabled: number;
+  device_id: string;
+  address: string | null;
+  created_at: string;
+  updated_at: string;
+  personnel: string;
+  contract_id: string | null;
 }
 
 export interface Marketer {
@@ -59,11 +82,12 @@ export interface Contract {
   remaining_other_balance: number;
   paid_infrastructure_amount: number;
   paid_other_amount: number;
-  contract_id: string;
+  contract_id: string | null;
   number_of_unit: number;
   initial_payment_percentage: number;
-  marketer: Marketer | null; // Added marketer object
+  marketer: Marketer | null;
   property: PropertyDetail;
+  user: User;
 }
 
 export interface ContractPaginationLinks {
@@ -97,26 +121,25 @@ export interface ContractsResponse {
   contract_list: ContractListData;
 }
 
-// Base URL for your API
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com"; // Fallback for VITE_API_BASE_URL
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
 
-/**
- * Async Thunk to fetch contract listings.
- * It fetches contracts with pagination and handles authentication.
- */
 export const fetchContracts = createAsyncThunk<
-  ContractsResponse, // Return type of the fulfilled action
-  { page?: number }, // Argument type for the thunk (optional page number)
+  ContractsResponse,
+  { 
+    page?: number; 
+    status?: number | null; 
+    search?: string | null;
+    per_page?: number;
+  },
   {
-    state: RootState; // Type for getState
-    rejectValue: ErrorResponse; // Type for rejectWithValue
+    state: RootState;
+    rejectValue: ErrorResponse;
   }
 >(
   "contracts/fetch",
-  async ({ page = 1 }, { rejectWithValue }) => {
-    const token = Cookies.get("token"); // Get authentication token from cookies
+  async ({ page = 1, status = null, search = null, per_page = 10 }, { rejectWithValue }) => {
+    const token = Cookies.get("token");
 
-    // Check if authentication token exists
     if (!token) {
       toast.error("Authentication required. Please login.");
       return rejectWithValue({
@@ -125,50 +148,53 @@ export const fetchContracts = createAsyncThunk<
     }
 
     try {
+      const params: Record<string, any> = {
+        page,
+        per_page,
+      };
+
+      if (status !== null) {
+        params.status = status;
+      }
+
+      if (search) {
+        params.search = search;
+      }
+
       const response = await axios.get<ContractsResponse>(
-        `${BASE_URL}/api/admin/contracts`, // API endpoint for contracts
+        `${BASE_URL}/api/admin/contracts`,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Authorization header
-            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno", // Custom header
-            device_id: "1010l0010l1", // Custom header
+            Authorization: `Bearer ${token}`,
+            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+            device_id: "1010l0010l1",
           },
-          params: {
-            page: page, // Pass the current page for pagination
-          },
+          params,
         }
       );
-      return response.data; // Return the data from the successful response
+      return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>; // Cast error to AxiosError
+      const axiosError = error as AxiosError<ErrorResponse>;
 
-      // Handle 401 Unauthorized error: remove token and notify user
       if (axiosError.response?.status === 401) {
         Cookies.remove("token");
         toast.error("Session expired. Please login again.");
       }
 
-      // If there's a response from the server, use its error message
       if (axiosError.response) {
         const errorMessage =
           axiosError.response.data.message ||
-          "Failed to fetch contracts data"; // Default error message
-        toast.error(errorMessage); // Display error toast
-        return rejectWithValue(axiosError.response.data); // Reject with the server's error data
-      } else if (axiosError.request) {
-        // If no response was received (e.g., network error)
-        const errorMessage =
-          "No response from server. Please check your network connection.";
-        toast.error(errorMessage); // Display error toast
-        return rejectWithValue({
-          message: errorMessage,
-        });
+          "Failed to fetch contracts data";
+        toast.error(errorMessage);
+        return rejectWithValue(axiosError.response.data);
       }
 
-      // Handle any other unexpected errors
-      const errorMessage = "An unexpected error occurred. Please try again.";
-      toast.error(errorMessage); // Display error toast
+      const errorMessage = axiosError.request
+        ? "No response from server. Please check your network connection."
+        : "An unexpected error occurred. Please try again.";
+      
+      toast.error(errorMessage);
       return rejectWithValue({
         message: errorMessage,
       });
