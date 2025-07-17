@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import UsersTableComponent from "./Personnel_Table";
@@ -8,6 +8,7 @@ import { personnels } from "../../components/Redux/personnel/personnel_thunk";
 import { User } from "../../components/Redux/personnel/edithPersonelle";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
+import { PropertyContext } from "../../MyContext/MyContext";
 
 interface UsersTable {
   id: number;
@@ -16,11 +17,12 @@ interface UsersTable {
   Role: string;
   Created: string;
   user: User;
+  referral_code:any
 }
 
 const getRoleName = (roleId: number) => {
   switch (roleId) {
-     case 0:
+    case 0:
       return "Customer";
     case 1:
       return "Admin";
@@ -36,16 +38,33 @@ const getRoleName = (roleId: number) => {
 };
 
 export default function Personnel() {
+
+  const sortOptions = [
+  { value: 2, name: "Marketer" },
+  { value: 3, name: "Director" },
+  { value: 4, name: "Accountant" },
+  { value: 1, name: "Admin" }
+];
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
+
+
+  const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const { data, error, loading } = useSelector(
     (state: RootState) => state.getpersonnel
   );
 
-  useEffect(() => {
-    dispatch(personnels());
-  }, [dispatch]);
+  const {
+option,
+setOption
+  } = useContext(PropertyContext)!;
+
+
+useEffect(() => {
+  // const roleValues = sortOptions.map(option => option.value);
+  dispatch(personnels({ role: option.value }));
+}, [dispatch,option]);
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
@@ -56,6 +75,7 @@ export default function Personnel() {
       Email: item.email,
       Role: getRoleName(item.role),
       Created: item.created_at,
+      referral_code:item.referral_code,
       user: {
         ...item,
         country: item.country || "",
@@ -63,8 +83,23 @@ export default function Personnel() {
     }));
   };
 
-  const filteredData = personnelData();
+  const allData = personnelData();
+  
+  // Filter data based on search term
+  const filteredData = allData.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.User.toLowerCase().includes(searchLower) ||
+      item.Email.toLowerCase().includes(searchLower) ||
+      item.Role.toLowerCase().includes(searchLower)
+    );
+  });
+
   const isEmpty = filteredData.length === 0;
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
 
   return (
     <div className="mb-[52px]">
@@ -78,6 +113,12 @@ export default function Personnel() {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          searchPlaceholder="search for personnel"
+          onSearch={handleSearch}
+          sortOptions={sortOptions}
+          onSortChange={setOption}
+      defaultSort={option.value}
+          
         >
           {loading ? (
             <div className=" w-full flex items-center justify-center">

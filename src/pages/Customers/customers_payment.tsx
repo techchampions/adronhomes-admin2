@@ -162,10 +162,11 @@ export default function MarketerInvoice() {
         history={true}
         title="Customers"
         subtitle="Manage the list of registered customers"
+        showSearchAndButton={false}
       />
 
       <ProfileCard
-        imageUrl={planProperties.user?.profile_picture || "/profile.svg"}
+        imageUrl={planProperties.user?.profile_picture || "/unknown.png"}
         name={`${planProperties.user?.first_name} ${planProperties.user?.last_name}`}
         dateJoined={new Date(
           planProperties.user?.created_at
@@ -231,7 +232,7 @@ export default function MarketerInvoice() {
 
       <p className="md:text-[20px] font-[325] text-base text-dark">Payments</p>
 
-      <ReusableTable activeTab={"All"} tabs={tabs} sortButtonText="Latest">
+      <ReusableTable activeTab={"All"} tabs={tabs} >
         <div className="w-full overflow-x-auto">
           {/* invoiceAmount={`₦${planProperties.paid_amount?.toLocaleString()}`} */}
           <div className="space-y-[10px]">
@@ -248,6 +249,7 @@ export default function MarketerInvoice() {
             ))}
           </div>
         </div>
+
       </ReusableTable>
 
       {isModalOpen && data && (
@@ -281,11 +283,7 @@ export default function MarketerInvoice() {
                           Payment {item.property?.name || "Property"}
                         </p>
                         <p className="font-[400] text-xs sm:text-sm text-[#767676] truncate">
-                          {new Date(item.due_date).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                                Payment #{item.id}
                         </p>
                       </div>
 
@@ -311,7 +309,12 @@ export default function MarketerInvoice() {
                             onClick={() => {}}
                             className="text-xs sm:text-sm font-[400] text-[#767676] bg-transparent py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap hover:bg-[#EAEAEA]"
                           >
-                            Payment #{item.id}
+                               {new Date(item.due_date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                     
                           </button>
                         )}
                       </div>

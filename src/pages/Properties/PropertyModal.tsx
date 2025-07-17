@@ -99,24 +99,11 @@ useEffect(() => {
     );
   };
 
-  const getPropertyType = (type: number) => {
-    switch (type) {
-      case 1:
-        return "Residential";
-      case 2:
-        return "Commercial";
-      case 3:
-        return "Land";
-      default:
-        return "Other";
-    }
-  };
-
   // Format saved users data for display
   const formatSavedUsers = () => {
     if (!savedUsers || savedUsers.length === 0) return [];
     
-    return savedUsers.map((user) => ({
+    return savedUsers.map((user:any) => ({
       name: `${user.saved_user.first_name} ${user.saved_user.last_name || ''}`.trim(),
       email: user.saved_user.email,
       phone: user.saved_user.phone_number,
@@ -400,7 +387,7 @@ useEffect(() => {
             ) : (
               <>
                 <div className="space-y-4">
-                  {formatSavedUsers().map((client, index) => (
+                  {formatSavedUsers().map((client:any, index:any) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
@@ -409,7 +396,7 @@ useEffect(() => {
                         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-sm font-semibold text-gray-700">
                           {client.name
                             .split(" ")
-                            .map((n) => n[0])
+                            .map((n:any) => n[0])
                             .join("")}
                         </div>
                         <div>
@@ -445,3 +432,19 @@ useEffect(() => {
     </div>
   );
 }
+
+
+
+
+export const getPropertyType = (type: number) => {
+       switch (type) {
+      case 1:
+        return "Residential";
+      case 2:
+        return "Commercial";
+      case 3:
+        return "Land";
+      default:
+        return "Other";
+    }
+  };

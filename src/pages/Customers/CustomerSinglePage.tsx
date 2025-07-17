@@ -313,6 +313,7 @@ export default function CustomerSinglePage() {
         history={true}
         title="Customers"
         subtitle="Manage the list of registered customers"
+        showSearchAndButton={false}
       />
 
       <div className="grid md:grid-cols-3 gap-[20px]">
@@ -334,7 +335,7 @@ export default function CustomerSinglePage() {
       </div>
 
       <ProfileCard
-        profileImage={data.customer.profile_picture || "/profile.svg"}
+        profileImage={data.customer.profile_picture || "/unknown.png"}
         name={`${data.customer.first_name} ${data.customer.last_name}`}
         dateJoined={formatDate(data.customer.created_at)}
         email={data.customer.email}

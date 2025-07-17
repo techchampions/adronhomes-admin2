@@ -20,14 +20,10 @@ const BulkBasicDetails = forwardRef<BulkBasicDetailsHandles, BulkBasicDetailsPro
   const dispatch = useDispatch<AppDispatch>();
   
   useEffect(() => {
-    dispatch(personnels());
+    dispatch(personnels({role:4}));
   }, [dispatch]);
 
-  const {
-    loading: userLoading,
-    error: userError,
-    data
-  } = useSelector((state: RootState) => state.getpersonnel);
+
 
   const propertyTypeOptions = [
     { value: "1", label: "Land" },

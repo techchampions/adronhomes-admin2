@@ -10,7 +10,7 @@ export interface PropertyData {
   type: number;
   no_of_bedroom: number | null;
   slug: string;
-  features: string[] | string; // Can be array or stringified array
+  features: string[] | string; 
   overview: string;
   description: string;
   street_address: string;
@@ -29,7 +29,7 @@ export interface PropertyData {
   is_sold: boolean;
   is_active: boolean;
   property_duration_limit: number;
-  payment_schedule: string[] | string | null; // Can be array or stringified array
+  payment_schedule: string[] | string | null; 
   category: string;
   is_discount: boolean;
   discount_name: string | null;

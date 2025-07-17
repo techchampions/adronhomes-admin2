@@ -53,12 +53,11 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   );
 };
 
-// RevenueCard (Green)
 interface RevenueCardProps {
   title?: string;
   value?: string;
   icon?: string;
-  value2?: string;
+  value2?: string | number; // Allow both string and number for flexibility
 }
 
 export function RevenueCard({
@@ -67,14 +66,33 @@ export function RevenueCard({
   icon = "/solar.svg",
   value2 = "40%",
 }: RevenueCardProps) {
+  // Function to format the value to 2 decimal places
+  const formatValue = (val: string | number) => {
+    // If it's already a number, format it directly
+    if (typeof val === 'number') {
+      return val.toFixed(2);
+    }
+    
+    // If it's a string, try to extract the numeric part
+    const numericValue = parseFloat(val.replace(/[^0-9.-]/g, ''));
+    if (!isNaN(numericValue)) {
+      return numericValue.toFixed(2) + (val.includes('%') ? '%' : '');
+    }
+    
+    // Return original if we can't parse it
+    return val;
+  };
+
+  const formattedValue = formatValue(value2);
+
   return (
     <div className="bg-[#57713A]  md:min-h-[200px] min-h-full rounded-[20px] pt-[24px] pb-[35px] pl-[19px] md:pl-[29px] md:pr-[120px] pr-[60px]">
       <p className="font-[325] md:text-[14px]  text-[10px] leading-[100%] tracking-[0%] text-white mb-[22px]">
         {title}
       </p>
       <img src={icon} className="mb-[10px]" alt="icon " />
-      <p className="leading-[34px] tracking-[0] font-[350] md:text-[27px] text-[18px] text-white">
-        {value2} <span className="font-[325]">{value}</span>
+      <p className="leading-[34px] tracking-[0] font-[350] md:text-[27px] text-[18px] text-white pr-4">
+        {formattedValue} <span className="font-[325] text-base">{value}</span>
       </p>
     </div>
   );

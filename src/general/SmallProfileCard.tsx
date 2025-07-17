@@ -32,7 +32,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           Date Joined: <span className="font-normal">{dateJoined}</span>
         </p>
 
-        <p className='text-dark md:text-sm font-bold  text-[10px] cursor-pointer' onClick={()=>navigate(`${customerId}`)} >View Customer</p>
+        {/* <p className='text-dark md:text-sm font-bold  text-[10px] cursor-pointer' onClick={()=>navigate(`${customerId}`)} >View Customer</p> */}
        </div>
       </div>
     </div>

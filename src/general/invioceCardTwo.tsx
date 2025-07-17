@@ -449,13 +449,13 @@ export default function InvoiceCard({
                   </div>
                 ))}
 
-                <div className="flex items-center">
+              
+              </div>
+  <div className="flex items-center">
                   <span className="text-xs md:text-base break-words font-[325]">
-                    {property.type}
+                  Property Type :  {property.type}
                   </span>
                 </div>
-              </div>
-
               {/* <p className="mt-3 md:mt-[10px] text-xs md:text-base break-words font-[350]">
                 View Property
               </p> */}
