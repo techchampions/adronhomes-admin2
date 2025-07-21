@@ -71,9 +71,10 @@ export const PasswordFormField = ({
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? (
-            <FiEyeOff className="h-5 w-5" />
+             <BsEye className="h-5 w-5" />
+          
           ) : (
-            <BsEye className="h-5 w-5" />
+             <FiEyeOff className="h-5 w-5" />
           )}
         </button>
       )}
@@ -85,3 +86,8 @@ export const PasswordFormField = ({
     </div>
   );
 };
+
+
+
+
+

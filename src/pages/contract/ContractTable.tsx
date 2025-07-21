@@ -182,7 +182,7 @@ export default function ContractsTableComponent({
                   </td>
 
                   {/* Status */}
-                  <td className="pb-[31px] font-gotham font-[325] text-sm max-w-[100px] truncate pr-4 relative group">
+                  <td className="pb-[31px] font-gotham font-[325] text-sm max-w-[100px] truncate pr-4 relative group" onClick={()=>navigation(`/customers/${contract.user.id}`)}>
                     <div className={`px-2 py-1 ${getStatusBadgeClass(contract.status)} truncate`}>
                       {getStatusText(contract.status)}
                     </div>
@@ -194,7 +194,7 @@ export default function ContractsTableComponent({
                   </td>
 
                   {/* Marketer */}
-                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group">
+                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group" onClick={()=>navigation(`/customers/${contract.user.id}`)}>
                     <div className="truncate">
                       {contract.marketer
                         ? `${contract.marketer.first_name} ${contract.marketer.last_name}`

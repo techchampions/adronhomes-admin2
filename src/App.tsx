@@ -50,6 +50,7 @@ import HRDashboard from "./hr/page";
 import CarrerSideBar from "./hr/sideNav";
 import Contract from "./pages/contract/Contract";
 import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
+import UserPayments from "./pages/Transactions/Transactions";
 
 
 const AuthGuard = () => {
@@ -130,7 +131,7 @@ const App = () => {
                   path="/payments/status/:paymentId"
                   element={<PaymentById />}
                 />
-                <Route path="/transactions" element={<Transactions />} />
+              
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
                    <Route path="/contracts" element={<Contract />} />
@@ -170,6 +171,7 @@ const App = () => {
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
+                  <Route path="/customers/transactions/:id" element={<UserPayments />} />
                 <Route
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
