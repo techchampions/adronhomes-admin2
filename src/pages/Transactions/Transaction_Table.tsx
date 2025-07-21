@@ -1,67 +1,76 @@
 import React, { useState } from "react";
 import Pagination from "../../components/Tables/Pagination";
-import { fetchTransactions } from "../../components/Redux/Transactions/Transactions_thunk";
+// import { fetchUserPayments } from "../../components/Redux/UserPayments/userPaymentsThunk";
 import { useDispatch, useSelector } from "react-redux";
-import { selectTransactionsPagination, setCurrentPage } from "../../components/Redux/Transactions/Transactions_slice";
+// import { selectUserPaymentsPagination, setCurrentPage } from "../../components/Redux/UserPayments/userPaymentsSlice";
 import { AppDispatch } from "../../components/Redux/store";
-import TransactionModal from "../../components/Modals/Transaction";
+import { selectUserPaymentsPagination, setCurrentPage } from "../../components/Redux/Payment/userPayment/ userPaymentsSlice";
+import { fetchUserPayments } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
+import PaymentModal from "../../components/Modals/Transaction";
+import { formatDate } from "../../utils/formatdate";
+// import PaymentModal from "../../components/Modals/PaymentModal";
 
-
-export interface TransactionData {
-  id: string;
+export interface PaymentData {
+  id: number;
   customerName: string;
   marketerInCharge: string;
   amount: string;
   status: "Approved" | "Pending" | "Rejected";
   paymentDate: string;
+  description: string;
+  payment_type: string;
+  reference: string;
+  property?: {
+    name: string;
+  };
+  director?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
-interface TransactionDatas {
-  data: TransactionData[];
+interface PaymentDatas {
+  data: PaymentData[];
 }
 
-export default function TransactionTableComponent({ data }: TransactionDatas) {
+export default function PaymentTableComponent({ data,userId }: {data:any,userId:any}) {
   const dispatch = useDispatch<AppDispatch>();
-  const pagination = useSelector(selectTransactionsPagination);
-  const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
+
+  const pagination = useSelector(selectUserPaymentsPagination);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchTransactions());
+    await dispatch(fetchUserPayments({ userId: userId,page })); 
   };
 
-  const handleRowClick = (transaction: TransactionData) => {
-    setSelectedTransaction(transaction);
+  const handleRowClick = (payment: PaymentData) => {
+    setSelectedPayment(payment);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedTransaction(null);
+    setSelectedPayment(null);
   };
 
-  // Convert table transaction data to modal transaction data format
-  const getModalTransactionData = (transaction: any) => {
+  // Convert table payment data to modal payment data format
+  const getModalPaymentData = (payment: PaymentData) => {
     return {
-      from: transaction.customerName,
-      description:transaction.description, // You can customize this
-      type:transaction.description, // You can customize this
-      method:transaction.transaction_method, // You can customize this
-      fees: transaction.amount, // You can customize this
-      reference: transaction.reference,
-      status: transaction.status === "Rejected" ? "Failed" : transaction.status,
-      bankIcon: "/bank.svg", // You can customize this
+      from: payment.customerName,
+      description: payment.description,
+      property: payment.property?.name || 'N/A',
+      type: payment.payment_type,
+      method: payment.payment_type,
+      amount: payment.amount,
+      reference: payment.reference,
+      status: payment.status === "Rejected" ? "Failed" : payment.status,
+      paymentDate: payment.paymentDate,
+      director: payment.director ? 
+        `${payment.director.first_name} ${payment.director.last_name}` : 'N/A'
     };
   };
-
-
-
-
-
-
-
-  
 
   return (
     <>
@@ -71,7 +80,7 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
             <thead>
               <tr className="text-left">
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[150px] max-w-[150px]">
-                  <div className="truncate">Transaction ID</div>
+                  <div className="truncate">Payment ID</div>
                 </th>
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[200px] max-w-[200px]">
                   <div className="truncate">Customer's Name</div>
@@ -91,38 +100,41 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
               </tr>
             </thead>
             <tbody>
-              {data.map((transaction, index) => (
+              {data.map((payment:any, index:any) => (
                 <tr 
-                  key={`transaction-${index}`}
-                  onClick={() => handleRowClick(transaction)}
+                  key={`payment-${index}`}
+                  onClick={() => handleRowClick(payment)}
                   className="cursor-pointer hover:bg-gray-50 transition-colors"
                 >
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
-                    <div className="truncate">{transaction.id}</div>
+                    <div className="truncate">{payment.id}</div>
                   </td>
                   <td className="py-4 pr-6 font-medium text-dark text-sm w-[200px] max-w-[200px]">
-                    <div className="truncate">{transaction.customerName}</div>
+                    <div className="truncate">{payment.customerName}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-gray-800 text-sm w-[200px] max-w-[200px]">
-                    <div className="truncate">{transaction.marketerInCharge}</div>
+                    <div className="truncate">{payment.marketerInCharge}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
-                    <div className="truncate">{transaction.amount}</div>
+                    <div className="truncate">₦{Number(payment.amount).toLocaleString()}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">
                     <div
                       className={`truncate ${
-                        transaction.status === "Approved"
-                          ? "text-[#2E9B2E]":  transaction.status === "Rejected"
+                        payment.status === "Approved"
+                          ? "text-[#2E9B2E]":  
+                        payment.status === "Rejected"
                           ? "text-[#D70E0E]"
                           : "text-[#FF9131]"
                       }`}
                     >
-                      { transaction.status === "Rejected"?"Disapproved":transaction.status}
+                      {payment.status === "Rejected" ? "Disapproved" : payment.status}
                     </div>
                   </td>
                   <td className="py-4 pl-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">
-                    <div className="truncate">{transaction.paymentDate}</div>
+                    <div className="truncate">
+                      {formatDate(payment.paymentDate)}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -138,12 +150,12 @@ export default function TransactionTableComponent({ data }: TransactionDatas) {
         />
       </div>
 
-      {/* Transaction Modal */}
-      {selectedTransaction && (
-        <TransactionModal
+      {/* Payment Modal */}
+      {selectedPayment && (
+        <PaymentModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          transactionData={getModalTransactionData(selectedTransaction)}
+          paymentData={getModalPaymentData(selectedPayment)}
         />
       )}
     </>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import ProfileCard from "../../general/ProfileCard";
@@ -43,6 +43,7 @@ interface TableRowData {
 export default function CustomerSinglePage() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const { data, loading, error } = useSelector(
     (state: RootState) => state.customerById
@@ -159,7 +160,7 @@ export default function CustomerSinglePage() {
   const completedProperties =
     data?.limit_completed_property.map((item) => {
       const property = item.property;
-         const getDurationLabel = (type: any) => {
+      const getDurationLabel = (type: any) => {
         if (type === "2") return "Installment Payment";
         if (type === "1") return "One-Time Payment";
         return "N/A";
@@ -171,7 +172,7 @@ export default function CustomerSinglePage() {
         image: property.display_image || "/default-property.jpg",
         price: formatAsNaira(property.price),
         amountPaid: formatAsNaira(item.paid_amount),
-          Duration: getDurationLabel(item.payment_type),
+        Duration: getDurationLabel(item.payment_type),
         StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
         FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
         property: item.property,
@@ -317,11 +318,19 @@ export default function CustomerSinglePage() {
       />
 
       <div className="grid md:grid-cols-3 gap-[20px]">
-        <MatrixCardGreen
-          title="Total Amount Paid"
-          value={formatAsNaira(parseInt(data.total_paid))}
-          change="Includes total amount paid by this customer"
-        />
+        <div className=" w-full relative">
+          <button
+            className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1  px-2 rounded-full   border "
+            onClick={() => navigate(`/customers/transactions/${id}`)}
+          >
+            view Transactions
+          </button>
+          <MatrixCardGreen
+            title="Total Amount Paid"
+            value={formatAsNaira(parseInt(data.total_paid))}
+            change="Includes total amount paid by this customer"
+          />
+        </div>
         <MatrixCard
           title="Total Pending Payments"
           value={formatAsNaira(data.pending_paid)}

@@ -36,7 +36,8 @@ import jobDetailsReducer from "./carreer/job_details_slice";
 import createJobReducer from "./carreer/create_job_slice";
 import editJobReducer from "./carreer/edit_job_slice";
 import deleteJobReducer from "./carreer/delete_job_slice";
-import contractsReducer from './Contract/contracts_slice'
+import contractsReducer from './Contract/contracts_slice';
+import userPaymentsReducer from './Payment/userPayment/ userPaymentsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -77,6 +78,7 @@ export const store = configureStore({
     deletejob: deleteJobReducer,
     savedPropertyUser: savedPropertyUserReducer,
     getcontracts:contractsReducer,
+    userPayments:userPaymentsReducer
     // contracts:contractsReducer
   },
 });
