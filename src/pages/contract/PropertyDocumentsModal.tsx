@@ -4,34 +4,27 @@ import { BiDumbbell } from "react-icons/bi";
 import { TfiRulerAlt2 } from "react-icons/tfi";
 import * as Yup from "yup";
 
-// --- Interfaces (No changes needed here) ---
 interface ContractDocument {
   id?: number;
   document_file: string | File;
-  // If your existing documents have other properties you need to pass, add them here
-  plan_id?: number; // Added for clarity if your existing docs also carry plan_id
-  [key: string]: any; // For any additional properties
+  plan_id?: number;
+  [key: string]: any; 
 }
 
 interface PropertyDocumentsModalProps {
   onClose: () => void;
   onSubmit: (values: {
     documents: Array<{ plan_id: number; document_file: File | string }>;
-    removedDocuments?: number[];
   }) => Promise<void>;
   propertyDetails: PropertyDetails;
   isLoading?: boolean;
-  initialDocuments?: ContractDocument[];
   isEditMode?: boolean;
 }
 
 interface FileWithPreview {
-  file: File | string; // Can be a File object (new) or a string URL (existing)
+  file: File;
   preview: string;
   name: string;
-  isExisting?: boolean; // True if loaded from initialDocuments
-  id?: number; // ID of the existing document if applicable
-  plan_id?: number; // Include plan_id if relevant for existing documents
 }
 
 interface PropertyDetails {
@@ -42,69 +35,34 @@ interface PropertyDetails {
   features?: string[];
 }
 
-// --- PropertyDocumentsModal Component ---
 export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
   onClose,
   onSubmit,
   propertyDetails,
   isLoading = false,
-  initialDocuments = [],
   isEditMode = false,
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPreview[]>([]);
-  const [removedExistingFiles, setRemovedExistingFiles] = useState<number[]>([]);
-  const [originalFiles, setOriginalFiles] = useState<FileWithPreview[]>([]); // To reset on cancel in edit mode
 
-  // --- useEffect to Initialize State with Existing Documents ---
   useEffect(() => {
-    if (isEditMode && initialDocuments.length > 0) {
-      const existingFiles = initialDocuments.map((doc) => ({
-        file: doc.document_file, // This will be the string URL from the backend
-        preview:
-          typeof doc.document_file === "string"
-            ? doc.document_file // Preview is the URL itself for existing
-            : URL.createObjectURL(doc.document_file), // For any local File objects (unlikely for initial, but safe)
-        name:
-          typeof doc.document_file === "string"
-            ? doc.document_file.split("/").pop() || "Document" // Extract name from URL
-            : doc.document_file.name, // Use file name for File objects
-        isExisting: true,
-        id: doc.id, // Crucial for identifying existing documents for potential removal
-        plan_id: doc.plan_id, // Pass plan_id if available on your ContractDocument
-      }));
-      setUploadedFiles(existingFiles);
-      setOriginalFiles(existingFiles); // Save initial state for potential reset
-    } else if (!isEditMode) {
-      // Clear files if switching from edit to create, or just initializing for create
-      setUploadedFiles([]);
-      setRemovedExistingFiles([]);
-      setOriginalFiles([]);
-    }
-    // Cleanup URL objects if component unmounts or initialDocuments change
+    // Cleanup URL objects if component unmounts
     return () => {
       uploadedFiles.forEach(file => {
-        if (file.file instanceof File) {
-          URL.revokeObjectURL(file.preview);
-        }
+        URL.revokeObjectURL(file.preview);
       });
     };
-  }, [isEditMode, initialDocuments]); // Depend on initialDocuments and isEditMode
-
-  // --- useEffect to Keep Formik in Sync with uploadedFiles ---
-  // This is vital for validation and ensuring Formik always has the latest set of docs
+  }, [uploadedFiles]); 
+ 
   useEffect(() => {
     const documentsValue = uploadedFiles.map((f) => ({
-      // If the document is existing, use its original plan_id if available, otherwise default to 0
-      // The parent component's handleSubmit will likely set the definitive plan_id
-      plan_id: f.plan_id || 0,
-      document_file: f.file, // This correctly includes both string URLs and File objects
+      plan_id: 0, // Default plan_id for new uploads
+      document_file: f.file, 
     }));
 
     formik.setFieldValue("documents", documentsValue);
-    formik.validateField("documents"); // Manually trigger validation
-  }, [uploadedFiles]); // Re-run whenever uploadedFiles changes
+    formik.validateField("documents"); 
+  }, [uploadedFiles]); 
 
-  // --- Formik Setup ---
   const validationSchema = Yup.object().shape({
     documents: Yup.array()
       .min(1, "At least one document is required")
@@ -117,35 +75,20 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
     },
     validationSchema,
     onSubmit: async (values) => {
-      // The `documents` array in `values` already contains both new File objects
-      // and string URLs for existing documents, thanks to the useEffect above.
-      // We just ensure the structure matches the onSubmit prop's expectation.
-      const allCurrentDocumentsForSubmission = uploadedFiles.map((f) => ({
-        plan_id: f.plan_id || 0, // Use the stored plan_id or default
-        document_file: f.file,
-      }));
-
       const submitValues = {
-        documents: allCurrentDocumentsForSubmission,
-        removedDocuments: isEditMode ? removedExistingFiles : [],
+        documents: values.documents,
       };
 
       await onSubmit(submitValues);
-      // Optional: Reset states after successful submission if modal closes automatically
-      // setUploadedFiles([]);
-      // setRemovedExistingFiles([]);
     },
   });
 
-  // --- File Handling Functions ---
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files).map((file) => ({
         file,
         preview: URL.createObjectURL(file),
         name: file.name,
-        isExisting: false, // Newly added files are not existing
-        // No id or plan_id for new files yet, they'll get assigned by backend
       }));
 
       setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
@@ -154,50 +97,26 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
 
   const removeFile = (index: number) => {
     const fileToRemove = uploadedFiles[index];
+    URL.revokeObjectURL(fileToRemove.preview);
 
-    // If removing an existing file, add its ID to the `removedExistingFiles` list
-    if (fileToRemove.isExisting && typeof fileToRemove.id === "number") {
-      setRemovedExistingFiles((prev) => [...prev, fileToRemove.id!]);
-    }
-
-    // Revoke object URL for newly added files to prevent memory leaks
-    if (fileToRemove.file instanceof File) {
-      URL.revokeObjectURL(fileToRemove.preview);
-    }
-
-    // Remove the file from the `uploadedFiles` state
     const newFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(newFiles);
   };
 
   const handleCancel = () => {
-    // Revoke any created URLs for unsaved new files
     uploadedFiles.forEach(file => {
-      if (!file.isExisting && file.file instanceof File) {
-        URL.revokeObjectURL(file.preview);
-      }
+      URL.revokeObjectURL(file.preview);
     });
-
-    // Reset files to original state if in edit mode, otherwise clear them
-    if (isEditMode) {
-      setUploadedFiles(originalFiles);
-      setRemovedExistingFiles([]);
-    } else {
-      setUploadedFiles([]);
-      setRemovedExistingFiles([]);
-    }
-    onClose(); // Close the modal
+    setUploadedFiles([]);
+    onClose();
   };
 
-  // --- Render JSX (No major changes here, mostly styling and structure) ---
   return (
     <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-[40px] p-6 w-full max-w-md mx-4 shadow-lg">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-[#1E1E1E]">
-            {isEditMode
-              ? "Edit Property Documents"
-              : "Upload Property Documents"}
+            {isEditMode ? "Upload Property Documents" : "Upload Property Documents"}
           </h2>
           <button
             onClick={handleCancel}
@@ -209,9 +128,7 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
         </div>
 
         <p className="text-sm text-[#4F4F4F] mb-[30px]">
-          {isEditMode
-            ? "Edit the documents for this property."
-            : "Upload the documents for this property."}
+          Upload the documents for this property.
         </p>
 
         <div className="mb-6 flex items-start space-x-4">
@@ -247,7 +164,7 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                 >
                   {feature === "Str Lights" && (
                     <img
-                      src="/wand.svg" // Make sure this path is correct
+                      src="/wand.svg" 
                       alt="Street Lights"
                       className="mr-1 w-3 h-3"
                     />
@@ -257,7 +174,7 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                   )}
                   {feature === "Land" && (
                     <img
-                      src="/land.svg" // Example: Use /land.svg for consistency or provide actual path
+                      src="/land.svg"
                       alt="Land"
                       className="mr-1 w-3 h-3"
                     />
@@ -299,19 +216,12 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                 <div className="mt-4 max-h-[150px] overflow-y-auto pr-1 space-y-2">
                   {uploadedFiles.map((file, index) => (
                     <div
-                      key={file.id || index} // Use file.id for existing docs, fall back to index
-                      className={`flex items-center rounded-full pl-3 pr-2 py-1 ${
-                        file.isExisting ? "bg-[#E0F7FA]" : "bg-[#F2F2F2]"
-                      }`}
+                      key={index}
+                      className="flex items-center rounded-full pl-3 pr-2 py-1 bg-[#F2F2F2]"
                     >
                       <span className="text-sm text-[#4F4F4F] truncate max-w-[150px]">
                         {file.name}
                       </span>
-                      {file.isExisting && (
-                        <span className="ml-1 text-xs text-[#79B833]">
-                          (existing)
-                        </span>
-                      )}
                       <button
                         type="button"
                         onClick={() => removeFile(index)}
@@ -361,10 +271,8 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  {isEditMode ? "Updating..." : "Uploading..."}
+                  Uploading...
                 </div>
-              ) : isEditMode ? (
-                "Update"
               ) : (
                 "Done"
               )}
