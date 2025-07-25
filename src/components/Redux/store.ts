@@ -37,7 +37,12 @@ import createJobReducer from "./carreer/create_job_slice";
 import editJobReducer from "./carreer/edit_job_slice";
 import deleteJobReducer from "./carreer/delete_job_slice";
 import contractsReducer from './Contract/contracts_slice';
-import userPaymentsReducer from './Payment/userPayment/ userPaymentsSlice'
+import userPaymentsReducer from './Payment/userPayment/ userPaymentsSlice';
+import walletTransactionsReducer from './customers/wallet_Transaction_Slice'
+import contractingReducer from './UpdateContract/UpdateContract'
+import contractDocumentsReducer from './UpdateContract/createContractDocuments'
+import contractingFormReducer from './UpdateContract/viewcontractFormDetails'
+import ViewcontractDocumentsREducer from './UpdateContract/contractDocumentsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -78,8 +83,12 @@ export const store = configureStore({
     deletejob: deleteJobReducer,
     savedPropertyUser: savedPropertyUserReducer,
     getcontracts:contractsReducer,
-    userPayments:userPaymentsReducer
-    // contracts:contractsReducer
+    userPayments:userPaymentsReducer,
+    walletTransactions:walletTransactionsReducer,
+    contract:contractingReducer,
+      contractForm:contractingFormReducer,
+    contractDocuments:contractDocumentsReducer,
+    ViewcontractDocuments:ViewcontractDocumentsREducer
   },
 });
 

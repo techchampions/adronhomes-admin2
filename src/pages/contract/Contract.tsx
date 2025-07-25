@@ -17,13 +17,16 @@ import {
   setCurrentPage,
   setStatusFilter,
   setSearchFilter,
+  setContractFilter,
 } from "../../components/Redux/Contract/contracts_slice";
 import { fetchContracts } from "../../components/Redux/Contract/contracts_thunk";
 import NotFound from "../../components/NotFound";
+import ContractsTableComponenTwo from "./contractTableTwo";
+import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
 
 export default function Contract() {
   const dispatch = useDispatch<AppDispatch>();
-  const [activeTab, setActiveTab] = useState("Active");
+  const [activeTab, setActiveTab] = useState("New");
   const [searchQuery, setSearchQuery] = useState("");
 
   const totalContracts = useSelector(selectTotalContracts);
@@ -35,48 +38,58 @@ export default function Contract() {
   const loading = useSelector((state: RootState) => state.getcontracts.loading);
   const error = useSelector((state: RootState) => state.getcontracts.error);
 
-  const getStatusNumber = useCallback((tab: string) => {
-    return tab === "Active" ? 1 : 2;
+
+  const getContractFilters = useCallback((tab: string) => {
+    switch (tab) {
+      case "New":
+        return { contract: 0, status: 1 }; 
+      case "Active":
+        return { contract: 1, status: 1 }; 
+      case "Completed":
+        return { contract: 1, status: 2 }; 
+      case "Allocated":
+        return { contract: 1, status: 3 }; 
+      default:
+        return { contract: 1, status: 1 }; 
+    }
   }, []);
 
   useEffect(() => {
-    const status = getStatusNumber(activeTab);
-    dispatch(setStatusFilter(status));
-    dispatch(fetchContracts({ page: 1, status, search: searchQuery }));
-  }, [dispatch, activeTab, getStatusNumber]);
+    const filters = getContractFilters(activeTab);
+    dispatch(setContractFilter(filters.contract));
+    dispatch(setStatusFilter(filters.status));
+    dispatch(fetchContracts({ 
+      page: 1, 
+      contract: filters.contract, 
+      status: filters.status, 
+      search: searchQuery 
+    }));
+  }, [dispatch, activeTab, getContractFilters, searchQuery]);
 
   const handlePageChange = async (page: number) => {
-    const status = getStatusNumber(activeTab);
+    const filters = getContractFilters(activeTab);
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchContracts({ page, status, search: searchQuery }));
+    await dispatch(fetchContracts({ 
+      page, 
+      contract: filters.contract, 
+      status: filters.status, 
+      search: searchQuery 
+    }));
   };
 
-  // const debounce = (func: (...args: any[]) => void, delay: number) => {
-  //   let timeout: NodeJS.Timeout;
-  //   return (...args: any[]) => {
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(() => func(...args), delay);
-  //   };
-  // };
-
-  // const handleSearch = useCallback(
-  //   debounce((query: string) => {
-  //     setSearchQuery(query);
-  //     const status = getStatusNumber(activeTab);
-  //     dispatch(setSearchFilter(query));
-  //     dispatch(fetchContracts({ page: 1, status, search: query }));
-  //   }, 500),
-  //   [dispatch, activeTab, getStatusNumber]
-  // );
-
-   const handleSearch = useCallback(
+  const handleSearch = useCallback(
     (query: string) => {
       setSearchQuery(query);
-      const status = getStatusNumber(activeTab);
+      const filters = getContractFilters(activeTab);
       dispatch(setSearchFilter(query));
-      dispatch(fetchContracts({ page: 1, status, search: query }));
+      dispatch(fetchContracts({ 
+        page: 1, 
+        contract: filters.contract, 
+        status: filters.status, 
+        search: query 
+      }));
     },
-    [dispatch, activeTab, getStatusNumber]
+    [dispatch, activeTab, getContractFilters]
   );
 
   const getStatusText = (status: number) => {
@@ -86,7 +99,7 @@ export default function Contract() {
       case 2:
         return "Completed";
       case 3:
-        return "Pending";
+        return "Allocated";
       default:
         return "Unknown";
     }
@@ -106,6 +119,7 @@ export default function Contract() {
         title="Contracts"
         subtitle="Manage the list of contracts for each property bought by user"
         showSearchAndButton={false}
+     
       />
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
@@ -142,35 +156,42 @@ export default function Contract() {
       </div>
 
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        <ReusableTable
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          tabs={["Active", "Completed"]}
-          searchPlaceholder={"Search by contract ID or email"}
-          showTabs={true}
-          onSearch={handleSearch}
-        >
-          {loading ? (
-            <div className="w-full flex items-center justify-center">
-              <LoadingAnimations loading={loading} />
-            </div>
-          ) : !loading && (!contractList || contractList.length === 0) ? (
-            <div className="max-h-screen">
-              <p className="text-center font-normal text-[#767676]">
-                No data found
-              </p>
-              <NotFound />
-            </div>
-          ) : (
-            <ContractsTableComponent
-              data={contractList || []}
-              pagination={contractPagination}
-              onPageChange={handlePageChange}
-              getStatusText={getStatusText}
-            />
-          )}
-        </ReusableTable>
+      <ReusableTable
+  activeTab={activeTab}
+  onTabChange={setActiveTab}
+  tabs={["New", "Active", "Completed", "Allocated"]}
+  searchPlaceholder={"Search by contract ID or email"}
+  showTabs={true}
+  onSearch={handleSearch}
+>
+  {loading ? (
+    <div className="w-full flex items-center justify-center">
+      <LoadingAnimations loading={loading} />
+    </div>
+  ) : !loading && (!contractList || contractList.length === 0) ? (
+    <div className="max-h-screen">
+      <p className="text-center font-normal text-[#767676]">No data found</p>
+      <NotFound />
+    </div>
+  ) : activeTab === "New" ? (
+    <ContractsTableComponent
+      data={contractList || []}
+      pagination={contractPagination}
+      onPageChange={handlePageChange}
+      getStatusText={getStatusText}
+    />
+  ) : (
+    <ContractsTableComponenTwo
+      data={contractList || []}
+      pagination={contractPagination}
+      onPageChange={handlePageChange}
+      getStatusText={getStatusText}
+    />
+  )}
+</ReusableTable>
+
       </div>
+     
     </div>
   );
 }

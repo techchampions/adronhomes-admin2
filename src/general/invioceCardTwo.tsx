@@ -5,7 +5,7 @@ import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 interface InvoiceProps {
   invoiceAmount?: string;
   paidAmount?: string;
-  paymentSchedule?: string;
+  paymentSchedule?: any;
   progressPercentage?: number;
   duration?: string;
   nextPaymentDate?: string;
@@ -428,7 +428,7 @@ export default function InvoiceCard({
 
                 {property.features?.slice(0, 2).map((feature, index) => (
                   <div key={index} className="flex items-center gap-1 md:gap-2">
-                    {feature.toLowerCase().includes("light") ? (
+                    {feature.toLowerCase().includes("electricity") ? (
                       <img
                         src="/wand.svg"
                         className="h-4 w-4 md:h-5 md:w-5"

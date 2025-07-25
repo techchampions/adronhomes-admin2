@@ -51,6 +51,8 @@ import CarrerSideBar from "./hr/sideNav";
 import Contract from "./pages/contract/Contract";
 import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 import UserPayments from "./pages/Transactions/Transactions";
+import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
+import ContractInvoice from "./pages/contract/customers_payment";
 
 
 const AuthGuard = () => {
@@ -135,6 +137,11 @@ const App = () => {
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
                    <Route path="/contracts" element={<Contract />} />
+                     <Route
+                  path="/contracts/details/:user_id/:plan_id"
+                  element={<ContractInvoice />}
+                />
+                   
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
@@ -171,7 +178,9 @@ const App = () => {
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
+             
                   <Route path="/customers/transactions/:id" element={<UserPayments />} />
+                   <Route path="/customers/wallet-transactions/:id" element={<WalletTransactionsPage />} />
                 <Route
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}

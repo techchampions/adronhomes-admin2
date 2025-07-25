@@ -79,15 +79,13 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
           <table className="w-full">
             <thead>
               <tr className="text-left">
-                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[150px] max-w-[150px]">
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[10px] max-w-[150px]">
                   <div className="truncate">Payment ID</div>
                 </th>
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[200px] max-w-[200px]">
-                  <div className="truncate">Customer's Name</div>
+                  <div className="truncate">Payer Name</div>
                 </th>
-                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[200px] max-w-[200px]">
-                  <div className="truncate">Marketer in Charge</div>
-                </th>
+             
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[150px] max-w-[150px]">
                   <div className="truncate">Amount</div>
                 </th>
@@ -106,15 +104,13 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                   onClick={() => handleRowClick(payment)}
                   className="cursor-pointer hover:bg-gray-50 transition-colors"
                 >
-                  <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm w-[10px] max-w-[150px]">
                     <div className="truncate">{payment.id}</div>
                   </td>
                   <td className="py-4 pr-6 font-medium text-dark text-sm w-[200px] max-w-[200px]">
                     <div className="truncate">{payment.customerName}</div>
                   </td>
-                  <td className="py-4 pr-6 font-[325] text-gray-800 text-sm w-[200px] max-w-[200px]">
-                    <div className="truncate">{payment.marketerInCharge}</div>
-                  </td>
+                 
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
                     <div className="truncate">₦{Number(payment.amount).toLocaleString()}</div>
                   </td>

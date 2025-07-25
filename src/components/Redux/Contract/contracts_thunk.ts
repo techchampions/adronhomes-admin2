@@ -130,6 +130,7 @@ export const fetchContracts = createAsyncThunk<
     status?: number | null; 
     search?: string | null;
     per_page?: number;
+    contract?: number | null; // New parameter for contract type
   },
   {
     state: RootState;
@@ -137,7 +138,7 @@ export const fetchContracts = createAsyncThunk<
   }
 >(
   "contracts/fetch",
-  async ({ page = 1, status = null, search = null, per_page = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, status = null, search = null, per_page = 10, contract = null }, { rejectWithValue }) => {
     const token = Cookies.get("token");
 
     if (!token) {
@@ -159,6 +160,10 @@ export const fetchContracts = createAsyncThunk<
 
       if (search) {
         params.search = search;
+      }
+
+      if (contract !== null) {
+        params.contract = contract;
       }
 
       const response = await axios.get<ContractsResponse>(
