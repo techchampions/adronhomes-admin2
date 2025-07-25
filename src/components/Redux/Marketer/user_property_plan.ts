@@ -20,6 +20,50 @@ export interface Property {
   lga: string;
   state: string;
   total_amount: number;
+  no_of_bedroom?: number | null;
+  slug?: string;
+  overview?: string;
+  description?: string;
+  street_address?: string;
+  country?: string;
+  photos?: string[];
+  created_at?: string;
+  updated_at?: string;
+  area?: string | null;
+  property_map?: string | null;
+  property_video?: string | null;
+  virtual_tour?: string | null;
+  subscriber_form?: string | null;
+  status?: string;
+  initial_deposit?: number;
+  is_sold?: number;
+  is_active?: number;
+  property_duration_limit?: number;
+  payment_schedule?: string[];
+  category?: string;
+  is_discount?: boolean;
+  discount_name?: string | null;
+  discount_percentage?: number | null;
+  discount_units?: number | null;
+  discount_start_date?: string | null;
+  discount_end_date?: string | null;
+  parking_space?: number | null;
+  number_of_bathroom?: number | null;
+  number_of_unit?: number;
+  property_agreement?: string;
+  payment_type?: string;
+  location_type?: string;
+  purpose?: string;
+  year_built?: string | null;
+  shape?: string;
+  topography?: string | null;
+  title_document_type?: string;
+  road_access?: string;
+  director_id?: number;
+  unit_available?: number;
+  unit_sold?: number;
+  property_view?: number;
+  property_requests?: number;
 }
 
 export interface User {
@@ -31,16 +75,16 @@ export interface User {
   first_name: string;
   last_name: string;
   role: number;
-  country: string;
-  state: string;
-  lga: string;
+  country: string | null;
+  state: string | null;
+  lga: string | null;
   otp_verified_at: string;
   email_verified_at: string;
   profile_picture: string | null;
   gender: string | null;
   notification_enabled: number;
   device_id: string;
-  address: string;
+  address: string | null;
   created_at: string;
   updated_at: string;
   personnel: string;
@@ -56,31 +100,31 @@ export interface NextRepayment {
   due_date: string;
   created_at: string;
   updated_at: string;
+  user_id?: number;
+  director_id?: number;
+  marketer_id?: number | null;
 }
 
 export interface Transaction {
   id: number;
   property_id: number;
   user_id: number;
-  plan_id: number;
-  amount: number;
+  property_plan_id: number;
+  order_id: number | null;
+  amount_paid: number;
+  purpose: string;
+  payment_type: string;
   status: number;
-  description: string;
-  transaction_method: string;
+  reference: string;
+  is_coupon: number;
   created_at: string;
   updated_at: string;
-  marketer_id: number;
-  reference: string;
-  property: {
-    id: number;
-    name: string;
-    price: number;
-    size: string;
-    display_image: string;
-    lga: string;
-    state: string;
-    total_amount: number;
-  };
+  proof_of_payment: string | null;
+  bank_name: string | null;
+  description: string;
+  marketer_id: number | null;
+  director_id: number;
+  property: Property;
 }
 
 export interface InfrastructureBreakdown {
@@ -103,6 +147,61 @@ export interface OthersBreakdown {
   type: string;
 }
 
+export interface ContractDocument {
+  id: number;
+  plan_id: number;
+  document_name: string;
+  document_file: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Contract {
+  id: number;
+  plan_id: number;
+  status: number;
+  property_id: number;
+  user_id: number;
+  unique_contract_id: string;
+  contract_customer_id: string;
+  contract_business_type: string;
+  contract_subscriber_name_1: string;
+  contract_subscriber_name_2: string;
+  contract_subscriber_name_3: string;
+  contract_additional_name: string;
+  contract_transaction_date: string | null;
+  contract_purpose: string | null;
+  contract_promo: string | null;
+  contract_quantity: number | null;
+  contract_gender: string;
+  contract_marital_status: string;
+  contract_date_of_birth: string;
+  contract_nationality: string;
+  contract_residential_address: string;
+  contract_town: string;
+  contract_state: string;
+  contract_country: string;
+  contract_sms: string;
+  contract_email: string;
+  contract_processing_fee: number | null;
+  contract_manual_discount: number | null;
+  contract_termination_charge: number | null;
+  contract_main_marketer: string | null;
+  contract_marketer_1: string | null;
+  contract_marketer_2: string | null;
+  contract_employer: string;
+  contract_occupation: string;
+  contract_employer_address: string;
+  contract_next_of_kin: string;
+  contract_next_of_kin_address: string;
+  contract_next_of_kin_phone: string | null;
+  contract_next_of_kin_relationship: string;
+  contract_management_document: string | null;
+  contract_profile_picture: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PlanProperty {
   id: number;
   property_id: number;
@@ -116,14 +215,14 @@ export interface PlanProperty {
   payment_completed_at: string | null;
   created_at: string;
   updated_at: string;
-  monthly_duration: string;
+  monthly_duration: string | null;
   payment_type: string;
   end_date: string | null;
   start_date: string | null;
   payment_method: string | null;
-  repayment_schedule: string;
-  next_payment_date: string;
-  marketer_id: number;
+  repayment_schedule: string | null;
+  next_payment_date: string | null;
+  marketer_id: number | null;
   infrastructure_percentage: number;
   infrastructure_amount: number;
   other_percentage: number;
@@ -134,6 +233,8 @@ export interface PlanProperty {
   paid_other_amount: number;
   contract_id: string;
   number_of_unit: number;
+  initial_payment_percentage: number;
+  is_a_contract: number;
   property: Property;
   user: User;
 }
@@ -144,8 +245,10 @@ interface UserPropertyPlanResponse {
   plan_properties: PlanProperty;
   infrastructure_breakdown: InfrastructureBreakdown[];
   others_breakdown: OthersBreakdown[];
-  next_repayment: NextRepayment;
+  next_repayment: NextRepayment | null;
   transactions: Transaction[];
+  contract: Contract;
+  contract_documents: ContractDocument[];
 }
 
 interface UserPropertyPlanParams {
@@ -160,6 +263,8 @@ interface UserPropertyPlanState {
     othersBreakdown: OthersBreakdown[] | null;
     nextRepayment: NextRepayment | null;
     transactions: Transaction[] | null;
+    contract: Contract | null;
+    contractDocuments: ContractDocument[] | null;
   };
   loading: boolean;
   error: string | null;
@@ -172,6 +277,8 @@ const initialState: UserPropertyPlanState = {
     othersBreakdown: null,
     nextRepayment: null,
     transactions: null,
+    contract: null,
+    contractDocuments: null,
   },
   loading: false,
   error: null,
@@ -244,6 +351,8 @@ const userPropertyPlanSlice = createSlice({
         othersBreakdown: null,
         nextRepayment: null,
         transactions: null,
+        contract: null,
+        contractDocuments: null,
       };
       state.error = null;
     },
@@ -258,7 +367,15 @@ const userPropertyPlanSlice = createSlice({
       .addCase(
         fetchUserPropertyPlan.fulfilled,
         (state, action: PayloadAction<UserPropertyPlanResponse>) => {
-          const { plan_properties, infrastructure_breakdown, others_breakdown, next_repayment, transactions } = action.payload;
+          const { 
+            plan_properties, 
+            infrastructure_breakdown, 
+            others_breakdown, 
+            next_repayment, 
+            transactions,
+            contract,
+            contract_documents
+          } = action.payload;
           state.loading = false;
           state.data = {
             planProperties: plan_properties,
@@ -266,6 +383,8 @@ const userPropertyPlanSlice = createSlice({
             othersBreakdown: others_breakdown,
             nextRepayment: next_repayment,
             transactions,
+            contract,
+            contractDocuments: contract_documents
           };
           state.error = null;
         }
@@ -278,6 +397,8 @@ const userPropertyPlanSlice = createSlice({
           othersBreakdown: null,
           nextRepayment: null,
           transactions: null,
+          contract: null,
+          contractDocuments: null,
         };
         state.error =
           (action.payload && 'message' in action.payload)

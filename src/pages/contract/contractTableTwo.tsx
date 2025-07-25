@@ -1,13 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
-import { User } from "../../components/Redux/Contract/contracts_thunk"; 
-import ContractInputModal from "./ContractInputModal";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../components/Redux/store"; 
-import { updateContract, UpdateContractPayload } from "../../components/Redux/UpdateContract/UpdateContract";
-
+import { User } from "../../components/Redux/Contract/contracts_thunk";
 
 export interface Contract {
   id: number;
@@ -58,54 +53,15 @@ interface ContractsTableProps {
   getStatusText: (status: number) => string;
 }
 
-export default function ContractsTableComponent({
+export default function ContractsTableComponenTwo({
   data,
   pagination,
   onPageChange,
-  getStatusText,
+  getStatusText, 
 }: ContractsTableProps) {
   const navigation = useNavigate();
-  const dispatch = useDispatch<AppDispatch>(); // Initialize dispatch
-  const { loading: updateContractLoading } = useSelector((state: RootState) => state.contract); 
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedContractForInput, setSelectedContractForInput] = useState<Contract | null>(null);
-
-  // Modified handleSubmit to dispatch updateContract
-  const handleSubmit = async (values: { customerCode: any; contractId: any }) => {
-    console.log("Submitted values from modal:", values);
-
-    // Ensure a contract was selected before attempting to update
-    if (selectedContractForInput) {
-      const contractIdToUpdate = selectedContractForInput?.contract_id; 
-
-      const updateData: UpdateContractPayload = {
-        unique_contract_id: values.contractId,
-        contract_customer_id: values.customerCode,
-      };
-
-      try {
-        await dispatch(updateContract({ contractId: contractIdToUpdate, data: updateData })).unwrap();
-       
-      } catch (error) {
-
-        console.error("Failed to update contract:", error);
-      }
-    } else {
-      console.warn("No contract selected for inputting code.");
-     
-    }
-
-    setShowModal(false); 
-    setSelectedContractForInput(null); 
-  };
-
-  // Function to open the modal and store the selected contract
-  const handleInputCodeClick = (contract: Contract) => {
-    setSelectedContractForInput(contract);
-    setShowModal(true);
-  };
-
+ 
   const getStatusBadgeClass = (status: number) => {
     switch (status) {
       case 1: // Active
@@ -126,24 +82,27 @@ export default function ContractsTableComponent({
           <table className="w-full">
             <thead>
               <tr className="text-left">
+                {/* Property Name */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[150px]">
                   Property Name
                 </th>
+                {/* Customer Name */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Customer Name
                 </th>
+                {/* Amount (corresponds to Total Amount) */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Amount
                 </th>
+                {/* Amount Paid */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Amount Paid
                 </th>
+                {/* Marketer */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[150px]">
                   Marketer
                 </th>
-                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] whitespace-nowrap max-w-[200px] text-center">
-                  Action
-                </th>
+               
               </tr>
             </thead>
             <tbody>
@@ -152,6 +111,7 @@ export default function ContractsTableComponent({
                   key={contract.id}
                   className="cursor-pointer hover:bg-gray-50"
                 >
+          
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
                     onClick={() => navigation(`/customers/${contract.user.id}`)}
@@ -168,6 +128,7 @@ export default function ContractsTableComponent({
                     )}
                   </td>
 
+                  {/* Customer Name */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
                     onClick={() => navigation(`/customers/${contract.user.id}`)}
@@ -186,6 +147,7 @@ export default function ContractsTableComponent({
                     )}
                   </td>
 
+                  {/* Amount (Total Amount) */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
                     onClick={() => navigation(`/customers/${contract.user.id}`)}
@@ -200,6 +162,7 @@ export default function ContractsTableComponent({
                     </div>
                   </td>
 
+                  {/* Amount Paid */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
                     onClick={() => navigation(`/customers/${contract.user.id}`)}
@@ -214,6 +177,7 @@ export default function ContractsTableComponent({
                     </div>
                   </td>
 
+                  {/* Marketer */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
                     onClick={() => navigation(`/customers/${contract.user.id}`)}
@@ -232,33 +196,6 @@ export default function ContractsTableComponent({
                     )}
                   </td>
 
-                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[200px] overflow-x-auto truncate relative group text-center">
-                    <div className="flex items-center justify-center space-x-2">
-                      <button
-                        onClick={() =>
-                          navigation(
-                            `/contracts/details/${contract.user_id}/${contract.id}`
-                          )
-                        }
-                        className="bg-[#272727] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
-                        aria-label="View contract details"
-                      >
-                        View Details
-                      </button>
-                      <button
-                        // Use the new handler here
-                        onClick={() => handleInputCodeClick(contract)}
-                        className="bg-[#6B9F4B] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-[#5C8C3C] transition-colors whitespace-nowrap"
-                        aria-label="Input code for contract"
-                        disabled={updateContractLoading}
-                      >
-                        {updateContractLoading && selectedContractForInput?.contract_id === contract.contract_id ? "Processing..." : "Input Code"}
-                      </button>
-                    </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                      Manage contract actions
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -270,12 +207,6 @@ export default function ContractsTableComponent({
         onPageChange={onPageChange}
         className="mt-8 mb-4"
       />
-      {showModal && (
-        <ContractInputModal
-          onClose={() => setShowModal(false)}
-          onSubmit={handleSubmit}
-        />
-      )}
     </>
   );
 }

@@ -1,4 +1,3 @@
-// Header.tsx
 import React, { useContext, useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -20,8 +19,10 @@ interface HeaderProps {
   history?: boolean;
   showBulkModal?: boolean;
   setShowBulkModal?: (show: boolean) => void;
-  // New prop to control visibility of search and button
+handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
+
+  viewForm?: boolean;
 }
 
 export default function Header({
@@ -31,8 +32,9 @@ export default function Header({
   buttonText = "Add Property",
   onButtonClick,
   history = false,
-  // Set default to true so it displays by default
   showSearchAndButton = true,
+  viewForm = false,
+  handleViewPurchaseFormClick
 }: HeaderProps) {
   const {
     showBulkModal,
@@ -73,6 +75,7 @@ export default function Header({
     }
   };
 
+
   // Determine button text based on page and state
   const getButtonText = () => {
     if (isCancelState) return "Cancel";
@@ -86,7 +89,7 @@ export default function Header({
           <h2 className="font-[325] text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-2">
             {title}
           </h2>
-          <p className="leading-tight font-[325] text-sm md:text-base text-[#767676]">
+          <p className="leading-tight font-[325] text- md:text-base text-[#767676]">
             {subtitle}
           </p>
           {history && (
@@ -107,9 +110,9 @@ export default function Header({
           )}
         </div>
 
-        {/* Conditionally render based on showSearchAndButton prop */}
+ 
         {showSearchAndButton && (
-          <div className="w-full lg:w-auto flex flex-row lg:flex-row items-center gap-4 mt-4 sm:mt-0">
+          <div className="w-full lg:w-auto flex flex-col lg:flex-row items-center gap-4 mt-4 sm:mt-0">
             <div
               className={`relative h-[51px] w-full sm:w-64 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${
                 isSearchFocused
@@ -136,6 +139,15 @@ export default function Header({
             >
               {getButtonText()}
             </button>
+
+            {viewForm && (
+              <button
+                className="text-[#79B833] border-2 border-[#79B833] md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap "
+                onClick={()=>handleViewPurchaseFormClick?.()}
+              >
+                View Purchase Form
+              </button>
+            )}
           </div>
         )}
       </div>

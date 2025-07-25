@@ -8,6 +8,7 @@ interface ContractPaginationState {
   totalPages: number;
   statusFilter: number | null;
   searchFilter: string | null;
+  contractFilter: number | null; // New filter for contract type
 }
 
 interface ContractsState {
@@ -56,6 +57,7 @@ const initialState: ContractsState = {
     totalPages: 1,
     statusFilter: null,
     searchFilter: null,
+    contractFilter: null, // Initialize contract filter
   },
 };
 
@@ -76,6 +78,10 @@ const contractsSlice = createSlice({
     },
     setSearchFilter: (state, action: PayloadAction<string | null>) => {
       state.pagination.searchFilter = action.payload;
+      state.pagination.currentPage = 1;
+    },
+    setContractFilter: (state, action: PayloadAction<number | null>) => {
+      state.pagination.contractFilter = action.payload;
       state.pagination.currentPage = 1;
     },
     setPerPage: (state, action: PayloadAction<number>) => {
@@ -123,13 +129,13 @@ export const {
   setCurrentPage, 
   setStatusFilter, 
   setSearchFilter,
+  setContractFilter,
   setPerPage
 } = contractsSlice.actions;
 
 export default contractsSlice.reducer;
 
-// selectors in contracts_slice.ts
-
+// Selectors
 export const selectContractPagination = (state: { getcontracts: ContractsState }) =>
   state.getcontracts.pagination;
 

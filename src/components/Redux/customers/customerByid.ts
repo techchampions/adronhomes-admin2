@@ -30,6 +30,7 @@ export interface PlanData {
   property_type: number;
   total_amount: number;
   paid_amount: number;
+  wallet_amount: number;
   remaining_balance: number;
   status: number;
   payment_percentage: number;
@@ -114,6 +115,7 @@ export interface CustomerByIdResponse {
   total_paid: string;
   pending_paid: number; // Changed to number as per new response
   active_property: number;
+  wallet_amount:number;
   viewed_property: number;
   saved_property: number;
   owned_property: number;

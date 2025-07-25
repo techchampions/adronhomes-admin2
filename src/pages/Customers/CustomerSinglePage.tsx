@@ -317,8 +317,8 @@ export default function CustomerSinglePage() {
         showSearchAndButton={false}
       />
 
-      <div className="grid md:grid-cols-3 gap-[20px]">
-        <div className=" w-full relative">
+      <div className="grid md:grid-cols-2 gap-[20px]">
+        <div className=" w-full relative ">
           <button
             className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1  px-2 rounded-full   border "
             onClick={() => navigate(`/customers/transactions/${id}`)}
@@ -331,6 +331,20 @@ export default function CustomerSinglePage() {
             change="Includes total amount paid by this customer"
           />
         </div>
+
+          <div className=" w-full relative ">
+          <button
+            className="absolute z-50 right-5 top-5 text-xs font-semibold text-[#57713A]  py-1  px-2 rounded-full   border "
+            onClick={() => navigate(`/customers/wallet-transactions/${id}`)}
+          >
+            view Wallet Trnx
+          </button>
+      <MatrixCard
+          title="Total Wallet Balance"
+        value={formatAsNaira(data.wallet_amount)}
+          change="Includes total  wallet balance of this customer"
+        />
+        </div>
         <MatrixCard
           title="Total Pending Payments"
           value={formatAsNaira(data.pending_paid)}
@@ -341,6 +355,7 @@ export default function CustomerSinglePage() {
           value={data.active_property.toString()}
           change="Includes all active property plans of this customer"
         />
+           
       </div>
 
       <ProfileCard
