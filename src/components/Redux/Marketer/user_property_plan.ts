@@ -237,6 +237,7 @@ export interface PlanProperty {
   is_a_contract: number;
   property: Property;
   user: User;
+  is_allocated:any
 }
 
 // API response shape

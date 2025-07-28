@@ -111,35 +111,28 @@ export default function Header({
         </div>
 
  
-        {showSearchAndButton && (
+        
           <div className="w-full lg:w-auto flex flex-col lg:flex-row items-center gap-4 mt-4 sm:mt-0">
-            <div
-              className={`relative h-[51px] w-full sm:w-64 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${
-                isSearchFocused
-                  ? "border-[#79B833] shadow-sm"
-                  : "border-[#D8D8D8]"
-              } bg-white overflow-hidden`}
-            >
-              <input
-                type="text"
-                placeholder={searchPlaceholder}
-                className="w-full h-full px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-              />
-            </div>
-
-            <button
-              className={`text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4  whitespace-nowrap ${
-                isCancelState
-                  ? "bg-[#D70E0E] hover:bg-red-600"
-                  : "bg-[#79B833] hover:bg-[#6aa22c]"
-              }`}
-              onClick={handleButtonClick}
-            >
+           {showSearchAndButton && ( <><div
+            className={`relative h-[51px] w-full sm:w-64 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${isSearchFocused
+                ? "border-[#79B833] shadow-sm"
+                : "border-[#D8D8D8]"} bg-white overflow-hidden`}
+          >
+            <input
+              type="text"
+              placeholder={searchPlaceholder}
+              className="w-full h-full px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)} />
+          </div><button
+            className={`text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4  whitespace-nowrap ${isCancelState
+                ? "bg-[#D70E0E] hover:bg-red-600"
+                : "bg-[#79B833] hover:bg-[#6aa22c]"}`}
+            onClick={handleButtonClick}
+          >
               {getButtonText()}
-            </button>
-
+            </button></>
+     )}
             {viewForm && (
               <button
                 className="text-[#79B833] border-2 border-[#79B833] md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap "
@@ -149,7 +142,7 @@ export default function Header({
               </button>
             )}
           </div>
-        )}
+   
       </div>
 
       {!isPersonnelPage && showBulkModal && (
