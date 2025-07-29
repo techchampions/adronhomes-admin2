@@ -92,22 +92,22 @@ export default function ContractInvoice() {
     setCurrentPage(page);
   };
 
- 
-const [isChecked, setIsChecked] = useState(planProperties?.is_allocated === 1);
-const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(
+    planProperties?.is_allocated === 1
+  );
+  const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
 
-// Function to handle checkbox change
-const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const checked = event.target.checked;
-  setIsChecked(checked);
+  // Function to handle checkbox change
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+    setIsChecked(checked);
 
-  if (checked) {
-    setIsAllocationModalOpen(true);
-  } else {
-    setIsAllocationModalOpen(true);
-  }
-};
-
+    if (checked) {
+      setIsAllocationModalOpen(true);
+    } else {
+      setIsAllocationModalOpen(true);
+    }
+  };
 
   const formatTransactions = () => {
     if (!transactions) return [];
@@ -323,10 +323,8 @@ const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             >
               I confirm that i have uploaded all required documents
             </label>
-            <p className="text-[10px] italic">
-              This confirms that all the required documents has be uploaded and
-              allocates property to the customer, ensure the documents were
-              properly reviewed
+            <p className="text-xs italic">
+              This confirms that all the required documents have been uploaded and that the property will be allocated to the customer. Please ensure the documents have been properly reviewed.
             </p>
           </div>
         </div>
@@ -535,7 +533,11 @@ const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         {isAllocationModalOpen && (
           <ConfirmAllocationModal
             onCancel={() => setIsAllocationModalOpen(false)}
-            plan_id={plan_id} user_id={user_id}          />
+            plan_id={plan_id}
+            user_id={user_id}
+            isChecked={isChecked}
+            setIsChecked={setIsChecked}
+          />
         )}
         {showContractModal && (
           <ContractModal

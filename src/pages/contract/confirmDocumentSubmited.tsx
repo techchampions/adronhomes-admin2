@@ -10,7 +10,8 @@ interface ConfirmAllocationModalProps {
   onConfirm?: () => void;
   plan_id: any;
   modalText?: string;
-  user_id:any
+  user_id:any;
+  isChecked:any, setIsChecked:any
 }
 
 export const ConfirmAllocationModal: React.FC<ConfirmAllocationModalProps> = ({ 
@@ -18,7 +19,8 @@ export const ConfirmAllocationModal: React.FC<ConfirmAllocationModalProps> = ({
   onConfirm, 
   plan_id,
   modalText = "Please confirm you want to upload these documents.",
-  user_id
+  user_id,isChecked,
+   setIsChecked
 }) => {
   const dispatch = useDispatch<AppDispatch>(); 
   
@@ -62,7 +64,8 @@ export const ConfirmAllocationModal: React.FC<ConfirmAllocationModalProps> = ({
         </p>
         <div className="flex gap-[60px]">
           <button
-            onClick={onCancel}
+            onClick={()=>{    onCancel?.(); 
+                setIsChecked(!isChecked)}}
             className="px-[30px] py-[10px]"
             disabled={loading}
           >
