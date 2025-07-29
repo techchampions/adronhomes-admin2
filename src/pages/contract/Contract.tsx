@@ -23,6 +23,9 @@ import { fetchContracts } from "../../components/Redux/Contract/contracts_thunk"
 import NotFound from "../../components/NotFound";
 import ContractsTableComponenTwo from "./contractTableTwo";
 import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
+import NewContractsTable from "./activeContractTable";
+import { useAppSelector } from "../../components/Redux/hook";
+import AllocationTable from "./AllocationTable";
 
 export default function Contract() {
   const dispatch = useDispatch<AppDispatch>();
@@ -42,7 +45,7 @@ export default function Contract() {
   const getContractFilters = useCallback((tab: string) => {
     switch (tab) {
       case "New":
-        return { contract: 0, status: 1 }; 
+        return { contract: 0, status: 5 }; 
       case "Active":
         return { contract: 1, status: 1 }; 
       case "Completed":
@@ -175,6 +178,26 @@ export default function Contract() {
     </div>
   ) : activeTab === "New" ? (
     <ContractsTableComponent
+                  data={contractList || []}
+                  pagination={contractPagination}
+                  onPageChange={handlePageChange}
+                  getStatusText={getStatusText} page={1} statuss={5} contract={0}    />
+  ) : activeTab === "Active" ? (
+    <NewContractsTable
+      data={contractList || []}
+      pagination={contractPagination}
+      onPageChange={handlePageChange}
+      getStatusText={getStatusText}
+    />
+  ) :  activeTab === "Completed" ? (
+    <NewContractsTable
+      data={contractList || []}
+      pagination={contractPagination}
+      onPageChange={handlePageChange}
+      getStatusText={getStatusText}
+    />
+  ):  activeTab === "Completed" ? (
+    <AllocationTable
       data={contractList || []}
       pagination={contractPagination}
       onPageChange={handlePageChange}
@@ -187,6 +210,7 @@ export default function Contract() {
       onPageChange={handlePageChange}
       getStatusText={getStatusText}
     />
+    
   )}
 </ReusableTable>
 

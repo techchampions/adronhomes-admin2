@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
-import { fetchContracts, User } from "../../components/Redux/Contract/contracts_thunk"; 
+import { User } from "../../components/Redux/Contract/contracts_thunk";
 import ContractInputModal from "./ContractInputModal";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../components/Redux/store"; 
-import { updateContract, UpdateContractPayload } from "../../components/Redux/UpdateContract/UpdateContract";
-
+import { AppDispatch, RootState } from "../../components/Redux/store";
+import {
+  updateContract,
+  UpdateContractPayload,
+} from "../../components/Redux/UpdateContract/UpdateContract";
+import { FaEdit } from "react-icons/fa"; // Import the edit icon
 
 export interface Contract {
   id: number;
@@ -53,39 +56,35 @@ interface ContractsTableProps {
     perPage: number;
     totalItems: number;
     totalPages: number;
- 
   };
   onPageChange: (page: number) => void;
   getStatusText: (status: number) => string;
-     page:any,
-  statuss:any,
-  contract:any
 }
 
-export default function ContractsTableComponent({
+export default function AllocationTable({
   data,
   pagination,
   onPageChange,
   getStatusText,
-  page,
-  statuss,
-  contract
-  
 }: ContractsTableProps) {
   const navigation = useNavigate();
-  const dispatch = useDispatch<AppDispatch>(); // Initialize dispatch
-  const { loading: updateContractLoading } = useSelector((state: RootState) => state.contract); 
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading: updateContractLoading } = useSelector(
+    (state: RootState) => state.contract
+  );
 
   const [showModal, setShowModal] = useState(false);
-  const [selectedContractForInput, setSelectedContractForInput] = useState<Contract | null>(null);
+  const [selectedContractForInput, setSelectedContractForInput] =
+    useState<Contract | null>(null);
 
-  // Modified handleSubmit to dispatch updateContract
-  const handleSubmit = async (values: { customerCode: any; contractId: any }) => {
+  const handleSubmit = async (values: {
+    customerCode: any;
+    contractId: any;
+  }) => {
     console.log("Submitted values from modal:", values);
 
-    // Ensure a contract was selected before attempting to update
     if (selectedContractForInput) {
-      const contractIdToUpdate = selectedContractForInput?.contract_id; 
+      const contractIdToUpdate = selectedContractForInput?.contract_id;
 
       const updateData: UpdateContractPayload = {
         unique_contract_id: values.contractId,
@@ -93,27 +92,20 @@ export default function ContractsTableComponent({
       };
 
       try {
-        await dispatch(updateContract({ contractId: contractIdToUpdate, data: updateData })).unwrap();
-       await dispatch(fetchContracts({ 
-      page:page, 
-      contract: contract, 
-      status:statuss, 
-
-    }))
+        await dispatch(
+          updateContract({ contractId: contractIdToUpdate, data: updateData })
+        ).unwrap();
       } catch (error) {
-
         console.error("Failed to update contract:", error);
       }
     } else {
       console.warn("No contract selected for inputting code.");
-     
     }
 
-    setShowModal(false); 
-    setSelectedContractForInput(null); 
+    setShowModal(false);
+    setSelectedContractForInput(null);
   };
 
-  // Function to open the modal and store the selected contract
   const handleInputCodeClick = (contract: Contract) => {
     setSelectedContractForInput(contract);
     setShowModal(true);
@@ -259,14 +251,25 @@ export default function ContractsTableComponent({
                         View Details
                       </button>
                       <button
-                        // Use the new handler here
                         onClick={() => handleInputCodeClick(contract)}
                         className="bg-[#6B9F4B] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-[#5C8C3C] transition-colors whitespace-nowrap"
                         aria-label="Input code for contract"
                         disabled={updateContractLoading}
                       >
-                        {updateContractLoading && selectedContractForInput?.contract_id === contract.contract_id ? "Processing..." : "Input Code"}
+                        {updateContractLoading &&
+                        selectedContractForInput?.contract_id ===
+                          contract.contract_id
+                          ? "Processing..."
+                          : "Input Code"}
                       </button>
+                      <FaEdit
+                        className="text-blue-500 cursor-pointer text-xl"
+                        onClick={() => {
+                          /* Add your edit logic here, e.g., open an edit modal */
+                          console.log("Edit icon clicked for contract:", contract.id);
+                        }}
+                        aria-label="Edit contract"
+                      />
                     </div>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                       Manage contract actions

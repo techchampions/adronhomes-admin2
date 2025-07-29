@@ -25,7 +25,9 @@ import createContractDocuments, {
 import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
 import { ContractModal } from "./ContractFormModal";
 import { ContractDocumentsModal } from "./ContractDocumentsModal";
-// import PropertyDocumentsModal from "./PropertyDocumentsModal";
+import { UserProfileCard } from "./contractProfileCard";
+import { formatDate } from "../../utils/formatdate";
+import { ConfirmAllocationModal } from "./confirmDocumentSubmited";
 
 export default function ContractInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,6 +38,7 @@ export default function ContractInvoice() {
     plan_id: string;
     user_id: string;
   }>();
+
   const [showModal, setShowModal] = useState(false);
   // Get data from Redux store
   const {
@@ -43,6 +46,11 @@ export default function ContractInvoice() {
     loading,
     error,
   } = useSelector((state: RootState) => state.marketerUserPropertyPlan);
+  const {
+    data: documents,
+    loading: docLoading,
+    error: errordoc,
+  } = useSelector((state: RootState) => state.ViewcontractDocuments);
   // Add this near the top of your component with other state declarations
   const [hasContractDocuments, setHasContractDocuments] = useState(false);
 
@@ -82,6 +90,23 @@ export default function ContractInvoice() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const [isChecked, setIsChecked] = useState(
+    planProperties?.is_allocated === 1
+  );
+  const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
+
+  // Function to handle checkbox change
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+    setIsChecked(checked);
+
+    if (checked) {
+      setIsAllocationModalOpen(true);
+    } else {
+      setIsAllocationModalOpen(true);
+    }
   };
 
   const formatTransactions = () => {
@@ -197,7 +222,7 @@ export default function ContractInvoice() {
 
       if (createContractDocumentsThunk.fulfilled.match(resultAction)) {
         setShowModal(false);
-              dispatch(fetchUserPropertyPlan({ planId: plan_id, userId: user_id }));
+        dispatch(fetchUserPropertyPlan({ planId: plan_id, userId: user_id }));
         toast.success(
           hasContractDocuments
             ? "Documents updated successfully!"
@@ -269,13 +294,55 @@ export default function ContractInvoice() {
           history={true}
           buttonText={"Upload Document"}
           onButtonClick={() => setShowModal(true)}
-          showSearchAndButton={true}
+          showSearchAndButton={planProperties.status === 2 ? true : false}
           handleViewPurchaseFormClick={() => setShowContractModal(true)}
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
-        {hasContractDocuments && (
-          <div className="relative">
+        <div className="flex items-center  mb-6">
+          {/* Custom Checkbox */}
+          <input
+            type="checkbox"
+            id="confirmCheckbox"
+            className="
+                            mr-3
+                            appearance-none inline-block w-6 h-6 border-2 border-gray-300 rounded-md
+                            relative cursor-pointer outline-none transition-colors duration-200 ease-in-out
+                            checked:bg-[#79B833] checked:border-[#79B833]
+                            after:content-['✔'] after:text-white after:text-base after:absolute
+                            after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2
+                            after:block
+                        "
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+          />
+          <div className="flex flex-col">
+            <label
+              htmlFor="confirmCheckbox"
+              className="text-lg text-gray-700 select-none cursor-pointer"
+            >
+              I confirm that i have uploaded all required documents
+            </label>
+            <p className="text-xs italic">
+              This confirms that all the required documents have been uploaded and that the property will be allocated to the customer. Please ensure the documents have been properly reviewed.
+            </p>
+          </div>
+        </div>
+
+        <UserProfileCard
+          name={contract?.contract_subscriber_name_1}
+          joinDate={formatDate(contract?.created_at)}
+          documentLinkText="list of Documents"
+          viewActionText="Click to view"
+          hasContractDocuments={hasContractDocuments}
+          openDoc={() => setShowDocumentsModal(true)}
+          name2={contract?.contract_subscriber_name_2}
+          marketer={contract?.contract_main_marketer ?? "N/A"}
+          businestype={contract?.contract_business_type ?? "N/A"}
+          jointType={contract?.contract_business_type === "Joint"}
+        />
+        {/* {hasContractDocuments && ( */}
+        {/* <div className="relative">
             <div
               className="absolute top-6 right-6 font-[350] text-[#79B833] md:flex items-center hidden"
               onClick={() => setShowDocumentsModal(true)}
@@ -301,8 +368,8 @@ export default function ContractInvoice() {
               })}
               customerId={planProperties.user?.referral_code}
             />
-          </div>
-        )}
+          </div> */}
+        {/* )} */}
 
         <InvoiceCard
           other={
@@ -463,6 +530,15 @@ export default function ContractInvoice() {
         )}
       </div>
       <>
+        {isAllocationModalOpen && (
+          <ConfirmAllocationModal
+            onCancel={() => setIsAllocationModalOpen(false)}
+            plan_id={plan_id}
+            user_id={user_id}
+            isChecked={isChecked}
+            setIsChecked={setIsChecked}
+          />
+        )}
         {showContractModal && (
           <ContractModal
             contract={contract}
@@ -470,11 +546,11 @@ export default function ContractInvoice() {
           />
         )}
         {showDocumentsModal && hasContractDocuments && (
-         <ContractDocumentsModal 
-  onClose={() => setShowDocumentsModal(false)}
-  plan_id={plan_id}
-  // user_id={userId}
-/>
+          <ContractDocumentsModal
+            onClose={() => setShowDocumentsModal(false)}
+            plan_id={plan_id}
+            user_id={user_id}
+          />
         )}
         {showModal && (
           <PropertyDocumentsModal
@@ -482,7 +558,6 @@ export default function ContractInvoice() {
             onSubmit={handleSubmit}
             propertyDetails={propertyDetails}
             isLoading={documentUploadLoading}
-            // initialDocuments={contractDocuments || []}
             isEditMode={hasContractDocuments}
           />
         )}

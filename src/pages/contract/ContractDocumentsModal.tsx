@@ -16,14 +16,14 @@ interface ContractDocumentsModalProps {
   onClose: () => void;
   onDocumentDeleted?: (documentId: number) => void;
   plan_id: any;
-  // user_id: number;
+  user_id: any;
 }
 
 export const ContractDocumentsModal: React.FC<ContractDocumentsModalProps> = ({
   onClose,
   onDocumentDeleted,
   plan_id,
-  // user_id
+  user_id
 }) => {
   const [currentDocument, setCurrentDocument] = useState<{
     url: string;
@@ -56,7 +56,7 @@ export const ContractDocumentsModal: React.FC<ContractDocumentsModalProps> = ({
         toast.success(result.message || 'Document deleted successfully');
         // Refresh the documents list and property plan
         dispatch(fetchContractDocuments({ planId: plan_id, page: pagination.currentPage }));
-        // dispatch(fetchUserPropertyPlan({ planId: plan_id, userId: user_id }));
+        dispatch(fetchUserPropertyPlan({ planId: plan_id, userId: user_id }));
         
         if (onDocumentDeleted) {
           onDocumentDeleted(documentId);
