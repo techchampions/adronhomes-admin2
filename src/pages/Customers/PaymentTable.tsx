@@ -90,7 +90,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({
       <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        transactionData={transactionData}
+        // transactionData={transactionData}
       />
     </>
   );
