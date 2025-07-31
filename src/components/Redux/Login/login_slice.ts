@@ -18,7 +18,6 @@ interface AuthState {
   logoutSuccess: boolean;
 }
 
-
 const initialState: AuthState = {
   loading: false,
   token: Cookies.get("token") || null,
@@ -27,9 +26,8 @@ const initialState: AuthState = {
   otpVerified: false,
   error: null,
   user: null,
-  logoutSuccess: false, 
+  logoutSuccess: false,
 };
-
 
 const authSlice = createSlice({
   name: "auth",
@@ -44,7 +42,7 @@ const authSlice = createSlice({
       state.user = null;
       state.loading = false;
       Cookies.remove("token");
-       state.logoutSuccess = true;
+      state.logoutSuccess = true;
     },
     clearError: (state) => {
       state.error = null;
@@ -56,9 +54,8 @@ const authSlice = createSlice({
       state.message = null;
     },
     resetLogoutSuccess: (state) => {
-  state.logoutSuccess = false;
-},
-
+      state.logoutSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -77,7 +74,7 @@ const authSlice = createSlice({
           state.otpVerified = action.payload.otpVerified || false;
           state.user = action.payload.user || null;
           state.error = null;
-          
+
           if (action.payload.token) {
             Cookies.set("token", action.payload.token, { expires: 7 }); // Expires in 7 days
           }
@@ -99,7 +96,7 @@ export const {
   clearError,
   resetSuccess,
   clearMessage,
-  resetLogoutSuccess, 
+  resetLogoutSuccess,
 } = authSlice.actions;
 
 export default authSlice.reducer;

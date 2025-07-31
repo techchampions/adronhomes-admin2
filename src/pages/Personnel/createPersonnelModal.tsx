@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 interface PersonnelModalProps {
   isOpen?: boolean;
   onClose?: () => void;
-  role: any;
+  role?: any;
 }
 
 interface PersonnelFormValues {

@@ -17,22 +17,18 @@ import { fetchPropertyPlanPayments } from "../../components/Redux/Marketer/Payme
 import { PaymentCard } from "../../pages/Customers/PaymentTable";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import InvoiceCard from "../../general/invioceCardTwo";
-// import { PropertyDocumentsModal } from "./PropertyDocumentsModal";
+
 import { toast } from "react-toastify";
 import createContractDocuments, {
   createContractDocumentsThunk,
 } from "../../components/Redux/UpdateContract/createContractDocuments";
 import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
-// import { ContractModal } from "./ContractFormModal";
-// import { ContractDocumentsModal } from "./ContractDocumentsModal";
-// import { UserProfileCard } from "./contractProfileCard";
-import { formatDate } from "../../utils/formatdate";
-import { UserProfileCard } from "../contract/contractProfileCard";
-import { ConfirmAllocationModal } from "../contract/confirmDocumentSubmited";
-import { ContractModal } from "../contract/ContractFormModal";
 import { ContractDocumentsModal } from "../contract/ContractDocumentsModal";
 import { PropertyDocumentsModal } from "../contract/PropertyDocumentsModal";
-// import { ConfirmAllocationModal } from "./confirmDocumentSubmited";
+import { formatDate } from "../../utils/formatdate";
+import { ConfirmAllocationModal } from "../contract/confirmDocumentSubmited";
+import { ContractModal } from "../contract/ContractFormModal";
+import { UserProfileCard } from "../contract/contractProfileCard";
 
 export default function ContractInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -304,12 +300,13 @@ export default function ContractInvoice() {
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
-        <div className="flex items-center  mb-6">
-          {/* Custom Checkbox */}
-          <input
-            type="checkbox"
-            id="confirmCheckbox"
-            className="
+        {hasContractDocuments && (
+          <div className="flex items-center  mb-6">
+            {/* Custom Checkbox */}
+            <input
+              type="checkbox"
+              id="confirmCheckbox"
+              className="
                             mr-3
                             appearance-none inline-block w-6 h-6 border-2 border-gray-300 rounded-md
                             relative cursor-pointer outline-none transition-colors duration-200 ease-in-out
@@ -318,22 +315,24 @@ export default function ContractInvoice() {
                             after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2
                             after:block
                         "
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="confirmCheckbox"
-              className="text-lg text-gray-700 select-none cursor-pointer"
-            >
-              I confirm that i have uploaded all required documents
-            </label>
-            <p className="text-xs italic">
-              This confirms that all the required documents have been uploaded and that the property will be allocated to the customer. Please ensure the documents have been properly reviewed.
-            </p>
+              checked={isChecked}
+              onChange={handleCheckboxChange}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="confirmCheckbox"
+                className="text-lg text-gray-700 select-none cursor-pointer"
+              >
+                I confirm that i have uploaded all required documents
+              </label>
+              <p className="text-xs italic">
+                This confirms that all the required documents have been uploaded
+                and that the property will be allocated to the customer. Please
+                ensure the documents have been properly reviewed.
+              </p>
+            </div>
           </div>
-        </div>
-
+        )}
         <UserProfileCard
           name={contract?.contract_subscriber_name_1}
           joinDate={formatDate(contract?.created_at)}
