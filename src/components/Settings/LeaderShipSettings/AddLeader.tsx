@@ -32,7 +32,7 @@ const initialValues = {
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
-  picture: Yup.array().required("picture is required"),
+  picture: Yup.mixed().required("picture is required"),
   position: Yup.string().required("Position is required"),
   description: Yup.string().required("Description is required"),
 });
@@ -59,7 +59,7 @@ export default function AddLeader({
 
   return (
     <div className="fixed inset-0 z-50 bg-[#17191CBA] bg-opacity-25 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-h-[95%] overflow-y-scroll scrollbar-hide max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-10">
+      <div className="bg-white rounded-2xl sm:rounded-3xl w-full md:w-[450px] max-h-[95%] overflow-y-scroll scrollbar-hide mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-10">
         <div className="flex justify-between items-center mb-1 sm:mb-2 md:mb-[10px]">
           <h2 className="text-lg sm:text-xl md:text-2xl font-[350] text-dark">
             Add New Leader{" "}
@@ -88,6 +88,7 @@ export default function AddLeader({
             setFieldValue,
             values,
             isSubmitting,
+            isValid,
           }) => (
             <Form>
               <label className="mb-3 mx-auto cursor-pointer border border-dashed border-gray-300 overflow-hidden p-1 rounded-full relative w-[150px] h-[150px] flex flex-col justify-center items-center">
@@ -153,7 +154,7 @@ export default function AddLeader({
                   label="Submit"
                   type="submit"
                   isLoading={isPending || isSubmitting}
-                  disabled={isPending || isSubmitting}
+                  disabled={isPending || isSubmitting || !isValid}
                 />
               </div>
             </Form>
