@@ -2,21 +2,22 @@ import React, { useState, useEffect } from "react";
 import Header from "../../general/Header";
 import PaymentCard from "./paymentconfirmcard";
 import ProfileCard from "../../general/SmallProfileCard";
-
 import PaymentListComponent from "../Customers/PaymentStatus";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPaymentById } from "../../components/Redux/Payment/payment_thunk";
-import { clearPayment } from "../../components/Redux/Payment/paymentById_Slice";
 import { useParams } from "react-router-dom";
 import { getUser } from "../../components/Redux/User/user_Thunk";
 import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import InvoiceCard from "../../general/invioceCardTwo";
+import { clearPaymentList } from "../../components/Redux/Payment/fetchPaymentListById_slice";
 
 export default function PaymentById() {
   const [isPaymentListOpen, setIsPaymentListOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  
+  // Correctly typed selector for paymentById state
   const { payment, loading, error } = useSelector(
     (state: RootState) => state.paymentsById
   );
@@ -41,7 +42,7 @@ export default function PaymentById() {
     }
 
     return () => {
-      dispatch(clearPayment());
+      dispatch(clearPaymentList());
     };
   }, [dispatch, paymentId]);
 
@@ -50,7 +51,6 @@ export default function PaymentById() {
     if (!dateString || dateString === "Payment completed") return "Payment completed";
     try {
       const date = new Date(dateString);
-      // Check for 'Invalid Date'
       if (isNaN(date.getTime())) {
         return "Invalid date";
       }
@@ -89,7 +89,6 @@ export default function PaymentById() {
         <div className="flex items-center justify-center h-screen text-center ">
           <LoadingAnimations loading={loading} />
         </div>
-        ;
       </div>
     );
   }
@@ -161,12 +160,13 @@ export default function PaymentById() {
           paymentId2={payment.id}
           paymentId={payment.reference}
           amount={formatCurrency(payment.amount_paid)}
-          bankName={payment.bank_name || "N/A"}
+          bankName={payment.payment_type === 'Virtual Wallet' ? payment.payment_type : payment.bank_name || "N/A"}
           date={formatDate(payment.created_at)}
           receiptImage={payment.proof_of_payment || "/reciept.svg"}
           fullReciept={payment.proof_of_payment || "/fullreciept.svg"}
           handleHistory={() => setIsPaymentListOpen(true)}
           id={Number(paymentId)}
+          wallet={payment.payment_type === 'Virtual Wallet' ||payment.payment_type === 'Paystack'  }
         />
 
         {payment.property && payment.plan && (
@@ -205,7 +205,9 @@ export default function PaymentById() {
                   remainingBalance: payment.plan.remaining_other_balance,
                   paidAmount: payment.plan.paid_other_amount,
                 }
-                : undefined} number_of_unit={payment.plan.number_of_unit}            />
+                : undefined}
+              number_of_unit={payment.plan.number_of_unit}
+            />
           </div>
         )}
 
@@ -222,7 +224,7 @@ export default function PaymentById() {
         </div>
       </div>
 
-      {isPaymentListOpen && paymentId && (
+      {isPaymentListOpen && paymentId && payment.property_plan_id && (
         <PaymentListComponent
           onClose={() => setIsPaymentListOpen(false)}
           paymentId={Number(payment.property_plan_id)}

@@ -24,6 +24,7 @@ interface PaymentByIdCardProps {
   handleHistory?: any;
   status?: number;
   id: any;
+  wallet?: boolean; 
 }
 
 interface ModalProps {
@@ -70,6 +71,7 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
   handleHistory,
   status = 0,
   id,
+    wallet = false,
 }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -174,48 +176,53 @@ const PaymentCard: React.FC<PaymentByIdCardProps> = ({
         </div>
         {/* right side */}
 
-        <div className="w-full flex flex-col items-start lg:items-end justify-end">
-          {/* file for view */}
-          <div
-            className="bg-[#F7F7F7] py-4 lg:py-[20px] pl-4 lg:pl-[29px] h-[120px] w-full lg:w-[409px] rounded-[20px] mb-4 lg:mb-[21px] relative cursor-pointer"
-            onClick={handleView}
-          >
-            <img
-              src={receiptImage}
-              alt="receipt"
-              className="border border-[#BEBEBE] rounded-[21px] h-full aspect-square  object-cover min-w-7 md:min-w-[300px]"
-            />
-            <p className="absolute right-8 lg:right-7 top-1/2 transform -translate-y-1/2 text-dark text-sm font-bold">
-              View
-            </p>
-          </div>
+       <div className="w-full flex flex-col items-start lg:items-end justify-end">
+  {/* Conditional rendering based on wallet prop */}
+  {!wallet && (
+    <>
+      {/* file for view */}
+      <div
+        className="bg-[#F7F7F7] py-4 lg:py-[20px] pl-4 lg:pl-[29px] h-[120px] w-full lg:w-[409px] rounded-[20px] mb-4 lg:mb-[21px] relative cursor-pointer"
+        onClick={handleView}
+      >
+        <img
+          src={receiptImage}
+          alt="receipt"
+          className="border border-[#BEBEBE] rounded-[21px] h-full aspect-square  object-cover min-w-7 md:min-w-[300px]"
+        />
+        <p className="absolute right-8 lg:right-7 top-1/2 transform -translate-y-1/2 text-dark text-sm font-bold">
+          View
+        </p>
+      </div>
 
-          {/* Status display or action buttons */}
-          {status === 1 ? (
-            <div className="text-[#79B833] text-sm font-bold py-3 sm:py-[14px] w-full text-center">
-              Approved
-            </div>
-          ) : status === 2 ? (
-            <div className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] w-full text-center">
-              Disapproved
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0 w-full sm:w-auto">
-              <button
-                className="bg-[#79B833] rounded-[60px] py-3 sm:py-[14px] px-6 sm:px-[44px] text-white text-sm font-bold w-full sm:w-auto text-center"
-                onClick={handleApprove}
-              >
-                Approve Payment
-              </button>
-              <p
-                className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] sm:pl-[45px] w-full sm:w-auto text-center sm:text-left cursor-pointer"
-                onClick={handleDisapprove}
-              >
-                Disapprove Payment
-              </p>
-            </div>
-          )}
+      {/* Status display or action buttons */}
+      {status === 1 ? (
+        <div className="text-[#79B833] text-sm font-bold py-3 sm:py-[14px] w-full text-center">
+          Approved
         </div>
+      ) : status === 2 ? (
+        <div className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] w-full text-center">
+          Disapproved
+        </div>
+      ) : (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0 w-full sm:w-auto">
+          <button
+            className="bg-[#79B833] rounded-[60px] py-3 sm:py-[14px] px-6 sm:px-[44px] text-white text-sm font-bold w-full sm:w-auto text-center"
+            onClick={handleApprove}
+          >
+            Approve Payment
+          </button>
+          <p
+            className="text-[#D70E0E] text-sm font-bold py-3 sm:py-[14px] sm:pl-[45px] w-full sm:w-auto text-center sm:text-left cursor-pointer"
+            onClick={handleDisapprove}
+          >
+            Disapprove Payment
+          </p>
+        </div>
+      )}
+    </>
+  )}
+</div>
       </div>
 
       {/* View Modal */}

@@ -149,6 +149,8 @@ interface PropertyContextType {
   resetFormData: () => void;
   option:any,
    setOption: (option:any) => void;
+   role:any,
+   setRole: (role:any) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(undefined);
@@ -326,7 +328,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     isBulk,
     isLandProperty,
   ]);
-
+const [role,setRole]=useState()
   const setSpecifications = (data: PropertySpecificationsFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -631,7 +633,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setIsSubmitting,
         resetFormData,
         option, 
-        setOption
+        setOption,
+        role,
+        setRole
       }}
     >
       {children}

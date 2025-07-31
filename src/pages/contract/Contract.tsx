@@ -196,7 +196,7 @@ export default function Contract() {
       onPageChange={handlePageChange}
       getStatusText={getStatusText}
     />
-  ):  activeTab === "Completed" ? (
+  ):  activeTab === "Allocated" ? (
     <AllocationTable
       data={contractList || []}
       pagination={contractPagination}

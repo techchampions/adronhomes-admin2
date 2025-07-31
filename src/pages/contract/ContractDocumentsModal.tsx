@@ -197,10 +197,6 @@ export const ContractDocumentsModal: React.FC<ContractDocumentsModalProps> = ({
   );
 };
 
-// Keep your existing Modal and DocumentViewerModal implementations
-// ...
-// Modal Component (keep your existing Modal and DocumentViewerModal implementations)
-// ...Modal Component
 interface ModalProps {
   title: string;
   onClose: () => void;

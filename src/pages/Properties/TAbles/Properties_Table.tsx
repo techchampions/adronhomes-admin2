@@ -16,6 +16,8 @@ import { resetUpdatePropertyState } from "../../../components/Redux/addProperty/
 import { DeleteProperty } from "../../../components/Redux/addProperty/UpdateProperties/deleteThunk";
 import ConfirmationModal from "../../../components/Modals/delete";
 import PropertyModal from "../PropertyModal";
+import { directors } from "../../../components/Redux/directors/directors_thunk";
+import OptionInputField from "../../../components/input/drop_down";
 
 export interface PropertyData {
   id: number;
@@ -27,7 +29,7 @@ export interface PropertyData {
   type: number;
   no_of_bedroom: number | null;
   slug: string;
-  features: string[] | string; // Can be array or stringified array
+  features: string[] | string;
   overview: string;
   description: string;
   street_address: string;
@@ -46,7 +48,7 @@ export interface PropertyData {
   is_sold: any;
   is_active: any;
   property_duration_limit: number;
-  payment_schedule: string[] | string | null; // Can be array or stringified array
+  payment_schedule: string[] | string | null;
   category: string;
   is_discount: boolean;
   discount_name: string | null;
@@ -67,6 +69,7 @@ export interface PropertyData {
   unit_sold: any;
   property_view: any;
   property_requests: any;
+  director_id?: any | null; // Add director_id to the interface
 }
 
 interface PropertyTableProps {
@@ -97,6 +100,22 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   const [propertyToDelete, setPropertyToDelete] = useState<PropertyData | null>(
     null
   );
+  interface DropdownOption {
+    label: string;
+    value: string | number;
+  }
+  const {
+    loading: userLoading,
+    error: userError,
+    data: directorDta,
+  } = useSelector((state: RootState) => state.directors);
+
+  const labels: DropdownOption[] = Array.isArray(directorDta)
+    ? directorDta.map((person) => ({
+        label: `${person.first_name} ${person.last_name}`,
+        value: person.id,
+      }))
+    : [];
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
       toast.success("Property deleted successfully!");
@@ -113,6 +132,10 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
     setPropertyToDelete(property);
     setIsDeleteModalOpen(true);
   };
+
+  useEffect(() => {
+    dispatch(directors());
+  }, [dispatch]);
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
@@ -157,7 +180,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
       case 3:
         return "Land";
       default:
-        return "Other";
+        return "Commercial";
     }
   };
 
@@ -190,20 +213,27 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
       // Handle checkboxes (including is_discount)
       if (type === "checkbox") {
         const checked = (e.target as HTMLInputElement).checked;
-        return {
-          ...prev,
-          [name]: checked,
-        };
-      }
+        const numericValue = checked ? 1 : 0;
 
-      // Handle radio buttons - ensure mutual exclusivity
-      if (name === "is_active" || name === "is_sold") {
-        const checked = (e.target as HTMLInputElement).checked;
+        // Handle the mutually exclusive checkboxes
+        if (name === "is_active" || name === "is_sold") {
+          return {
+            ...prev,
+            [name]: numericValue,
+            // When one is checked (1), the other must be unchecked (0)
+            ...(name === "is_active"
+              ? { is_sold: numericValue === 1 ? 0 : prev.is_sold }
+              : {}),
+            ...(name === "is_sold"
+              ? { is_active: numericValue === 1 ? 0 : prev.is_active }
+              : {}),
+          };
+        }
+
+        // Handle other checkboxes (like is_discount)
         return {
           ...prev,
-          [name]: checked,
-          ...(name === "is_active" && checked ? { is_sold: false } : {}),
-          ...(name === "is_sold" && checked ? { is_active: false } : {}),
+          [name]: numericValue,
         };
       }
 
@@ -211,7 +241,10 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
       return {
         ...prev,
         [name]:
-          name === "total_amount" || name === "no_of_bedroom" || name === "type"
+          name === "total_amount" ||
+          name === "no_of_bedroom" ||
+          name === "type" ||
+          name === "director_id"
             ? Number(value)
             : value,
       };
@@ -243,6 +276,9 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
     formData.append("street_address", editingProperty.street_address);
     formData.append("total_amount", editingProperty.total_amount.toString());
     formData.append("type", editingProperty.type.toString());
+    if (editingProperty.director_id) {
+      formData.append("director_id", editingProperty.director_id.toString());
+    }
     if (editingProperty.no_of_bedroom) {
       formData.append(
         "no_of_bedroom",
@@ -442,7 +478,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
           property={selectedProperty}
         />
       )}
-      {/* // Update the form inside the modal with all fields */}
+      {/* // Update the form inside the modal with all fields */}{" "}
       {isModalOpen && editingProperty && (
         <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-[30px] w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -470,13 +506,31 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
               </div>
 
               <form onSubmit={handleSubmit}>
-                <div className="grid  md:grid-cols-2 gap-4 mb-4">
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
                   {/* Basic Information */}
                   <div className="md:col-span-2">
                     <h3 className="text-lg font-semibold mb-2">
                       Basic Information
                     </h3>
-                    <div className="grid  md:grid-cols-2 gap-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Add the OptionInputField here */}
+                      <div className="col-span-2">
+                        <OptionInputField
+                          label="Director"
+                          placeholder="Select director"
+                          name="director_id"
+                          value={editingProperty.director_id || ""}
+                          onChange={(value: any) => {
+                            setEditingProperty({
+                              ...editingProperty,
+                              director_id: value ? Number(value) : null,
+                            });
+                          }}
+                          options={labels}
+                          dropdownTitle="Directors"
+                        />
+                      </div>
+
                       <div>
                         <InputField
                           type="text"
@@ -857,12 +911,11 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                           <option value="Installment">Installment</option>
                         </select>
                       </div>
-
                       <div className="flex items-center">
                         <input
                           type="checkbox"
                           name="is_active"
-                          checked={editingProperty.is_active || false}
+                          checked={editingProperty.is_active === 1}
                           onChange={handleInputChange}
                           className="mr-2 accent-black"
                         />
@@ -875,7 +928,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                         <input
                           type="checkbox"
                           name="is_sold"
-                          checked={editingProperty.is_sold || false}
+                          checked={editingProperty.is_sold === 1}
                           onChange={handleInputChange}
                           className="mr-2 accent-black"
                         />

@@ -11,17 +11,17 @@ export interface ContractData {
   status: number;
   property_id: number;
   user_id: number;
-  unique_contract_id: string;
-  contract_customer_id: string;
+  unique_contract_id: string | null; // Can be null based on new data
+  contract_customer_id: string | null; // Can be null based on new data
   contract_business_type: string;
   contract_subscriber_name_1: string;
-  contract_subscriber_name_2: string;
-  contract_subscriber_name_3: string;
-  contract_additional_name: string;
-  contract_transaction_date: string;
-  contract_purpose: string;
-  contract_promo: string;
-  contract_quantity: number;
+  contract_subscriber_name_2: string | null; // Can be null based on new data
+  contract_subscriber_name_3: string | null;
+  contract_additional_name: string | null;
+  contract_transaction_date: string | null; // Can be null based on new data
+  contract_purpose: string | null;
+  contract_promo: string | null;
+  contract_quantity: number | null; // Can be null based on new data
   contract_gender: string;
   contract_marital_status: string;
   contract_date_of_birth: string;
@@ -32,21 +32,24 @@ export interface ContractData {
   contract_country: string;
   contract_sms: string;
   contract_email: string;
-  contract_processing_fee: number;
-  contract_manual_discount: number;
-  contract_termination_charge: number;
-  contract_main_marketer: number;
-  contract_marketer_1: number;
-  contract_marketer_2: number;
+  contract_processing_fee: number | null; // Can be null based on new data
+  contract_manual_discount: number | null; // Can be null based on new data
+  contract_termination_charge: number | null; // Can be null based on new data
+  contract_main_marketer: number | null; // Can be null based on new data
+  contract_marketer_1: number | null; // Can be null based on new data
+  contract_marketer_2: number | null; // Can be null based on new data
   contract_employer: string;
   contract_occupation: string;
   contract_employer_address: string;
   contract_next_of_kin: string | null;
   contract_next_of_kin_address: string;
-  contract_next_of_kin_phone: string;
+  contract_next_of_kin_phone: string | null; // Can be null based on new data
   contract_next_of_kin_relationship: string;
-  contract_management_document: string | null;
+  contract_management_document?: string | null; // Optional, not in new data but was in old
   contract_profile_picture: string;
+  // New fields from the provided JSON response
+  contract_profile_picture_2: string | null; // Added
+  means_of_ids: string; // Added (JSON string of array of URLs)
   created_at: string;
   updated_at: string;
 }
@@ -129,7 +132,7 @@ export const getContract = createAsyncThunk<
   }
 );
 
-//  state for the contract slice
+// State for the contract slice
 interface ContractState {
   contract: ContractData | null;
   loading: boolean;
@@ -142,7 +145,7 @@ const initialState: ContractState = {
   error: null,
 };
 
-//  contract slice
+// Contract slice
 const contractSlice = createSlice({
   name: "contract",
   initialState,

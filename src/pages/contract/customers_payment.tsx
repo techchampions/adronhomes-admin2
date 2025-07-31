@@ -299,7 +299,7 @@ export default function ContractInvoice() {
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
-        <div className="flex items-center  mb-6">
+       { hasContractDocuments&& <div className="flex items-center  mb-6">
           {/* Custom Checkbox */}
           <input
             type="checkbox"
@@ -324,11 +324,13 @@ export default function ContractInvoice() {
               I confirm that i have uploaded all required documents
             </label>
             <p className="text-xs italic">
-              This confirms that all the required documents have been uploaded and that the property will be allocated to the customer. Please ensure the documents have been properly reviewed.
+              This confirms that all the required documents have been uploaded
+              and that the property will be allocated to the customer. Please
+              ensure the documents have been properly reviewed.
             </p>
           </div>
         </div>
-
+}
         <UserProfileCard
           name={contract?.contract_subscriber_name_1}
           joinDate={formatDate(contract?.created_at)}

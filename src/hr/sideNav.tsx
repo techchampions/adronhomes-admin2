@@ -20,7 +20,8 @@ export default function CarrerSideBar() {
 
   const handleLogout = () => {
     dispatch(logout());
-    window.location.reload();
+   window.location.href = '/';
+
   };
 
   const isActive = (path: string) =>

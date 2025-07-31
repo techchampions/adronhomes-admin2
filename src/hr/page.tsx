@@ -129,7 +129,7 @@ export default function HRDashboard() {
     dispatch(fetchCareers());
   }, [dispatch]);
 
-  // You can add an error handling display here if useGetDirectorDashboard reports an error
+ 
   if (isError) {
     return <NotFound />; 
   }

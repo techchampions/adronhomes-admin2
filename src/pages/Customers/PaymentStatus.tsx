@@ -5,11 +5,12 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { clearPaymentList, selectPaymentListPagination, setPaymentListPage } from "../../components/Redux/Payment/fetchPaymentListById_slice";
 import Pagination from "../../components/Tables/Pagination";
 import NotFound from "../../components/NotFound";
+import { Payment as PaymentType } from "../../components/Redux/Payment/fetchPaymentListById_slice"; // Import Payment type from slice
 
 // Define types
 type PaymentStatus = "Completed" | "Pending" | "Failed" | "Missed" | "Paid";
 
-interface Payment {
+interface PaymentDisplay { // Renamed to avoid conflict with imported PaymentType
   id: string;
   date: string;
   description: string;
@@ -104,19 +105,18 @@ interface PaymentListComponentProps {
   paymentId: number;
 }
 
-const PaymentListComponent: React.FC<PaymentListComponentProps> = ({ 
+const PaymentListComponent: React.FC<PaymentListComponentProps> = ({
   onClose,
-  paymentId 
+  paymentId
 }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { data, loading, error } = useSelector(
+  const { data, loading, error, pagination } = useSelector( // Destructure pagination directly
     (state: RootState) => state.paymentList
   );
-  const pagination = useSelector(selectPaymentListPagination);
 
   useEffect(() => {
     dispatch(fetchPaymentListById({ paymentId, currentPage: pagination.currentPage }));
-    
+
     return () => {
       dispatch(clearPaymentList());
     };
@@ -127,17 +127,17 @@ const PaymentListComponent: React.FC<PaymentListComponentProps> = ({
   };
 
   // Transform API data to match your UI format
-  const transformedPayments: Payment[] = data.map(payment => ({
+  const transformedPayments: PaymentDisplay[] = data.map((payment: PaymentType) => ({
     id: payment.id.toString(),
-    date: new Date(payment.created_at).toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    date: new Date(payment.created_at).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     }),
     description: payment.description,
-    amount: `₦${payment.amount.toLocaleString()}`,
-    status: payment.status === 1 ? "Paid" : "Pending",
+    amount: `₦${payment.amount_paid.toLocaleString()}`, // Use amount_paid
+    status: payment.status === 1 ? "Paid" : "Pending", // Assuming 1 means paid
   }));
 
   if (loading) return (
@@ -192,9 +192,9 @@ const PaymentListComponent: React.FC<PaymentListComponentProps> = ({
 
         {transformedPayments.length > 0 && (
           <div className="pb-4 px-2 sm:px-6">
-            <Pagination 
-              pagination={pagination} 
-              onPageChange={handlePageChange} 
+            <Pagination
+              pagination={pagination}
+              onPageChange={handlePageChange}
             />
           </div>
         )}

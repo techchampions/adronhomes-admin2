@@ -11,6 +11,7 @@ import {
   UpdateContractPayload,
 } from "../../components/Redux/UpdateContract/UpdateContract";
 import { FaEdit } from "react-icons/fa"; // Import the edit icon
+import { RiPencilFill } from "react-icons/ri";
 
 export interface Contract {
   id: number;
@@ -131,6 +132,10 @@ export default function AllocationTable({
           <table className="w-full">
             <thead>
               <tr className="text-left">
+                {/* New S/N column header */}
+                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[50px]">
+                  S/N
+                </th>
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[150px]">
                   Property Name
                 </th>
@@ -152,11 +157,15 @@ export default function AllocationTable({
               </tr>
             </thead>
             <tbody>
-              {data.map((contract) => (
+              {data.map((contract, index) => ( // Add index to map function
                 <tr
                   key={contract.id}
                   className="cursor-pointer hover:bg-gray-50"
                 >
+                  {/* S/N column data */}
+                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[50px] truncate pr-4">
+                    {(pagination.currentPage - 1) * pagination.perPage + index + 1}
+                  </td>
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
                     onClick={() => navigation(`/customers/${contract.user.id}`)}
@@ -250,26 +259,16 @@ export default function AllocationTable({
                       >
                         View Details
                       </button>
-                      <button
-                        onClick={() => handleInputCodeClick(contract)}
-                        className="bg-[#6B9F4B] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-[#5C8C3C] transition-colors whitespace-nowrap"
-                        aria-label="Input code for contract"
-                        disabled={updateContractLoading}
-                      >
-                        {updateContractLoading &&
-                        selectedContractForInput?.contract_id ===
-                          contract.contract_id
-                          ? "Processing..."
-                          : "Input Code"}
-                      </button>
-                      <FaEdit
-                        className="text-blue-500 cursor-pointer text-xl"
-                        onClick={() => {
-                          /* Add your edit logic here, e.g., open an edit modal */
-                          console.log("Edit icon clicked for contract:", contract.id);
-                        }}
-                        aria-label="Edit contract"
-                      />
+
+                 <button
+                          aria-label="Edit property"
+                        //   onClick={() => handleEditClick(property)} .
+                        >
+                          <img
+                            src="/ic_round-edit.svg"
+                            className="w-[18px] h-[18px]"
+                          />
+                        </button>
                     </div>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                       Manage contract actions
@@ -286,12 +285,7 @@ export default function AllocationTable({
         onPageChange={onPageChange}
         className="mt-8 mb-4"
       />
-      {showModal && (
-        <ContractInputModal
-          onClose={() => setShowModal(false)}
-          onSubmit={handleSubmit}
-        />
-      )}
+      
     </>
   );
 }

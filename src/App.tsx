@@ -212,10 +212,10 @@ const App = () => {
                 />
               </Route>
 
-                 <Route
-                  path="/human-resources"
+                 <Route   path="/human-resources"
                   element={<HRDashboard />}
-                />
+              ></Route>
+                
             </Routes>
           </AppLayout>
           {isInfrastructure && (

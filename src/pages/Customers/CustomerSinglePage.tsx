@@ -176,6 +176,8 @@ export default function CustomerSinglePage() {
         StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
         FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
         property: item.property,
+           user_id: item.user_id,
+        plan_id: item.id,
       };
     }) || [];
 

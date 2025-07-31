@@ -22,6 +22,7 @@ export interface PropertyDetail {
   total_amount: number;
 }
 
+
 export interface User {
   id: number;
   email: string;
@@ -45,6 +46,7 @@ export interface User {
   updated_at: string;
   personnel: string;
   contract_id: string | null;
+  unique_customer_id:any|null
 }
 
 export interface Marketer {
@@ -88,7 +90,56 @@ export interface Contract {
   marketer: Marketer | null;
   property: PropertyDetail;
   user: User;
+  contract:singleContract
 }
+
+export interface singleContract {
+  id: number;
+  plan_id: number;
+  status: number;
+  property_id: number;
+  user_id: number;
+  unique_contract_id: string | null;
+  contract_customer_id: string | null;
+  contract_business_type: string;
+  contract_subscriber_name_1: string;
+  contract_subscriber_name_2: string;
+  contract_subscriber_name_3: string;
+  contract_additional_name: string;
+  contract_transaction_date: string;
+  contract_purpose: string;
+  contract_promo: string;
+  contract_quantity: number;
+  contract_gender: string;
+  contract_marital_status: string;
+  contract_date_of_birth: string; 
+  contract_nationality: string;
+  contract_residential_address: string;
+  contract_town: string;
+  contract_state: string;
+  contract_country: string;
+  contract_sms: string;
+  contract_email: string;
+  contract_processing_fee: number;
+  contract_manual_discount: number;
+  contract_termination_charge: number;
+  contract_main_marketer: string;
+  contract_marketer_1: number;
+  contract_marketer_2: number;
+  contract_employer: string;
+  contract_occupation: string;
+  contract_employer_address: string;
+  contract_next_of_kin: string | null;
+  contract_next_of_kin_address: string;
+  contract_next_of_kin_phone: string;
+  contract_next_of_kin_relationship: string;
+  contract_profile_picture_2: string | null;
+  contract_profile_picture: string;
+  created_at: string; 
+  updated_at: string; 
+  means_of_ids: any; 
+}
+
 
 export interface ContractPaginationLinks {
   url: string | null;
@@ -120,6 +171,7 @@ export interface ContractsResponse {
   total_unpaid_contract: number;
   contract_list: ContractListData;
 }
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
 
