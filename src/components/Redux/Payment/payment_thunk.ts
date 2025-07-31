@@ -206,7 +206,17 @@ export interface User {
   profile_picture: string | null;
 }
 
+export interface User {
+  id: number;
+  email_verified_at: string;
+  last_name: string;
+  first_name: string;
+  profile_picture: string | null;
+}
 
+// This interface seems to be for a single payment detail, not a list item.
+// It's not directly used in the fetchPaymentListById thunk's return type,
+// but it's good to keep if used elsewhere.
 interface SinglePaymentResponse {
   status: string;
   message: string;
@@ -227,21 +237,21 @@ interface SinglePaymentResponse {
     proof_of_payment: string;
     property: any | null; // Replace 'any' with proper type if available
     plan: any | null;     // Replace 'any' with proper type if available
-      bank_name:string
-      user:User
+    bank_name:string
+    user:User
   };
 }
 
 
 export const fetchPaymentListById = createAsyncThunk<
   SinglePaymentListResponse,
-  { paymentId: number; currentPage?: number }, // Changed to accept an object with both paymentId and currentPage
+  { paymentId: number; currentPage?: number },
   { rejectValue: ErrorResponse; state: RootState }
 >(
   "payments/fetchPaymentListById",
-  async ({ paymentId, currentPage = 1 }, { rejectWithValue }) => { // Destructure the parameters
+  async ({ paymentId, currentPage = 1 }, { rejectWithValue }) => {
     const token = Cookies.get('token');
-    
+
     if (!token) {
       return rejectWithValue({
         message: "No authentication token found. Please login again.",
@@ -259,7 +269,7 @@ export const fetchPaymentListById = createAsyncThunk<
             device_id: "1010l0010l1",
           },
           params: {
-            page: currentPage 
+            page: currentPage
           }
         }
       );
@@ -287,7 +297,6 @@ export const fetchPaymentListById = createAsyncThunk<
     }
   }
 );
-
 
 
 interface UpdatePaymentstatusCredentials {

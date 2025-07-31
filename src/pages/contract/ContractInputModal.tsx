@@ -1,18 +1,20 @@
 import { useFormik } from "formik";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react"; // Import useEffect
 import * as Yup from "yup";
 import InputField from "../../components/input/inputtext";
 
 interface ContractInputModalProps {
   onClose: () => void;
   onSubmit: (values: { customerCode: string; contractId: string }) => void;
+  uniqueCustomerId: string;
 }
 
 const ContractInputModal: React.FC<ContractInputModalProps> = ({
   onClose,
   onSubmit,
+  uniqueCustomerId, 
 }) => {
-  const [loading, setLoading] = useState(false); // ← add this
+  const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     customerCode: Yup.string().required("Customer Code is required"),
@@ -21,7 +23,7 @@ const ContractInputModal: React.FC<ContractInputModalProps> = ({
 
   const formik = useFormik({
     initialValues: {
-      customerCode: "",
+      customerCode: uniqueCustomerId, 
       contractId: "",
     },
     validationSchema,
@@ -34,6 +36,11 @@ const ContractInputModal: React.FC<ContractInputModalProps> = ({
       }
     },
   });
+
+
+  useEffect(() => {
+    formik.setFieldValue('customerCode', uniqueCustomerId);
+  }, [uniqueCustomerId]); 
 
 
   return (
@@ -60,9 +67,11 @@ const ContractInputModal: React.FC<ContractInputModalProps> = ({
               placeholder="Enter customer code"
               name="customerCode"
               value={formik.values.customerCode}
-              onChange={formik.handleChange}
+             
+              onChange={formik.handleChange} 
               error={formik.touched.customerCode && formik.errors.customerCode}
               required
+              disabled
             />
 
             <InputField
@@ -85,15 +94,14 @@ const ContractInputModal: React.FC<ContractInputModalProps> = ({
               Cancel
             </button>
            <button
-  type="submit"
-  disabled={loading}
-  className={`w-full max-w-[217px] h-[50px] sm:h-[61px] font-semibold rounded-[60px] bg-[#272727] text-white text-sm sm:text-base hover:bg-[#272727] px-6 sm:px-[87px] py-3 sm:py-[21px] transition-opacity ${
-    loading ? 'opacity-50 cursor-not-allowed' : ''
-  }`}
->
-  {loading ? 'Submitting...' : 'Input'}
-</button>
-
+              type="submit"
+              disabled={loading}
+              className={`w-full max-w-[217px] h-[50px] sm:h-[61px] font-semibold rounded-[60px] bg-[#272727] text-white text-sm sm:text-base hover:bg-[#272727] px-6 sm:px-[87px] py-3 sm:py-[21px] transition-opacity ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {loading ? 'Submitting...' : 'Input'}
+            </button>
           </div>
         </form>
       </div>

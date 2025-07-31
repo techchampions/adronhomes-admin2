@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination"; // Assuming this path is correct
 import { formatAsNaira } from "../../utils/formatcurrency"; // Assuming this path is correct
+import { singleContract } from "../../components/Redux/Contract/contracts_thunk";
 
 // Define the Contract interface based on your existing code and the image data
 export interface Contract {
@@ -39,11 +40,13 @@ export interface Contract {
   other_percentage: number;
   other_amount: number;
   user: {
-    // Assuming User interface from your original code
+   
     id: any;
     first_name: string;
     last_name: string;
+    unique_customer_id:any
   };
+  contract: singleContract;
 }
 
 // Props for the NewContractsTable component
@@ -84,9 +87,13 @@ export default function NewContractsTable({
   return (
     <div className="w-full overflow-x-auto">
       <div className="min-w-[1000px] md:min-w-0">
-        <table className="w-full border-collapse">
+        <table className="w-full -collapse">
           <thead>
             <tr className="">
+              {/* S/N Header */}
+              <th className="pb-[23px] pr-4 whitespace-nowrap text-left text-[#757575] text-[12px] font-gotham font-[325]">
+                S/N
+              </th>
               <th className="pb-[23px] pr-4 whitespace-nowrap text-left text-[#757575] text-[12px] font-gotham font-[325]">
                 Contract ID
               </th>
@@ -116,26 +123,32 @@ export default function NewContractsTable({
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={8} className="text-center py-8 text-gray-500">
+                <td colSpan={9} className="text-center py-8 text-gray-500">
                   No contracts to display.
                 </td>
               </tr>
             ) : (
-              data.map((contract) => (
+              data.map((contract, index) => (
                 <tr
                   key={contract.id}
-                  className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors duration-200"
+                  className="-b -gray-200 last:-b-0 hover:bg-gray-50 transition-colors duration-200"
                 >
+                  {/* S/N Cell */}
+                  <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm">
+                    {(pagination.currentPage - 1) * pagination.perPage +
+                      index +
+                      1}
+                  </td>
                   {/* Contract ID */}
                   <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group">
                     <div className="truncate">
-                      {contract.contract_id || "N/A"}
+                      {contract?.contract?.unique_contract_id || "N/A"}
                     </div>
                     {contract.contract_id && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                         <div className="font-medium">Contract ID</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{contract.contract_id}</div>
+                        <div className="-b -gray-600 my-1"></div>
+                        <div>{contract?.contract?.unique_contract_id}</div>
                       </div>
                     )}
                   </td>
@@ -143,7 +156,7 @@ export default function NewContractsTable({
                   {/* Property Name */}
                   <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group cursor-pointer"
-                    onClick={() => navigate(`/customers/${contract.user.id}`)} 
+                    onClick={() => navigate(`/customers/${contract.user.id}`)}
                   >
                     <div className="truncate">
                       {contract.property?.name || "N/A"}
@@ -151,7 +164,7 @@ export default function NewContractsTable({
                     {contract.property?.name && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                         <div className="font-medium">Property Name</div>
-                        <div className="border-t border-gray-600 my-1"></div>
+                        <div className="-b -gray-600 my-1"></div>
                         <div>{contract.property.name}</div>
                       </div>
                     )}
@@ -170,7 +183,7 @@ export default function NewContractsTable({
                     {contract.user && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                         <div className="font-medium">Customer Name</div>
-                        <div className="border-t border-gray-600 my-1"></div>
+                        <div className="-b -gray-600 my-1"></div>
                         <div>{`${contract.user.first_name} ${contract.user.last_name}`}</div>
                       </div>
                     )}
@@ -186,7 +199,7 @@ export default function NewContractsTable({
                     </div>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                       <div className="font-medium">Total Amount</div>
-                      <div className="border-t border-gray-600 my-1"></div>
+                      <div className="-b -gray-600 my-1"></div>
                       <div>{formatAsNaira(contract.total_amount)}</div>
                     </div>
                   </td>
@@ -201,7 +214,7 @@ export default function NewContractsTable({
                     </div>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                       <div className="font-medium">Amount Paid</div>
-                      <div className="border-t border-gray-600 my-1"></div>
+                      <div className="-b -gray-600 my-1"></div>
                       <div>{formatAsNaira(contract.paid_amount)}</div>
                     </div>
                   </td>
@@ -230,7 +243,7 @@ export default function NewContractsTable({
                     {contract.marketer && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
                         <div className="font-medium">Marketer</div>
-                        <div className="border-t border-gray-600 my-1"></div>
+                        <div className="-b -gray-600 my-1"></div>
                         <div>{`${contract.marketer.first_name} ${contract.marketer.last_name}`}</div>
                       </div>
                     )}

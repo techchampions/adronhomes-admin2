@@ -14,7 +14,7 @@ import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesM
 import { PropertyContext } from "../../MyContext/MyContext";
 import PropertyModal from "./PropertyModal";
 
-const tabs = ['All', 'On sale', 'Active Plans', 'Sold'];
+const tabs = ['All', 'On sale', 'Sold'];
 
 export default function Properties() {
   const [activeTab, setActiveTab] = useState('All');
@@ -35,8 +35,7 @@ export default function Properties() {
         return properties;
       case 'On sale':
         return properties.filter((property: any) => property.is_sold === 0 && property.is_active === 0);
-      case 'Active Plans':
-        return properties.filter((property: any) => property.is_active === 1);
+      
       case 'Sold':
         return properties.filter((property: any) => property.is_sold === 1);
       default:
@@ -95,7 +94,7 @@ export default function Properties() {
             <>
               {activeTab === 'All' && <PropertyTableComponent data={filteredProperties} />}
               {activeTab === 'On sale' && <PropertyTableComponent data={filteredProperties} />}
-              {activeTab === 'Active Plans' && <PropertyTableComponent data={filteredProperties} />}
+              {/* {activeTab === 'Active Plans' && <PropertyTableComponent data={filteredProperties} />} */}
               {activeTab === 'Sold' && <PropertyTableComponent data={filteredProperties} />}
             </>
           )}

@@ -32,6 +32,8 @@ const getRoleName = (roleId: number) => {
       return "Director";
     case 4:
       return "Accountant";
+          case 5:
+      return "Hr";
     default:
       return "Unknown";
   }

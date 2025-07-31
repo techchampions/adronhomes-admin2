@@ -46,6 +46,8 @@ export default function Header({
     setPersonnelModal,
     isUserBulk,
     setIsUserBulk,
+        role,
+        setRole
   } = useContext(PropertyContext)!;
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
@@ -197,9 +199,8 @@ export default function Header({
             />
           ) : (
             <PersonnelModal
-              isOpen={showPersonnelModal}
-              onClose={() => setPersonnelModal(false)}
-            />
+                isOpen={showPersonnelModal}
+                onClose={() => setPersonnelModal(false)} role={role}            />
           )}
         </>
       )}

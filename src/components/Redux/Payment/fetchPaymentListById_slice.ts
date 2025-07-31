@@ -1,20 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchPaymentListById } from './payment_thunk';
+import { fetchPaymentListById } from './payment_thunk'; // Assuming the thunk file is named payment_thunk.ts
 
 export interface Payment {
   id: number;
-  property_id: number;
+  property_id: number | null;
   user_id: number;
-  plan_id: number;
-  amount: number;
+  property_plan_id: number | null;
+  order_id: number | null;
+  amount_paid: number; 
+  purpose: string;
+  payment_type: string; 
   status: number;
-  description: string;
-  transaction_method: string;
+  reference: string;
+  is_coupon: number;
   created_at: string;
   updated_at: string;
-  marketer_id: number;
-
-
+  proof_of_payment: string;
+  bank_name: string;
+  description: string;
+  marketer_id: number | null; 
+  director_id: number | null; 
 }
 
 export interface ErrorResponse {
@@ -44,24 +49,24 @@ export interface SinglePaymentListResponse {
     total: number;
   };
 }
+
 interface PaymentListState {
   data: Payment[];
   loading: boolean;
   error: string | null;
-   pagination: {
+  pagination: {
     currentPage: number;
     totalPages: number;
     totalItems: number;
     perPage: number;
   };
-
 }
 
 const initialState: PaymentListState = {
   data: [],
   loading: false,
   error: null,
-   pagination: {
+  pagination: {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
@@ -87,11 +92,23 @@ const paymentListSlice = createSlice({
       .addCase(fetchPaymentListById.fulfilled, (state, action: PayloadAction<SinglePaymentListResponse>) => {
         state.loading = false;
         state.data = action.payload.payment_list.data;
+        // Update pagination state
+        state.pagination.currentPage = action.payload.payment_list.current_page;
+        state.pagination.totalPages = action.payload.payment_list.last_page;
+        state.pagination.totalItems = action.payload.payment_list.total;
+        state.pagination.perPage = action.payload.payment_list.per_page;
       })
       .addCase(fetchPaymentListById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch payment list';
         state.data = [];
+        // Reset pagination on error
+        state.pagination = {
+            currentPage: 1,
+            totalPages: 1,
+            totalItems: 0,
+            perPage: 10,
+        };
       });
   },
 });

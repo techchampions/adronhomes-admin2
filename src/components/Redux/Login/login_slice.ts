@@ -15,7 +15,7 @@ interface AuthState {
     email: string;
     name: string;
   } | null;
-  logoutSuccess: boolean; // ✅ added
+  logoutSuccess: boolean;
 }
 
 
@@ -27,7 +27,7 @@ const initialState: AuthState = {
   otpVerified: false,
   error: null,
   user: null,
-  logoutSuccess: false, // ✅ added
+  logoutSuccess: false, 
 };
 
 

@@ -79,6 +79,9 @@ export default function Login() {
          if (user?.role === 3) {
         navigate("/director");
       }
+         if (user?.role === 5) {
+        navigate("/human-resources");
+      }
     }
   }, [userError, userSuccess, dispatch]);
 

@@ -8,7 +8,7 @@ interface ContractDocument {
   id?: number;
   document_file: string | File;
   plan_id?: number;
-  [key: string]: any; 
+  [key: string]: any;
 }
 
 interface PropertyDocumentsModalProps {
@@ -43,25 +43,29 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
   isEditMode = false,
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<FileWithPreview[]>([]);
+  // State to store duplicate file error message
+  const [duplicateFileError, setDuplicateFileError] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     // Cleanup URL objects if component unmounts
     return () => {
-      uploadedFiles.forEach(file => {
+      uploadedFiles.forEach((file) => {
         URL.revokeObjectURL(file.preview);
       });
     };
-  }, [uploadedFiles]); 
- 
+  }, [uploadedFiles]);
+
   useEffect(() => {
     const documentsValue = uploadedFiles.map((f) => ({
       plan_id: 0, // Default plan_id for new uploads
-      document_file: f.file, 
+      document_file: f.file,
     }));
 
     formik.setFieldValue("documents", documentsValue);
-    formik.validateField("documents"); 
-  }, [uploadedFiles]); 
+    formik.validateField("documents");
+  }, [uploadedFiles]);
 
   const validationSchema = Yup.object().shape({
     documents: Yup.array()
@@ -85,13 +89,38 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-        name: file.name,
-      }));
+      const newFiles = Array.from(e.target.files);
+      const currentFileNames = uploadedFiles.map((f) => f.name);
+      let hasDuplicate = false;
+      let duplicateFileName = "";
 
-      setUploadedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      const filesToAdd: FileWithPreview[] = [];
+
+      for (const file of newFiles) {
+        if (currentFileNames.includes(file.name)) {
+          hasDuplicate = true;
+          duplicateFileName = file.name;
+          break; // Stop on the first duplicate found
+        }
+        filesToAdd.push({
+          file,
+          preview: URL.createObjectURL(file),
+          name: file.name,
+        });
+      }
+
+      if (hasDuplicate) {
+        setDuplicateFileError(
+          `A file with the name "${duplicateFileName}" already exists.`
+        );
+        // Clear the input field to allow re-selection of files
+        e.target.value = "";
+      } else {
+        setDuplicateFileError(null); // Clear any previous duplicate error
+        setUploadedFiles((prevFiles) => [...prevFiles, ...filesToAdd]);
+        // Clear the input field after successful upload to allow selection of the same files again
+        e.target.value = "";
+      }
     }
   };
 
@@ -101,13 +130,18 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
 
     const newFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(newFiles);
+    // Clear duplicate file error if no files are left or if the removed file was the one causing the error
+    if (newFiles.length === 0 || duplicateFileError) {
+      setDuplicateFileError(null);
+    }
   };
 
   const handleCancel = () => {
-    uploadedFiles.forEach(file => {
+    uploadedFiles.forEach((file) => {
       URL.revokeObjectURL(file.preview);
     });
     setUploadedFiles([]);
+    setDuplicateFileError(null); // Clear error on cancel
     onClose();
   };
 
@@ -164,7 +198,7 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                 >
                   {feature === "Str Lights" && (
                     <img
-                      src="/wand.svg" 
+                      src="/wand.svg"
                       alt="Street Lights"
                       className="mr-1 w-3 h-3"
                     />
@@ -217,7 +251,7 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                   {uploadedFiles.map((file, index) => (
                     <div
                       key={index}
-                      className="flex items-center rounded-full pl-3 pr-2 py-1 bg-[#F2F2F2]"
+                      className="flex items-center  w-fit rounded-full pl-3 pr-2 py-1 bg-[#F2F2F2]"
                     >
                       <span className="text-sm text-[#4F4F4F] truncate max-w-[150px]">
                         {file.name}
@@ -235,7 +269,12 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
                 </div>
               )}
             </div>
-
+            {/* Display duplicate file error message here */}
+            {duplicateFileError && (
+              <p className="text-red-500 text-sm mt-1">
+                {duplicateFileError}
+              </p>
+            )}
             {formik.errors.documents && formik.touched.documents && (
               <p className="text-red-500 text-sm mt-1">
                 {formik.errors.documents as string}
@@ -247,7 +286,7 @@ export const PropertyDocumentsModal: React.FC<PropertyDocumentsModalProps> = ({
             <button
               type="submit"
               className="w-full max-w-[217px] h-[50px] sm:h-[61px] font-semibold rounded-[60px] bg-[#79B833] text-white text-sm sm:text-base hover:bg-[#79B833] px-6 sm:px-[87px] py-3 sm:py-[21px]"
-              disabled={uploadedFiles.length === 0 || isLoading}
+              disabled={uploadedFiles.length === 0 || isLoading || !!duplicateFileError}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
