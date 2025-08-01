@@ -63,9 +63,11 @@ import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 import MarketerInvoice from "./marketer/Payment/customers_payment";
+
 import Page from "./Legal/page";
 import LegalSideBar from "./Legal/sidenavlegal";
 import LegalContractInvoice from "./Legal/contractDetails";
+
 
 const AuthGuard = () => {
   const token = Cookies.get('token');
@@ -86,7 +88,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
   const isPayments = location.pathname.startsWith('/payments/');
+
    const isLegal = location.pathname.startsWith('/legal');
+
 
   return (
     <div className="flex">
