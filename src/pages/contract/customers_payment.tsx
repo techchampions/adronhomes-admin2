@@ -51,7 +51,7 @@ export default function ContractInvoice() {
     loading: docLoading,
     error: errordoc,
   } = useSelector((state: RootState) => state.ViewcontractDocuments);
-  // Add this near the top of your component with other state declarations
+
   const [hasContractDocuments, setHasContractDocuments] = useState(false);
 
   // Update this useEffect to check for contract documents
@@ -92,9 +92,19 @@ export default function ContractInvoice() {
     setCurrentPage(page);
   };
 
-  const [isChecked, setIsChecked] = useState(
-    planProperties?.is_allocated === 1
-  );
+  // const [isChecked, setIsChecked] = useState(
+  //   planProperties?.is_allocated === 1?true:false
+  // );
+
+  const [isChecked, setIsChecked] = useState(false);
+
+// Set initial state once planProperties is available
+useEffect(() => {
+  if (planProperties?.is_allocated !== undefined) {
+    setIsChecked(planProperties.is_allocated === 1);
+  }
+}, [planProperties]);
+
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
 
   // Function to handle checkbox change
@@ -304,6 +314,7 @@ export default function ContractInvoice() {
           <input
             type="checkbox"
             id="confirmCheckbox"
+            // value={isChecked}
             className="
                             mr-3
                             appearance-none inline-block w-6 h-6 border-2 border-gray-300 rounded-md
