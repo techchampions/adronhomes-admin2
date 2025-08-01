@@ -4,6 +4,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
+import { BASE_URL } from "../UpdateContract/viewcontractFormDetails";
 
 // Define interfaces for the API response
 export interface ErrorResponse {
@@ -51,11 +52,11 @@ export interface CareerResponse {
   data: CareerData;
 }
 
-const BASE_URL = "https://adron.microf10.sg-host.com";
+// const BASE_URL = "https://adron.microf10.sg-host.com";
 
 export const fetchCareers = createAsyncThunk<
-  CareerResponse, // Return type
-  void, // No arguments
+  CareerResponse, 
+  void, 
   {
     state: RootState;
     rejectValue: ErrorResponse;
