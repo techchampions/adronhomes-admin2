@@ -71,7 +71,7 @@ const ContractInputModal: React.FC<ContractInputModalProps> = ({
               onChange={formik.handleChange} 
               error={formik.touched.customerCode && formik.errors.customerCode}
               required
-              disabled
+              // disabled
             />
 
             <InputField

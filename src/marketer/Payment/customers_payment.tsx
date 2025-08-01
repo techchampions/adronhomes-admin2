@@ -23,13 +23,14 @@ import createContractDocuments, {
   createContractDocumentsThunk,
 } from "../../components/Redux/UpdateContract/createContractDocuments";
 import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
-import { ContractDocumentsModal } from "../../pages/contract/ContractDocumentsModal";
 import { ConfirmAllocationModal } from "../../pages/contract/confirmDocumentSubmited";
+
 import { ContractModal } from "../../pages/contract/ContractFormModal";
 import { UserProfileCard } from "../../pages/contract/contractProfileCard";
 import { PropertyDocumentsModal } from "../../pages/contract/PropertyDocumentsModal";
+import PropertyBadge from "../../pages/Customers/PropertyBadge";
 import { formatDate } from "../../utils/formatdate";
-
+import { ContractDocumentsModal } from "../../pages/contract/ContractDocumentsModal";
 
 export default function ContractInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,9 +95,15 @@ export default function ContractInvoice() {
     setCurrentPage(page);
   };
 
-  const [isChecked, setIsChecked] = useState(
-    planProperties?.is_allocated === 1
-  );
+  const [isChecked, setIsChecked] = useState(false);
+
+  // Set initial state once planProperties is available
+  useEffect(() => {
+    if (planProperties?.is_allocated !== undefined) {
+      setIsChecked(planProperties.is_allocated === 1);
+    }
+  }, [planProperties]);
+
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
 
   // Function to handle checkbox change
@@ -296,17 +303,19 @@ export default function ContractInvoice() {
           history={true}
           buttonText={"Upload Document"}
           onButtonClick={() => setShowModal(true)}
-          showSearchAndButton={planProperties.status === 2 ? true : false}
+          showSearchAndButton={false}
           handleViewPurchaseFormClick={() => setShowContractModal(true)}
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
-       { hasContractDocuments&& <div className="flex items-center  mb-6">
-          {/* Custom Checkbox */}
-          <input
-            type="checkbox"
-            id="confirmCheckbox"
-            className="
+        {<PropertyBadge status={isChecked ? "ALLOCATED" : "PENDING"} />}
+        {/* {hasContractDocuments && (
+          <div className="flex items-center  mb-6">
+      
+            <input
+              type="checkbox"
+              id="confirmCheckbox"
+              className="
                             mr-3
                             appearance-none inline-block w-6 h-6 border-2 border-gray-300 rounded-md
                             relative cursor-pointer outline-none transition-colors duration-200 ease-in-out
@@ -315,24 +324,24 @@ export default function ContractInvoice() {
                             after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2
                             after:block
                         "
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="confirmCheckbox"
-              className="text-lg text-gray-700 select-none cursor-pointer"
-            >
-              I confirm that i have uploaded all required documents
-            </label>
-            <p className="text-xs italic">
-              This confirms that all the required documents have been uploaded
-              and that the property will be allocated to the customer. Please
-              ensure the documents have been properly reviewed.
-            </p>
+              checked={isChecked}
+              onChange={handleCheckboxChange}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="confirmCheckbox"
+                className="text-lg text-gray-700 select-none cursor-pointer"
+              >
+                I confirm that i have uploaded all required documents
+              </label>
+              <p className="text-xs italic">
+                This confirms that all the required documents have been uploaded
+                and that the property will be allocated to the customer. Please
+                ensure the documents have been properly reviewed.
+              </p>
+            </div>
           </div>
-        </div>
-}
+        )} */}
         <UserProfileCard
           name={contract?.contract_subscriber_name_1}
           joinDate={formatDate(contract?.created_at)}
@@ -344,6 +353,7 @@ export default function ContractInvoice() {
           marketer={contract?.contract_main_marketer ?? "N/A"}
           businestype={contract?.contract_business_type ?? "N/A"}
           jointType={contract?.contract_business_type === "Joint"}
+          unique_contract_id={contract?.unique_contract_id ?? "N/A"}
         />
         {/* {hasContractDocuments && ( */}
         {/* <div className="relative">

@@ -17,7 +17,7 @@ export default function Customers() {
   const { data, customers, loading, error, pagination } = useSelector(
     (state: RootState) => state.customers
   );
-  const tabs = ["Registered Customers", "Active Plans"];
+  const tabs = ['Customers'];
   return (
     <div className="pb-[52px] relative">
       <Header
@@ -45,7 +45,7 @@ export default function Customers() {
         <ReusableTable
           tabs={tabs}
           searchPlaceholder={"Search Customer"}
-          activeTab={""}
+          activeTab={"Customers"}
         >
           <CustomersTableComponent data={customers} />
         </ReusableTable>

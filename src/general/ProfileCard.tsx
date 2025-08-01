@@ -77,7 +77,7 @@ export default function ProfileCard({
       if (sendMessage.fulfilled.match(result)) {
         // toast.success(result.payload.message || "Message sent successfully");
         setIsOpen(false);
-        setMessage(""); // Clear the message input
+        setMessage(""); 
       } else if (sendMessage.rejected.match(result)) {
         const errorMessage =
           result.payload?.message || "Failed to send message";
@@ -167,7 +167,7 @@ export default function ProfileCard({
 
           <div className="w-full justify-center flex flex-col items-center text-center md:text-left">
             <div className="md:text-base text-sm font-[350] text-dark mb-2 gap-2 flex">
-              <p className="text-[#767676]">Next Payment: </p>
+              <p className="text-[#767676]">Customer Code: </p>
               <div className="grid grid-cols-2 gap-x-2 truncate">
                 <span className="md:text-base text-sm  font-[350] text-dark truncate">
                   {paymentInfo.amount}

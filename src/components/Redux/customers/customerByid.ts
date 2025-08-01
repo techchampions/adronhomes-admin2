@@ -56,6 +56,7 @@ export interface PlanData {
   contract_id: string | null;
   number_of_unit: number;
   property: PropertyInPlan; 
+  unique_customer_id:any
 }
 
 // Interface for Pagination Links
@@ -106,6 +107,7 @@ export interface Customer {
   updated_at: string;
   personnel: string;
   contract_id: string | null;
+  unique_customer_id:any
 }
 
 // Interface for the overall API response
@@ -124,6 +126,7 @@ export interface CustomerByIdResponse {
   limit_completed_property: PlanData[]; // Now an array of PlanData
   active_plan: PaginatedPlans; // Now includes pagination
   completed_property: PaginatedPlans; // Now includes pagination
+  unique_customer_id:any
 }
 
 // Error Response Interface

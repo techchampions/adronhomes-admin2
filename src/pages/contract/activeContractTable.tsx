@@ -106,9 +106,9 @@ export default function NewContractsTable({
               <th className="pb-[23px] pr-4 whitespace-nowrap text-left text-[#757575] text-[12px] font-gotham font-[325]">
                 Total Amount
               </th>
-              <th className="pb-[23px] pr-4 whitespace-nowrap text-left text-[#757575] text-[12px] font-gotham font-[325]">
+              {/* <th className="pb-[23px] pr-4 whitespace-nowrap text-left text-[#757575] text-[12px] font-gotham font-[325]">
                 Amount Paid
-              </th>
+              </th> */}
               <th className="pb-[23px] pr-4 whitespace-nowrap text-left text-[#757575] text-[12px] font-gotham font-[325]">
                 Status
               </th>
@@ -131,7 +131,7 @@ export default function NewContractsTable({
               data.map((contract, index) => (
                 <tr
                   key={contract.id}
-                  className="-b -gray-200 last:-b-0 hover:bg-gray-50 transition-colors duration-200"
+                  className=" hover:bg-gray-50 transition-colors duration-200"
                 >
                   {/* S/N Cell */}
                   <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm">
@@ -205,7 +205,7 @@ export default function NewContractsTable({
                   </td>
 
                   {/* Amount Paid */}
-                  <td
+                  {/* <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[120px] truncate relative group cursor-pointer"
                     onClick={() => navigate(`/customers/${contract.user.id}`)}
                   >
@@ -216,8 +216,8 @@ export default function NewContractsTable({
                       <div className="font-medium">Amount Paid</div>
                       <div className="-b -gray-600 my-1"></div>
                       <div>{formatAsNaira(contract.paid_amount)}</div>
-                    </div>
-                  </td>
+                    </div> */}
+                  {/* </td> */}
 
                   {/* Status */}
                   <td className="py-4 pr-4 font-gotham font-[325] text-sm max-w-[100px] whitespace-nowrap">
