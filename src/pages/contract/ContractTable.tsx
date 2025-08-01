@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
 import { fetchContracts, singleContract, User } from "../../components/Redux/Contract/contracts_thunk";
-import ContractInputModal from "./ContractInputModal"; // Make sure this path is correct
+import ContractInputModal from "./ContractInputModal";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { updateContract, UpdateContractPayload } from "../../components/Redux/UpdateContract/UpdateContract";

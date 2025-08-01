@@ -12,6 +12,7 @@ interface UserProfileCardProps {
   marketer: any;
   businestype: any;
   jointType: any;
+  unique_contract_id:any
 }
 
 // UserProfileCard component with props type
@@ -26,6 +27,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
   marketer,
   businestype,
   jointType,
+  unique_contract_id
 }) => {
   return (
     <div className="bg-white rounded-2xl  p-6 md:p-8 flex items-center justify-between w-full  flex-wrap gap-4">
@@ -54,6 +56,10 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
                 {name2}
               </h2>
             )}
+            
+               <p className="text-sm md:text-base text-gray-600">
+              Contrsct Id: {unique_contract_id}
+            </p>
             <p className="text-sm md:text-base text-gray-600">
               Initial PaymentDate: {joinDate}
             </p>

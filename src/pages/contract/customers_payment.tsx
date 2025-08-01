@@ -352,8 +352,7 @@ useEffect(() => {
           name2={contract?.contract_subscriber_name_2}
           marketer={contract?.contract_main_marketer ?? "N/A"}
           businestype={contract?.contract_business_type ?? "N/A"}
-          jointType={contract?.contract_business_type === "Joint"}
-        />
+          jointType={contract?.contract_business_type === "Joint"} unique_contract_id={contract?.unique_contract_id  ?? "N/A"}        />
         {/* {hasContractDocuments && ( */}
         {/* <div className="relative">
             <div
