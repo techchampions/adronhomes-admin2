@@ -47,7 +47,8 @@ export default function Header({
     isUserBulk,
     setIsUserBulk,
         role,
-        setRole
+        setRole,
+        isLandProperty, setIsLandProperty,resetFormData
   } = useContext(PropertyContext)!;
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
@@ -64,6 +65,8 @@ export default function Header({
       // When in cancel state, navigate back
       navigate(isPersonnelPage ? "/personnel" : "/properties");
       setIsCancelState(false);
+         resetFormData()
+    setIsLandProperty(false);
     } else {
       // Normal state behavior
       if (isPersonnelPage) {
@@ -151,14 +154,17 @@ export default function Header({
         <BulkSelectModal
           onSelect={(isBulk) => {
             navigate("/properties/form");
-            setIsBulk(true);
+            // setIsBulk(true);
+             setIsLandProperty(true);
+            
             setShowBulkModal(false);
             setIsCancelState(true);
           }}
           onSelects={(isBulk) => {
             navigate("/properties/form");
-            setIsBulk(false);
+            // setIsBulk(false);
             setShowBulkModal(false);
+             setIsLandProperty(false);
             setIsCancelState(true);
           }}
           onClose={() => setShowBulkModal(false)}

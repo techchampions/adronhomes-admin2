@@ -34,10 +34,10 @@ const BulkSelectModal: React.FC<BulkSelectModalProps> = ({ onSelect, onClose, on
                 className='mb-3 md:mb-[21px] w-12 h-12 md:w-[68px] md:h-[68px]'
                 alt="Single Property"
               />
-              <p className='mb-1 md:mb-[5px] text-dark font-[350] text-sm md:text-base'>Single Property</p>
-              <h1 className='text-dark font-[325] text-xs md:text-sm text-left'>
+              <p className='mb-1 md:mb-[5px] text-dark font-[350] text-sm md:text-base'> Property Form</p>
+              {/* <h1 className='text-dark font-[325] text-xs md:text-sm text-left'>
                 A stand alone unit property available for sale.
-              </h1>
+              </h1> */}
             </div>
           </button>
           <button 
@@ -50,10 +50,10 @@ const BulkSelectModal: React.FC<BulkSelectModalProps> = ({ onSelect, onClose, on
                 className='mb-3 md:mb-[21px] w-12 h-12 md:w-[68px] md:h-[68px]'
                 alt="Bulk Property"
               />
-              <p className='mb-1 md:mb-[5px] text-dark font-[350] text-sm md:text-base'>Bulk Property</p>
-              <h1 className='text-dark font-[325] text-xs md:text-sm text-left'>
+              <p className='mb-1 md:mb-[5px] text-dark font-[350] text-sm md:text-base'>Estate Form</p>
+              {/* <h1 className='text-dark font-[325] text-xs md:text-sm text-left'>
                 A group of properties with multiple units available for sale.
-              </h1>
+              </h1> */}
             </div>
           </button>
         </div>

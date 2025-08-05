@@ -19,6 +19,7 @@ interface Fee {
   amount: string;
   checked: boolean;
   type: string;
+  purpose:any
 }
 
 interface BasicDetailsFormValues {
@@ -28,10 +29,10 @@ interface BasicDetailsFormValues {
   initialDeposit: string;
   address: string;
   locationType: string;
-  purpose: string;
-      country: any;
-      state: any;
-      lga:any;
+  purpose: string[];
+  country: any;
+  state: any;
+  lga: any;
 }
 
 interface BulkDetailsFormValues {
@@ -43,8 +44,8 @@ interface BulkDetailsFormValues {
   city: string;
   state: string;
   initialDeposit: string;
-    country: any;
-      lga:any;
+  country: any;
+  lga: any;
 }
 
 interface PropertySpecificationsFormValues {
@@ -59,20 +60,33 @@ interface PropertySpecificationsFormValues {
   overview: string;
   documents: string;
   director_id: any;
+  nearbyLandmarks: string[];
+  rentDuration: string;
+  buildingCondition: string;
+  purpose: string[];
+  whatsAppLink: string;
+  contactNumber: string;
+  toilets: string;
 }
 
 interface LandFormValues {
-  director_id: any;
   plotShape: string;
   topography: string;
   propertySize: string;
   landSize: string;
-  roadAccess: string;
-  titleDocumentType: string;
+  roadAccess: string[];
   unitsAvailable: string;
   description: string;
   overview: string;
-documents: string; 
+  documents: string;
+  director_id: string;
+  titleDocumentType: string[];
+  fencing: string;
+  gatedEstate: string;
+  contactNumber: string;
+  whatsAppLink: string;
+  publishOption: string;
+  nearbyLandmarks: string[];
 }
 
 interface FeaturesFormValues {
@@ -147,13 +161,15 @@ interface PropertyContextType {
   isSubmitting: boolean;
   setIsSubmitting: (isSubmitting: boolean) => void;
   resetFormData: () => void;
-  option:any,
-   setOption: (option:any) => void;
-   role:any,
-   setRole: (role:any) => void;
+  option: any;
+  setOption: (option: any) => void;
+  role: any;
+  setRole: (role: any) => void;
 }
 
-const PropertyContext = createContext<PropertyContextType | undefined>(undefined);
+const PropertyContext = createContext<PropertyContextType | undefined>(
+  undefined
+);
 
 interface PropertyProviderProps {
   children: ReactNode;
@@ -167,10 +183,10 @@ const initialFormData: PropertyFormData = {
     initialDeposit: "",
     address: "",
     locationType: "",
-    purpose: "",
-    country: '',
-    state: '',
-    lga:""
+    purpose: ["Bungalow"],
+    country: "",
+    state: "",
+    lga: "",
   },
   bulkDetails: {
     propertyName: "",
@@ -181,9 +197,8 @@ const initialFormData: PropertyFormData = {
     city: "",
     state: "",
     initialDeposit: "",
-     country: '',
-    lga:""
-    
+    country: "",
+    lga: "",
   },
   specifications: {
     director_id: "",
@@ -196,7 +211,14 @@ const initialFormData: PropertyFormData = {
     unitsAvailable: "",
     description: "",
     overview: "",
-      documents: "",
+    documents: "",
+    nearbyLandmarks: [],
+    rentDuration: "",
+    buildingCondition: "",
+    purpose: [],
+    whatsAppLink: "",
+    contactNumber: "",
+    toilets: "",
   },
   landForm: {
     director_id: "",
@@ -204,12 +226,18 @@ const initialFormData: PropertyFormData = {
     topography: "",
     propertySize: "",
     landSize: "",
-    roadAccess: "",
-    titleDocumentType: "",
+    roadAccess: ["paved"],
+    titleDocumentType: ["Lease Agreement"],
     unitsAvailable: "",
     description: "",
     overview: "",
-    documents: '',
+    documents: "",
+    fencing: "",
+    gatedEstate: "",
+    contactNumber: "",
+    whatsAppLink: "",
+    publishOption: "Draft",
+    nearbyLandmarks: [],
   },
   features: {
     features: ["Gym", "Swimming Pool", "Drainage", "Super Market"],
@@ -251,20 +279,6 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [option, setOption] = useState(2);
   const [fees, setFees] = useState<Fee[]>([
-    {
-      id: 1,
-      name: "Building Charge",
-      amount: "₦16,000,000",
-      checked: true,
-      type: "others",
-    },
-    {
-      id: 2,
-      name: "Service charge",
-      amount: "₦2,000,000",
-      checked: true,
-      type: "others",
-    },
   ]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const navigate = useNavigate();
@@ -274,28 +288,15 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     setCurrentStep(1);
     setIsLandProperty(false);
     setIsBulk(false);
-   navigate("/properties");
-    
+    navigate("/properties");
+
     setFees([
-      {
-        id: 1,
-        name: "Building Charge",
-        amount: "₦16,000,000",
-        checked: true,
-        type: "₦16,000,000",
-      },
-      {
-        id: 2,
-        name: "Service charge",
-        amount: "₦2,000,000",
-        checked: true,
-        type: "₦16,000,000",
-      },
+    
     ]);
   };
 
   const setBasicDetails = (data: BasicDetailsFormValues) => {
-    const isLand = data.propertyType === 1;
+    const isLand = isLandProperty
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -305,7 +306,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   const setBulkDetails = (data: BulkDetailsFormValues) => {
-    const isLand = data.propertyType === 1;
+  const isLand = isLandProperty
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -315,10 +316,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    const propertyType = isBulk
-      ? formData.bulkDetails.propertyType
-      : formData.basicDetails.propertyType;
-    const isLand = propertyType === 1;
+  
+      formData.basicDetails.propertyType;
+   const isLand = isLandProperty
     if (isLandProperty !== isLand) {
       setIsLandProperty(isLand);
     }
@@ -328,7 +328,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     isBulk,
     isLandProperty,
   ]);
-const [role,setRole]=useState()
+  const [role, setRole] = useState();
   const setSpecifications = (data: PropertySpecificationsFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -398,33 +398,40 @@ const [role,setRole]=useState()
         formPayload.append("street_address", bulkDetails.address);
         formPayload.append("city", bulkDetails.city || "");
 
-           formPayload.append("name", basicDetails.propertyName);
+        formPayload.append("name", basicDetails.propertyName);
         formPayload.append("type", basicDetails.propertyType);
         formPayload.append("price", basicDetails.price);
-  
-         formPayload.append("country", basicDetails.country);
-         formPayload.append("state", basicDetails.state);
-          formPayload.append("lga", basicDetails.lga);
-        
+
+        formPayload.append("country", basicDetails.country);
+        formPayload.append("state", basicDetails.state);
+        formPayload.append("lga", basicDetails.lga);
+
         formPayload.append("category", "bulk");
         formPayload.append(
           "initial_deposit",
-          basicDetails.initialDeposit || "0");
+          basicDetails.initialDeposit || "0"
+        );
       } else {
         formPayload.append("name", basicDetails.propertyName);
         formPayload.append("type", basicDetails.propertyType);
         formPayload.append("price", basicDetails.price);
-        
+
         formPayload.append(
           "initial_deposit",
           basicDetails.initialDeposit || "0"
         );
         formPayload.append("country", basicDetails.country);
-         formPayload.append("state", basicDetails.state);
-          formPayload.append("lga", basicDetails.lga);
-           formPayload.append("street_address", basicDetails.address);
+        formPayload.append("state", basicDetails.state);
+        formPayload.append("lga", basicDetails.lga);
+        formPayload.append("street_address", basicDetails.address);
         formPayload.append("location_type", basicDetails.locationType || "");
-        formPayload.append("purpose", basicDetails.purpose || "");
+        formPayload.append(
+          "purpose",
+          Array.isArray(basicDetails.purpose)
+            ? basicDetails.purpose.join(", ")
+            : basicDetails.purpose || ""
+        );
+
         formPayload.append("category", "single");
       }
 
@@ -432,21 +439,46 @@ const [role,setRole]=useState()
         formPayload.append("size", landForm.propertySize);
         formPayload.append("shape", landForm.plotShape || "");
         formPayload.append("topography", landForm.topography || "");
-        formPayload.append("road_access", landForm.roadAccess || "");
+        formPayload.append(
+          "nearbyLandmarks",
+          Array.isArray(landForm.nearbyLandmarks)
+            ? landForm.nearbyLandmarks.join(", ")
+            : landForm.nearbyLandmarks || ""
+        );
+
+        formPayload.append(
+          "road_access",
+          Array.isArray(landForm.roadAccess)
+            ? landForm.roadAccess.join(", ")
+            : landForm.roadAccess || ""
+        );
+
         formPayload.append(
           "title_document_type",
-          landForm.titleDocumentType || ""
+          Array.isArray(landForm.titleDocumentType)
+            ? landForm.titleDocumentType.join(", ")
+            : landForm.titleDocumentType || ""
         );
+
         formPayload.append("overview", landForm.overview);
         formPayload.append("description", landForm.description);
         formPayload.append("number_of_unit", landForm.unitsAvailable || "1");
-        formPayload.append("director_id", landForm.director_id || '1');
+        formPayload.append("director_id", landForm.director_id || "1");
+
+        // New fields for land properties
+        formPayload.append("fencing", landForm.fencing || "");
+        formPayload.append("gated_estate", landForm.gatedEstate || "");
+        formPayload.append("contact_number", landForm.contactNumber || "");
+        formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
+        formPayload.append("publish_option", landForm.publishOption || "Draft");
       } else {
         formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
         formPayload.append(
           "number_of_bathroom",
           specifications.bathrooms || "0"
         );
+        formPayload.append("toilets", specifications.toilets || "0");
+
         formPayload.append("size", specifications.propertySize);
         formPayload.append(
           "parking_space",
@@ -460,6 +492,29 @@ const [role,setRole]=useState()
           specifications.unitsAvailable || "1"
         );
         formPayload.append("director_id", specifications.director_id || "1");
+
+        formPayload.append(
+          "nearby_landmarks",
+          Array.isArray(specifications.nearbyLandmarks)
+            ? specifications.nearbyLandmarks.join(", ")
+            : specifications.nearbyLandmarks || ""
+        );
+        formPayload.append("rent_duration", specifications.rentDuration || "");
+        formPayload.append(
+          "building_condition",
+          specifications.buildingCondition || ""
+        );
+        formPayload.append(
+          "purpose",
+          Array.isArray(specifications.purpose)
+            ? specifications.purpose.join(", ")
+            : specifications.purpose || ""
+        );
+        formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
+        formPayload.append(
+          "contact_number",
+          specifications.contactNumber || ""
+        );
       }
 
       if (Array.isArray(features.features)) {
@@ -508,16 +563,11 @@ const [role,setRole]=useState()
         formPayload.append("is_discount", "0");
       }
 
-     if (isLandProperty) {    formPayload.append(`property_agreement`, landForm.documents);}
-         else {formPayload.append(`property_agreement`,   specifications.documents)}
-    
-      // if (Array.isArray(docs)) {
-      //   docs.forEach((doc, index) => {
-      //     if (doc instanceof File) {
-      //       formPayload.append(`property_agreement[${index}]`, doc);
-      //     }
-      //   });
-      // }
+      if (isLandProperty) {
+        formPayload.append(`property_agreement`, landForm.documents);
+      } else {
+        formPayload.append(`property_agreement`, specifications.documents);
+      }
 
       formPayload.append("is_active", "1");
       formPayload.append("status", "available");
@@ -632,10 +682,10 @@ const [role,setRole]=useState()
         isSubmitting,
         setIsSubmitting,
         resetFormData,
-        option, 
+        option,
         setOption,
         role,
-        setRole
+        setRole,
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import StepIndicator from "../../general/StepIndicator";
 import ForProperties from "../../components/Tables/forProperties";
-import BasicDetails from "./BasicDetails/BasicDetails";
+// import BasicDetails from "./BasicDetails/BasicDetails";
 import BulkBasicDetails from "./BasicDetails/BulkBasicDetails";
 import Header from "../../general/Header";
 import PropertySpecifications from "./BasicDetails/PropertySpecifications/PropertySpecifications";
@@ -15,6 +15,7 @@ import LandForm from "./BasicDetails/PropertySpecifications/land";
 import FinalSubmission from "./FinalSubmission";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
+import BasicDetails from "./BasicDetails/BasicDetailsLand";
 
 export default function General() {
   const {

@@ -14,6 +14,7 @@ import OptionInputField from "../../../../components/input/drop_down";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../components/Redux/store";
 import { directors } from "../../../../components/Redux/directors/directors_thunk";
+import TagInputField from "../../../../components/input/TagInputField";
 
 interface LandFormHandles {
   handleSubmit: () => void;
@@ -25,20 +26,42 @@ interface LandFormValues {
   topography: string;
   propertySize: string;
   landSize: string;
-  roadAccess: string;
-  titleDocumentType: string;
+  roadAccess: string[];
   unitsAvailable: string;
   description: string;
   overview: string;
-documents: string; 
-  director_id: string; 
+  documents: string;
+  director_id: string;
+  titleDocumentType: string[];
+  fencing: string;
+  gatedEstate: string;
+  contactNumber: string;
+  whatsAppLink: string;
+  publishOption: string;
+    nearbyLandmarks: string[];
+    propertyUnits: string;
+
 }
+
 interface DropdownOption {
   label: string;
   value: string | number;
 }
+
 const LandForm = forwardRef<LandFormHandles>((props, ref) => {
   const { formData, setLandForm } = useContext(PropertyContext)!;
+  const [titleDocumentType, setTitleDocumentType] = React.useState<string[]>(
+    formData.landForm.titleDocumentType || []
+  );
+  const [roadAccess, setRoadAccess] = React.useState<string[]>(
+    formData.landForm.roadAccess || []
+  );
+    const [nearbyLandmarks, setNearbyLandmarks] = React.useState<string[]>(
+    formData.landForm.nearbyLandmarks || []
+  ); 
+
+
+
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(directors());
@@ -56,16 +79,58 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
         value: person.id,
       }))
     : [];
+     useEffect(() => {
+    formik.setFieldValue("nearbyLandmarks", nearbyLandmarks);
+  }, [nearbyLandmarks]);
+
 
   const validationSchema = Yup.object().shape({
     propertySize: Yup.string().required("Property size is required"),
     description: Yup.string().required("Description is required"),
     overview: Yup.string().required("Overview is required"),
-    director_id: Yup.string().required("Director is required"), // Add validation
+    director_id: Yup.string().required("Director is required"),
+    titleDocumentType: Yup.array()
+      .of(Yup.string())
+      .min(1, "At least one title document type is required")
+      .required("Title Document Type is required"),
+    roadAccess: Yup.array()
+      .of(Yup.string())
+      .min(1, "At least one access road type is required")
+      .required("Access Road is required"),
+    fencing: Yup.string().required("Please specify if the property is fenced"),
+    gatedEstate: Yup.string().required("Please specify if it's a gated estate"),
+    contactNumber: Yup.string().required("Contact number is required"),
+    whatsAppLink: Yup.string().required("WhatsApp link is required"),
+    publishOption: Yup.string().required("Please select a publish option"),
+     propertyUnits: Yup.string().required("Number of units is required"),
+
+    nearbyLandmarks: Yup.array()
+      .of(Yup.string())
+      .min(1, "At least one landmark is required")
+      .required("Nearby Landmarks are required"),
   });
 
-  const formik = useFormik<LandFormValues>({
-    initialValues: formData.landForm,
+  useEffect(() => {
+    formik.setFieldValue("roadAccess", roadAccess);
+  }, [roadAccess]);
+
+  useEffect(() => {
+    formik.setFieldValue("titleDocumentType", titleDocumentType);
+  }, [titleDocumentType]);
+ const formik = useFormik<LandFormValues>({
+    initialValues: {
+      ...formData.landForm,
+      titleDocumentType,
+      roadAccess,
+      nearbyLandmarks,
+      fencing: formData.landForm.fencing || "",
+      gatedEstate: formData.landForm.gatedEstate || "",
+      contactNumber: formData.landForm.contactNumber || "",
+      whatsAppLink: formData.landForm.whatsAppLink || "",
+      // publishOption: formData.landForm.publishOption || "Draft",
+      propertyUnits: formData.landForm.propertyUnits || "",
+
+    },
     validationSchema,
     onSubmit: (values) => {
       setLandForm(values);
@@ -80,7 +145,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
       if (hasErrors) {
         formik.setTouched(
           Object.keys(errors).reduce((acc, key) => {
-            acc[key] = true;
+            acc[key as keyof LandFormValues] = true;
             return acc;
           }, {} as { [field: string]: boolean }),
           true
@@ -93,15 +158,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
     },
     isValid: formik.isValid,
   }));
-  const propertyTypeOptions = [
-    { value: 0, label: "customers" },
-    { value: 1, label: "admin" },
-    { value: 2, label: "marketer" },
-    { value: 3, label: "director" },
-    { value: 4, label: "accountant" },
-    { value: 5, label: "hr" },
-  ];
-  // Options for dropdowns
+
   const plotShapeOptions = [
     { value: "regular", label: "Regular" },
     { value: "irregular", label: "Irregular" },
@@ -118,24 +175,20 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
     { value: "rolling", label: "Rolling" },
   ];
 
-  const roadAccessOptions = [
-    { value: "paved", label: "Paved Road" },
-    { value: "dirt", label: "Dirt Road" },
-    { value: "gravel", label: "Gravel Road" },
-    { value: "none", label: "No Direct Road Access" },
+  const yesNoOptions = [
+    { value: "Yes", label: "Yes" },
+    { value: "No", label: "No" },
   ];
 
-  const titleDocumentOptions = [
-    { value: "deed", label: "Deed" },
-    { value: "certificate", label: "Certificate of Title" },
-    { value: "lease", label: "Lease Agreement" },
-    { value: "allotment", label: "Letter of Allotment" },
+  const publishOptions = [
+    { value: "Publish Now", label: "Publish Now" },
+    { value: "Draft", label: "Draft" },
   ];
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
       <OptionInputField
-        label="Role"
+        label="Agent/Manager Assigned"
         placeholder="Select director"
         name="director_id"
         value={formik.values.director_id}
@@ -148,7 +201,33 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
             : undefined
         }
       />
-      <div className="grid md:  md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-12">
+        <InputField
+          label="WhatsApp Link"
+          placeholder="Enter WhatsApp link"
+          name="whatsAppLink"
+          value={formik.values.whatsAppLink}
+          onChange={formik.handleChange}
+          error={
+            formik.touched.whatsAppLink && formik.errors.whatsAppLink
+              ? formik.errors.whatsAppLink
+              : undefined
+          }
+        />
+          <InputField
+          label="Contact Number"
+          placeholder="Enter contact number"
+          name="contactNumber"
+          value={formik.values.contactNumber}
+          onChange={formik.handleChange}
+          error={
+            formik.touched.contactNumber && formik.errors.contactNumber
+              ? formik.errors.contactNumber
+              : undefined
+          }
+        />
+      </div>
+      <div className="grid md:grid-cols-2 gap-12">
         <OptionInputField
           label="Plot Shape"
           placeholder="Select Plot Shape"
@@ -157,7 +236,6 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
           onChange={(value) => formik.setFieldValue("plotShape", value)}
           options={plotShapeOptions}
         />
-
         <OptionInputField
           label="Topography"
           placeholder="Select Topography"
@@ -168,7 +246,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
         />
       </div>
 
-      <div className="grid  md:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <div className="relative">
           <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">
             Sq M
@@ -186,7 +264,6 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
             }
           />
         </div>
-
         <InputField
           label="Land Size"
           placeholder="Enter Land Size"
@@ -195,28 +272,34 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
           onChange={formik.handleChange}
         />
       </div>
+         <TagInputField
+        label="Nearby Landmarks"
+        placeholder="Add nearby landmarks (e.g., Hospital, Mall)"
+        values={nearbyLandmarks}
+        onChange={(newLandmarks) => setNearbyLandmarks(newLandmarks)}
+        error={formik.touched.nearbyLandmarks && formik.errors.nearbyLandmarks}
+      />
 
-      <div className="grid  md:grid-cols-2 gap-12">
-        <OptionInputField
-          label="Road Access"
-          placeholder="Select Road Access"
-          name="roadAccess"
-          value={formik.values.roadAccess}
-          onChange={(value) => formik.setFieldValue("roadAccess", value)}
-          options={roadAccessOptions}
+      <div className="grid md:grid-cols-2 gap-12">
+        <TagInputField
+          label="Access Road"
+          placeholder="Add access road types (e.g., Paved, Dirt)"
+          values={roadAccess}
+          onChange={(roadAccess) => setRoadAccess(roadAccess)}
+          error={formik.touched.roadAccess && formik.errors.roadAccess}
         />
-
-        <OptionInputField
+        <TagInputField
           label="Title Document Type"
-          placeholder="Select Title Document Type"
-          name="titleDocumentType"
-          value={formik.values.titleDocumentType}
-          onChange={(value) => formik.setFieldValue("titleDocumentType", value)}
-          options={titleDocumentOptions}
+          placeholder="Add title document type (e.g., Deed, Lease)"
+          values={titleDocumentType}
+          onChange={(newTypes) => setTitleDocumentType(newTypes)}
+          error={
+            formik.touched.titleDocumentType && formik.errors.titleDocumentType
+          }
         />
       </div>
 
-      <div className="grid  md:grid-cols-2 gap-12">
+      <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="Units Available"
           placeholder="Enter Units Available"
@@ -224,7 +307,52 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
           value={formik.values.unitsAvailable}
           onChange={formik.handleChange}
         />
+        <OptionInputField
+          label="Fencing"
+          placeholder="Is the property fenced?"
+          name="fencing"
+          value={formik.values.fencing}
+          onChange={(value) => formik.setFieldValue("fencing", value)}
+          options={yesNoOptions}
+          error={
+            formik.touched.fencing && formik.errors.fencing
+              ? formik.errors.fencing
+              : undefined
+          }
+        />
       </div>
+
+      <div className="grid md:grid-cols-2 gap-12">
+        <OptionInputField
+          label="Gated Estate"
+          placeholder="Is it in a gated estate?"
+          name="gatedEstate"
+          value={formik.values.gatedEstate}
+          onChange={(value) => formik.setFieldValue("gatedEstate", value)}
+          options={yesNoOptions}
+          error={
+            formik.touched.gatedEstate && formik.errors.gatedEstate
+              ? formik.errors.gatedEstate
+              : undefined
+          }
+        />
+    <InputField
+  label="Property Units"
+  placeholder="Enter number of units"
+  name="propertyUnits"
+  type="number"
+  value={formik.values.propertyUnits}
+  onChange={formik.handleChange}
+  error={
+    formik.touched.propertyUnits && formik.errors.propertyUnits
+      ? formik.errors.propertyUnits
+      : undefined
+  }
+/>
+
+      </div>
+
+    
 
       <InputAreaField
         label="Description"
@@ -256,15 +384,14 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
         }
       />
 
-     <InputAreaField
-  label="Property Agreement"
-  placeholder="Enter Property Agreement details"
-  name="documents"
-  value={formik.values.documents as unknown as string}
-  onChange={(e) => formik.setFieldValue("documents", e.target.value)}
-  rows={6}
-/>
-
+      <InputAreaField
+        label="Property Agreement"
+        placeholder="Enter Property Agreement details"
+        name="documents"
+        value={formik.values.documents as unknown as string}
+        onChange={(e) => formik.setFieldValue("documents", e.target.value)}
+        rows={6}
+      />
     </form>
   );
 });

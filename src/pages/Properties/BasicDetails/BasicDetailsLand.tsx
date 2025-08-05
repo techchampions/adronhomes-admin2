@@ -18,7 +18,7 @@ import { formatToNaira } from "../../../utils/formatcurrency";
 import TagInputField from "../../../components/input/TagInputField";
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails,isLandProperty, setIsLandProperty } = useContext(PropertyContext)!;
+  const { formData, setBasicDetails } = useContext(PropertyContext)!;
   const [initialLoad, setInitialLoad] = useState(true);
 const [purpose, setpurpose] = useState<string[]>(formData.basicDetails.purpose || []);
 
@@ -232,7 +232,7 @@ useEffect(() => {
 
       <TagInputField
         label="purpose"
-        placeholder="Add purpose (e.g.,Bungalow)"
+        placeholder="Add purpose (e.g.,Bongalo)"
         values={purpose}
         onChange={(newpurpose) => setpurpose(newpurpose)}
         error={formik.touched.purpose && formik.errors.purpose}
