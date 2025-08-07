@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import StepIndicator from "../../general/StepIndicator";
 import ForProperties from "../../components/Tables/forProperties";
-import BasicDetails from "./BasicDetails/BasicDetails";
 import BulkBasicDetails from "./BasicDetails/BulkBasicDetails";
 import Header from "../../general/Header";
 import PropertySpecifications from "./BasicDetails/PropertySpecifications/PropertySpecifications";
@@ -15,6 +14,10 @@ import LandForm from "./BasicDetails/PropertySpecifications/land";
 import FinalSubmission from "./FinalSubmission";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
+// import BasicDetails from "./BasicDetails/BasicDetailsLand";
+import DraftPublishModal from "./DraftPublishModal";
+import BasicDetails from "./BasicDetails/BasicDetails";
+import BasicDetailsLand from "./BasicDetails/BasicDetailsLand";
 
 export default function General() {
   const {
@@ -25,13 +28,14 @@ export default function General() {
     isLandProperty,
     isBulk,
     isSubmitting,
+    setIsSubmitting,
+    setPaymentStructure,
+    setDisplayStatus
   } = useContext(PropertyContext)!;
   const [discount, setDiscount] = useState(false);
-    const dispatch = useDispatch<AppDispatch>();
-      const { loading, success, error } = useSelector((state: RootState) => state.addproperty);
-      // useEffect(()=>{
-      //   if(s)
-      // })
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, success, error } = useSelector((state: RootState) => state.addproperty);
+  const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
 
   // Create refs for all form components
   const basicDetailsRef = useRef<any>(null);
@@ -99,17 +103,40 @@ export default function General() {
           paymentStructureRef.current.handleSubmit();
           canProceed = paymentStructureRef.current.isValid && canProceed;
         }
+        
+        // Show modal instead of proceeding to next step
+        if (canProceed) {
+          setShowDraftPublishModal(true);
+          return; // Don't proceed to next step yet
+        }
         break;
       case 6:
-        case 7:
-          await submitForm();
-          return;
+      case 7:
+        await submitForm();
+        return;
     }
 
     if (canProceed) {
       setCurrentStep(currentStep + 1);
     }
   };
+const handleDraftPublishSelect = async (option: "draft" | "publish") => {
+  try {
+    setIsSubmitting(true);
+    setShowDraftPublishModal(false);
+
+  
+    setDisplayStatus(option === "draft" ? "draft" : "publish");
+
+ 
+    setCurrentStep(currentStep + 1);
+  } catch (error) {
+    console.error("Error handling selection:", error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const handleBack = () => {
     if (currentStep > 1 && !isSubmitting) {
@@ -139,17 +166,13 @@ export default function General() {
     <div className="w-full">
       <Header />
       <div className="w-full lg:pl-[38px] lg:pr-[64px] pr-[15px] pl-[15px]">
-        {/* {isSubmitting && (
-          <div className="fixed inset-0 bg-[#272727] flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg flex items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#79B833]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Submitting your property...
-            </div>
-          </div>
-        )} */}
+        {/* Draft/Publish Modal */}
+        <DraftPublishModal
+          isOpen={showDraftPublishModal}
+          onClose={() => setShowDraftPublishModal(false)}
+          onSelect={handleDraftPublishSelect}
+          isSubmitting={isSubmitting}
+        />
 
         {currentStep === 6 || currentStep === 7 ? (
           <>
@@ -179,10 +202,11 @@ export default function General() {
           <ForProperties
             tab={stepTitles[0]}
             children={
-              isBulk ? (
-                <BulkBasicDetails ref={bulkBasicDetailsRef} />
+              isLandProperty ? (
+              <BasicDetailsLand ref={basicDetailsRef} />
               ) : (
-                <BasicDetails ref={basicDetailsRef} />
+                    <BasicDetails ref={basicDetailsRef} />
+              
               )
             }
           />

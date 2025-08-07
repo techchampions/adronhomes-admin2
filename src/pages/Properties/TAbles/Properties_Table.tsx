@@ -325,7 +325,6 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
-    setIsPropertyModalOpen(true);
   };
 
   return (
@@ -885,7 +884,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
 
                       <div>
                         <label className="block text-[#4F4F4F] font-[325] text-[14px] mb-2">
-                          Duration Limit (years)
+                          Duration Limit (months)
                         </label>
                         <input
                           type="number"

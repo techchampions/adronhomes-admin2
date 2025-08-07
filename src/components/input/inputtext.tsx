@@ -31,7 +31,7 @@ const InputField: React.FC<InputFieldProps> = ({
       </label>
       <input
         type={type}
-        name={name} // Added name attribute
+        name={name} 
         value={value}
         onChange={onChange}
         disabled={disabled}

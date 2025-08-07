@@ -25,7 +25,7 @@ interface PaymentStructureFormValues {
 }
 
 const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
-  const { formData, setPaymentStructure } = useContext(PropertyContext)!;
+  const { formData, setPaymentStructure,isLandProperty } = useContext(PropertyContext)!;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const paymentTypeOptions = [
@@ -169,7 +169,7 @@ const validationSchema = Yup.object().shape({
 
         </div>
       )}
-    </form><div
+    </form>{isLandProperty &&(<div
     className="pt-5"
       onClick={(e) => {
         e.stopPropagation();
@@ -189,7 +189,7 @@ const validationSchema = Yup.object().shape({
         <InfrastructureFeesModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)} />
-      </div></>
+      </div>)}</>
   );
 });
 

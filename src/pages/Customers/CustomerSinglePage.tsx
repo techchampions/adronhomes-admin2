@@ -372,7 +372,7 @@ export default function CustomerSinglePage() {
           ownedProperties: data.owned_property,
         }}
         paymentInfo={{
-          amount: formatAsNaira(parseInt(data.total_paid)),
+          amount: data.customer.unique_customer_id,
           date: formatDate(data.customer.updated_at),
         }}
         marketerName={data.customer.referral_code || "Unknown Marketer"}
