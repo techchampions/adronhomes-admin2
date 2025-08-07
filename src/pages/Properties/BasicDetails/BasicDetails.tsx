@@ -30,7 +30,7 @@ const [purpose, setpurpose] = useState<string[]>(formData.basicDetails.purpose |
   }, [dispatch]);
 
   const propertyTypeOptions = [
-    { value: 1, label: "Land" },
+
     { value: 2, label: "Residential" },
     { value: 3, label: "Industrial" },
     { value: 4, label: "Commercial" },

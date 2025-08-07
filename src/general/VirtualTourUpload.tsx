@@ -24,8 +24,8 @@ const FileUpload = ({
   minResolution = { width: 1500, height: 1000 },
   recommendedRatio = "3:2",
   supportedFormats = ["JPG", "JPEG", "PNG"],
-  dragDropText = "Drag & drop files here or click to browse",
-  orderHint = "Drag pictures in order in which you want them to appear.",
+  dragDropText = "",
+  orderHint = "",
   ...props
 }: FileUploadProps & FieldHookConfig<File[]>) => {
   const [field, meta, helpers] = useField<File[]>(props);

@@ -37,10 +37,8 @@ interface LandFormValues {
   gatedEstate: string;
   contactNumber: string;
   whatsAppLink: string;
-  publishOption: string;
+  // publishOption: string;
     nearbyLandmarks: string[];
-    propertyUnits: string;
-
 }
 
 interface DropdownOption {
@@ -101,9 +99,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
     gatedEstate: Yup.string().required("Please specify if it's a gated estate"),
     contactNumber: Yup.string().required("Contact number is required"),
     whatsAppLink: Yup.string().required("WhatsApp link is required"),
-    publishOption: Yup.string().required("Please select a publish option"),
-     propertyUnits: Yup.string().required("Number of units is required"),
-
+    // publishOption: Yup.string().required("Please select a publish option"),
     nearbyLandmarks: Yup.array()
       .of(Yup.string())
       .min(1, "At least one landmark is required")
@@ -128,8 +124,6 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
       contactNumber: formData.landForm.contactNumber || "",
       whatsAppLink: formData.landForm.whatsAppLink || "",
       // publishOption: formData.landForm.publishOption || "Draft",
-      propertyUnits: formData.landForm.propertyUnits || "",
-
     },
     validationSchema,
     onSubmit: (values) => {
@@ -336,20 +330,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
               : undefined
           }
         />
-    <InputField
-  label="Property Units"
-  placeholder="Enter number of units"
-  name="propertyUnits"
-  type="number"
-  value={formik.values.propertyUnits}
-  onChange={formik.handleChange}
-  error={
-    formik.touched.propertyUnits && formik.errors.propertyUnits
-      ? formik.errors.propertyUnits
-      : undefined
-  }
-/>
-
+ 
       </div>
 
     

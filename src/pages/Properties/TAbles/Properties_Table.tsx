@@ -325,7 +325,6 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
-    setIsPropertyModalOpen(true);
   };
 
   return (

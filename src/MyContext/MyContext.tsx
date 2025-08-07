@@ -19,7 +19,7 @@ interface Fee {
   amount: string;
   checked: boolean;
   type: string;
-  purpose:any
+  purpose: any;
 }
 
 interface BasicDetailsFormValues {
@@ -63,10 +63,11 @@ interface PropertySpecificationsFormValues {
   nearbyLandmarks: string[];
   rentDuration: string;
   buildingCondition: string;
-  purpose: string[];
+  // purpose: string[];
   whatsAppLink: string;
   contactNumber: string;
   toilets: string;
+   titleDocumentTypeProp: string[];
 }
 
 interface LandFormValues {
@@ -85,7 +86,6 @@ interface LandFormValues {
   gatedEstate: string;
   contactNumber: string;
   whatsAppLink: string;
-  publishOption: string;
   nearbyLandmarks: string[];
 }
 
@@ -95,8 +95,9 @@ interface FeaturesFormValues {
 
 interface MediaFormValues {
   tourLink: string;
+  videoLink: string;
   images: File[];
-  propertyVideo?: File;
+  videoFile: File[];
 }
 
 interface DiscountFormValues {
@@ -124,6 +125,9 @@ interface PropertyFormData {
   media: MediaFormValues;
   discount: DiscountFormValues;
   paymentStructure: PaymentStructureFormValues;
+  display: {
+    status: "draft" | "publish";
+  };
 }
 
 interface PropertyContextType {
@@ -165,6 +169,7 @@ interface PropertyContextType {
   setOption: (option: any) => void;
   role: any;
   setRole: (role: any) => void;
+  setDisplayStatus: (status: "draft" | "publish") => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(
@@ -215,10 +220,11 @@ const initialFormData: PropertyFormData = {
     nearbyLandmarks: [],
     rentDuration: "",
     buildingCondition: "",
-    purpose: [],
+    // purpose: [],
     whatsAppLink: "",
     contactNumber: "",
     toilets: "",
+     titleDocumentTypeProp: ['']
   },
   landForm: {
     director_id: "",
@@ -226,8 +232,8 @@ const initialFormData: PropertyFormData = {
     topography: "",
     propertySize: "",
     landSize: "",
-    roadAccess: ["paved"],
-    titleDocumentType: ["Lease Agreement"],
+    roadAccess: [],
+    titleDocumentType: [],
     unitsAvailable: "",
     description: "",
     overview: "",
@@ -236,7 +242,6 @@ const initialFormData: PropertyFormData = {
     gatedEstate: "",
     contactNumber: "",
     whatsAppLink: "",
-    publishOption: "Draft",
     nearbyLandmarks: [],
   },
   features: {
@@ -244,7 +249,9 @@ const initialFormData: PropertyFormData = {
   },
   media: {
     tourLink: "",
+    videoLink: "",
     images: [],
+    videoFile: [],
   },
   discount: {
     discountName: "",
@@ -260,6 +267,9 @@ const initialFormData: PropertyFormData = {
     paymentSchedule: [],
     feesCharges: "",
   },
+  display: {
+    status: "draft"
+  }
 };
 
 const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
@@ -278,8 +288,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [isInfrastructure, setIsCancelInfrastructure] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [option, setOption] = useState(2);
-  const [fees, setFees] = useState<Fee[]>([
-  ]);
+  const [fees, setFees] = useState<Fee[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const navigate = useNavigate();
 
@@ -289,14 +298,20 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     setIsLandProperty(false);
     setIsBulk(false);
     navigate("/properties");
+    setFees([]);
+  };
 
-    setFees([
-    
-    ]);
+  const setDisplayStatus = (status: "draft" | "publish") => {
+    setFormData((prev) => ({
+      ...prev,
+      display: {
+        status,
+      },
+    }));
   };
 
   const setBasicDetails = (data: BasicDetailsFormValues) => {
-    const isLand = isLandProperty
+    const isLand = isLandProperty;
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -306,7 +321,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   const setBulkDetails = (data: BulkDetailsFormValues) => {
-  const isLand = isLandProperty
+    const isLand = isLandProperty;
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -316,9 +331,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-  
-      formData.basicDetails.propertyType;
-   const isLand = isLandProperty
+    formData.basicDetails.propertyType;
+    const isLand = isLandProperty;
     if (isLandProperty !== isLand) {
       setIsLandProperty(isLand);
     }
@@ -328,7 +342,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
     isBulk,
     isLandProperty,
   ]);
+
   const [role, setRole] = useState();
+  
   const setSpecifications = (data: PropertySpecificationsFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -384,6 +400,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         media,
         discount,
         paymentStructure,
+        display
       } = formData;
 
       console.log("Complete form data:", formData);
@@ -425,12 +442,15 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("lga", basicDetails.lga);
         formPayload.append("street_address", basicDetails.address);
         formPayload.append("location_type", basicDetails.locationType || "");
-        formPayload.append(
-          "purpose",
-          Array.isArray(basicDetails.purpose)
-            ? basicDetails.purpose.join(", ")
-            : basicDetails.purpose || ""
-        );
+        
+        // Fixed purpose field to be properly formatted as array
+        if (Array.isArray(basicDetails.purpose)) {
+          basicDetails.purpose.forEach((purpose, index) => {
+            formPayload.append(`purpose[${index}]`, purpose);
+          });
+        } else {
+          formPayload.append("purpose", basicDetails.purpose || "");
+        }
 
         formPayload.append("category", "single");
       }
@@ -462,7 +482,11 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
 
         formPayload.append("overview", landForm.overview);
         formPayload.append("description", landForm.description);
-        formPayload.append("number_of_unit", landForm.unitsAvailable || "1");
+        
+        // Fixed number_of_unit to ensure it's a number
+        const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
+        formPayload.append("number_of_unit", unitsAvailable.toString());
+        
         formPayload.append("director_id", landForm.director_id || "1");
 
         // New fields for land properties
@@ -470,12 +494,17 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("gated_estate", landForm.gatedEstate || "");
         formPayload.append("contact_number", landForm.contactNumber || "");
         formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
-        formPayload.append("publish_option", landForm.publishOption || "Draft");
       } else {
         formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
         formPayload.append(
           "number_of_bathroom",
           specifications.bathrooms || "0"
+        );
+                formPayload.append(
+          "title_document_type",
+          Array.isArray(specifications.titleDocumentTypeProp)
+            ? specifications.titleDocumentTypeProp.join(", ")
+            : specifications.titleDocumentTypeProp || ""
         );
         formPayload.append("toilets", specifications.toilets || "0");
 
@@ -487,10 +516,11 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("overview", specifications.overview);
         formPayload.append("description", specifications.description);
         formPayload.append("year_built", specifications.yearBuilt || "");
-        formPayload.append(
-          "number_of_unit",
-          specifications.unitsAvailable || "1"
-        );
+        
+        // Fixed number_of_unit to ensure it's a number
+        const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
+        formPayload.append("number_of_unit", unitsAvailable.toString());
+        
         formPayload.append("director_id", specifications.director_id || "1");
 
         formPayload.append(
@@ -504,12 +534,16 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           "building_condition",
           specifications.buildingCondition || ""
         );
-        formPayload.append(
-          "purpose",
-          Array.isArray(specifications.purpose)
-            ? specifications.purpose.join(", ")
-            : specifications.purpose || ""
+        
+        // Fixed purpose field to be properly formatted as array
+          formPayload.append(
+          "title_document_type",
+          Array.isArray(landForm.titleDocumentType)
+            ? landForm.titleDocumentType.join(", ")
+            : landForm.titleDocumentType || ""
         );
+
+        
         formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
         formPayload.append(
           "contact_number",
@@ -538,6 +572,18 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("virtual_tour", media.tourLink);
       }
 
+      if (media.videoLink) {
+        formPayload.append("video_link", media.videoLink);
+      }
+
+      if (Array.isArray(media.videoFile) && media.videoFile.length > 0) {
+        media.videoFile.forEach((video, index) => {
+          if (video instanceof File) {
+            formPayload.append(`video_file[${index}]`, video);
+          }
+        });
+      }
+
       formPayload.append("payment_type", paymentStructure.paymentType);
       formPayload.append(
         "property_duration_limit",
@@ -563,14 +609,16 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("is_discount", "0");
       }
 
+      formPayload.append(
+        "is_active", 
+        display.status === "draft" ? '0' : "1"
+      );
+
       if (isLandProperty) {
         formPayload.append(`property_agreement`, landForm.documents);
       } else {
         formPayload.append(`property_agreement`, specifications.documents);
       }
-
-      formPayload.append("is_active", "1");
-      formPayload.append("status", "available");
 
       const result = await dispatch(
         createProperty({ credentials: formPayload })
@@ -686,6 +734,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setOption,
         role,
         setRole,
+        setDisplayStatus
       }}
     >
       {children}

@@ -39,7 +39,7 @@ interface PropertySpecificationsFormValues {
   nearbyLandmarks: string[];
   rentDuration: string;
   buildingCondition: string;
-  purpose: string[];
+  titleDocumentTypeProp: string[];
   whatsAppLink: string;
   contactNumber: string;
 }
@@ -69,9 +69,10 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>(
     const [nearbyLandmarks, setNearbyLandmarks] = useState<string[]>(
       formData.specifications?.nearbyLandmarks || []
     );
-    const [purpose, setPurpose] = useState<string[]>(
-      formData.specifications?.purpose || []
-    );
+const [titleDocumentTypeProp, setTitleDocumentType] = useState<string[]>(
+  formData.specifications?.titleDocumentTypeProp || []
+);
+
 
    const validationSchema = Yup.object().shape({
   bedrooms: Yup.string().required("Number of bedrooms is required"),
@@ -88,10 +89,10 @@ const PropertySpecifications = forwardRef<PropertySpecificationsHandles>(
     .required("Nearby Landmarks are required"),
   rentDuration: Yup.string().required("Rent duration is required"),
   buildingCondition: Yup.string().required("Building condition is required"),
-  purpose: Yup.array()
+titleDocumentTypeProp: Yup.array()
     .of(Yup.string())
-    .min(1, "At least one purpose is required")
-    .required("Purpose is required"),
+    .min(1, "At least one title document type is required")
+    .required("Title document type is required"),
   whatsAppLink: Yup.string().required("WhatsApp link is required"),
   contactNumber: Yup.string().required("Contact number is required"),
 });
@@ -110,10 +111,10 @@ const formik = useFormik<PropertySpecificationsFormValues>({
     overview: formData.specifications?.overview || "",
     documents: formData.specifications?.documents || "",
     director_id: formData.specifications?.director_id || "",
-    nearbyLandmarks: formData.specifications?.nearbyLandmarks || [],
+    nearbyLandmarks: formData.specifications?.nearbyLandmarks || [],  // array
     rentDuration: formData.specifications?.rentDuration || "",
     buildingCondition: formData.specifications?.buildingCondition || "",
-    purpose: formData.specifications?.purpose || [],
+    titleDocumentTypeProp: formData.specifications?.titleDocumentTypeProp || [],  // array
     whatsAppLink: formData.specifications?.whatsAppLink || "",
     contactNumber: formData.specifications?.contactNumber || "",
   },
@@ -128,9 +129,10 @@ const formik = useFormik<PropertySpecificationsFormValues>({
       formik.setFieldValue("nearbyLandmarks", nearbyLandmarks);
     }, [nearbyLandmarks]);
 
-    useEffect(() => {
-      formik.setFieldValue("purpose", purpose);
-    }, [purpose]);
+useEffect(() => {
+  formik.setFieldValue("titleDocumentTypeProp", titleDocumentTypeProp);
+}, [titleDocumentTypeProp]);
+
 
     const validateAndSubmit = useCallback(async () => {
       try {
@@ -410,13 +412,15 @@ const formik = useFormik<PropertySpecificationsFormValues>({
               formik.touched.nearbyLandmarks && formik.errors.nearbyLandmarks
             }
           />
-          <TagInputField
-            label="Purpose"
-            placeholder="Add purpose (Sale, Rent, Shortlet)"
-            values={purpose}
-            onChange={(newPurpose) => setPurpose(newPurpose)}
-            error={formik.touched.purpose && formik.errors.purpose}
-          />
+       <TagInputField
+  label="Title Document Type"
+  placeholder="Add title document type (e.g., Deed, Lease)"
+  values={titleDocumentTypeProp}
+  onChange={(newTypes) => setTitleDocumentType(newTypes)}
+  error={
+    formik.touched.titleDocumentTypeProp && formik.errors.titleDocumentTypeProp
+  }
+/>
         </div>
 
         <InputAreaField
