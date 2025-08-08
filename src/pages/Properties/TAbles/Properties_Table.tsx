@@ -329,6 +329,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
+
   };
 
   const {
@@ -359,6 +360,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
     setLoadingPropertyId(propertyId);
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
+
   };
 
   return (

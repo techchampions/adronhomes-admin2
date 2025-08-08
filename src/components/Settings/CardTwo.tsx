@@ -28,19 +28,19 @@ const websiteSettings = [
     slug: "leadership",
     description: "Manage leadership information",
   },
-  {
-    title: "Testimonials",
-    slug: "testmonials",
-    description: "Manage Testmonials",
-  },
+  // {
+  //   title: "Testimonials",
+  //   slug: "testmonials",
+  //   description: "Manage Testmonials",
+  // },
 ];
 
 const paymentSettings = [
-  {
-    title: "Add Payment Method",
-    description: "Click to add a new payment method",
-    slug: "add-payment",
-  },
+  // {
+  //   title: "Add Payment Method",
+  //   description: "Click to add a new payment method",
+  //   slug: "add-payment",
+  // },
   {
     title: "Add Account Details",
     description: "Click to add a bank account details",
