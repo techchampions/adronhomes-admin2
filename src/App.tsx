@@ -53,7 +53,9 @@ import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 import UserPayments from "./pages/Transactions/Transactions";
 import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
 import ContractInvoice from "./pages/contract/customers_payment";
-
+import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
+import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
+import FAQs from "./components/Settings/FAQs/FAQs";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -82,7 +84,7 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isCareerPage = location.pathname.startsWith("/human-resources");
-    const isMarketerRoute = location.pathname.startsWith("/marketer");
+  const isMarketerRoute = location.pathname.startsWith("/marketer");
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
 
@@ -92,7 +94,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <div className="min-h-screen bg-white">
           {isCareerPage ? (
             <CarrerSideBar />
-          ) :isMarketerRoute ? (
+          ) : isMarketerRoute ? (
             <SideBar />
           ) : isDirectorRoute ? (
             <DirectorSideBar />
@@ -133,15 +135,15 @@ const App = () => {
                   path="/payments/status/:paymentId"
                   element={<PaymentById />}
                 />
-              
+
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
-                   <Route path="/contracts" element={<Contract />} />
-                     <Route
+                <Route path="/contracts" element={<Contract />} />
+                <Route
                   path="/contracts/details/:user_id/:plan_id"
                   element={<ContractInvoice />}
                 />
-                   
+
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
@@ -170,17 +172,32 @@ const App = () => {
                   element={<OfficeLocations />}
                 />
                 <Route
+                  path="/settings/site-information"
+                  element={<SiteInformationPage />}
+                />
+                <Route
                   path="/settings/leadership"
                   element={<LeaderShipSettings />}
                 />
+                <Route
+                  path="/settings/testimonials"
+                  element={<TestimonialsPage />}
+                />
+                <Route path="/settings/faqs" element={<FAQs />} />
                 <Route
                   path="/settings/add-account"
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
-             
-                  <Route path="/customers/transactions/:id" element={<UserPayments />} />
-                   <Route path="/customers/wallet-transactions/:id" element={<WalletTransactionsPage />} />
+
+                <Route
+                  path="/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
                 <Route
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
@@ -190,7 +207,7 @@ const App = () => {
                   element={<CustomersSinglePayment />}
                 /> */}
                 <Route path="/properties/form" element={<General />} />
-             
+
                 <Route
                   path="/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
@@ -212,10 +229,7 @@ const App = () => {
                 />
               </Route>
 
-                 <Route   path="/human-resources"
-                  element={<HRDashboard />}
-              ></Route>
-                
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
             </Routes>
           </AppLayout>
           {isInfrastructure && (

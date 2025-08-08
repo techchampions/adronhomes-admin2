@@ -5,6 +5,11 @@ import {
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
+  FAQItem,
+  FAQPayload,
+  FAQResponse,
+} from "../../pages/Properties/types/FAQsTypes";
+import {
   HeadersResponse,
   UpdateHeaderPayload,
   UpdateHeaderResponse,
@@ -28,7 +33,17 @@ import {
   PropertyByIdRequestsResponse,
 } from "../../pages/Properties/types/PropertyRequestTypes";
 import { SliderByTypeRes } from "../../pages/Properties/types/SliderByTypeResponse";
+import {
+  SettingItem,
+  SettingsResponse,
+  SocialPayload,
+} from "../../pages/Properties/types/SocialsTypes";
 import { GetPropertyByIdResponse } from "../../pages/Properties/types/SoosarPropertyTypes";
+import {
+  ApiResponse,
+  Testimonial,
+  TestimonialPayload,
+} from "../../pages/Properties/types/TestimonialTypes";
 import {
   UploadSliderPayload,
   UploadSliderResponse,
@@ -362,5 +377,136 @@ export const sendNotification = async (payload: NotificationPayload) => {
 // Get User Profile
 export const getUser = async (): Promise<GetUserResponse> => {
   const response = await adronApi.get("/user-profile");
+  return response.data;
+};
+// Get Testimonials
+export const getTestimonials = async (): Promise<ApiResponse> => {
+  const response = await adminApi.get("/testimonials");
+  return response.data;
+};
+
+export const updateTestimonial = async (
+  payload: Partial<TestimonialPayload>
+): Promise<Testimonial> => {
+  const formData = new FormData();
+  if (payload.client_name) formData.append("client_name", payload.client_name);
+  if (payload.client_comment)
+    formData.append("client_comment", payload.client_comment);
+  if (payload.client_country)
+    formData.append("client_country", payload.client_country);
+  if (payload.client_image)
+    formData.append("client_image", payload.client_image);
+
+  const response = await adminApi.post(
+    `/update-testimony/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+export const createTestimony = async (
+  payload: Partial<TestimonialPayload>
+): Promise<Testimonial> => {
+  const formData = new FormData();
+  if (payload.client_name) formData.append("client_name", payload.client_name);
+  if (payload.client_comment)
+    formData.append("client_comment", payload.client_comment);
+  if (payload.client_country)
+    formData.append("client_country", payload.client_country);
+  if (payload.client_image)
+    formData.append("client_image", payload.client_image);
+
+  const response = await adminApi.post(`/create-testimony`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export const deleteTestimony = async (
+  payload: Partial<TestimonialPayload>
+): Promise<Testimonial> => {
+  const response = await adminApi.delete(`/delete-testimony/${payload.id}`, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+// Get User Profile
+export const getSocials = async (): Promise<SettingsResponse> => {
+  const response = await adminApi.get("/settings?type=social");
+  return response.data;
+};
+
+export const updateSocial = async (
+  payload: Partial<SocialPayload>
+): Promise<SettingItem> => {
+  const formData = new FormData();
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.type) formData.append("type", payload.type);
+  if (payload.value) formData.append("value", payload.value);
+
+  const response = await adminApi.post(
+    `/update-setting/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getFAQs = async (): Promise<FAQResponse> => {
+  const response = await adronApi.get("/faqs");
+  return response.data;
+};
+
+export const createFAQs = async (
+  payload: Partial<FAQPayload>
+): Promise<FAQItem> => {
+  const formData = new FormData();
+  if (payload.question) formData.append("question", payload.question);
+  if (payload.answer) formData.append("answer", payload.answer);
+
+  const response = await adminApi.post(`/faq/create`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+export const updateFAQs = async (
+  payload: Partial<FAQPayload>
+): Promise<FAQItem> => {
+  const formData = new FormData();
+  if (payload.question) formData.append("question", payload.question);
+  if (payload.answer) formData.append("answer", payload.answer);
+  if (payload.faq_id) formData.append("faq_id", payload.faq_id.toString());
+
+  const response = await adminApi.post(`/faq/edit`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
+export const deleteFAQs = async (
+  payload: Partial<FAQPayload>
+): Promise<FAQItem> => {
+  const response = await adminApi.delete(`/faq/delete/${payload.faq_id}`, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
