@@ -53,6 +53,7 @@ import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 import UserPayments from "./pages/Transactions/Transactions";
 import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
 import ContractInvoice from "./pages/contract/customers_payment";
+import SingleJob from "./hr/singleCarrerPage";
 
 
 const AuthGuard = () => {
@@ -211,7 +212,8 @@ const App = () => {
                   element={<MarketerInvoice />}
                 />
               </Route>
-
+                         
+                            <Route   path="/human-resources/view-job/:jobId" element={<SingleJob />} ></Route>
                  <Route   path="/human-resources"
                   element={<HRDashboard />}
               ></Route>

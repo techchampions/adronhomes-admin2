@@ -17,7 +17,7 @@ export interface Property {
   type: number;
   no_of_bedroom: number | null;
   slug: string;
-  features: string[] | string; 
+  features: string[] | string;
   overview: string;
   description: string;
   street_address: string;
@@ -53,56 +53,84 @@ export interface Property {
   purpose: string | null;
   year_built: string | null;
   total_amount: number;
-  unit_available:any
-  unit_sold:any
-  property_view:any
-  property_requests:any
+  unit_available: any;
+  unit_sold: any;
+  property_view: any;
+  property_requests: any;
 }
 
+export interface PaginationData<T> {
+  current_page: number;
+  data: T[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
 export interface PropertiesResponse {
   status: string;
   message: string;
   total_properties: number;
-  live_properties: number;
-  active_plans: number;
+    total_published: number,
+    total_drafted: number,
   total_sold: number;
-  data: {
-    current_page: number;
-    data: Property[];
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
-  };
+  drafted_properties: PaginationData<Property>;
+  published_properties: PaginationData<Property>;
+  sold_properties: PaginationData<Property>;
 }
-
 export interface PropertiesState {
-  data: Property[];
-  loading: boolean;
-  error: ErrorResponse | null;
-  pagination: {
-    currentPage: number;
-    perPage: number;
-    totalItems: number;
-    totalPages: number;
+  drafted: {
+    data: Property[];
+    loading: boolean;
+    error: ErrorResponse | null;
+    pagination: {
+      currentPage: number;
+      perPage: number;
+      totalItems: number;
+      totalPages: number;
+    };
+  };
+  published: {
+    data: Property[];
+    loading: boolean;
+    error: ErrorResponse | null;
+    pagination: {
+      currentPage: number;
+      perPage: number;
+      totalItems: number;
+      totalPages: number;
+    };
+  };
+  sold: {
+    data: Property[];
+    loading: boolean;
+    error: ErrorResponse | null;
+    pagination: {
+      currentPage: number;
+      perPage: number;
+      totalItems: number;
+      totalPages: number;
+    };
   };
   stats: {
     totalProperties: number;
-    liveProperties: number;
-    activePlans: number;
     totalSold: number;
+    total_published: number,
+    total_drafted: number,
   };
+  loading: boolean;
+  error: ErrorResponse | null;
 }
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -110,55 +138,54 @@ export const fetchProperties = createAsyncThunk<
   PropertiesResponse,
   void,
   { rejectValue: ErrorResponse; state: RootState }
->(
-  "properties/fetch",
-  async (_, { rejectWithValue, getState }) => {
-    const token = Cookies.get('token');
-    const state = getState() as RootState;
-    const currentPage = state.properties?.pagination?.currentPage || 1;
-    
-    if (!token) {
-      return rejectWithValue({
-        message: "No authentication token found. Please login again.",
-      });
-    }
-
-    try {
-      const response = await axios.get<PropertiesResponse>(
-        `${BASE_URL}/api/admin/properties`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
-            device_id: "1010l0010l1",
-          },
-          params: {
-            page: currentPage 
-          }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>;
-
-      if (axiosError.response?.status === 401) {
-        Cookies.remove('token');
-      }
-
-      if (axiosError.response) {
-        return rejectWithValue({
-          message: axiosError.response.data.message || "Failed to fetch properties data",
-          errors: axiosError.response.data.errors,
-        });
-      } else if (axiosError.request) {
-        return rejectWithValue({
-          message: "No response from server. Please check your network connection.",
-        });
-      }
-      return rejectWithValue({
-        message: "An unexpected error occurred. Please try again.",
-      });
-    }
+>("properties/fetch", async (_, { rejectWithValue, getState }) => {
+  const token = Cookies.get("token");
+  const state = getState() as RootState;
+  const currentPage = state.properties?.published.pagination.currentPage || 1;
+  const page = state.properties?.published.pagination.currentPage || 1;
+  if (!token) {
+    return rejectWithValue({
+      message: "No authentication token found. Please login again.",
+    });
   }
-);
+
+  try {
+    const response = await axios.get<PropertiesResponse>(
+      `${BASE_URL}/api/admin/properties`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+          device_id: "1010l0010l1",
+        },
+        params: {
+          page: currentPage,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+
+    if (axiosError.response?.status === 401) {
+      Cookies.remove("token");
+    }
+
+    if (axiosError.response) {
+      return rejectWithValue({
+        message:
+          axiosError.response.data.message || "Failed to fetch properties data",
+        errors: axiosError.response.data.errors,
+      });
+    } else if (axiosError.request) {
+      return rejectWithValue({
+        message:
+          "No response from server. Please check your network connection.",
+      });
+    }
+    return rejectWithValue({
+      message: "An unexpected error occurred. Please try again.",
+    });
+  }
+});

@@ -1,7 +1,7 @@
 import React from "react";
 import { FaExclamationCircle } from "react-icons/fa";
 type Props = {
-  text?: string;
+  text?: any;
 };
 const NotFound: React.FC<Props> = ({ text }) => {
   return (

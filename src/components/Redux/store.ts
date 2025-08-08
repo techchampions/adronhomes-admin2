@@ -44,6 +44,9 @@ import contractDocumentsReducer from './UpdateContract/createContractDocuments'
 import contractingFormReducer from './UpdateContract/viewcontractFormDetails'
 import ViewcontractDocumentsREducer from './UpdateContract/contractDocumentsSlice'
 import allocatePropertySliceReducer from './UpdateContract/allocateProperty'
+import singlejobDetailsReducer from './carreer/Single_job_slice'
+import toggleFeaturedReducer from './Properties/toggle_featured_slice'
+import ViewApplicationReducer from './carreer/ViewApplicationSlice'
 
 export const store = configureStore({
   reducer: {
@@ -90,7 +93,10 @@ export const store = configureStore({
       contractForm:contractingFormReducer,
     contractDocuments:contractDocumentsReducer,
     ViewcontractDocuments:ViewcontractDocumentsREducer,
-    allocateProperty:allocatePropertySliceReducer
+    allocateProperty:allocatePropertySliceReducer,
+    singlejobDetails:singlejobDetailsReducer,
+    toggleFeatured:toggleFeaturedReducer,
+    ViewApplication:ViewApplicationReducer
   },
 });
 

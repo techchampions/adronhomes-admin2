@@ -24,7 +24,7 @@ export default function PropertyTableComponentActivePlan({
   data,
 }: PropertyTableProps) {
    const dispatch = useDispatch<AppDispatch>();
-  const handlePageChange = async (page: number) => {
+  const handlePageChange = async (page: any) => {
     await dispatch(setPropertiesPage(page));
     await dispatch(fetchProperties());
   };

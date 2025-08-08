@@ -67,7 +67,8 @@ interface PropertySpecificationsFormValues {
   whatsAppLink: string;
   contactNumber: string;
   toilets: string;
-   titleDocumentTypeProp: string[];
+
+  titleDocumentTypeProp: string[];
 }
 
 interface LandFormValues {
@@ -224,7 +225,8 @@ const initialFormData: PropertyFormData = {
     whatsAppLink: "",
     contactNumber: "",
     toilets: "",
-     titleDocumentTypeProp: ['']
+
+    titleDocumentTypeProp: [""],
   },
   landForm: {
     director_id: "",
@@ -268,8 +270,10 @@ const initialFormData: PropertyFormData = {
     feesCharges: "",
   },
   display: {
-    status: "draft"
-  }
+
+    status: "draft",
+  },
+
 };
 
 const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
@@ -344,7 +348,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   ]);
 
   const [role, setRole] = useState();
-  
+
   const setSpecifications = (data: PropertySpecificationsFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -400,7 +404,10 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         media,
         discount,
         paymentStructure,
-        display
+
+        
+        display,
+
       } = formData;
 
       console.log("Complete form data:", formData);
@@ -442,7 +449,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("lga", basicDetails.lga);
         formPayload.append("street_address", basicDetails.address);
         formPayload.append("location_type", basicDetails.locationType || "");
-        
+
+
+
         // Fixed purpose field to be properly formatted as array
         if (Array.isArray(basicDetails.purpose)) {
           basicDetails.purpose.forEach((purpose, index) => {
@@ -482,11 +491,13 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
 
         formPayload.append("overview", landForm.overview);
         formPayload.append("description", landForm.description);
-        
+
+
         // Fixed number_of_unit to ensure it's a number
         const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
         formPayload.append("number_of_unit", unitsAvailable.toString());
-        
+
+
         formPayload.append("director_id", landForm.director_id || "1");
 
         // New fields for land properties
@@ -500,7 +511,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           "number_of_bathroom",
           specifications.bathrooms || "0"
         );
-                formPayload.append(
+
+        formPayload.append(
+
           "title_document_type",
           Array.isArray(specifications.titleDocumentTypeProp)
             ? specifications.titleDocumentTypeProp.join(", ")
@@ -516,11 +529,13 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("overview", specifications.overview);
         formPayload.append("description", specifications.description);
         formPayload.append("year_built", specifications.yearBuilt || "");
-        
+
+
         // Fixed number_of_unit to ensure it's a number
         const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
         formPayload.append("number_of_unit", unitsAvailable.toString());
-        
+
+
         formPayload.append("director_id", specifications.director_id || "1");
 
         formPayload.append(
@@ -534,16 +549,16 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           "building_condition",
           specifications.buildingCondition || ""
         );
-        
-        // Fixed purpose field to be properly formatted as array
-          formPayload.append(
+     // Fixed purpose field to be properly formatted as array
+        formPayload.append(
+
           "title_document_type",
           Array.isArray(landForm.titleDocumentType)
             ? landForm.titleDocumentType.join(", ")
             : landForm.titleDocumentType || ""
         );
 
-        
+
         formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
         formPayload.append(
           "contact_number",
@@ -609,10 +624,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("is_discount", "0");
       }
 
-      formPayload.append(
-        "is_active", 
-        display.status === "draft" ? '0' : "1"
-      );
+
+      formPayload.append("is_active", display.status === "draft" ? "0" : "1");
+
 
       if (isLandProperty) {
         formPayload.append(`property_agreement`, landForm.documents);
@@ -634,6 +648,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
             name: fee.name,
             value: fee.amount.replace(/[^\d.]/g, ""),
             type: fee.type,
+            purpose: fee.purpose,
           }))
           .map((feeDetail) =>
             dispatch(add_property_detail({ credentials: feeDetail }))
@@ -734,7 +749,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setOption,
         role,
         setRole,
-        setDisplayStatus
+
+        setDisplayStatus,
+
       }}
     >
       {children}
