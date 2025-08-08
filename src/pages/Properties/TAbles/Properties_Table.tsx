@@ -18,8 +18,11 @@ import ConfirmationModal from "../../../components/Modals/delete";
 import PropertyModal from "../PropertyModal";
 import { directors } from "../../../components/Redux/directors/directors_thunk";
 import OptionInputField from "../../../components/input/drop_down";
+import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
+import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
 
 export interface PropertyData {
+  is_featured: any;
   id: number;
   name: string;
   display_image: string;
@@ -70,6 +73,7 @@ export interface PropertyData {
   property_view: any;
   property_requests: any;
   director_id?: any | null; // Add director_id to the interface
+  
 }
 
 interface PropertyTableProps {
@@ -151,7 +155,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
     }
   };
 
-  const handlePageChange = async (page: number) => {
+  const handlePageChange = async (page: any) => {
     await dispatch(setPropertiesPage(page));
     await dispatch(fetchProperties());
   };
@@ -327,133 +331,220 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
     setSelectedProperty(property);
   };
 
+  const {
+    loading: toggleLoading,
+    success: toggleSuccess,
+    error: toggleError,
+  } = useSelector((state: RootState) => state.toggleFeatured);
+
+  const [loadingPropertyId, setLoadingPropertyId] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (toggleSuccess) {
+      // toast.success("Featured status updated successfully!");
+      dispatch(fetchProperties());
+      dispatch(resetToggleFeaturedState());
+    }
+
+    if (toggleError) {
+      // toast.error(toggleError);
+      dispatch(resetToggleFeaturedState());
+    }
+  }, [toggleSuccess, toggleError, dispatch]);
+
+  // Handler to toggle featured status
+  const handleToggleFeatured = async (propertyId: number) => {
+    setLoadingPropertyId(propertyId);
+    await dispatch(toggleFeatured({ id: propertyId }));
+    setLoadingPropertyId(null);
+  };
+
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[800px] md:min-w-0">
-          <table className="w-full min-w-[800px]">
-            <thead>
-              <tr className="text-left">
-                <th className="py-4 pr-6 font-normal text-[#757575] text-xs w-[220px]">
-                  Property Name
-                </th>
-                <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[120px]">
-                  Price
-                </th>
-                <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[100px]">
-                  Property Type
-                </th>
-                <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                  Bedrooms
-                </th>
-                <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[80px]">
-                  Status
-                </th>
-                <th className="py-4 pl-4 font-normal text-[#757575] text-xs w-[100px]">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data && data.length > 0 ? (
-                data.map((property) => (
-                  <tr
-                    key={`property-${property.id}`}
-                    className="hover:bg-gray-50 cursor-pointer"
+        <div className="max-w-[800px] md:min-w-0">
+         <table className="w-full min-w-[800px]">
+  <thead>
+    <tr className="text-left">
+      <th className="w-2/5 py-4 pr-6 font-normal text-[#757575] text-xs">
+        Property Name
+      </th>
+      <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
+        Price
+      </th>
+      <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
+        Property Type
+      </th>
+      <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
+        Bedrooms
+      </th>
+      <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
+        Status
+      </th>
+      <th className="w-1/6 py-4 pl-4 font-normal text-[#757575] text-xs">
+        Actions
+      </th>
+      <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
+        Featured
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    {data && data.length > 0 ? (
+      data.map((property) => (
+        <tr
+          key={`property-${property.id}`}
+          className="hover:bg-gray-50 cursor-pointer"
+        >
+          <td className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]">
+            <div className="group relative">
+              <div className="flex items-center">
+                <div
+                  className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"
+                  onClick={() => handlePropertyClick(property)}
+                >
+                  <img
+                    src={
+                      property.display_image ||
+                      "/default-property-image.jpg"
+                    }
+                    alt={property.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div
+                    className="font-[350] truncate mb-[12px]"
+                    onClick={() => handlePropertyClick(property)}
                   >
-                    <td className="py-4 pr-6 text-dark text-sm max-w-[220px]">
-                      <div className="flex items-center">
-                        <div
-                          className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"
-                          onClick={() => handlePropertyClick(property)}
-                        >
-                          <img
-                            src={
-                              property.display_image ||
-                              "/default-property-image.jpg"
-                            }
-                            alt={property.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <div
-                            className="font-[350] truncate mb-[12px]"
-                            onClick={() => handlePropertyClick(property)}
-                          >
-                            {property.name}
-                          </div>
-                          <div
-                            className="font-[325] text-[#757575] text-xs truncate flex"
-                            onClick={() => handlePropertyClick(property)}
-                          >
-                            <img src={"/location.svg"} className="mr-1" />
-                            {property.street_address}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[120px]"
-                      onClick={() => handlePropertyClick(property)}
-                    >
-                      ₦{property.price?.toLocaleString()}
-                    </td>
-                    <td
-                      className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[100px]"
-                      onClick={() => handlePropertyClick(property)}
-                    >
-                      {getPropertyType(property.type)}
-                    </td>
-                    <td
-                      className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]"
-                      onClick={() => handlePropertyClick(property)}
-                    >
-                      {property.no_of_bedroom || "N/A"}
-                    </td>
-                    <td
-                      className="py-4 px-6 font-[325] text-dark text-sm truncate max-w-[80px]"
-                      onClick={() => handlePropertyClick(property)}
-                    >
-                      {property.is_sold
-                        ? "Sold"
-                        : property.is_active
-                        ? "Active"
-                        : "Available"}
-                    </td>
-                    <td className="py-4 pl-4 text-sm">
-                      <div className="flex space-x-2">
-                        <button
-                          aria-label="Edit property"
-                          onClick={() => handleEditClick(property)}
-                        >
-                          <img
-                            src="/ic_round-edit.svg"
-                            className="w-[18px] h-[18px]"
-                          />
-                        </button>
-                        <button
-                          aria-label="Delete property"
-                          onClick={() => handleDeleteClick(property)}
-                        >
-                          <img
-                            src="mingcute_delete-fill.svg"
-                            className="w-[18px] h-[18px]"
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="py-4 text-center text-gray-500">
-                    No properties found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    {property.name}
+                  </div>
+                  <div
+                    className="font-[325] text-[#757575] text-xs truncate flex"
+                    onClick={() => handlePropertyClick(property)}
+                  >
+                    <img src={"/location.svg"} className="mr-1 shrink-0" />
+                    <span className="truncate">{property.street_address}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0 max-w-xs break-words">
+                {property.name} - {property.street_address}
+              </div>
+            </div>
+          </td>
+          <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]">
+            <div className="group relative">
+              <span className="truncate block">₦{property.price?.toLocaleString()}</span>
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
+                ₦{property.price?.toLocaleString()}
+              </div>
+            </div>
+          </td>
+          <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]">
+            <div className="group relative">
+              <span className="truncate block">{getPropertyType(property.type)}</span>
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
+                {getPropertyType(property.type)}
+              </div>
+            </div>
+          </td>
+          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]">
+            <div className="group relative">
+              <span className="truncate block">{property.no_of_bedroom || "N/A"}</span>
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
+                {property.no_of_bedroom || "N/A"}
+              </div>
+            </div>
+          </td>
+          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]">
+            <div className="group relative">
+              <span className="truncate block">
+                {property.is_sold
+                  ? "Sold"
+                  : property.is_active
+                  ? "Active"
+                  : "Available"}
+              </span>
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
+                {property.is_sold
+                  ? "Sold"
+                  : property.is_active
+                  ? "Active"
+                  : "Available"}
+              </div>
+            </div>
+          </td>
+          <td className="w-1/6 py-4 pl-4 text-sm">
+            <div className="flex space-x-2">
+              <button
+                aria-label="Edit property"
+                onClick={() => handleEditClick(property)}
+              >
+                <img
+                  src="/ic_round-edit.svg"
+                  className="w-[18px] h-[18px]"
+                />
+              </button>
+              <button
+                aria-label="Delete property"
+                onClick={() => handleDeleteClick(property)}
+              >
+                <img
+                  src="mingcute_delete-fill.svg"
+                  className="w-[18px] h-[18px]"
+                />
+              </button>
+            </div>
+          </td>
+          <td className="w-1/6 py-4 px-6 text-sm">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={property.is_featured === 1}
+                onChange={() => handleToggleFeatured(property.id)}
+                disabled={
+                  toggleLoading && loadingPropertyId === property.id
+                }
+              />
+              <div
+                className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
+                  toggleLoading && loadingPropertyId === property.id
+                    ? "bg-gray-300"
+                    : property.is_featured === 1
+                    ? "bg-[#79B833]"
+                    : "bg-gray-400"
+                } peer-checked:bg-[#79B833] peer-disabled:opacity-70 relative`}
+              >
+                <div
+                  className={`absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform ${
+                    property.is_featured === 1 ? "translate-x-5" : ""
+                  }`}
+                ></div>
+              </div>
+              <span className="ml-3 text-sm font-medium text-gray-700">
+                {toggleLoading && loadingPropertyId === property.id
+                  ? "Updating..."
+                  : property.is_featured === 1
+                  ? "On"
+                  : "Off"}
+              </span>
+            </label>
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan={7} className="py-4 text-center text-gray-500">
+          No properties found
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
         </div>
       </div>
       {/* delete property */}

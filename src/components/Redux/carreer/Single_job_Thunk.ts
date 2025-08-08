@@ -1,4 +1,4 @@
-// career_thunk.ts
+// job_details_thunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
@@ -12,29 +12,46 @@ export interface ErrorResponse {
   errors?: Record<string, string[]>;
 }
 
-export interface Career {
+export interface Job {
   id: number;
   job_title: string;
-  created_at: string | null;
+  description: string;
+  location: string;
+  job_type: string;
+  key_responsibility: string;
+  requirements: string;
+  qualifications: string;
+  image: string | null;
+  created_at: string;
+  updated_at: string;
+  address: string;
   views: number;
-  compensation: number | null;
   total_applications: number;
+  compensation: number;
 }
 
-export interface CareerPaginationLinks {
+export interface Application {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  created_at: string;
+}
+
+export interface PaginationLinks {
   url: string | null;
   label: string;
   active: boolean;
 }
 
-export interface CareerData {
+export interface ApplicationsData {
   current_page: number;
-  data: Career[];
+  data: Application[];
   first_page_url: string;
   from: number;
   last_page: number;
   last_page_url: string;
-  links: CareerPaginationLinks[];
+  links: PaginationLinks[];
   next_page_url: string | null;
   path: string;
   per_page: number;
@@ -43,30 +60,27 @@ export interface CareerData {
   total: number;
 }
 
-export interface CareerResponse {
+export interface JobDetailsResponse {
   success: boolean;
-  name: string;
-  total_career: number;
-  total_career_views: string;
-  total_applications: string;
-  data: CareerData;
+  job_list: Job;
+  total_career_views: number;
+  total_applications: number;
+  applications: ApplicationsData;
 }
 
-// const BASE_URL = "https://adron.microf10.sg-host.com";
-
-export const fetchCareers = createAsyncThunk<
-  CareerResponse, 
-  void, 
+export const fetchJobDetails = createAsyncThunk<
+  JobDetailsResponse,
+  string, // The jobId will be passed as an argument
   {
     state: RootState;
     rejectValue: ErrorResponse;
   }
 >(
-  "careers/fetch",
-  async (_, { rejectWithValue, getState }) => {
+  "singlejobDetails/fetch",
+  async (jobId, { rejectWithValue, getState }) => {
     const token = Cookies.get("token");
     const state = getState();
-    const currentPage = state.getcareers?.data?.current_page || 1;
+    const currentPage = state.singlejobDetails?.applications?.current_page || 1;
 
     if (!token) {
       toast.error("Authentication required. Please login.");
@@ -76,8 +90,8 @@ export const fetchCareers = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<CareerResponse>(
-        `${BASE_URL}/api/hr/jobs`,
+      const response = await axios.get<JobDetailsResponse>(
+        `${BASE_URL}/api/hr/career/${jobId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -90,18 +104,17 @@ export const fetchCareers = createAsyncThunk<
           },
         }
       );
-      
-      // // Validate the response structure matches our interface
-      // if (
-      //   !response.data.success ||
-      //   typeof response.data.name !== "string" ||
-      //   typeof response.data.total_career !== "number" ||
-      //   typeof response.data.total_career_views !== "string" ||
-      //   typeof response.data.total_applications !== "string" ||
-      //   !response.data.data
-      // ) {
-      //   throw new Error("Invalid response structure from server");
-      // }
+
+      // Validate the response structure matches our interface
+      if (
+        !response.data.success ||
+        !response.data.job_list ||
+        typeof response.data.total_career_views !== "number" ||
+        typeof response.data.total_applications !== "number" ||
+        !response.data.applications
+      ) {
+        throw new Error("Invalid response structure from server");
+      }
 
       return response.data;
     } catch (error) {
@@ -114,8 +127,7 @@ export const fetchCareers = createAsyncThunk<
 
       if (axiosError.response) {
         const errorMessage =
-          axiosError.response.data.message ||
-          "Failed to fetch career data";
+          axiosError.response.data.message || "Failed to fetch job details";
         toast.error(errorMessage);
         return rejectWithValue(axiosError.response.data);
       }
@@ -129,7 +141,6 @@ export const fetchCareers = createAsyncThunk<
         });
       }
 
-      // Handle cases where the error might be from our validation
       if (error instanceof Error) {
         toast.error(error.message);
         return rejectWithValue({
