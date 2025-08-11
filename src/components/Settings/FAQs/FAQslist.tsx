@@ -16,6 +16,7 @@ import { Testimonial } from "../../../pages/Properties/types/TestimonialTypes";
 import { FAQItem } from "../../../pages/Properties/types/FAQsTypes";
 import CreateFAQs from "./CreateFAQ";
 import EditFAQs from "./EditFAQ";
+import DeleteFAQ from "./DeleteFAQ";
 
 const tabs = ["All", "Approved", "Pending"] as const;
 type Tab = (typeof tabs)[number];
@@ -110,13 +111,13 @@ const FAQList: React.FC = () => {
         onClose={() => setshowEditModal(false)}
         faqItem={faqsItem}
       />
-      {/*
-      <DeleteTestimonial
+
+      <DeleteFAQ
         isOpen={showDeleteModal}
         onClose={() => setshowDeleteModal(false)}
-        client={client}
+        faqItem={faqsItem}
       />
-      */}
+
       <CreateFAQs
         isOpen={showCreateModal}
         onClose={() => setshowCreateModal(false)}

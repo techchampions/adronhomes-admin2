@@ -137,6 +137,7 @@ export default function EditTestimonial({
                 </label>
                 <SoosarInputField
                   name="client_comment"
+                  type="textarea"
                   placeholder="Enter Client Comment"
                 />
               </div>

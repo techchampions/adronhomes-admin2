@@ -5,6 +5,7 @@ import { useCreateFAQs } from "../../../utils/hooks/mutations";
 import SoosarInputField from "../../soosarInput";
 import ImageUploadField from "../../SoosarImageInput";
 import { FAQPayload } from "../../../pages/Properties/types/FAQsTypes";
+import SmallLoader from "../../SmallLoader";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -25,6 +26,15 @@ export default function CreateFAQs({
     answer: "",
   };
   const { mutate: create, isPending } = useCreateFAQs();
+  if (isPending) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#17191CBA] bg-opacity-25 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-h-[95%] overflow-y-scroll scrollbar-hide max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-10">
+          <SmallLoader />
+        </div>
+      </div>
+    );
+  }
   const handleSubmit = (values: typeof initialValues) => {
     const payload: FAQPayload = {
       question: values.question,
@@ -86,7 +96,11 @@ export default function CreateFAQs({
                 <label htmlFor="" className="text-sm text-gray-500">
                   Answer
                 </label>
-                <SoosarInputField name="answer" placeholder="Enter Answer" />
+                <SoosarInputField
+                  name="answer"
+                  placeholder="Enter Answer"
+                  type="textarea"
+                />
               </div>
 
               <div className="flex justify-between items-center gap-2 mt-[20px]">

@@ -1,30 +1,11 @@
-import { useState } from "react";
-import { Formik, Form, Field, FormikHelpers } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { FiEyeOff } from "react-icons/fi";
-import InputField from "../../input/inputtext";
-import OptionInputField from "../../input/drop_down";
 import Button from "../../input/Button";
-import InputAreaField from "../../input/TextArea";
-import {
-  useAddLeader,
-  useCreateAccount,
-  useCreateTestimony,
-  useEditAccount,
-  useUpdateTestimonial,
-} from "../../../utils/hooks/mutations";
-import { CreateLeaderPayload } from "../../../pages/Properties/types/LeadershipDataTypes";
-import { toast } from "react-toastify";
+import { useCreateTestimony } from "../../../utils/hooks/mutations";
 import SoosarInputField from "../../soosarInput";
-import {
-  AccountDetail,
-  CreateAccountPayload,
-} from "../../../pages/Properties/types/AccountDetailsTypes";
-import {
-  Testimonial,
-  TestimonialPayload,
-} from "../../../pages/Properties/types/TestimonialTypes";
+import { TestimonialPayload } from "../../../pages/Properties/types/TestimonialTypes";
 import ImageUploadField from "../../SoosarImageInput";
+import SmallLoader from "../../SmallLoader";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -49,6 +30,16 @@ export default function CreateTestimony({
     client_country: "http://adron.microf10.sg-host.com/flag.png",
   };
   const { mutate: create, isPending } = useCreateTestimony();
+  if (isPending) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#17191CBA] bg-opacity-25 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-h-[95%] overflow-y-scroll scrollbar-hide max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-10">
+          <SmallLoader />
+        </div>
+      </div>
+    );
+  }
+
   const handleSubmit = (values: typeof initialValues) => {
     const image =
       typeof values.client_image === "string" ? undefined : values.client_image;
@@ -138,6 +129,7 @@ export default function CreateTestimony({
                 </label>
                 <SoosarInputField
                   name="client_comment"
+                  type="textarea"
                   placeholder="Enter Client Comment"
                 />
               </div>
