@@ -20,7 +20,11 @@ export default function DirectorsDashboard() {
 
   return (
     <div className="mb-[52px]">
-      <Header title="Dashboard" subtitle="Manage settings" />
+      <Header
+        title="Dashboard"
+        subtitle="Manage settings"
+        showSearchAndButton={false}
+      />
 
       <div className="space-y-[30px]">
         <div className="grid lg:grid-cols-5 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">

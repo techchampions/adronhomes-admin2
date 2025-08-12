@@ -334,6 +334,7 @@ const handleRowClick = (propertyId: number) => {
   // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
+
   };
 
   const {
@@ -364,6 +365,7 @@ const handleRowClick = (propertyId: number) => {
     setLoadingPropertyId(propertyId);
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
+
   };
 
   return (
