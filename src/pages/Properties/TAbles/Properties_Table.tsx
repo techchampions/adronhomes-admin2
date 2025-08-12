@@ -443,6 +443,7 @@ const handleRowClick = (propertyId: number) => {
             </div>
           </td>
           <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]" onClick={() => handleRowClick(property.id)}>
+          <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]">
             <div className="group relative">
               <span className="truncate block">₦{property.price?.toLocaleString()}</span>
               <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
@@ -451,6 +452,7 @@ const handleRowClick = (propertyId: number) => {
             </div>
           </td>
           <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]" onClick={() => handleRowClick(property.id)}>
+          <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]">
             <div className="group relative">
               <span className="truncate block">{getPropertyType(property.type)}</span>
               <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
@@ -459,6 +461,7 @@ const handleRowClick = (propertyId: number) => {
             </div>
           </td>
           <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
+          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]">
             <div className="group relative">
               <span className="truncate block">{property.no_of_bedroom || "N/A"}</span>
               <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
@@ -467,6 +470,7 @@ const handleRowClick = (propertyId: number) => {
             </div>
           </td>
           <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
+          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]">
             <div className="group relative">
               <span className="truncate block">
                 {property.is_sold

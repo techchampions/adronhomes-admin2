@@ -1,19 +1,27 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createAccountDetails,
+  createFAQs,
   createLeaderData,
   createOfficeLocation,
+  createTestimony,
   deleteAccount,
+  deleteFAQs,
   deleteLeaderData,
   deleteOfficeLoaction,
   deleteSliderById,
+  deleteTestimony,
   editAccountDetails,
   editLeaderData,
   editOfficeLocation,
   sendNotification,
+  updateFAQs,
   updateHeaderData,
+  updateSocial,
+  updateTestimonial,
   uploadSliderByType,
 } from "./api";
+import { toast } from "react-toastify";
 
 // Query hook for Uploading Slides
 export const useUploadSlideByType = () => {
@@ -181,6 +189,123 @@ export const useSendNotification = () => {
       queryClient.invalidateQueries({
         queryKey: ["notifications"],
       });
+    },
+  });
+};
+
+export const useUpdateTestimonial = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateTestimonial,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully updated testimony");
+      queryClient.invalidateQueries({
+        queryKey: ["testimonials"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Update");
+    },
+  });
+};
+export const useCreateTestimony = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createTestimony,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully created testimony");
+      queryClient.invalidateQueries({
+        queryKey: ["testimonials"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Create");
+    },
+  });
+};
+
+export const useDeleteTestimony = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTestimony,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully deleted testimony");
+      queryClient.invalidateQueries({
+        queryKey: ["testimonials"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to delete");
+    },
+  });
+};
+
+export const useUpdateSocial = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateSocial,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully updated link");
+      queryClient.invalidateQueries({
+        queryKey: ["socials"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Update");
+    },
+  });
+};
+
+export const useCreateFAQs = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createFAQs,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully created FAQs");
+      queryClient.invalidateQueries({
+        queryKey: ["FAQs"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Create");
+    },
+  });
+};
+export const useUpdateFAQs = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateFAQs,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully updated FAQs");
+      queryClient.invalidateQueries({
+        queryKey: ["FAQs"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Update");
+    },
+  });
+};
+
+export const useDeleteFAQs = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteFAQs,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully deleted testimony");
+      queryClient.invalidateQueries({
+        queryKey: ["FAQs"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to delete");
     },
   });
 };
