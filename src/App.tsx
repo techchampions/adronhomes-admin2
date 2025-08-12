@@ -56,6 +56,8 @@ import ContractInvoice from "./pages/contract/customers_payment";
 import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
 import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
 import FAQs from "./components/Settings/FAQs/FAQs";
+import SingleJob from "./hr/singleCarrerPage";
+
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -230,6 +232,12 @@ const App = () => {
               </Route>
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
+                         
+                            <Route   path="/human-resources/view-job/:jobId" element={<SingleJob />} ></Route>
+                 <Route   path="/human-resources"
+                  element={<HRDashboard />}
+              ></Route>
+                
             </Routes>
           </AppLayout>
           {isInfrastructure && (
