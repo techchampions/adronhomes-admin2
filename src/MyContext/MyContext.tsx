@@ -170,6 +170,8 @@ interface PropertyContextType {
   role: any;
   setRole: (role: any) => void;
   setDisplayStatus: (status: "draft" | "publish") => void;
+  sales: boolean;
+  setSales: (sales: boolean) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(
@@ -224,7 +226,7 @@ const initialFormData: PropertyFormData = {
     whatsAppLink: "",
     contactNumber: "",
     toilets: "",
-    titleDocumentTypeProp: [""],
+    titleDocumentTypeProp: ["C of O"],
   },
   landForm: {
     director_id: "",
@@ -274,6 +276,7 @@ const initialFormData: PropertyFormData = {
 
 const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
+
   const { loading, error, success, propertyId } = useSelector(
     (state: RootState) => state.addproperty
   );
@@ -290,6 +293,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [option, setOption] = useState(2);
   const [fees, setFees] = useState<Fee[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
+  const [sales, setSales] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const resetFormData = () => {
@@ -732,6 +736,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         role,
         setRole,
         setDisplayStatus,
+        sales,
+        setSales,
       }}
     >
       {children}

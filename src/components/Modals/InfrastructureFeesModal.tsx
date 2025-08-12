@@ -33,7 +33,7 @@ export default function InfrastructureFeesModal({
   const [newFeePurpose, setNewFeePurpose] = useState<string>("");
 
   const typeOptions = [
-    { value: "Infrastructure and development", label: "Infrastructure and development" },
+    { value: "infrastructure", label: "Infrastructure and development" },
     { value: "others", label: "others" },
   ];
 

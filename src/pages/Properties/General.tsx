@@ -14,10 +14,11 @@ import LandForm from "./BasicDetails/PropertySpecifications/land";
 import FinalSubmission from "./FinalSubmission";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
-// import BasicDetails from "./BasicDetails/BasicDetailsLand";
 import DraftPublishModal from "./DraftPublishModal";
 import BasicDetails from "./BasicDetails/BasicDetails";
 import BasicDetailsLand from "./BasicDetails/BasicDetailsLand";
+
+
 
 export default function General() {
   const {
@@ -34,9 +35,11 @@ export default function General() {
   } = useContext(PropertyContext)!;
   const [discount, setDiscount] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, success, error } = useSelector((state: RootState) => state.addproperty);
+  // const { loading, success, error } = useSelector((state: RootState) => state.addproperty);
   const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
-
+const { loading, error, success, propertyId } = useSelector(
+  (state: RootState) => state.addproperty
+);
   // Create refs for all form components
   const basicDetailsRef = useRef<any>(null);
   const bulkBasicDetailsRef = useRef<any>(null);
@@ -103,14 +106,14 @@ export default function General() {
           paymentStructureRef.current.handleSubmit();
           canProceed = paymentStructureRef.current.isValid && canProceed;
         }
-        
-        // Show modal instead of proceeding to next step
+        break;
+      case 6:
+        // Show modal at final submission (Confirm & Submit)
         if (canProceed) {
           setShowDraftPublishModal(true);
           return; // Don't proceed to next step yet
         }
         break;
-      case 6:
       case 7:
         await submitForm();
         return;
@@ -120,23 +123,27 @@ export default function General() {
       setCurrentStep(currentStep + 1);
     }
   };
+
 const handleDraftPublishSelect = async (option: "draft" | "publish") => {
   try {
     setIsSubmitting(true);
     setShowDraftPublishModal(false);
 
-  
     setDisplayStatus(option === "draft" ? "draft" : "publish");
 
- 
-    setCurrentStep(currentStep + 1);
+    const result = await submitForm();
+
+    // Assume submitForm returns a success flag or throws on failure
+    if (success) {
+      setCurrentStep(7); // Only move to final step if successful
+    } 
   } catch (error) {
-    console.error("Error handling selection:", error);
+    console.error("Submission failed:", error);
+    // Stay on step 6 if there's an error
   } finally {
     setIsSubmitting(false);
   }
 };
-
 
   const handleBack = () => {
     if (currentStep > 1 && !isSubmitting) {
@@ -203,10 +210,9 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
             tab={stepTitles[0]}
             children={
               isLandProperty ? (
-              <BasicDetailsLand ref={basicDetailsRef} />
+                <BasicDetailsLand ref={basicDetailsRef} />
               ) : (
-                    <BasicDetails ref={basicDetailsRef} />
-              
+                <BasicDetails ref={basicDetailsRef} />
               )
             }
           />

@@ -54,6 +54,8 @@ import UserPayments from "./pages/Transactions/Transactions";
 import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
 import ContractInvoice from "./pages/contract/customers_payment";
 import SingleJob from "./hr/singleCarrerPage";
+import PropertyDetailsPage from "./pages/Properties/PropertyDetailsPage";
+// import GeneralEdeting from "./pages/Properties/GeneralEditing";
 
 
 const AuthGuard = () => {
@@ -134,7 +136,7 @@ const App = () => {
                   path="/payments/status/:paymentId"
                   element={<PaymentById />}
                 />
-              
+               <Route path="/properties/:id" element={<PropertyDetailsPage />} />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
                    <Route path="/contracts" element={<Contract />} />
@@ -191,6 +193,7 @@ const App = () => {
                   element={<CustomersSinglePayment />}
                 /> */}
                 <Route path="/properties/form" element={<General />} />
+                    {/* <Route path="/properties/form/:id" element={<GeneralEdeting/>} /> */}
              
                 <Route
                   path="/customers/payment/:user_id/:plan_id"

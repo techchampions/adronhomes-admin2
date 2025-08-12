@@ -11,12 +11,16 @@ import {
 } from "react-icons/fi";
 import Pagination from "../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSavedPropertyUsers, selectSavedPropertyUsersError, selectSavedPropertyUsersLoading, selectSavedPropertyUsersPagination, setSavedPropertyUsersCurrentPage } from "../../components/Redux/SavedPropertyUser_slice";
+import {
+  selectSavedPropertyUsers,
+  selectSavedPropertyUsersError,
+  selectSavedPropertyUsersLoading,
+  selectSavedPropertyUsersPagination,
+  setSavedPropertyUsersCurrentPage,
+} from "../../components/Redux/SavedPropertyUser_slice";
 import { fetchSavedPropertyUsers } from "../../components/Redux/SavedPropertyUser_thunk";
 import { AppDispatch } from "../../components/Redux/store";
 import LoadingAnimations from "../../components/LoadingAnimations";
-
-
 
 interface PropertyModalProps {
   isOpen: boolean;
@@ -72,17 +76,17 @@ export default function PropertyModal({
   const error = useSelector(selectSavedPropertyUsersError);
 
   // Handle page change
-const handlePageChange = (page: number) => {
-  dispatch(setSavedPropertyUsersCurrentPage(page));
-  dispatch(fetchSavedPropertyUsers({ propertyId: property.id, page })); 
-};
+  const handlePageChange = (page: number) => {
+    dispatch(setSavedPropertyUsersCurrentPage(page));
+    dispatch(fetchSavedPropertyUsers({ propertyId: property.id, page }));
+  };
 
-// Fetch saved users when modal opens and property changes
-useEffect(() => {
-  if (isOpen && property.id) {
-    dispatch(fetchSavedPropertyUsers({ propertyId: property.id, page: 1 })); 
-  }
-}, [isOpen, property.id, dispatch]);
+  // Fetch saved users when modal opens and property changes
+  useEffect(() => {
+    if (isOpen && property.id) {
+      dispatch(fetchSavedPropertyUsers({ propertyId: property.id, page: 1 }));
+    }
+  }, [isOpen, property.id, dispatch]);
 
   const propertyImages =
     property.photos.length > 0
@@ -102,18 +106,20 @@ useEffect(() => {
   // Format saved users data for display
   const formatSavedUsers = () => {
     if (!savedUsers || savedUsers.length === 0) return [];
-    
-    return savedUsers.map((user:any) => ({
-      name: `${user.saved_user.first_name} ${user.saved_user.last_name || ''}`.trim(),
+
+    return savedUsers.map((user: any) => ({
+      name: `${user.saved_user.first_name} ${
+        user.saved_user.last_name || ""
+      }`.trim(),
       email: user.saved_user.email,
       phone: user.saved_user.phone_number,
-      viewedDate: new Date(user.created_at).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      viewedDate: new Date(user.created_at).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       }),
-      avatar: null
+      avatar: null,
     }));
   };
 
@@ -269,7 +275,9 @@ useEffect(() => {
               <div className="text-sm text-gray-600">
                 {getPropertyType(property.type)}
               </div>
-              <div className="font-medium">Property Units: {property?.number_of_unit}</div>
+              <div className="font-medium">
+                Property Units: {property?.number_of_unit}
+              </div>
             </div>
           </div>
 
@@ -371,14 +379,14 @@ useEffect(() => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Saved By Users
             </h3>
-            
+
             {error ? (
               <div className="text-center py-8 text-red-500">
                 Error loading saved users: {error}
               </div>
             ) : loading ? (
               <div className="flex justify-center items-center p-8">
-               <LoadingAnimations loading={loading}/>
+                <LoadingAnimations loading={loading} />
               </div>
             ) : savedUsers.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -387,7 +395,7 @@ useEffect(() => {
             ) : (
               <>
                 <div className="space-y-4">
-                  {formatSavedUsers().map((client:any, index:any) => (
+                  {formatSavedUsers().map((client: any, index: any) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
@@ -396,7 +404,7 @@ useEffect(() => {
                         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-sm font-semibold text-gray-700">
                           {client.name
                             .split(" ")
-                            .map((n:any) => n[0])
+                            .map((n: any) => n[0])
                             .join("")}
                         </div>
                         <div>
@@ -433,18 +441,15 @@ useEffect(() => {
   );
 }
 
-
-
-
 export const getPropertyType = (type: number) => {
-       switch (type) {
-      case 1:
-        return "Residential";
-      case 2:
-        return "Commercial";
-      case 3:
-        return "Land";
-      default:
-        return "Other";
-    }
-  };
+  switch (type) {
+    case 1:
+      return "Residential";
+    case 2:
+      return "Commercial";
+    case 3:
+      return "Land";
+    default:
+      return "Other";
+  }
+};
