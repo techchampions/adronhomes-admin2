@@ -20,6 +20,7 @@ import { directors } from "../../../components/Redux/directors/directors_thunk";
 import OptionInputField from "../../../components/input/drop_down";
 import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
 import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
+import { useNavigate } from "react-router-dom";
 
 export interface PropertyData {
   is_featured: any;
@@ -187,7 +188,11 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
         return "Commercial";
     }
   };
+  const navigate = useNavigate();
 
+const handleRowClick = (propertyId: number) => {
+  navigate(`/properties/${propertyId}`);
+};
   const handleEditClick = (property: PropertyData) => {
     setEditingProperty(property);
     setImagePreview(property.display_image || null);
@@ -400,7 +405,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
           key={`property-${property.id}`}
           className="hover:bg-gray-50 cursor-pointer"
         >
-          <td className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]">
+          <td className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]" onClick={() => handleRowClick(property.id)}>
             <div className="group relative">
               <div className="flex items-center">
                 <div
@@ -437,6 +442,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
               </div>
             </div>
           </td>
+          <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]" onClick={() => handleRowClick(property.id)}>
           <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]">
             <div className="group relative">
               <span className="truncate block">₦{property.price?.toLocaleString()}</span>
@@ -445,6 +451,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
               </div>
             </div>
           </td>
+          <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]" onClick={() => handleRowClick(property.id)}>
           <td className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]">
             <div className="group relative">
               <span className="truncate block">{getPropertyType(property.type)}</span>
@@ -453,6 +460,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
               </div>
             </div>
           </td>
+          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
           <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]">
             <div className="group relative">
               <span className="truncate block">{property.no_of_bedroom || "N/A"}</span>
@@ -461,6 +469,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
               </div>
             </div>
           </td>
+          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
           <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]">
             <div className="group relative">
               <span className="truncate block">
@@ -470,7 +479,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                   ? "Active"
                   : "Available"}
               </span>
-              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0" onClick={() => handleRowClick(property.id)}>
                 {property.is_sold
                   ? "Sold"
                   : property.is_active

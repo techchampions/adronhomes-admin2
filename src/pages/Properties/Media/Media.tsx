@@ -33,8 +33,8 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
     images: Yup.array()
       .min(1, "At least one image is required")
       .required("Images are required"),
-    tourLink: Yup.string().url("Must be a valid URL").required(),
-    videoLink: Yup.string().url("Must be a valid URL").required(),
+    // tourLink: Yup.string().url("Must be a valid URL").required(),
+    // videoLink: Yup.string().url("Must be a valid URL").required(),
     // videoFile:Yup.array()
     //   .min(1, "At least one video is required")
     //   .required("video are required"),

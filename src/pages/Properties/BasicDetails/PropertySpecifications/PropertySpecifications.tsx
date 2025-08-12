@@ -51,7 +51,7 @@ interface DropdownOption {
 
 const PropertySpecifications = forwardRef<PropertySpecificationsHandles>(
   (props, ref) => {
-    const { formData, setSpecifications } = useContext(PropertyContext)!;
+    const { formData, setSpecifications,sales, setSales } = useContext(PropertyContext)!;
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
       dispatch(directors());
@@ -87,7 +87,7 @@ const [titleDocumentTypeProp, setTitleDocumentType] = useState<string[]>(
     .of(Yup.string())
     .min(1, "At least one landmark is required")
     .required("Nearby Landmarks are required"),
-  rentDuration: Yup.string().required("Rent duration is required"),
+  // rentDuration: Yup.string().required("Rent duration is required"),
   buildingCondition: Yup.string().required("Building condition is required"),
 titleDocumentTypeProp: Yup.array()
     .of(Yup.string())
@@ -374,7 +374,7 @@ useEffect(() => {
         />
 
         <div className="grid md:grid-cols-2 gap-12">
-          <OptionInputField
+       { sales  &&(<OptionInputField
             label="Rent Duration"
             placeholder="Select duration"
             name="rentDuration"
@@ -386,7 +386,7 @@ useEffect(() => {
                 ? formik.errors.rentDuration
                 : undefined
             }
-          />
+          />)}
           <OptionInputField
             label="Building Condition"
             placeholder="Select condition"
