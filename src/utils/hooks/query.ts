@@ -6,6 +6,7 @@ import {
   getCustomersAndProperties,
   getDirectorDashboardData,
   getEnquiryByID,
+  getFAQs,
   getHeadersData,
   getLeadersData,
   getNotifications,
@@ -14,6 +15,8 @@ import {
   getPropertyRequest,
   getPropertyRequestByID,
   getSliderByType,
+  getSocials,
+  getTestimonials,
   getUser,
 } from "./api";
 import { HeadersResponse } from "../../pages/Properties/types/HeaderDataTypes";
@@ -30,6 +33,9 @@ import { NotificationsResponse } from "../../pages/Properties/types/Notification
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { UsersAndPropertiesResponse } from "../../pages/Properties/types/UsersNPropertiesListTypes";
 import { GetUserResponse } from "../../pages/Properties/types/UserProfileTypes";
+import { ApiResponse } from "../../pages/Properties/types/TestimonialTypes";
+import { SettingsResponse } from "../../pages/Properties/types/SocialsTypes";
+import { FAQResponse } from "../../pages/Properties/types/FAQsTypes";
 
 // Query hook for properties and filtering
 export const useGetSlidersByType = (type: string) => {
@@ -129,5 +135,25 @@ export const useGetUser = () => {
   return useQuery<GetUserResponse>({
     queryKey: ["user-profile"],
     queryFn: getUser,
+  });
+};
+// Query hook for Getting Testimonials
+export const useGetTestimonials = () => {
+  return useQuery<ApiResponse>({
+    queryKey: ["testimonials"],
+    queryFn: getTestimonials,
+  });
+};
+
+export const useGetSocials = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["socials"],
+    queryFn: getSocials,
+  });
+};
+export const useGetFAQs = () => {
+  return useQuery<FAQResponse>({
+    queryKey: ["FAQs"],
+    queryFn: getFAQs,
   });
 };
