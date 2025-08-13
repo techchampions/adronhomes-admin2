@@ -1,6 +1,4 @@
-// FinalSubmission.tsx
 import React, { useContext } from "react";
-
 import { FaMapMarkerAlt, FaHome, FaTag } from "react-icons/fa";
 import { PropertyContext } from "../../MyContext/MyContext";
 
@@ -39,22 +37,25 @@ export default function FinalSubmission() {
     : [];
 
   return (
-    <div className="mx-auto bg-white rounded-[40px] p-6">
+    <div className="mx-auto bg-white rounded-[20px] md:rounded-[40px] p-4 md:p-6 max-w-4xl">
       {/* Header */}
       <div className="flex flex-col mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">{propertyData.title}</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800">{propertyData.title}</h1>
         <div className="flex items-center text-gray-600 mt-1">
           <FaMapMarkerAlt className="w-4 h-4 mr-1" />
-          <p className="text-sm">{propertyData.location}</p>
+          <p className="text-xs md:text-sm">{propertyData.location}</p>
         </div>
       </div>
 
       {/* Image Gallery */}
       {images.length > 0 && (
-        <div className="mb-6 max-w-[612px]">
-          <div className="grid grid-cols-4 gap-2">
+        <div className="mb-6 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {images.map((image, index) => (
-              <div key={index} className="relative w-[138px] h-[119px] rounded-[20px] overflow-hidden bg-gray-200">
+              <div 
+                key={index} 
+                className="relative aspect-square rounded-[10px] md:rounded-[20px] overflow-hidden bg-gray-200"
+              >
                 <img 
                   src={image} 
                   alt={`Property view ${index + 1}`} 
@@ -74,7 +75,7 @@ export default function FinalSubmission() {
             <input 
               type="text" 
               value={propertyData.virtualTour} 
-              className="w-full p-2 text-sm border border-gray-300 rounded-md bg-gray-50 text-[#272727]"
+              className="w-full p-2 text-xs md:text-sm border border-gray-300 rounded-md bg-gray-50 text-[#272727]"
               readOnly
             />
           </div>
@@ -82,53 +83,53 @@ export default function FinalSubmission() {
       )}
 
       {/* Property Details */}
-      <div className="flex items-center gap-6 mb-6">
+      <div className="flex flex-wrap items-center gap-4 md:gap-6 mb-6">
         <div className="flex items-center gap-2">
           <FaHome className="w-4 h-4 text-gray-600" />
-          <span className="text-sm">{propertyData.squareMeters}</span>
+          <span className="text-xs md:text-sm">{propertyData.squareMeters}</span>
         </div>
 
         {isBulk && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Units:</span>
-            <span className="text-sm">{propertyData.propertyUnits}</span>
+            <span className="text-xs md:text-sm font-medium">Units:</span>
+            <span className="text-xs md:text-sm">{propertyData.propertyUnits}</span>
           </div>
         )}
 
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-sm font-medium">{propertyData.propertyType}</span>
+        <div className="md:ml-auto flex items-center gap-2">
+          <span className="text-xs md:text-sm font-medium">{propertyData.propertyType}</span>
         </div>
       </div>
 
       {/* Price */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <h2 className="text-2xl font-bold">{propertyData.price}</h2>
-          {isBulk && <span className="ml-2 text-sm">per unit</span>}
+          <h2 className="text-xl md:text-2xl font-bold">{propertyData.price}</h2>
+          {isBulk && <span className="ml-2 text-xs md:text-sm">per unit</span>}
         </div>
       </div>
 
       {/* Overview */}
       {propertyData.overview && (
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Overview</h2>
-          <p className="text-sm text-gray-600">{propertyData.overview}</p>
+          <h2 className="text-base md:text-lg font-semibold mb-2">Overview</h2>
+          <p className="text-xs md:text-sm text-gray-600">{propertyData.overview}</p>
         </div>
       )}
 
       {/* Description */}
       {propertyData.description && (
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Description</h2>
-          <p className="text-sm text-gray-600">{propertyData.description}</p>
+          <h2 className="text-base md:text-lg font-semibold mb-2">Description</h2>
+          <p className="text-xs md:text-sm text-gray-600">{propertyData.description}</p>
         </div>
       )}
 
       {/* Features */}
       {propertyData.features.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Features</h2>
-          <ul className="text-sm text-gray-600 space-y-1">
+          <h2 className="text-base md:text-lg font-semibold mb-2">Features</h2>
+          <ul className="text-xs md:text-sm text-gray-600 space-y-1">
             {propertyData.features.map((feature, index) => (
               <li key={index} className="flex items-start">
                 <span className="mr-2">•</span>
@@ -141,34 +142,34 @@ export default function FinalSubmission() {
 
       {/* Address */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Address</h2>
+        <h2 className="text-base md:text-lg font-semibold mb-2">Address</h2>
         {isBulk ? (
           <div className="space-y-2">
-            <p className="text-sm text-gray-600">{propertyData.address}</p>
-            <div className="flex gap-4">
-              <div className="flex items-center">
-                <span className="text-sm font-medium mr-2">City:</span>
-                <span className="text-sm text-gray-600">{propertyData.city}</span>
+            <p className="text-xs md:text-sm text-gray-600">{propertyData.address}</p>
+            <div className="flex flex-col sm:flex-row sm:gap-4">
+              <div className="flex items-center mb-1 sm:mb-0">
+                <span className="text-xs md:text-sm font-medium mr-2">City:</span>
+                <span className="text-xs md:text-sm text-gray-600">{propertyData.city}</span>
               </div>
               <div className="flex items-center">
-                <span className="text-sm font-medium mr-2">State:</span>
-                <span className="text-sm text-gray-600">{propertyData.state}</span>
+                <span className="text-xs md:text-sm font-medium mr-2">State:</span>
+                <span className="text-xs md:text-sm text-gray-600">{propertyData.state}</span>
               </div>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-600">{propertyData.address}</p>
+          <p className="text-xs md:text-sm text-gray-600">{propertyData.address}</p>
         )}
       </div>
 
       {/* Discount */}
       <div className="mt-6">
-        <h2 className="text-lg font-semibold mb-2">Discount</h2>
-        <div className="bg-gray-100 p-4 rounded-lg">
+        <h2 className="text-base md:text-lg font-semibold mb-2">Discount</h2>
+        <div className="bg-gray-100 p-3 md:p-4 rounded-lg">
           {propertyData.discount.name ? (
             <>
-              <h3 className="font-medium text-gray-800">{propertyData.discount.name}</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="font-medium text-gray-800 text-sm md:text-base">{propertyData.discount.name}</h3>
+              <p className="text-xs md:text-sm text-gray-600 mt-1">
                 {propertyData.discount.off}% Off above {propertyData.discount.units} units
               </p>
               <p className="text-xs text-gray-500 mt-1">
@@ -176,7 +177,7 @@ export default function FinalSubmission() {
               </p>
             </>
           ) : (
-            <div className="flex items-center text-gray-500">
+            <div className="flex items-center text-gray-500 text-sm">
               <FaTag className="mr-2" />
               <span>No discount available</span>
             </div>

@@ -15,13 +15,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { personnels } from "../../../components/Redux/personnel/personnel_thunk";
 import { formatToNaira } from "../../../utils/formatcurrency";
-import TagInputField from "../../../components/input/TagInputField";
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails,isLandProperty, setIsLandProperty } = useContext(PropertyContext)!;
+  const { formData, setBasicDetails, isLandProperty, setIsLandProperty,sales, setSales } = useContext(PropertyContext)!;
   const [initialLoad, setInitialLoad] = useState(true);
-const [purpose, setpurpose] = useState<string[]>(formData.basicDetails.purpose || []);
-
+  const [purpose, setPurpose] = useState<string[]>(formData.basicDetails.purpose || []);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -30,7 +28,6 @@ const [purpose, setpurpose] = useState<string[]>(formData.basicDetails.purpose |
   }, [dispatch]);
 
   const propertyTypeOptions = [
-
     { value: 2, label: "Residential" },
     { value: 3, label: "Industrial" },
     { value: 4, label: "Commercial" },
@@ -43,46 +40,36 @@ const [purpose, setpurpose] = useState<string[]>(formData.basicDetails.purpose |
   ];
 
   const purposeOptions = [
-    { value: "bungalow", label: "Bungalow" },
-    { value: "bungalow_duplex", label: "Bungalow Duplex" },
-    { value: "single_family", label: "Single-Family Home" },
-    { value: "duplex", label: "Duplex" },
-    { value: "triplex", label: "Triplex" },
-    { value: "fourplex", label: "Fourplex" },
-    { value: "townhouse", label: "Townhouse" },
-    { value: "apartment", label: "Apartment" },
-    { value: "condo", label: "Condominium (Condo)" },
-    { value: "cottage", label: "Cottage" },
-    { value: "villa", label: "Villa" },
-    { value: "semi_detached", label: "Semi-Detached House" },
+    { value: "sale", label: "Sale" },
+    { value: "rent", label: "Rent" },
   ];
 
-const validationSchema = Yup.object().shape({
-  propertyName: Yup.string().required("Property name is required"),
-  propertyType: Yup.string().required("Property type is required"),
-  price: Yup.number()
-    .typeError("Price must be a number")
-    .positive("Price must be positive")
-    .required("Price is required"),
-  initialDeposit: Yup.number()
-    .typeError("Initial deposit must be a number")
-    .positive("Initial deposit must be positive")
-    .required("Initial deposit is required"),
-  address: Yup.string().required("Address is required"),
-  country: Yup.string().required("Country is required"),
-  state: Yup.string().required("State is required"),
-  lga: Yup.string().required("LGA is required"),
-  locationType: Yup.string().required("Location type is required"),
-  purpose: Yup.array()
-    .of(Yup.string())
-    .min(1, "At least one purpose is required")
-    .required("Purpose is required"),
-});
+  const validationSchema = Yup.object().shape({
+    propertyName: Yup.string().required("Property name is required"),
+    propertyType: Yup.string().required("Property type is required"),
+    price: Yup.number()
+      .typeError("Price must be a number")
+      .positive("Price must be positive")
+      .required("Price is required"),
+    initialDeposit: Yup.number()
+      .typeError("Initial deposit must be a number")
+      .positive("Initial deposit must be positive")
+      .required("Initial deposit is required"),
+    address: Yup.string().required("Address is required"),
+    country: Yup.string().required("Country is required"),
+    state: Yup.string().required("State is required"),
+    lga: Yup.string().required("LGA is required"),
+    locationType: Yup.string().required("Location type is required"),
+    purpose: Yup.array()
+      .of(Yup.string())
+      .min(1, "At least one purpose is required")
+      .required("Purpose is required"),
+  });
 
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-  purpose: purpose,
+      purpose: purpose,
     },
     validationSchema,
     onSubmit: (values) => {
@@ -99,14 +86,20 @@ const validationSchema = Yup.object().shape({
         ...formData.basicDetails,
         purpose: formData.basicDetails.purpose || [],
       });
-      setpurpose(formData.basicDetails.purpose || []);
+      setPurpose(formData.basicDetails.purpose || []);
       setInitialLoad(false);
     }
   }, [formData.basicDetails, initialLoad]);
 
-useEffect(() => {
-  formik.setFieldValue("purpose", purpose);
-}, [purpose]);
+  useEffect(() => {
+    formik.setFieldValue("purpose", purpose);
+  }, [purpose]);
+
+ const handlePurposeChange = (value: string) => {
+  const normalized = value.toLowerCase();
+  setPurpose([normalized]);
+  setSales(normalized === 'sale'?false :true);
+};
 
 
   useImperativeHandle(ref, () => ({
@@ -217,7 +210,7 @@ useEffect(() => {
         error={formik.touched.lga && formik.errors.lga}
       />
 
-      <div className=" gap-12">
+      <div className="gap-12">
         <OptionInputField
           label="Location Type"
           placeholder="Select location type"
@@ -230,11 +223,14 @@ useEffect(() => {
         />
       </div>
 
-      <TagInputField
-        label="purpose"
-        placeholder="Add purpose (e.g.,Bungalow)"
-        values={purpose}
-        onChange={(newpurpose) => setpurpose(newpurpose)}
+      <OptionInputField
+        label="Purpose"
+        placeholder="Select purpose"
+        name="purpose"
+        value={purpose[0] || ""} 
+        onChange={handlePurposeChange}
+        options={purposeOptions}
+        dropdownTitle="Purpose"
         error={formik.touched.purpose && formik.errors.purpose}
       />
     </form>

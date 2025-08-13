@@ -47,6 +47,8 @@ import allocatePropertySliceReducer from './UpdateContract/allocateProperty'
 import singlejobDetailsReducer from './carreer/Single_job_slice'
 import toggleFeaturedReducer from './Properties/toggle_featured_slice'
 import ViewApplicationReducer from './carreer/ViewApplicationSlice'
+import propertyDetailsReducer from './Properties/propertiesDetails/propetiesDetailsSlice'
+import publishDraftReducer from './Properties/publishpropertySlice'
 
 export const store = configureStore({
   reducer: {
@@ -96,7 +98,9 @@ export const store = configureStore({
     allocateProperty:allocatePropertySliceReducer,
     singlejobDetails:singlejobDetailsReducer,
     toggleFeatured:toggleFeaturedReducer,
-    ViewApplication:ViewApplicationReducer
+    ViewApplication:ViewApplicationReducer,
+    propertyDetails:propertyDetailsReducer,
+    publishDraft:publishDraftReducer
   },
 });
 
