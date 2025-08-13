@@ -90,7 +90,7 @@ export default function FinalSubmission() {
         </div>
 
         {isBulk && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 p">
             <span className="text-xs md:text-sm font-medium">Units:</span>
             <span className="text-xs md:text-sm">{propertyData.propertyUnits}</span>
           </div>
@@ -102,7 +102,7 @@ export default function FinalSubmission() {
       </div>
 
       {/* Price */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 m">
         <div className="flex items-center">
           <h2 className="text-xl md:text-2xl font-bold">{propertyData.price}</h2>
           {isBulk && <span className="ml-2 text-xs md:text-sm">per unit</span>}
