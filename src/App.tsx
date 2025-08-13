@@ -177,19 +177,19 @@ const App = () => {
                   path="/settings/office-locations"
                   element={<OfficeLocations />}
                 />
-                {/* <Route
+                <Route
                   path="/settings/site-information"
                   element={<SiteInformationPage />}
-                /> */}
+                />
                 <Route
                   path="/settings/leadership"
                   element={<LeaderShipSettings />}
                 />
-                {/* <Route
+                <Route
                   path="/settings/testimonials"
                   element={<TestimonialsPage />}
-                /> */}
-                {/* <Route path="/settings/faqs" element={<FAQs />} /> */}
+                />
+                <Route path="/settings/faqs" element={<FAQs />} />
                 <Route
                   path="/settings/add-account"
                   element={<AccountDetails />}

@@ -15,6 +15,7 @@ import {
   editLeaderData,
   editOfficeLocation,
   sendNotification,
+  updateEstate,
   updateFAQs,
   updateHeaderData,
   updateSocial,
@@ -306,6 +307,22 @@ export const useDeleteFAQs = () => {
     },
     onError: () => {
       toast.error("Failed to delete");
+    },
+  });
+};
+export const useUpdateEstate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateEstate,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully updated estate");
+      queryClient.invalidateQueries({
+        queryKey: ["estate-locations"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Update");
     },
   });
 };

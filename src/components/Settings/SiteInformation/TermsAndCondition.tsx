@@ -30,7 +30,7 @@ const TermsAndConditions = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-4xl col-span-2">
+    <div className="bg-white p-6 rounded-4xl md:col-span-2">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

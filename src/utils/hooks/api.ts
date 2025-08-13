@@ -5,6 +5,10 @@ import {
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
+  PropertyLocation,
+  PropertyLocationsResponse,
+} from "../../pages/Properties/types/EstateLocationTypes";
+import {
   FAQItem,
   FAQPayload,
   FAQResponse,
@@ -444,6 +448,11 @@ export const getSocials = async (): Promise<SettingsResponse> => {
   const response = await adminApi.get("/settings?type=social");
   return response.data;
 };
+export const getEstateLocation =
+  async (): Promise<PropertyLocationsResponse> => {
+    const response = await adminApi.get("/property-locations");
+    return response.data;
+  };
 
 export const updateSocial = async (
   payload: Partial<SocialPayload>
@@ -508,5 +517,21 @@ export const deleteFAQs = async (
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+export const updateEstate = async (payload: {
+  id: number;
+  formData: FormData;
+}): Promise<PropertyLocation> => {
+  const response = await adminApi.post(
+    `/update-property-location/${payload.id}`,
+    payload.formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
   return response.data;
 };
