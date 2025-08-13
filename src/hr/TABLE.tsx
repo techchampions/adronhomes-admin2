@@ -15,6 +15,7 @@ import { deleteJob } from "../components/Redux/carreer/delete_job_thunk";
 import { selectEditJobLoading, selectEditJobSuccess, selectEditJobError, resetEditJobState } from "../components/Redux/carreer/edit_job_slice";
 import { editJob } from "../components/Redux/carreer/edit_job_thunk";
 import EditJobModal from "./EdithHr";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -42,7 +43,7 @@ interface JobTableProps {
 
 const HumanResources: React.FC<JobTableProps> = ({ data, isLoading }) => {
   const dispatch = useDispatch<AppDispatch>();
-
+const navigate =useNavigate()
   // State for delete modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<JobData | null>(null);
@@ -168,22 +169,22 @@ const HumanResources: React.FC<JobTableProps> = ({ data, isLoading }) => {
             {data && data.length > 0 ? (
               data.map((job: JobData) => (
                 <tr key={`job-${job.id}`} className="cursor-pointer">
-                  <td className="py-4 text-dark text-sm truncate w-[60px]">
+                  <td className="py-4 text-dark text-sm truncate w-[60px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {job.id}
                   </td>
-                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[300px]">
+                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[300px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {job.job_title}
                   </td>
-                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[80px]">
+                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[80px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {job.views}
                   </td>
-                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[100px]">
+                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[100px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {job.total_applications}
                   </td>
-                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[160px]">
+                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[160px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {formatAsNaira(job.compensation)}
                   </td>
-                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[140px]">
+                  <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[140px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {formatDate(job.created_at)}
                   </td>
                   <td className="py-4 pl-4 text-sm">

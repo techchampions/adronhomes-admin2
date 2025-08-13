@@ -13,6 +13,8 @@ import Header from "./header";
 import { AppDispatch, RootState } from "../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCareers } from "../components/Redux/carreer/career_thunk";
+import App from "./ApplicationDetails";
+import { error } from "console";
 
 // Define the expected structure of the data returned by useGetDirectorDashboard
 interface DirectorDashboardData {
@@ -31,6 +33,7 @@ interface DirectorDashboardData {
 // Mock hook for demonstration purposes
 const useGetDirectorDashboard = () => {
   const [data, setData] = useState<DirectorDashboardData | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -54,7 +57,7 @@ const useGetDirectorDashboard = () => {
       // Simulate error (uncomment to test error state)
       // setIsError(true);
       // setIsLoading(false);
-    }, 1500); // Simulate 1.5 seconds loading time
+    }, 1500); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -130,14 +133,13 @@ export default function HRDashboard() {
   }, [dispatch]);
 
  
-  if (isError) {
-    return <NotFound />; 
+  if (carreerError) {
+    return <NotFound  text={carreerError}/>; 
   }
 
   return (
-    <div className="mb-[52px]">
+    <><div className="mb-[52px]">
       <Header title="Dashboard" subtitle="Human Resources" />
-
       <div className="space-y-[30px]">
         <div className="grid lg:grid-cols-5 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
           <DashCard
@@ -148,36 +150,32 @@ export default function HRDashboard() {
             // mutedText={`Created at ${data?.director.created_at ? formatDate(data.director.created_at) : 'Loading...'}`}
             actionText="Account Settings"
             icon={<FaUserShield />}
-            isloading={isLoading} 
-          />
+            isloading={isLoading} />
           <DashCard
             className=""
             mainText="Total Jobs"
-          valueText={totalCareer != null ? totalCareer : 'Loading...'}
+            valueText={totalCareer != null ? totalCareer : 'Loading...'}
 
             mutedText="Includes all Jobs"
-            isloading={isLoading} 
-          />
+            isloading={isLoading} />
           <DashCard
             className=""
             mainText="Total Jobs Views"
-              valueText={totalCareerViews != null ? totalCareerViews : 'Loading...'}
+            valueText={totalCareerViews != null ? totalCareerViews : 'Loading...'}
             mutedText="Includes all career views"
-            isloading={isLoading} 
-          />
+            isloading={isLoading} />
           <DashCard
             className=""
             mainText="Applications"
             valueText={totalApplications != null ? totalApplications : 'Loading...'}
             mutedText="Includes all career applications"
-            isloading={isLoading} 
-          />
+            isloading={isLoading} />
         </div>
 
         <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
           <ReusableTable
             tabs={tabs}
-            searchPlaceholder="Search Jobs" 
+            searchPlaceholder="Search Jobs"
             activeTab={activeTab}
             onTabChange={setActiveTab}
           >
@@ -188,6 +186,6 @@ export default function HRDashboard() {
           {showModal && <ReferralModal onClose={() => setShowModal(false)} />}
         </div>
       </div>
-    </div>
+    </div></>
   );
 }

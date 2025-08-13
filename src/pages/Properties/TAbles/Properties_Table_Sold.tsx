@@ -27,7 +27,7 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null);
   
-  const handlePageChange = async (page: number) => {
+  const handlePageChange = async (page: any) => {
     await dispatch(setPropertiesPage(page));
     await dispatch(fetchProperties());
   };

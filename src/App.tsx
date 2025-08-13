@@ -56,6 +56,7 @@ import ContractInvoice from "./pages/contract/customers_payment";
 import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
 import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
 import FAQs from "./components/Settings/FAQs/FAQs";
+import SingleJob from "./hr/singleCarrerPage";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -176,9 +177,18 @@ const App = () => {
                   element={<SiteInformationPage />}
                 />
                 <Route
+                  path="/settings/site-information"
+                  element={<SiteInformationPage />}
+                />
+                <Route
                   path="/settings/leadership"
                   element={<LeaderShipSettings />}
                 />
+                <Route
+                  path="/settings/testimonials"
+                  element={<TestimonialsPage />}
+                />
+                <Route path="/settings/faqs" element={<FAQs />} />
                 <Route
                   path="/settings/testimonials"
                   element={<TestimonialsPage />}
@@ -189,6 +199,15 @@ const App = () => {
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
+
+                <Route
+                  path="/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
 
                 <Route
                   path="/customers/transactions/:id"
@@ -228,6 +247,14 @@ const App = () => {
                   element={<MarketerInvoice />}
                 />
               </Route>
+
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
+
+              <Route
+                path="/human-resources/view-job/:jobId"
+                element={<SingleJob />}
+              ></Route>
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
             </Routes>
