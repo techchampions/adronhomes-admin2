@@ -87,6 +87,7 @@ export default function FinalSubmission() {
         <div className="flex items-center gap-2">
           <FaHome className="w-4 h-4 text-gray-600" />
           <span className="text-xs md:text-sm">{propertyData.squareMeters}</span>
+          <span className="text-xs md:text-sm">{propertyData.squareMeters}</span>
         </div>
 
         {isBulk && (

@@ -475,7 +475,7 @@ const handleRowClick = (propertyId: number) => {
                   ? "Active"
                   : "Available"}
               </span>
-              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0" onClick={() => handleRowClick(property.id)}>
+              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
                 {property.is_sold
                   ? "Sold"
                   : property.is_active
