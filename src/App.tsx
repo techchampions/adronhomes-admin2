@@ -53,11 +53,12 @@ import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 import UserPayments from "./pages/Transactions/Transactions";
 import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
 import ContractInvoice from "./pages/contract/customers_payment";
-import SingleJob from "./hr/singleCarrerPage";
-import PropertyDetailsPage from "./pages/Properties/PropertyDetailsPage";
 import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
 import FAQs from "./components/Settings/FAQs/FAQs";
 import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
+import SingleJob from "./hr/singleCarrerPage";
+import PropertyDetailsPage from "./pages/Properties/PropertyDetailsPage";
+
 // import GeneralEdeting from "./pages/Properties/GeneralEditing";
 
 const AuthGuard = () => {
@@ -250,6 +251,14 @@ const App = () => {
                 path="/human-resources/view-job/:jobId"
                 element={<SingleJob />}
               ></Route>
+
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
+
+              <Route
+                path="/human-resources/view-job/:jobId"
+                element={<SingleJob />}
+              ></Route>
+
               <Route path="/human-resources" element={<HRDashboard />}></Route>
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
