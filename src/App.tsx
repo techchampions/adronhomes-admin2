@@ -160,6 +160,10 @@ const App = () => {
                   element={<RequestsEnquiries />}
                 />
                 <Route
+                  path="/director/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
+                />
+                <Route
                   path="/requests-enquiries/:id"
                   element={<PropertyEnquiries />}
                 />

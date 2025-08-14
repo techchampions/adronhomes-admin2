@@ -17,6 +17,7 @@ export default function Requests_Enquiries() {
     isLoading: loadingDR,
     isError: errorDR,
   } = useGetDirectorDashboard();
+  const isDirectorRoute = location.pathname.startsWith("/director");
   const director_id = directorData?.director.id || undefined;
   const { data, isLoading, isError } = useGetPropertyRequest(page, director_id);
   const propertyData = data?.data.data || [];
@@ -40,7 +41,10 @@ export default function Requests_Enquiries() {
           ) : propertyData.length < 1 ? (
             <NotFound />
           ) : (
-            <PropertyTableComponent data={propertyData} />
+            <PropertyTableComponent
+              data={propertyData}
+              isDirector={isDirectorRoute}
+            />
           )}
         </ReusableTable>
         {/* Pagination */}
