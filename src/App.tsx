@@ -60,6 +60,9 @@ import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPag
 import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
 import PaymentBar from "./components/Payments/PaymentNavBar";
 import { useAxiosInterceptor } from "./components/Redux/middleware";
+import Error500 from "./components/Error500";
+import Error404 from "./components/Error404";
+
 
 const AuthGuard = () => {
   const token = Cookies.get('token');
@@ -255,6 +258,14 @@ const App = () => {
                 <Route
                   path="/payments/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
+                />
+                 <Route
+                  path="*"
+                  element={<Error404 />}
+                />
+                   <Route
+                  path="/error-500"
+                  element={<Error500 />}
                 />
               </Route>
             </Routes>
