@@ -121,7 +121,8 @@ export default function Contract() {
       <Header
         title="Contracts"
         subtitle="Manage the list of contracts for each property bought by user"
-        showSearchAndButton={false}
+        // showSearchAndButton={false}
+         buttonText="export"
      
       />
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
@@ -177,6 +178,7 @@ export default function Contract() {
       <NotFound />
     </div>
   ) : activeTab === "New" ? (
+    // 1
     <ContractsTableComponent
                   data={contractList || []}
                   pagination={contractPagination}

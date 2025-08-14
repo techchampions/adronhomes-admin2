@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import api from '../middleware';
 
 // Types
 export interface ErrorResponse {
@@ -45,7 +46,7 @@ export const deleteUser = createAsyncThunk<
     }
 
     try {
-      const response = await axios.delete<DeleteUserResponse>(
+      const response = await api.delete<DeleteUserResponse>(
         `https://adron.microf10.sg-host.com/api/admin/delete-user/${userId}`,
         {
           headers: {

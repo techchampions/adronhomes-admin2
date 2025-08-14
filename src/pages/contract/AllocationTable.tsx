@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
 import { User } from "../../components/Redux/Contract/contracts_thunk";
@@ -73,7 +73,7 @@ export default function AllocationTable({
   const { loading: updateContractLoading } = useSelector(
     (state: RootState) => state.contract
   );
-
+   const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [selectedContractForInput, setSelectedContractForInput] =
     useState<Contract | null>(null);
@@ -168,7 +168,15 @@ export default function AllocationTable({
                   </td>
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                          onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
+                    
                   >
                     <div className="truncate">
                       {contract.property?.name || "N/A"}
@@ -184,7 +192,14 @@ export default function AllocationTable({
 
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                          onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.user
@@ -202,7 +217,14 @@ export default function AllocationTable({
 
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                          onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {formatAsNaira(contract.total_amount)}
@@ -216,7 +238,14 @@ export default function AllocationTable({
 
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                          onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {formatAsNaira(contract.paid_amount)}
@@ -230,7 +259,14 @@ export default function AllocationTable({
 
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                          onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.marketer
@@ -249,11 +285,16 @@ export default function AllocationTable({
                   <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[200px] overflow-x-auto truncate relative group text-center">
                     <div className="flex items-center justify-center space-x-2">
                       <button
-                        onClick={() =>
-                          navigation(
-                            `/contracts/details/${contract.user_id}/${contract.id}`
+                        onClick={() => {
+                          const basePath = location.pathname.startsWith(
+                            "/payments/contracts"
                           )
-                        }
+                            ? "/payments/contracts/details"
+                            : "/contracts/details";
+                          navigation(
+                            `${basePath}/${contract.user_id}/${contract.id}`
+                          );
+                        }}
                         className="bg-[#272727] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
                         aria-label="View contract details"
                       >

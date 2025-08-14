@@ -23,6 +23,7 @@ export default function Customers() {
       <Header
         title="Customers"
         subtitle="Manage the list of registered customers"
+         buttonText="export"
       />
       <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen 
@@ -33,7 +34,7 @@ export default function Customers() {
           change="includes all customers on a property plan"
         />
         <MatrixCard
-          title="Total Active Plans"
+          title="Total Active Contracts"
           value={data?.active_plan || 0}
           change="Includes all active property plans"
         />

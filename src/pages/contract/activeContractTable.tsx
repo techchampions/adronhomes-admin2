@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination"; // Assuming this path is correct
 import { formatAsNaira } from "../../utils/formatcurrency"; // Assuming this path is correct
 import { singleContract } from "../../components/Redux/Contract/contracts_thunk";
@@ -69,7 +69,7 @@ export default function NewContractsTable({
   getStatusText,
 }: NewContractsTableProps) {
   const navigate = useNavigate();
-
+const location = useLocation();
   // Helper function to get status badge class (reused from your original code)
   const getStatusBadgeClass = (status: number) => {
     switch (status) {
@@ -83,6 +83,7 @@ export default function NewContractsTable({
         return "bg-gray-100 text-gray-800";
     }
   };
+  
 
   return (
     <div className="w-full overflow-x-auto">
@@ -156,7 +157,14 @@ export default function NewContractsTable({
                   {/* Property Name */}
                   <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group cursor-pointer"
-                    onClick={() => navigate(`/customers/${contract.user.id}`)}
+                     onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigate(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.property?.name || "N/A"}
@@ -173,7 +181,14 @@ export default function NewContractsTable({
                   {/* Customer Name */}
                   <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[120px] truncate relative group cursor-pointer"
-                    onClick={() => navigate(`/customers/${contract.user.id}`)}
+                     onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigate(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.user
@@ -192,7 +207,14 @@ export default function NewContractsTable({
                   {/* Total Amount */}
                   <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[120px] truncate relative group cursor-pointer"
-                    onClick={() => navigate(`/customers/${contract.user.id}`)}
+                     onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigate(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {formatAsNaira(contract.total_amount)}
@@ -207,7 +229,14 @@ export default function NewContractsTable({
                   {/* Amount Paid */}
                   {/* <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[120px] truncate relative group cursor-pointer"
-                    onClick={() => navigate(`/customers/${contract.user.id}`)}
+                     onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {formatAsNaira(contract.paid_amount)}
@@ -233,7 +262,14 @@ export default function NewContractsTable({
                   {/* Marketer */}
                   <td
                     className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group cursor-pointer"
-                    onClick={() => navigate(`/customers/${contract.user.id}`)}
+                     onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigate(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.marketer
@@ -252,11 +288,21 @@ export default function NewContractsTable({
                   {/* Action Button */}
                   <td className="py-4 pr-4 text-center">
                     <button
-                      onClick={() =>
-                        navigate(
-                          `/contracts/details/${contract.user_id}/${contract.id}`
-                        )
-                      }
+                      // onClick={() =>
+                      //   navigate(
+                      //     `/contracts/details/${contract.user_id}/${contract.id}`
+                      //   )
+                      // }
+                       onClick={() => {
+                          const basePath = location.pathname.startsWith(
+                            "/payments/contracts"
+                          )
+                            ? "/payments/contracts/details"
+                            : "/contracts/details";
+                          navigate(
+                            `${basePath}/${contract.user_id}/${contract.id}`
+                          );
+                        }}
                       className="bg-[#272727] cursor-pointer text-white px-4 py-2 rounded-full text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
                       aria-label="View contract details"
                     >

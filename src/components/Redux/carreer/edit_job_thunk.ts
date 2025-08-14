@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
 import { JobListing } from "./job_details_thunk"; 
+import api from "../middleware";
 
 // Define interfaces for the API response and request body
 export interface ErrorResponse {
@@ -46,7 +47,7 @@ export const editJob = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<EditJobResponse>( 
+      const response = await api.post<EditJobResponse>( 
         `${BASE_URL}/api/hr/jobs/edit/${id}`,
         credentials, 
         {

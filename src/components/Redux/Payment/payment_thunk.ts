@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { SinglePaymentListResponse } from "./fetchPaymentListById_slice";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -91,7 +92,7 @@ export const payments = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<PaymentsResponse>(
+      const response = await api.get<PaymentsResponse>(
         `${BASE_URL}/api/admin/payments`,
         {
           headers: {
@@ -163,7 +164,7 @@ export const fetchPaymentById = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<SinglePaymentResponse>(
+      const response = await api.get<SinglePaymentResponse>(
         `${BASE_URL}/api/admin/payment/${paymentId}`,
         {
           headers: {
@@ -259,7 +260,7 @@ export const fetchPaymentListById = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<SinglePaymentListResponse>(
+      const response = await api.get<SinglePaymentListResponse>(
         `${BASE_URL}/api/admin/payment-list/${paymentId}`,
         {
           headers: {
@@ -340,7 +341,7 @@ export const UpdatePaymentstatus = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<UpdatePaymentstatusResponse>(
+      const response = await api.post<UpdatePaymentstatusResponse>(
         `${BASE_URL}/api/admin/update-payment/${paymentId}`,
         credentials,
         {

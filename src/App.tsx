@@ -1,4 +1,11 @@
-import { Routes, Route, useLocation, Outlet, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+  Outlet,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Cookies from "js-cookie";
@@ -28,7 +35,6 @@ import Notifications from "./components/Notifications/Notifications";
 import Settings from "./components/Settings/Settings";
 import CustomerSinglePage from "./pages/Customers/CustomerSinglePage";
 import CustomersPayment from "./marketer/Payment/customers_payment";
-// import CustomersSinglePayment from "./pages/Customers/customers_singlepayment";
 import General from "./pages/Properties/General";
 import { getUser } from "./components/Redux/User/user_Thunk";
 import PaymentListComponent from "./pages/Customers/PaymentStatus";
@@ -55,29 +61,22 @@ import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walle
 import ContractInvoice from "./pages/contract/customers_payment";
 import SingleJob from "./hr/singleCarrerPage";
 import PropertyDetailsPage from "./pages/Properties/PropertyDetailsPage";
-// import GeneralEdeting from "./pages/Properties/GeneralEditing";
-
+import FAQs from "./components/Settings/FAQs/FAQs";
+import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
+import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
+import PaymentBar from "./components/Payments/PaymentNavBar";
+import { useAxiosInterceptor } from "./components/Redux/middleware";
+import Error500 from "./components/Error500";
+import Error404 from "./components/Error404";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
-
-  // const isAuthenticated = () => {
-  // if (!token) return false;
-
-  // try {
-  //   const payload = JSON.parse(atob(token.split(".")[1]));
-  //   return payload.exp * 1000 > Date.now();
-  // } catch (error) {
-  //   return false;
-  // }
-  // };
-
   if (!token) {
     return <Navigate to="/" replace />;
   }
-
   return <Outlet />;
 };
+
 interface AppLayoutProps {
   children: ReactNode;
 }
@@ -88,6 +87,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isMarketerRoute = location.pathname.startsWith("/marketer");
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
+  const isPayments = location.pathname.startsWith("/payments/");
 
   return (
     <div className="flex">
@@ -99,6 +99,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <SideBar />
           ) : isDirectorRoute ? (
             <DirectorSideBar />
+          ) : isPayments ? (
+            <PaymentBar />
           ) : (
             <AdminSidebar />
           )}
@@ -118,6 +120,10 @@ const App = () => {
     isInfrastructure,
     setIsCancelInfrastructure,
   } = useContext(PropertyContext)!;
+
+  // Initialize axios interceptor
+  useAxiosInterceptor();
+
   return (
     <Provider store={store}>
       <QueryProvider>
@@ -133,10 +139,13 @@ const App = () => {
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
                 <Route
-                  path="/payments/status/:paymentId"
+                  path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
-               <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+                <Route
+                  path="/properties/:id"
+                  element={<PropertyDetailsPage />}
+                />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
                 <Route path="/contracts" element={<Contract />} />
@@ -144,7 +153,6 @@ const App = () => {
                   path="/contracts/details/:user_id/:plan_id"
                   element={<ContractInvoice />}
                 />
-
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
@@ -172,25 +180,24 @@ const App = () => {
                   path="/settings/office-locations"
                   element={<OfficeLocations />}
                 />
-                {/* <Route
+                <Route
                   path="/settings/site-information"
                   element={<SiteInformationPage />}
-                /> */}
+                />
                 <Route
                   path="/settings/leadership"
                   element={<LeaderShipSettings />}
                 />
-                {/* <Route
+                <Route
                   path="/settings/testimonials"
                   element={<TestimonialsPage />}
-                /> */}
-                {/* <Route path="/settings/faqs" element={<FAQs />} /> */}
+                />
+                <Route path="/settings/faqs" element={<FAQs />} />
                 <Route
                   path="/settings/add-account"
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
-
                 <Route
                   path="/customers/transactions/:id"
                   element={<UserPayments />}
@@ -203,12 +210,7 @@ const App = () => {
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
                 />
-                {/* <Route
-                  path="/customers/singlepage/singlepayment"
-                  element={<CustomersSinglePayment />}
-                /> */}
                 <Route path="/properties/form" element={<General />} />
-                    {/* <Route path="/properties/form/:id" element={<GeneralEdeting/>} /> */}
                 <Route
                   path="/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
@@ -221,19 +223,55 @@ const App = () => {
                   path="/marketer-customer"
                   element={<MarketerCustomer />}
                 />
-
                 <Route path="/director" element={<DirectorsDashboard />} />
-                <Route path="marketer-settings" element={<SettingsPage />} />
+                <Route path="/marketer-settings" element={<SettingsPage />} />
                 <Route
                   path="/marketer-payment/:plan_id/:user_id"
                   element={<MarketerInvoice />}
                 />
-              </Route>   
-                            <Route   path="/human-resources/view-job/:jobId" element={<SingleJob />} ></Route>
-                 <Route   path="/human-resources"
-                  element={<HRDashboard />}
-              ></Route>
-                
+                {/* HR Routes */}
+                <Route
+                  path="/human-resources/view-job/:jobId"
+                  element={<SingleJob />}
+                />
+                <Route path="/human-resources" element={<HRDashboard />} />
+
+                {/* Payment Routes */}
+                <Route path="/payments/dashboard" element={<Dashboard />} />
+                <Route path="/payments/customers" element={<Customers />} />
+                <Route path="/payments/payments" element={<Payment />} />
+                <Route
+                  path="/payments/payments/status/:paymentId"
+                  element={<PaymentById />}
+                />
+                <Route path="/payments/contracts" element={<Contract />} />
+                <Route
+                  path="/payments/contracts/details/:user_id/:plan_id"
+                  element={<ContractInvoice />}
+                />
+                <Route
+                  path="/payments/customers/:id"
+                  element={<CustomerSinglePage />}
+                />
+                <Route
+                  path="/payments/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/payments/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
+                <Route
+                  path="/payments/customers/singlepage/payment"
+                  element={<CustomersPayment />}
+                />
+                <Route
+                  path="/payments/customers/payment/:user_id/:plan_id"
+                  element={<Customers_payment />}
+                />
+                <Route path="/error-500" element={<Error500 />} />
+                <Route path="*" element={<Error404 />} />
+              </Route>
             </Routes>
           </AppLayout>
           {isInfrastructure && (

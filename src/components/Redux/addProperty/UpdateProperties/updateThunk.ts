@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "../../store";
+import api from "../../middleware";
 
 
 interface PropertyDocument {
@@ -87,7 +88,7 @@ export const UpdateProperty = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<AddPropertySuccessResponse>(
+      const response = await api.post<AddPropertySuccessResponse>(
         `${BASE_URL}/api/admin/edit-property/${UpdateId}`,
         credentials,
         {

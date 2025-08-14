@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store"; 
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 export interface Property {
   id: number;
@@ -43,7 +44,7 @@ export const toggleFeatured = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<ToggleFeaturedResponse>(
+      const response = await api.get<ToggleFeaturedResponse>(
         `${BASE_URL}/api/admin/toggle-feature/${id}`,
         {
           headers: {

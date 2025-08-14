@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -41,7 +42,7 @@ export const directors = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<PersonnelsResponse>(
+      const response = await api.get<PersonnelsResponse>(
         `${BASE_URL}/api/admin/directors`,
         {
           headers: {

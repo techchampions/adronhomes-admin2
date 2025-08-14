@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import { BASE_URL } from './viewcontractFormDetails';
+import api from '../middleware';
 
 // Types
 export interface ErrorResponse {
@@ -51,7 +52,7 @@ export const downloadContract = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<ContractDownloadResponse>(
+      const response = await api.get<ContractDownloadResponse>(
         `${BASE_URL}/api/admin/download-contract-form/${contractId}`,
         {
           headers: {

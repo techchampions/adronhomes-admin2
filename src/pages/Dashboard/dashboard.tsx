@@ -12,7 +12,8 @@ import DashboardHeader from "../../general/DashboardHearder";
 import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
-import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesModal";
+import Header from "../../general/Header";
+import { useLocation } from "react-router-dom";
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -27,7 +28,7 @@ export default function Dashboard() {
     error: userError,
     user,
   } = useSelector((state: RootState) => state.user);
-
+const location = useLocation();
   const {
     loading: dashLoading,
     error: dashError,
@@ -38,15 +39,15 @@ export default function Dashboard() {
   const propstats = [
     {
       value: dashdata?.properties?.total || 0,
-      label: "Live Properties",
+      label: "Total Properties",
     },
     {
       value: dashdata?.properties?.sold || 0,
       label: "Sold",
     },
     {
-      value: dashdata?.plans?.active || 0,
-      label: "Active Plans",
+      value: dashdata?.properties?.publish || 0,
+      label: "Published Properties",
     },
   ];
 
@@ -56,12 +57,12 @@ export default function Dashboard() {
       label: "Registered Customers",
     },
     {
-      value: dashdata?.customers.active || 0,
-      label: "Active Customers",
+      value: dashdata?.contracts.completed || 0,
+      label: "Completed Contracts",
     },
     {
-      value: dashdata?.plans?.active || 0,
-      label: "Active Plans",
+      value: dashdata?.contracts.active || 0,
+      label: "Active Contracts",
     },
   ];
 
@@ -93,53 +94,79 @@ export default function Dashboard() {
       label: "Pending",
     },
   ];
-
-
+  const basePath = location.pathname.startsWith(
+                        "/payments/dashboard"
+                      )
+                      const basePath2 = location.pathname.startsWith(
+                        "/dashboard"
+                      )
   if (userError || dashError) {
-  return (
-    <div className="flex h-screen w-full justify-center items-center">
-      <div className="text-center">
-        <p className="font-normal text-[#767676]">No data found</p>
-        <NotFound />
+    return (
+      <div className="flex h-screen w-full justify-center items-center">
+        <div className="text-center">
+          <p className="font-normal text-[#767676]">No data found</p>
+          <NotFound />
+        </div>
       </div>
-    </div>
-  );
-}
-
+    );
+  }
 
   return (
     <div className="pb-[390px] overflow-x-hidden ">
-        {userLoading || dashLoading ? (
-   <div className="flex justify-center items-center h-screen">  <LoadingAnimations loading={userLoading || dashLoading} /></div>
-      ) :(
-      <><DashboardHeader
-            title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`} /><div className="space-y-[20px]">
-              <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-                <StatsCard stats={propstats} />
-                <StatsCard stats={Customerstats} tag="Customers" />
-              </div>
+      {userLoading || dashLoading ? (
+        <div className="flex justify-center items-center h-screen">
+          {" "}
+          <LoadingAnimations loading={userLoading || dashLoading} />
+        </div>
+      ) : (
+        <>
+       {  <>{basePath2&&<DashboardHeader
+              title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`} />}
+              {basePath &&<Header
+              showSearchAndButton={false}
+                title="Payment Admin"
+                subtitle="Manage the list of payments made by customers" />}</>}
+          <div className="space-y-[20px]">
+            <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+              <StatsCard stats={propstats} />
+              <StatsCard stats={Customerstats} tag="Customers" />
+            </div>
 
-              <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-                <StatsCard stats={Transactionstat} tag="Transactions" />
-                <StatsCard stats={PaymentsStat} tag="Payments" />
-              </div>
-              <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">
-                <RevenueCard
-                  value2={`${dashdata?.revenue.percentage}%`} />
-                <RevenueWhiteCard
-                  tag="Total Payments Made"
-                  amount={dashdata?.payments?.total_amount?.toLocaleString() || "0"}
-                  currency="₦"
-                  note="Includes all property plans" />
-                <RevenueWhiteCard
-                  tag="Pending Payments"
-                  amount={dashdata?.payments?.pending_amount?.toLocaleString() || "0"}
-                  currency="₦"
-                  note="from last 6 months" />
-              </div>
-            </div></>)}
+            <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+              <StatsCard stats={Transactionstat} tag="Transactions" />
+              <StatsCard stats={PaymentsStat} tag="Payments" />
+            </div>
+            <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">
+              <RevenueWhiteCard
+                tag="Monthly Payments "
+                amount={
+                  dashdata?.payments?.total_amount_this_month?.toLocaleString() ||
+                  "0"
+                }
+                currency="₦"
+                note="Includes all Payments for the Month"
+              />
+              <RevenueWhiteCard
+                tag="Total Payments Made"
+                amount={
+                  dashdata?.payments?.total_amount?.toLocaleString() || "0"
+                }
+                currency="₦"
+                note="Includes all property plans"
+              />
+              <RevenueWhiteCard
+                tag="Pending Payments"
+                amount={
+                  dashdata?.payments?.pending_amount?.toLocaleString() || "0"
+                }
+                currency="₦"
+                note="from last 6 months"
+              />
+            </div>
+          </div>
+        </>
+      )}
       <div className="lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px] lg:pl-[38px]"></div>
-
     </div>
   );
 }

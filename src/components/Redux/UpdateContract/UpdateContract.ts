@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store"; // Assuming your store is in ../store.ts
 import { toast } from "react-toastify"; // Assuming you are using react-toastify for notifications
+import api from "../middleware";
 
 // Define interfaces for the request and response
 export interface UpdateContractPayload {
@@ -91,7 +92,7 @@ export const updateContract = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<UpdateContractResponse>(
+      const response = await api.post<UpdateContractResponse>(
         `${BASE_URL}/api/admin/update-contract/${contractId}`,
         data, // Request body
         {

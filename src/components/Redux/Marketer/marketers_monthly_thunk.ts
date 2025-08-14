@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -44,7 +45,7 @@ export const fetchMonthlyStats = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<MonthlyStatsResponse>(
+      const response = await api.get<MonthlyStatsResponse>(
         `${BASE_URL}/api/marketers/monthly`,
         {
           headers: {

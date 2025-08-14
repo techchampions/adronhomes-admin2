@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 // Types
 export interface ContractDocument {
@@ -67,7 +68,7 @@ export const fetchContractDocuments = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<ContractDocumentsResponse>(
+      const response = await api.get<ContractDocumentsResponse>(
         `https://adron.microf10.sg-host.com/api/admin/contract-documents/${planId}`,
         {
           params: { page },

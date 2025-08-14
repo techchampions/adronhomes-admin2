@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import api from '../middleware';
 
 // Types
 export interface ErrorResponse {
@@ -65,7 +66,7 @@ export const sendMessage = createAsyncThunk<
     formData.append('message', message);
 
     try {
-      const response = await axios.post<MessageResponse>(
+      const response = await api.post<MessageResponse>(
         'https://adron.microf10.sg-host.com/api/admin/message-user',
         formData,
         {

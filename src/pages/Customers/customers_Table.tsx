@@ -9,9 +9,12 @@ import {
   selectCustomersPagination,
   setCustomersPage,
 } from "../../components/Redux/customers/customers_slice";
-import { customer, Marketer } from "../../components/Redux/customers/customers_thunk"; // Import Marketer interface
+import {
+  customer,
+  Marketer,
+} from "../../components/Redux/customers/customers_thunk"; // Import Marketer interface
 import { formatDate } from "../../utils/formatdate";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useLocation, useNavigate, useNavigation } from "react-router-dom";
 
 interface CustomersTable {
   id: any;
@@ -31,6 +34,7 @@ interface CustomersTableprop {
 export default function CustomersTableComponent({ data }: CustomersTableprop) {
   const dispatch = useDispatch<AppDispatch>();
   const pagination = useSelector(selectCustomersPagination);
+  const location = useLocation();
 
   const handlePageChange = async (page: number) => {
     await dispatch(setCustomersPage(page));
@@ -69,7 +73,14 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                 <tr
                   key={row.id}
                   className="cursor-pointer"
-                  onClick={() => navigate(`/customers/${row.id}`)}
+                  onClick={() => {
+                    const basePath = location.pathname.startsWith(
+                      "/payments/customers"
+                    )
+                      ? "/payments/customers"
+                      : "/customers";
+                    navigate(`${basePath}/${row.id}`);
+                  }}
                 >
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[72px] truncate whitespace-nowrap pr-4"

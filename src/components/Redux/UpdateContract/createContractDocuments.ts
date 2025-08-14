@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 export interface CreateContractDocumentPayload {
   documents: Array<{
@@ -58,7 +59,7 @@ export const createContractDocumentsThunk = createAsyncThunk<
         formData.append(`documents[${index}][document_file]`, doc.document_file);
       });
 
-      const response = await axios.post<CreateContractDocumentResponse>(
+      const response = await api.post<CreateContractDocumentResponse>(
         `${BASE_URL}/api/admin/add-contract-document`,
         formData,
         {

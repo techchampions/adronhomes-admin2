@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
+import api from "../middleware";
 
 
 export interface User {
@@ -60,7 +61,7 @@ export const getUser = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<UserResponse>(
+      const response = await api.get<UserResponse>(
         `${BASE_URL}/api/user-profile`,
         {
 

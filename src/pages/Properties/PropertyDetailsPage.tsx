@@ -10,6 +10,8 @@ import { publishDraft } from '../../components/Redux/Properties/publishPropertyt
 import { PropertyType } from '../../components/Redux/Properties/propertiesDetails/types';
 import NotFound from '../../components/NotFound';
 import LoadingAnimations from '../../components/LoadingAnimations';
+import { RootState } from '../../components/Redux/store';
+import { resetPropertyState } from '../../components/Redux/addProperty/UpdateProperties/update_slice';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,7 @@ const PropertyDetailsPage = () => {
   const dispatch = useAppDispatch();
   const { data, loading, error } = useAppSelector((state) => state.propertyDetails);
   const { loading: publishLoading } = useAppSelector((state) => state.publishDraft);
+    const { success: Updatesuccess } = useAppSelector((state:RootState) => state.updateproperty);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Property>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +89,11 @@ const PropertyDetailsPage = () => {
       reader.readAsDataURL(file);
     }
   };
-
+useEffect(()=>{
+if(Updatesuccess){
+dispatch(resetPropertyState())
+}
+},[dispatch,Updatesuccess])
   const handleGalleryImageChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

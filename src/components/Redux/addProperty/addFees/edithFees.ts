@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../../store";
+import api from "../../middleware";
 
 // Define the response and form data interfaces
 export interface EditPropertyDetailSuccessResponse {
@@ -59,7 +60,7 @@ export const edit_property_detail = createAsyncThunk<
     form.append("purpose", formData.purpose);
 
     try {
-      const response = await axios.post<EditPropertyDetailSuccessResponse>(
+      const response = await api.post<EditPropertyDetailSuccessResponse>(
         `${BASE_URL}/api/admin/edit-property-detail/${detailId}`,
         form,
         {

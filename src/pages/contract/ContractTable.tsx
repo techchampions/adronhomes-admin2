@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
-import { fetchContracts, singleContract, User } from "../../components/Redux/Contract/contracts_thunk";
+import {
+  fetchContracts,
+  singleContract,
+  User,
+} from "../../components/Redux/Contract/contracts_thunk";
 import ContractInputModal from "./ContractInputModal";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
-import { updateContract, UpdateContractPayload } from "../../components/Redux/UpdateContract/UpdateContract";
-
+import {
+  updateContract,
+  UpdateContractPayload,
+} from "../../components/Redux/UpdateContract/UpdateContract";
 
 export interface Contract {
   id: number;
@@ -54,13 +60,12 @@ interface ContractsTableProps {
     perPage: number;
     totalItems: number;
     totalPages: number;
-
   };
   onPageChange: (page: number) => void;
   getStatusText: (status: number) => string;
-  page: any,
-  statuss: any,
-  contract: any
+  page: any;
+  statuss: any;
+  contract: any;
 }
 
 export default function ContractsTableComponent({
@@ -70,17 +75,22 @@ export default function ContractsTableComponent({
   getStatusText,
   page,
   statuss,
-  contract
-
+  contract,
 }: ContractsTableProps) {
   const navigation = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading: updateContractLoading } = useSelector((state: RootState) => state.contract);
-
+  const { loading: updateContractLoading } = useSelector(
+    (state: RootState) => state.contract
+  );
+  const location = useLocation();
   const [showModal, setShowModal] = useState(false);
-  const [selectedContractForInput, setSelectedContractForInput] = useState<Contract | null>(null);
+  const [selectedContractForInput, setSelectedContractForInput] =
+    useState<Contract | null>(null);
 
-  const handleSubmit = async (values: { customerCode: any; contractId: any }) => {
+  const handleSubmit = async (values: {
+    customerCode: any;
+    contractId: any;
+  }) => {
     console.log("Submitted values from modal:", values);
 
     if (selectedContractForInput) {
@@ -92,12 +102,16 @@ export default function ContractsTableComponent({
       };
 
       try {
-        await dispatch(updateContract({ contractId: contractIdToUpdate, data: updateData })).unwrap();
-        await dispatch(fetchContracts({
-          page: page,
-          contract: contract,
-          status: statuss,
-        }));
+        await dispatch(
+          updateContract({ contractId: contractIdToUpdate, data: updateData })
+        ).unwrap();
+        await dispatch(
+          fetchContracts({
+            page: page,
+            contract: contract,
+            status: statuss,
+          })
+        );
       } catch (error) {
         console.error("Failed to update contract:", error);
       }
@@ -164,11 +178,20 @@ export default function ContractsTableComponent({
                   className="cursor-pointer hover:bg-gray-50"
                 >
                   <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[50px] truncate pr-4">
-                    {(pagination.currentPage - 1) * pagination.perPage + index + 1}
+                    {(pagination.currentPage - 1) * pagination.perPage +
+                      index +
+                      1}
                   </td>
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                    onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.property?.name || "N/A"}
@@ -182,10 +205,7 @@ export default function ContractsTableComponent({
                     )}
                   </td>
 
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
-                  >
+                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group">
                     <div className="truncate">
                       {contract.user
                         ? `${contract.user.first_name} ${contract.user.last_name}`
@@ -200,10 +220,7 @@ export default function ContractsTableComponent({
                     )}
                   </td>
 
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
-                  >
+                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group">
                     <div className="truncate">
                       {formatAsNaira(contract.total_amount)}
                     </div>
@@ -214,10 +231,7 @@ export default function ContractsTableComponent({
                     </div>
                   </td>
 
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
-                  >
+                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group">
                     <div className="truncate">
                       {formatAsNaira(contract.paid_amount)}
                     </div>
@@ -228,10 +242,7 @@ export default function ContractsTableComponent({
                     </div>
                   </td>
 
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
-                  >
+                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group">
                     <div className="truncate">
                       {contract.marketer
                         ? `${contract.marketer.first_name} ${contract.marketer.last_name}`
@@ -249,11 +260,21 @@ export default function ContractsTableComponent({
                   <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[200px] overflow-x-auto truncate relative group text-center">
                     <div className="flex items-center justify-center space-x-2">
                       <button
-                        onClick={() =>
-                          navigation(
-                            `/contracts/details/${contract.user_id}/${contract.id}`
+                        // onClick={() =>
+                        //   navigation(
+                        //     `/contracts/details/${contract.user_id}/${contract.id}`
+                        //   )
+                        // }
+                        onClick={() => {
+                          const basePath = location.pathname.startsWith(
+                            "/payments/contracts"
                           )
-                        }
+                            ? "/payments/contracts/details"
+                            : "/contracts/details";
+                          navigation(
+                            `${basePath}/${contract.user_id}/${contract.id}`
+                          );
+                        }}
                         className="bg-[#272727] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
                         aria-label="View contract details"
                       >
@@ -265,7 +286,11 @@ export default function ContractsTableComponent({
                         aria-label="Input code for contract"
                         disabled={updateContractLoading}
                       >
-                        {updateContractLoading && selectedContractForInput?.contract_id === contract.contract_id ? "Processing..." : "Input Code"}
+                        {updateContractLoading &&
+                        selectedContractForInput?.contract_id ===
+                          contract.contract_id
+                          ? "Processing..."
+                          : "Input Code"}
                       </button>
                     </div>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
@@ -283,11 +308,13 @@ export default function ContractsTableComponent({
         onPageChange={onPageChange}
         className="mt-8 mb-4"
       />
-      {showModal && selectedContractForInput && ( 
+      {showModal && selectedContractForInput && (
         <ContractInputModal
           onClose={() => setShowModal(false)}
           onSubmit={handleSubmit}
-          uniqueCustomerId={selectedContractForInput.user.unique_customer_id || ""}
+          uniqueCustomerId={
+            selectedContractForInput.user.unique_customer_id || ""
+          }
         />
       )}
     </>

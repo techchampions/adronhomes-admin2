@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
+import api from "../middleware";
 
 
 
@@ -101,7 +102,7 @@ export const publishDraft = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<PublishDraftSuccessResponse>(
+      const response = await api.get<PublishDraftSuccessResponse>(
         `${BASE_URL}/api/admin/publish-draft/${propertyId}`,
         {
           headers: {
