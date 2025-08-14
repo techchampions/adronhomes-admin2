@@ -59,6 +59,9 @@ import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 import UserPayments from "./pages/Transactions/Transactions";
 import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
 import ContractInvoice from "./pages/contract/customers_payment";
+import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
+import FAQs from "./components/Settings/FAQs/FAQs";
+import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
 import SingleJob from "./hr/singleCarrerPage";
 import PropertyDetailsPage from "./pages/Properties/PropertyDetailsPage";
 import FAQs from "./components/Settings/FAQs/FAQs";
@@ -198,6 +201,15 @@ const App = () => {
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
+                <Route
+                  path="/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
+
                 <Route
                   path="/customers/transactions/:id"
                   element={<UserPayments />}

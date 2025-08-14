@@ -3,6 +3,7 @@ import Header from "../../../general/Header";
 import SocialLinks from "./SocialLinks";
 import ContactInfo from "./ContactInfo";
 import TermsAndConditions from "./TermsAndCondition";
+import EstateLocation from "./EstateLocation";
 
 const SiteInformationPage = () => {
   return (
@@ -34,7 +35,8 @@ const SiteInformationPage = () => {
     /> */}
       <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <SocialLinks />
-        <ContactInfo />
+        <EstateLocation />
+        {/* <ContactInfo /> */}
         <TermsAndConditions />
       </div>
     </div>
