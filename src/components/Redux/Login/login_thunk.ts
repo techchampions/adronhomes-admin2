@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
+import api from "../middleware";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -36,7 +37,7 @@ export const loginUser = createAsyncThunk<
   "auth/login",
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post<LoginSuccessResponse>(
+      const response = await api.post<LoginSuccessResponse>(
         `${BASE_URL}/api/login`,
         credentials,
         {

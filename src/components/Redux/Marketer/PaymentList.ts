@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { RootState } from '../store'; 
+import api from '../middleware';
 
 
 
@@ -109,7 +110,7 @@ export const fetchPropertyPlanPayments = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<PropertyPlanPaymentsResponse>(
+      const response = await api.get<PropertyPlanPaymentsResponse>(
         `${BASE_URL}/api/plan-payment-list/${planId}`,
         {
           headers: {

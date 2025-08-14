@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import api from '../middleware';
 
 // Types
 export interface ErrorResponse {
@@ -302,7 +303,7 @@ export const fetchUserPropertyPlan = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<UserPropertyPlanResponse>(
+      const response = await api.get<UserPropertyPlanResponse>(
         `https://adron.microf10.sg-host.com/api/user-property-plan/${planId}/${userId}`,
         {
           headers: {

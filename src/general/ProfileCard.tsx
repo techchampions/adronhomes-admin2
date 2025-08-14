@@ -172,9 +172,9 @@ export default function ProfileCard({
                 <span className="md:text-base text-sm  font-[350] text-dark truncate">
                   {paymentInfo.amount}
                 </span>
-                <span className="md:text-base text-sm  font-[350] text-dark truncate">
+                {/* <span className="md:text-base text-sm  font-[350] text-dark truncate">
                   {paymentInfo.date}
-                </span>
+                </span> */}
               </div>
             </div>
             <div className="grid grid-cols-2  max-w-full mb-4">
@@ -192,12 +192,12 @@ export default function ProfileCard({
               >
                 {buttonTexts.sendMessage}
               </button>
-              <button
+              {/* <button
                 className="bg-white text-[#D70E0E] font-bold text-sm rounded-[30px] py-[14px] px-[44px] border border-[#D70E0E]"
                 onClick={() => setIsOpendelete(true)}
               >
                 {buttonTexts.removeClient}
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

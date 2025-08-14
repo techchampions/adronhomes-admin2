@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -218,7 +219,7 @@ export const fetchContracts = createAsyncThunk<
         params.contract = contract;
       }
 
-      const response = await axios.get<ContractsResponse>(
+      const response = await api.get<ContractsResponse>(
         `${BASE_URL}/api/admin/contracts`,
         {
           headers: {

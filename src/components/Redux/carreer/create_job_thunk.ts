@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { RootState } from "../store"; // Assuming your store is at ../store
 import { toast } from "react-toastify";
 import { JobListing } from "./job_details_thunk"; // Re-using JobListing interface
+import api from "../middleware";
 
 // Define interfaces for the API response and request body
 export interface ErrorResponse {
@@ -60,7 +61,7 @@ export const createJob = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<CreateJobResponse>(
+      const response = await api.post<CreateJobResponse>(
         `${BASE_URL}/api/hr/jobs/create`, // API endpoint for creating jobs
         credentials, // FormData body
         {

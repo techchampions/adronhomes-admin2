@@ -4,6 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -100,7 +101,7 @@ export const customer = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<CustomersResponse>(
+      const response = await api.get<CustomersResponse>(
         `${BASE_URL}/api/admin/customers`,
         {
           headers: {

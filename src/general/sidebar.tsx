@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
+// import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
 import { logout, resetLogoutSuccess } from '../components/Redux/Login/login_slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../components/Redux/store';
+import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from './icon';
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/dashboard" },

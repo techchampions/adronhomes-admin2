@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -85,7 +86,7 @@ export const fetchTransactions = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<TransactionsResponse>(
+      const response = await api.get<TransactionsResponse>(
         `${BASE_URL}/api/admin/transactions`,
         {
           headers: {

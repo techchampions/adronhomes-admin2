@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "../../store";
+import api from "../../middleware";
 
 
 
@@ -40,7 +41,7 @@ export const DeleteProperty = createAsyncThunk<
     }
 
     try {
-      const response = await axios.delete<deleteResponse>(
+      const response = await api.delete<deleteResponse>(
         `${BASE_URL}/api/admin/delete-property/${propertyId}`,
         {
           headers: {

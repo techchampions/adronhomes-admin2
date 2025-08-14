@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -150,7 +151,7 @@ export const fetchProperties = createAsyncThunk<
   }
 
   try {
-    const response = await axios.get<PropertiesResponse>(
+    const response = await api.get<PropertiesResponse>(
       `${BASE_URL}/api/admin/properties`,
       {
         headers: {

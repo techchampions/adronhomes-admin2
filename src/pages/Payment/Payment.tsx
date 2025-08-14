@@ -69,6 +69,7 @@ export default function Payment() {
       <Header
         title="Payments"
         subtitle="Manage the list of payments made by customers"
+        buttonText="export"
       />
       <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] items-center lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
@@ -81,7 +82,7 @@ export default function Payment() {
         />
         <MatrixCard
           currency={true}
-          title="Total Pending Payments"
+          title="Total Pending Contracts"
           value={
             data?.amount_pending
               ? `${data.amount_pending.toLocaleString()}`
@@ -90,7 +91,7 @@ export default function Payment() {
           change="Includes all customers on a property plan"
         />
         <MatrixCard
-          title="Total Active Properties"
+          title="Total Active Contracts"
           value={data?.total ? data.total.toString() : "0"}
           change="Includes all active property plans"
         />

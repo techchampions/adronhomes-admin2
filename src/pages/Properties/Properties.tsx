@@ -19,7 +19,6 @@ export default function Properties() {
   );
 
   useEffect(() => {
-    // We only need to fetch the data once since the API returns all three lists.
     dispatch(fetchProperties());
   }, [dispatch]);
 
@@ -32,7 +31,6 @@ export default function Properties() {
       case 'Drafted':
         return drafted.data;
       default:
-        // Fallback or a combination for a potential 'All' tab
         return [...published.data, ...sold.data, ...drafted.data];
     }
   };

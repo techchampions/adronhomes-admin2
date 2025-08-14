@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
 import { User } from "../../components/Redux/Contract/contracts_thunk";
@@ -61,7 +61,7 @@ export default function ContractsTableComponenTwo({
 }: ContractsTableProps) {
   const navigation = useNavigate();
 
- 
+    const location = useLocation();
   const getStatusBadgeClass = (status: number) => {
     switch (status) {
       case 1: // Active
@@ -114,7 +114,14 @@ export default function ContractsTableComponenTwo({
           
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                   onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.property?.name || "N/A"}
@@ -131,7 +138,14 @@ export default function ContractsTableComponenTwo({
                   {/* Customer Name */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                   onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.user
@@ -150,7 +164,14 @@ export default function ContractsTableComponenTwo({
                   {/* Amount (Total Amount) */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                   onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {formatAsNaira(contract.total_amount)}
@@ -165,7 +186,14 @@ export default function ContractsTableComponenTwo({
                   {/* Amount Paid */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                   onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {formatAsNaira(contract.paid_amount)}
@@ -180,7 +208,14 @@ export default function ContractsTableComponenTwo({
                   {/* Marketer */}
                   <td
                     className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                    onClick={() => navigation(`/customers/${contract.user.id}`)}
+                   onClick={() => {
+                      const basePath = location.pathname.startsWith(
+                        "/payments/contracts"
+                      )
+                        ? "/payments/customers"
+                        : "/customers";
+                      navigation(`${basePath}/${contract.user.id}`);
+                    }}
                   >
                     <div className="truncate">
                       {contract.marketer

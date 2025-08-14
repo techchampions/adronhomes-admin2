@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import api from '../middleware';
 
 // Types
 interface ErrorResponse {
@@ -48,7 +49,7 @@ export const deleteContractDocument = createAsyncThunk<
     }
 
     try {
-      const response = await axios.delete<DeleteContractDocumentResponse>(
+      const response = await api.delete<DeleteContractDocumentResponse>(
         `https://adron.microf10.sg-host.com/api/admin/delete-contract-document/${documentId}`,
         {
           headers: {

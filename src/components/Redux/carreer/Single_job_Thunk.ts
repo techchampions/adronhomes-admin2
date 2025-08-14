@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
 import { BASE_URL } from "../UpdateContract/viewcontractFormDetails";
+import api from "../middleware";
 
 // Define interfaces for the API response
 export interface ErrorResponse {
@@ -90,7 +91,7 @@ export const fetchJobDetails = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<JobDetailsResponse>(
+      const response = await api.get<JobDetailsResponse>(
         `${BASE_URL}/api/hr/career/${jobId}`,
         {
           headers: {

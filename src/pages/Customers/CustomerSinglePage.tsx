@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import ProfileCard from "../../general/ProfileCard";
@@ -44,6 +44,7 @@ export default function CustomerSinglePage() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+    const location = useLocation();
 
   const { data, loading, error } = useSelector(
     (state: RootState) => state.customerById
@@ -323,7 +324,14 @@ export default function CustomerSinglePage() {
         <div className=" w-full relative ">
           <button
             className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1  px-2 rounded-full   border "
-            onClick={() => navigate(`/customers/transactions/${id}`)}
+            // onClick={() => navigate(`/customers/transactions/${id}`)}
+            onClick={() => {
+  const basePath = location.pathname.startsWith("/payments/customers")
+    ? "/payments/customers/transactions"
+    : "/customers/transactions";
+  navigate(`${basePath}/${id}`);
+}}
+
           >
             view Transactions
           </button>
@@ -337,7 +345,13 @@ export default function CustomerSinglePage() {
           <div className=" w-full relative ">
           <button
             className="absolute z-50 right-5 top-5 text-xs font-semibold text-[#57713A]  py-1  px-2 rounded-full   border "
-            onClick={() => navigate(`/customers/wallet-transactions/${id}`)}
+            // onClick={() => navigate(`/customers/wallet-transactions/${id}`)}
+                       onClick={() => {
+  const basePath = location.pathname.startsWith("/payments/customers")
+    ? "/payments/customers/wallet-transactions"
+    : "/customers/wallet-transactions";
+  navigate(`${basePath}/${id}`);
+}}
           >
             view Wallet Trnx
           </button>

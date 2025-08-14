@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
+import api from "../middleware";
 
 interface PropertyDocument {
   name: string;
@@ -92,7 +93,7 @@ export const createProperty = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<AddPropertySuccessResponse>(
+      const response = await api.post<AddPropertySuccessResponse>(
         `${BASE_URL}api/admin/create-property`,
         credentials,
         {
