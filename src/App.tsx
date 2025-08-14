@@ -1,15 +1,9 @@
-import {
-  Routes,
-  Route,
-  useLocation,
-  Outlet,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { Routes, Route, useLocation, Outlet, Navigate, useNavigate } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Cookies from "js-cookie";
 import { ReactNode, useContext, useEffect } from "react";
+
 
 // Context
 import { PropertyContext, PropertyProvider } from "./MyContext/MyContext";
@@ -59,9 +53,6 @@ import PropertyEnquiries from "./pages/Requests_Enquiries/PropertyEnquiries";
 import UserPayments from "./pages/Transactions/Transactions";
 import WalletTransactionsPage from "./pages/Transactions/walletTransaction/walletPage";
 import ContractInvoice from "./pages/contract/customers_payment";
-import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
-import FAQs from "./components/Settings/FAQs/FAQs";
-import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPage";
 import SingleJob from "./hr/singleCarrerPage";
 import PropertyDetailsPage from "./pages/Properties/PropertyDetailsPage";
 import FAQs from "./components/Settings/FAQs/FAQs";
@@ -72,8 +63,9 @@ import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 
+
 const AuthGuard = () => {
-  const token = Cookies.get("token");
+  const token = Cookies.get('token');
   if (!token) {
     return <Navigate to="/" replace />;
   }
@@ -90,7 +82,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isMarketerRoute = location.pathname.startsWith("/marketer");
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
-  const isPayments = location.pathname.startsWith("/payments/");
+  const isPayments = location.pathname.startsWith('/payments/');
 
   return (
     <div className="flex">
@@ -123,7 +115,7 @@ const App = () => {
     isInfrastructure,
     setIsCancelInfrastructure,
   } = useContext(PropertyContext)!;
-
+  
   // Initialize axios interceptor
   useAxiosInterceptor();
 
@@ -145,10 +137,7 @@ const App = () => {
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
-                <Route
-                  path="/properties/:id"
-                  element={<PropertyDetailsPage />}
-                />
+                <Route path="/properties/:id" element={<PropertyDetailsPage />} />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
                 <Route path="/contracts" element={<Contract />} />
@@ -209,16 +198,8 @@ const App = () => {
                   path="/customers/wallet-transactions/:id"
                   element={<WalletTransactionsPage />}
                 />
-
                 <Route
-                  path="/customers/transactions/:id"
-                  element={<UserPayments />}
-                />
-                <Route
-                  path="/customers/wallet-transactions/:id"
-                  element={<WalletTransactionsPage />}
-                />
-                <Route
+         
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
                 />
@@ -247,7 +228,7 @@ const App = () => {
                   element={<SingleJob />}
                 />
                 <Route path="/human-resources" element={<HRDashboard />} />
-
+                
                 {/* Payment Routes */}
                 <Route path="/payments/dashboard" element={<Dashboard />} />
                 <Route path="/payments/customers" element={<Customers />} />
@@ -261,10 +242,7 @@ const App = () => {
                   path="/payments/contracts/details/:user_id/:plan_id"
                   element={<ContractInvoice />}
                 />
-                <Route
-                  path="/payments/customers/:id"
-                  element={<CustomerSinglePage />}
-                />
+                <Route path="/payments/customers/:id" element={<CustomerSinglePage />} />
                 <Route
                   path="/payments/customers/transactions/:id"
                   element={<UserPayments />}
@@ -281,8 +259,14 @@ const App = () => {
                   path="/payments/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
                 />
-                <Route path="/error-500" element={<Error500 />} />
-                <Route path="*" element={<Error404 />} />
+                 <Route
+                  path="*"
+                  element={<Error404 />}
+                />
+                   <Route
+                  path="/error-500"
+                  element={<Error500 />}
+                />
               </Route>
             </Routes>
           </AppLayout>
