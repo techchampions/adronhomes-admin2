@@ -6,6 +6,7 @@ import {
   getCustomersAndProperties,
   getDirectorDashboardData,
   getEnquiryByID,
+  getEstateLocation,
   getFAQs,
   getHeadersData,
   getLeadersData,
@@ -36,6 +37,7 @@ import { GetUserResponse } from "../../pages/Properties/types/UserProfileTypes";
 import { ApiResponse } from "../../pages/Properties/types/TestimonialTypes";
 import { SettingsResponse } from "../../pages/Properties/types/SocialsTypes";
 import { FAQResponse } from "../../pages/Properties/types/FAQsTypes";
+import { PropertyLocationsResponse } from "../../pages/Properties/types/EstateLocationTypes";
 
 // Query hook for properties and filtering
 export const useGetSlidersByType = (type: string) => {
@@ -155,5 +157,11 @@ export const useGetFAQs = () => {
   return useQuery<FAQResponse>({
     queryKey: ["FAQs"],
     queryFn: getFAQs,
+  });
+};
+export const useGetEstateLocations = () => {
+  return useQuery<PropertyLocationsResponse>({
+    queryKey: ["estate-locations"],
+    queryFn: getEstateLocation,
   });
 };
