@@ -42,7 +42,7 @@ const EstateLocation = () => {
         item={editItem}
       />
       <div className="flex flex-col gap-2 max-h-[400px] pb-6 overflow-scroll scrollbar-hide">
-        <h4 className="mb-4">Edit Estates Here</h4>
+        <h4 className="mb-4">Edit Estates Locations Here</h4>
         <ul className="space-y-2">
           {estateData.map((item, index) => (
             <li

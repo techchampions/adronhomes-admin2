@@ -152,6 +152,10 @@ const App = () => {
                 />
 
                 <Route
+                  path="/director/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
+                <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
                 />

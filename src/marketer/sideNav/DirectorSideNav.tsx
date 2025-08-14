@@ -16,7 +16,11 @@ import { logout } from "../../components/Redux/Login/login_slice";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/director" },
-  // { label: "Notifications", icon: Icon8, path: "/notifications" },
+  {
+    label: "Requests & Enquiries",
+    icon: Icon7,
+    path: "/director/Requests-Enquiries",
+  },
   // { label: "Settings", icon: Icon9, path: "/settings" },
 ];
 

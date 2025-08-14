@@ -319,10 +319,21 @@ export const getDirectorDashboardData =
 
 //Get All Property Requests
 export const getPropertyRequest = async (
-  page: number
+  page: number,
+  director_id?: number
 ): Promise<PropertiesRequestResponse> => {
-  const response = await adminApi.get(`/properties-requests?page=${page}`);
+  const params = new URLSearchParams();
+  if (director_id) params.append("director_id", director_id.toString());
+  if (page) {
+    params.append("page", page.toString());
+  }
+  const response = await adminApi.get(`/properties-requests`, {
+    params: params,
+  });
   return response.data;
+  // const endpoint = director_id?`properties-requests?page=${page}`
+  // const response = await adminApi.get(`/properties-requests?page=${page}`);
+  // return response.data;
 };
 //Get Requests for Property by ID
 export const getPropertyRequestByID = async (
