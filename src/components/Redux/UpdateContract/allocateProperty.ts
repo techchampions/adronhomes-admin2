@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "../store";
+import api from "../middleware";
 
 export interface PlanData {
   id: number;
@@ -89,7 +90,7 @@ export const allocateProperty = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<AllocatePropertySuccessResponse>(
+      const response = await api.post<AllocatePropertySuccessResponse>(
         `${BASE_URL}/api/admin/allocate-property`,
         body,
         {

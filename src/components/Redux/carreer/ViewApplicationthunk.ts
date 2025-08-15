@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { BASE_URL } from "../UpdateContract/viewcontractFormDetails";
+import api from "../middleware";
 
 export interface Career {
   id: number;
@@ -46,7 +47,7 @@ export const fetchCareerById = createAsyncThunk<
   }
 
   try {
-    const response = await axios.get<CareerResponse>(
+    const response = await api.get<CareerResponse>(
       `${BASE_URL}/api/hr/career-view/${id}`,
       {
         headers: {

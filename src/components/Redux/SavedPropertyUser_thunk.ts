@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "./store";
+import api from "./middleware";
 
 
 export interface ErrorResponse {
@@ -92,7 +93,7 @@ export const fetchSavedPropertyUsers = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<SavedPropertyUserResponse>(
+      const response = await api.get<SavedPropertyUserResponse>(
         `${BASE_URL}/api/admin/property-saved-user/${propertyId}`,
         {
            headers: {

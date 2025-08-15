@@ -7,7 +7,7 @@ import {
   selectPaymentsPagination,
   setCurrentPage,
 } from "../../components/Redux/Payment/payment_slice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function PaymentTableComponent({ data }: { data: any }) {
   const Navigate = useNavigate();
@@ -17,12 +17,15 @@ export default function PaymentTableComponent({ data }: { data: any }) {
     await dispatch(payments());
   };
   const pagination = useSelector(selectPaymentsPagination);
+  const location = useLocation();
 
   return (
     <>
       <div className="w-full overflow-x-auto">
         <div className="min-w-[800px] md:min-w-0">
-          <table className="w-full table-auto"> {/* Added table-auto */}
+          <table className="w-full table-auto">
+            {" "}
+            {/* Added table-auto */}
             <thead>
               <tr className="text-left">
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
@@ -49,16 +52,23 @@ export default function PaymentTableComponent({ data }: { data: any }) {
               {data.map((payment: any) => (
                 <tr
                   key={payment.id.replace(/^#/, "") + payment.status}
-                  onClick={() =>
-                    Navigate(`/payments/status/${payment.id.replace(/^#/, "")}`)
-                  }
+                  onClick={() => {
+                    const basePath = location.pathname.startsWith(
+                      "/payments/payments"
+                    )
+                      ? "/payments/payments/status"
+                      : "/payment/status";
+                    Navigate(`${basePath}/${payment.id.replace(/^#/, "")}`);
+                  }}
                   className="cursor-pointer"
                 >
                   <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     <div className="truncate">{payment.id}</div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm max-w-[220px]">
-                    <div className="truncate  ">{payment.description || "N/A"} </div>
+                    <div className="truncate  ">
+                      {payment.description || "N/A"}{" "}
+                    </div>
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm max-w-[100px]">
                     <div className="truncate">{payment.customerName}</div>
@@ -76,7 +86,9 @@ export default function PaymentTableComponent({ data }: { data: any }) {
                           : "text-[#FF9131]"
                       }`}
                     >
-                      {payment.status === "Rejected" ? "Disapproved" : payment.status}
+                      {payment.status === "Rejected"
+                        ? "Disapproved"
+                        : payment.status}
                     </div>
                   </td>
                   <td className="py-4 pr-6 font-[325px] text-text-dark text-sm">

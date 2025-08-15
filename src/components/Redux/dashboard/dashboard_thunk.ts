@@ -1,6 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
+import api from "../middleware";
+
 
 // Define the response data structure based on your example
 export interface DashboardData {
@@ -8,7 +10,7 @@ export interface DashboardData {
   properties: {
     total: number;
     sold: number;
-    active: number;
+    publish: number;
   };
   transactions: {
     total_orders: number;
@@ -22,7 +24,16 @@ export interface DashboardData {
     total_amount: number;
     approved_amount: number;
     pending_amount: number;
+    total_amount_this_month:number
   };
+
+  contracts: {
+            total: number,
+          active: number,
+            completed: number,
+            allocated: number
+        }
+
   customers: {
     total: number;
     active: number;
@@ -36,6 +47,7 @@ export interface DashboardData {
   };
 }
 
+
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
@@ -44,8 +56,8 @@ export interface ErrorResponse {
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getDashboardData = createAsyncThunk<
-  DashboardData, // Return type
-  void, // Argument type (none in this case)
+  DashboardData, 
+  void,
   { rejectValue: ErrorResponse }
 >(
   "dashboard/getData",
@@ -59,7 +71,7 @@ export const getDashboardData = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<DashboardData>(
+      const response = await api.get<DashboardData>(
         `${BASE_URL}/api/admin/dashboard`,
         {
           headers: {

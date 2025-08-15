@@ -1,40 +1,44 @@
-import { Form, Formik } from "formik";
-import { FormField, PasswordFormField } from "./logininput";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useContext } from "react";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { IoCheckmarkCircle } from "react-icons/io5";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useDispatch, useSelector } from "react-redux";
+import { IoCheckmarkCircle } from "react-icons/io5";
 import { loginUser } from "../Redux/Login/login_thunk";
 import { AppDispatch, RootState } from "../Redux/store";
-import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { clearError, resetSuccess } from "../Redux/Login/login_slice";
 import { getUser } from "../Redux/User/user_Thunk";
 import ForgotPasswordModal from "../input/fogotPassword/ForgotPassword";
 import { PropertyContext } from "../../MyContext/MyContext";
 import { resetOtpPasswordState } from "../Redux/resetPassword/resetPassword_slice";
 import { resetOtpState } from "../Redux/resetPassword/sendOtp_slice";
+import { FormField, PasswordFormField } from "./logininput";
+
+// Role-to-route mapping
+const roleRoutes: Record<number, string> = {
+  1: "/dashboard",
+  2: "/marketer",
+  3: "/director",
+  4: "/payments/dashboard",
+  5: "/human-resources",
+};
 
 export default function Login() {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, token, success, message, error } = useSelector(
     (state: RootState) => state.auth
   );
-
-  const {
-    loading: userLoading,
-    success: userSuccess,
-    error: userError,
-    user,
-  } = useSelector((state: RootState) => state.user);
+  const { loading: userLoading, success: userSuccess, error: userError, user } =
+    useSelector((state: RootState) => state.user);
   const { forgotPassword, setForgotPassword } = useContext(PropertyContext)!;
+  const navigate = useNavigate();
 
   const initialValues = {
     email: "",
     password: "",
   };
-  const navigate = useNavigate();
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -51,51 +55,46 @@ export default function Login() {
     } catch (err) {}
   };
 
+  // Handle toast notifications
   useEffect(() => {
     if (error) {
       toast.error(error);
       dispatch(clearError());
     }
-
     if (success) {
       toast.success(message || "Login successful!");
       dispatch(getUser());
       dispatch(resetSuccess());
     }
-  }, [error, success, message]);
+  }, [error, success, message, dispatch]);
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (token) {
+      dispatch(getUser());
+    }
+  }, [token, dispatch]);
+
+  // Handle redirection based on user role or error
   useEffect(() => {
     if (userError) {
       navigate("/");
+      return;
     }
 
-    if (userSuccess) {
-      if (user?.role === 1) {
-        navigate("/dashboard");
-      }
-      if (user?.role === 2) {
-        navigate("/marketer");
-      }
-         if (user?.role === 3) {
-        navigate("/director");
-      }
-         if (user?.role === 5) {
-        navigate("/human-resources");
-      }
+    if (userSuccess && user?.role) {
+      const route = roleRoutes[user.role] || "/";
+      navigate(route, { replace: true });
     }
-  }, [userError, userSuccess, dispatch]);
+  }, [userError, userSuccess, user?.role, navigate]);
+
+
 
   return (
-    <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6 ">
-      {/* <ToastContainer position="top-center" autoClose={5000} /> */}
-
+    <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6">
       <div className="bg-white w-full max-w-[841px] flex flex-col items-center rounded-[20px] md:rounded-[50px] px-6 sm:px-12 md:px-[233px] py-8 sm:py-12 md:py-[54px] relative">
         <div>
-          <img
-            src="/loginlogo.svg"
-            alt="loginlogo"
-            className="w-16 sm:w-auto"
-          />
+          <img src="/loginlogo.svg" alt="loginlogo" className="w-16 sm:w-auto" />
         </div>
         <p className="text-dark font-bold text-2xl sm:text-3xl md:text-[36px] xl:text-[36px] lg:text-[36px] mt-4 sm:mt-[22px] mb-8 sm:mb-[56px] font-cormorant">
           Admin Login
@@ -107,7 +106,7 @@ export default function Login() {
           onSubmit={onSubmit}
         >
           {({ isSubmitting }) => (
-            <div className="flex w-full ">
+            <div className="flex w-full">
               <Form className="w-full max-w-[374px]">
                 <div className="mb-4 sm:mb-6">
                   <FormField type="text" name="email" placeholder="Email" />
@@ -120,15 +119,9 @@ export default function Login() {
                   />
                 </div>
                 <div className="flex justify-between mt-3 sm:mt-4 cursor-pointer">
-                  {/* <h1 className="text-[#79B833] flex gap-1 items-center text-sm sm:text-[16px] font-[400]">
-                    <IoCheckmarkCircle className="w-4 h-4" />
-                    Remember me
-                  </h1> */}
                   <p
                     className="text-[#FF4A1B] text-sm sm:text-base font-[400]"
-                    onClick={() => {
-                      setForgotPassword(true);
-                    }}
+                    onClick={() => setForgotPassword(true)}
                   >
                     Forgot password?
                   </p>
@@ -148,7 +141,7 @@ export default function Login() {
             </div>
           )}
         </Formik>
-        <div className="absolute top-5 md:right-14 right-0 ">
+        <div className="absolute top-5 md:right-14 right-0">
           <ForgotPasswordModal
             isOpen={forgotPassword}
             onClose={() => {

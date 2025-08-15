@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "../store";
+import api from "../middleware";
 
 export interface User {
   id: number;
@@ -75,7 +76,7 @@ export const Edithpersonel = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<EdithpersonelSuccessResponse>(
+      const response = await api.post<EdithpersonelSuccessResponse>(
         `${BASE_URL}/api/admin/edit-personnel/${UpdateId}`,
         credentials,
         {

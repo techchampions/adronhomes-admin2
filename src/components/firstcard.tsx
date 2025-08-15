@@ -58,6 +58,7 @@ interface RevenueCardProps {
   value?: string;
   icon?: string;
   value2?: string | number; // Allow both string and number for flexibility
+    currency?:any
 }
 
 export function RevenueCard({
@@ -65,6 +66,7 @@ export function RevenueCard({
   value = "increase in revenue",
   icon = "/solar.svg",
   value2 = "40%",
+    currency = "",
 }: RevenueCardProps) {
   // Function to format the value to 2 decimal places
   const formatValue = (val: string | number) => {
@@ -91,9 +93,12 @@ export function RevenueCard({
         {title}
       </p>
       <img src={icon} className="mb-[10px]" alt="icon " />
-      <p className="leading-[34px] tracking-[0] font-[350] md:text-[27px] text-[18px] text-white pr-4">
-        {formattedValue} <span className="font-[325] text-base">{value}</span>
+     <div className="flex text-white ">
+        <span className="md:text-[20px] text-[10px] font-[325]">
+            {currency} </span> <p className="leading-[34px] tracking-[0] font-[350] md:text-[27px] text-[18px] text-white pr-4">
+        {formattedValue} <span className="font-[325] text-xs">{value}</span>
       </p>
+     </div>
     </div>
   );
 }

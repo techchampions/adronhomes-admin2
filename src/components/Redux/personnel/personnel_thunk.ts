@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { zstdCompress } from "zlib";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -85,7 +86,7 @@ export const personnels = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<PersonnelsResponse>(
+      const response = await api.get<PersonnelsResponse>(
         `${BASE_URL}/api/admin/personnels`,
         {
           headers: {
@@ -175,7 +176,7 @@ export const CreatePersonnel = createAsyncThunk<
     }
 
     try {
-      const response = await axios.post<PersonnelResponse>(
+      const response = await api.post<PersonnelResponse>(
         `${BASE_URL}/api/admin/create-personnel`,
         credentials,
         {

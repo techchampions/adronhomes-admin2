@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { ErrorResponse, PaymentsResponse } from "./type";
 import { RootState } from "../../store";
+import api from "../../middleware";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
 
@@ -48,7 +49,7 @@ export const fetchUserPayments = createAsyncThunk<
         params.search = search;
       }
 
-      const response = await axios.get<PaymentsResponse>(
+      const response = await api.get<PaymentsResponse>(
         `${BASE_URL}/api/admin/user-wallet-payment/${userId}`,
         {
           headers: {

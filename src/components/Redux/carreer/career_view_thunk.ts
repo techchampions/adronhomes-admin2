@@ -4,6 +4,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store"; // Assuming your store is at ../store
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 // Define interfaces for the API response
 export interface ErrorResponse {
@@ -61,7 +62,7 @@ export const fetchCareerById = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<CareerViewResponse>(
+      const response = await api.get<CareerViewResponse>(
         `${BASE_URL}/api/hr/career-view/${id}`, // API endpoint for career view with ID
         {
           headers: {

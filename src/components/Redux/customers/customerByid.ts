@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "../store"; // Assuming you have a RootState defined in your store
+import api from "../middleware";
 
 // --- Interfaces for the new response structure ---
 
@@ -194,7 +195,7 @@ export const fetchCustomerById = createAsyncThunk<
 
     try {
       // Modify the URL to include pagination parameters for active_plan and completed_property
-      const response = await axios.get<CustomerByIdResponse>(
+      const response = await api.get<CustomerByIdResponse>(
         `${BASE_URL}/api/admin/customer/${customerId}?active_page=${activePage}&completed_page=${completedPage}`,
         {
           headers: {

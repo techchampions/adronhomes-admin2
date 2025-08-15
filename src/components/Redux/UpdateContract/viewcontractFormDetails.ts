@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 // Define interfaces for the response
 export interface ContractData {
@@ -87,7 +88,7 @@ export const getContract = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<GetContractResponse>(
+      const response = await api.get<GetContractResponse>(
         `${BASE_URL}/api/admin/contract/${contractId}`,
         {
           headers: {

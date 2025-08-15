@@ -36,6 +36,7 @@ export default function MarketerCustomer() {
            copyCode={data?.marketer?.referral_code}
            role={data?.marketer?.referral_code} 
            Name={`${data?.marketer?.first_name || ''} ${data?.marketer?.last_name || ''}`}
+           
          />
 
       <div className="grid lg:grid-cols-4 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">

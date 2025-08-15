@@ -1,6 +1,6 @@
 // src/general/TableCard.tsx (or wherever your TableCard is located)
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../components/Tables/Pagination";
 
 // New type for pagination props
@@ -50,6 +50,7 @@ const TableCard = <T extends Record<string, any>>({
     return row[rowKey] || index;
   };
   const navigate = useNavigate();
+      const location = useLocation();
 
   const getWidthStyle = (width?: number) => ({
     width: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
@@ -93,9 +94,15 @@ const TableCard = <T extends Record<string, any>>({
               <tr
                 key={getRowKey(row, index)}
                 className="text-sm text-dark font-[325] cursor-pointer hover:bg-gray-50"
-                onClick={() =>
-                  navigate(`/customers/payment/${row.user_id}/${row.plan_id}`)
-                }
+                // onClick={() =>
+                //   navigate(`/customers/payment/${row.user_id}/${row.plan_id}`)
+                // }
+                  onClick={() => {
+  const basePath = location.pathname.startsWith("/payments/customers")
+    ? "/payments/customers/payment"
+    : "/customers/payment";
+  navigate(`${basePath}/${row.user_id}/${row.plan_id}`);
+}}
               >
                 {columns.map((column) => {
                   const cellValue = row[column.key];

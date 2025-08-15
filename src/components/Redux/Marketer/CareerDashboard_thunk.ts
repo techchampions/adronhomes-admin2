@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { RootState } from "../store";
 import { toast } from "react-toastify";
+import api from "../middleware";
 
 export interface ErrorResponse {
   message: string;
@@ -134,7 +135,7 @@ export const fetchMarketerDashboard = createAsyncThunk<
     }
 
     try {
-      const response = await axios.get<MarketerDashboardResponse>(
+      const response = await api.get<MarketerDashboardResponse>(
         `${BASE_URL}/api/marketers/customers`,
         {
           headers: {
