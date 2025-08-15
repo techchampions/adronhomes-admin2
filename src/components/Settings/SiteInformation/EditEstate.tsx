@@ -12,12 +12,12 @@ import {
   TestimonialPayload,
 } from "../../../pages/Properties/types/TestimonialTypes";
 import ImageUploadField from "../../SoosarImageInput";
-import { PropertyLocation } from "../../../pages/Properties/types/EstateLocationTypes";
+import { Location } from "../../../pages/Properties/types/EstateLocationTypes";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
-  item: PropertyLocation | undefined;
+  item: Location | undefined;
 }
 
 const validationSchema = Yup.object().shape({
