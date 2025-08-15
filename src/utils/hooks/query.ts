@@ -82,10 +82,10 @@ export const useGetDirectorDashboard = () => {
   });
 };
 // Property Request List
-export const useGetPropertyRequest = (page: number) => {
+export const useGetPropertyRequest = (page: number, director_id?: number) => {
   return useQuery<PropertiesRequestResponse>({
-    queryKey: ["properties-requests", page],
-    queryFn: () => getPropertyRequest(page),
+    queryKey: ["properties-requests", page, director_id],
+    queryFn: () => getPropertyRequest(page, director_id),
   });
 };
 export const useGetPropertyRequestByID = (id: number) => {

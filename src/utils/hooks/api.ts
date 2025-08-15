@@ -5,7 +5,7 @@ import {
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
-  PropertyLocation,
+  Location,
   PropertyLocationsResponse,
 } from "../../pages/Properties/types/EstateLocationTypes";
 import {
@@ -261,8 +261,7 @@ export const createOfficeLocation = async (
     formData.append("first_contact", payload.first_contact);
   if (payload.second_contact)
     formData.append("second_contact", payload.second_contact);
-  if (payload.third_contact)
-    formData.append("third_contact", payload.third_contact);
+  if (payload.email) formData.append("email", payload.email);
 
   const response = await adminApi.post("/create-office-info", formData, {
     headers: {
@@ -319,16 +318,27 @@ export const getDirectorDashboardData =
 
 //Get All Property Requests
 export const getPropertyRequest = async (
-  page: number
+  page: number,
+  director_id?: number
 ): Promise<PropertiesRequestResponse> => {
-  const response = await adminApi.get(`/properties-requests?page=${page}`);
+  const params = new URLSearchParams();
+  if (director_id) params.append("director_id", director_id.toString());
+  if (page) {
+    params.append("page", page.toString());
+  }
+  const response = await adronApi.get(`/director/properties-requests`, {
+    params: params,
+  });
   return response.data;
+  // const endpoint = director_id?`properties-requests?page=${page}`
+  // const response = await adminApi.get(`/properties-requests?page=${page}`);
+  // return response.data;
 };
 //Get Requests for Property by ID
 export const getPropertyRequestByID = async (
   id: number
 ): Promise<PropertyByIdRequestsResponse> => {
-  const response = await adminApi.get(`/properties/${id}/requests`);
+  const response = await adronApi.get(`/director/properties/${id}/requests`);
   return response.data;
 };
 
@@ -342,7 +352,7 @@ export const getPropertyByID = async (
 export const getEnquiryByID = async (
   id?: number | string
 ): Promise<GetPropertyByIdResponse> => {
-  const response = await adminApi.get(`/request/${id}`);
+  const response = await adronApi.get(`/director/request/${id}`);
   return response.data;
 };
 
@@ -450,7 +460,7 @@ export const getSocials = async (): Promise<SettingsResponse> => {
 };
 export const getEstateLocation =
   async (): Promise<PropertyLocationsResponse> => {
-    const response = await adminApi.get("/property-locations");
+    const response = await adronApi.get("/property-locations");
     return response.data;
   };
 
@@ -523,7 +533,7 @@ export const deleteFAQs = async (
 export const updateEstate = async (payload: {
   id: number;
   formData: FormData;
-}): Promise<PropertyLocation> => {
+}): Promise<Location> => {
   const response = await adminApi.post(
     `/update-property-location/${payload.id}`,
     payload.formData,

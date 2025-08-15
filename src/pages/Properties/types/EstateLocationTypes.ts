@@ -20,7 +20,7 @@ export interface Pagination<T> {
 }
 
 // Property Location type
-export interface PropertyLocation {
+export interface Location {
   id: number;
   country_name: string;
   total_property: number;
@@ -33,6 +33,6 @@ export interface PropertyLocation {
 // Main Response type
 export interface PropertyLocationsResponse {
   success: boolean;
-  message: string;
-  data: Pagination<PropertyLocation>;
+  locations: Location[];
+  // data: Pagination<PropertyLocation>;
 }

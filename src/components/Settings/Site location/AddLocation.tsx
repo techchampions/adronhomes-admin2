@@ -36,9 +36,9 @@ export default function AddLocationModal({
     office_name: "",
     first_contact: "",
     second_contact: "",
-    third_contact: "",
+    // third_contact: "",
     office_address: "",
-    // email: "",
+    email: "",
   };
   const {
     mutate: createOfficeLocation,
@@ -49,13 +49,12 @@ export default function AddLocationModal({
     createOfficeLocation(values, {
       onSuccess(data, variables, context) {
         toast.success("Office Contact Added Successfully");
+        onClose();
       },
       onError(error, variables, context) {
         toast.error("Failed to Add contacts");
       },
     });
-    console.log("Form submitted:", values);
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -133,9 +132,9 @@ export default function AddLocationModal({
               </div>
               <div className="mb-2">
                 <label htmlFor="" className="text-xs text-gray-400">
-                  Alt Phone Number 2
+                  Email Address
                 </label>
-                <SoosarInputField name="third_contact" />
+                <SoosarInputField name="email" />
               </div>
 
               <div className="flex justify-between items-center gap-2 mt-[50px]">

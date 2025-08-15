@@ -5,9 +5,13 @@ import { useNavigate } from "react-router-dom";
 
 interface PropertyTableProps {
   data: PropertyRequest[];
+  isDirector?: boolean;
 }
 
-export default function PropertyTableComponent({ data }: PropertyTableProps) {
+export default function PropertyTableComponent({
+  data,
+  isDirector,
+}: PropertyTableProps) {
   const navigate = useNavigate();
   return (
     <>
@@ -67,9 +71,15 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
                   </td>
                   <td className="py-4  text-sm">
                     <button
-                      onClick={() =>
-                        navigate(`/requests-enquiries/${property.id}`)
-                      }
+                      onClick={() => {
+                        if (isDirector) {
+                          navigate(
+                            `/director/requests-enquiries/${property.id}`
+                          );
+                        } else {
+                          navigate(`/requests-enquiries/${property.id}`);
+                        }
+                      }}
                       className="bg-[#272727] cursor-pointer text-white px-4 py-2 rounded-full xl:text-sm  text-sm font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
                       aria-label="View requests"
                     >

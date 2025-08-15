@@ -2,14 +2,24 @@ import React, { useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import PropertyTableComponent from "./Requests_Enquiries_Tables";
-import { useGetPropertyRequest } from "../../utils/hooks/query";
+import {
+  useGetDirectorDashboard,
+  useGetPropertyRequest,
+} from "../../utils/hooks/query";
 import SoosarPagination from "../../components/SoosarPagination";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
 
 export default function Requests_Enquiries() {
   const [page, setpage] = useState(1);
-  const { data, isLoading, isError } = useGetPropertyRequest(page);
+  const {
+    data: directorData,
+    isLoading: loadingDR,
+    isError: errorDR,
+  } = useGetDirectorDashboard();
+  const isDirectorRoute = location.pathname.startsWith("/director");
+  const director_id = directorData?.director.id || undefined;
+  const { data, isLoading, isError } = useGetPropertyRequest(page, director_id);
   const propertyData = data?.data.data || [];
   const totalPages = data?.data.last_page || 1;
   const tab = ["Requests"];
@@ -31,7 +41,10 @@ export default function Requests_Enquiries() {
           ) : propertyData.length < 1 ? (
             <NotFound />
           ) : (
-            <PropertyTableComponent data={propertyData} />
+            <PropertyTableComponent
+              data={propertyData}
+              isDirector={isDirectorRoute}
+            />
           )}
         </ReusableTable>
         {/* Pagination */}
