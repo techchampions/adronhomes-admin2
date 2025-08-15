@@ -471,6 +471,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("size", landForm.propertySize);
         formPayload.append("shape", landForm.plotShape || "");
         formPayload.append("topography", landForm.topography || "");
+          formPayload.append("category",  "estate");
         formPayload.append(
           "nearbyLandmarks",
           Array.isArray(landForm.nearbyLandmarks)

@@ -1,11 +1,11 @@
 // propertySlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchPropertyData, SavedPropertyUser } from "./propertiesDetails_thunk";
+import { fetchPropertyData, Property, SavedPropertyUser } from "./propertiesDetails_thunk";
 import { SimilarPropertyUser } from "./types";
 
 interface PropertyState {
   data: {
-    properties: any[];
+    properties: Property[];
     saved_property_user: SavedPropertyUser[];
     similar_property_user: SimilarPropertyUser[];
   } | null;
