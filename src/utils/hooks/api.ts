@@ -5,7 +5,7 @@ import {
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
-  PropertyLocation,
+  Location,
   PropertyLocationsResponse,
 } from "../../pages/Properties/types/EstateLocationTypes";
 import {
@@ -261,8 +261,7 @@ export const createOfficeLocation = async (
     formData.append("first_contact", payload.first_contact);
   if (payload.second_contact)
     formData.append("second_contact", payload.second_contact);
-  if (payload.third_contact)
-    formData.append("third_contact", payload.third_contact);
+  if (payload.email) formData.append("email", payload.email);
 
   const response = await adminApi.post("/create-office-info", formData, {
     headers: {
@@ -461,7 +460,7 @@ export const getSocials = async (): Promise<SettingsResponse> => {
 };
 export const getEstateLocation =
   async (): Promise<PropertyLocationsResponse> => {
-    const response = await adminApi.get("/property-locations");
+    const response = await adronApi.get("/property-locations");
     return response.data;
   };
 
@@ -534,7 +533,7 @@ export const deleteFAQs = async (
 export const updateEstate = async (payload: {
   id: number;
   formData: FormData;
-}): Promise<PropertyLocation> => {
+}): Promise<Location> => {
   const response = await adminApi.post(
     `/update-property-location/${payload.id}`,
     payload.formData,

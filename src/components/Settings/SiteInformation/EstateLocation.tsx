@@ -1,35 +1,15 @@
-import React, { useState } from "react";
-import { Formik, Form, Field, FormikHelpers } from "formik";
-import * as Yup from "yup";
-import InputField from "../../input/inputtext";
-import SoosarInputField from "../../soosarInput";
-import {
-  IoLogoFacebook,
-  IoLogoInstagram,
-  IoLogoLinkedin,
-  IoLogoTiktok,
-  IoLogoTwitter,
-  IoLogoWhatsapp,
-} from "react-icons/io5";
-import Button from "../../input/Button";
-import {
-  useGetEstateLocations,
-  useGetSocials,
-} from "../../../utils/hooks/query";
+import { useState } from "react";
+import { useGetEstateLocations } from "../../../utils/hooks/query";
 import SmallLoader from "../../SmallLoader";
-import { useUpdateSocial } from "../../../utils/hooks/mutations";
-import { SocialPayload } from "../../../pages/Properties/types/SocialsTypes";
 import { FiEdit } from "react-icons/fi";
-import { BiTrash } from "react-icons/bi";
 import EditEstate from "./EditEstate";
-import { PropertyLocation } from "../../../pages/Properties/types/EstateLocationTypes";
+import { Location } from "../../../pages/Properties/types/EstateLocationTypes";
 
 const EstateLocation = () => {
   const { data, isLoading } = useGetEstateLocations();
-  const [editItem, setEditItem] = useState<PropertyLocation>();
+  const [editItem, setEditItem] = useState<Location>();
   const [showEditModal, setShowEditModal] = useState(false);
-  const estateData = data?.data.data || [];
-  const { mutate: update, isPending } = useUpdateSocial();
+  const estateData = data?.locations || [];
   if (isLoading) {
     return <SmallLoader />;
   }
@@ -66,7 +46,7 @@ const EstateLocation = () => {
                 <p className="font-medium text-xs md:text-sm truncate">
                   {" "}
                   {/* Removed w-full as it's not needed */}
-                  {item.state_name}, {item.country_name}
+                  {item.state_name} Estate
                 </p>
                 <p className="text-xs truncate hover:underline underline-offset-2">
                   {item.total_property} Estates
