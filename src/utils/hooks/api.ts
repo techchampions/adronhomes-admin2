@@ -352,7 +352,7 @@ export const getPropertyByID = async (
 export const getEnquiryByID = async (
   id?: number | string
 ): Promise<GetPropertyByIdResponse> => {
-  const response = await adminApi.get(`/director/request/${id}`);
+  const response = await adronApi.get(`/director/request/${id}`);
   return response.data;
 };
 
