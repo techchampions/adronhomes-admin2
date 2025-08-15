@@ -13,14 +13,15 @@ import LoadingAnimations from '../../components/LoadingAnimations';
 import { RootState } from '../../components/Redux/store';
 import { resetPropertyState } from '../../components/Redux/addProperty/UpdateProperties/update_slice';
 import { PropertyContext } from '../../MyContext/MyContext';
+import { resetPublishDraftState } from '../../components/Redux/Properties/publishpropertySlice';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data, loading, error } = useAppSelector((state) => state.propertyDetails);
-  const { loading: publishLoading } = useAppSelector((state) => state.publishDraft);
-  const { success: Updatesuccess } = useAppSelector((state: RootState) => state.updateproperty);
+  const { loading: publishLoading,success:publishSuccess,  error:publishError } = useAppSelector((state) => state.publishDraft);
+  const { success: Updatesuccess,  error:UpdateError} = useAppSelector((state: RootState) => state.updateproperty);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Property>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,10 +64,22 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
   }, [id, dispatch, navigate]);
 
   useEffect(() => {
+    if (publishSuccess) {
+      dispatch(resetPublishDraftState());
+    }
+     if (publishError) {
+      dispatch(resetPublishDraftState());
+    }
+  }, [dispatch, Updatesuccess,UpdateError]);
+
+    useEffect(() => {
     if (Updatesuccess) {
       dispatch(resetPropertyState());
     }
-  }, [dispatch, Updatesuccess]);
+     if (UpdateError) {
+      dispatch(resetPropertyState());
+    }
+  }, [dispatch, Updatesuccess,UpdateError]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
