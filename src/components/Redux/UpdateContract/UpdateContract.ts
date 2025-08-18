@@ -71,13 +71,12 @@ export interface ErrorResponse {
 // Get the base URL from environment variables
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Async Thunk for updating a contract
 export const updateContract = createAsyncThunk<
-  UpdateContractResponse, // Return type of the fulfilled action
-  { contractId: any; data: UpdateContractPayload }, // Arguments for the thunk
+  UpdateContractResponse,
+  { contractId: any; data: UpdateContractPayload },
   {
-    state: RootState; // Type for the Redux state (if you need to access it)
-    rejectValue: ErrorResponse; // Type for the rejected value
+    state: RootState;
+    rejectValue: ErrorResponse;
   }
 >(
   "contract/updateContract",
@@ -85,7 +84,6 @@ export const updateContract = createAsyncThunk<
     const token = Cookies.get("token");
 
     if (!token) {
-      // If no token, reject with an error
       return rejectWithValue({
         message: "No authentication token found. Please login again.",
       });
@@ -94,50 +92,59 @@ export const updateContract = createAsyncThunk<
     try {
       const response = await api.post<UpdateContractResponse>(
         `${BASE_URL}/api/admin/update-contract/${contractId}`,
-        data, // Request body
+        data,
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno", // Make sure this is correct for your API
-            device_id: "1010l0010l1", // Make sure this is correct for your API
+            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+            device_id: "1010l0010l1",
           },
         }
       );
-      // Show success toast
       toast.success(response.data.message || "Contract updated successfully!");
       return response.data;
     } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>;
+      const axiosError = error as AxiosError<{
+        status: boolean;
+        errors?: Record<string, string[]>;
+        message?: string;
+      }>;
 
-      // Handle 401 Unauthorized specifically to remove token
       if (axiosError.response?.status === 401) {
         Cookies.remove("token");
         toast.error("Session expired. Please login again.");
       }
 
-      // Extract and return meaningful error message
       if (axiosError.response) {
-        toast.error(
-          axiosError.response.data.message || "Failed to update contract."
-        );
+        // Handle validation errors
+        if (axiosError.response.data.errors) {
+          // Join all error messages into a single string
+          const errorMessages = Object.values(axiosError.response.data.errors)
+            .flat()
+            .join(', ');
+          toast.error(errorMessages);
+          return rejectWithValue({
+            message: errorMessages,
+            errors: axiosError.response.data.errors,
+          });
+        }
+        
+        // Handle other error messages
+        const errorMessage = axiosError.response.data.message || "Failed to update contract.";
+        toast.error(errorMessage);
         return rejectWithValue({
-          message:
-            axiosError.response.data.message || "Failed to update contract.",
-          errors: axiosError.response.data.errors,
-        });
-      } else if (axiosError.request) {
-        // No response received
-        toast.error(
-          "No response from server. Please check your network connection."
-        );
-        return rejectWithValue({
-          message:
-            "No response from server. Please check your network connection.",
+          message: errorMessage,
         });
       }
 
-      // Catch all other errors
+      if (axiosError.request) {
+        toast.error("No response from server. Please check your network connection.");
+        return rejectWithValue({
+          message: "No response from server. Please check your network connection.",
+        });
+      }
+
       toast.error("An unexpected error occurred. Please try again.");
       return rejectWithValue({
         message: "An unexpected error occurred. Please try again.",

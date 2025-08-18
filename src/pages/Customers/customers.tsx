@@ -31,12 +31,12 @@ export default function Customers() {
         <MatrixCard
           title="Total Active Customers"
           value={data?.active_customer || 0}
-          change="includes all customers on a property plan"
+          change="includes all customers on  active Contracts"
         />
         <MatrixCard
           title="Total Active Contracts"
           value={data?.active_plan || 0}
-          change="Includes all active property plans"
+          change="Includes all active Contracts"
         />
       </div>
       {loading ? (
