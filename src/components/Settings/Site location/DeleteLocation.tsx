@@ -19,12 +19,12 @@ export default function DeleteLocationModal({
     deleteOffice(item?.id, {
       onSuccess(data, variables, context) {
         toast.success("Deleted Contact Successfully");
+        onClose();
       },
       onError(error, variables, context) {
         toast.error("Failed to delete Contact");
       },
     });
-    onClose();
   };
 
   if (!isOpen) return null;

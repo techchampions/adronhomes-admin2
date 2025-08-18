@@ -63,7 +63,6 @@ import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 
-
 const AuthGuard = () => {
   const token = Cookies.get('token');
   if (!token) {
@@ -145,9 +144,18 @@ const App = () => {
                   path="/contracts/details/:user_id/:plan_id"
                   element={<ContractInvoice />}
                 />
+
+                <Route
+                  path="/director/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
+                />
+                <Route
+                  path="/director/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
                 />
                 <Route
                   path="/requests-enquiries/:id"
@@ -190,6 +198,7 @@ const App = () => {
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
+
                 <Route
                   path="/customers/transactions/:id"
                   element={<UserPayments />}
@@ -204,6 +213,7 @@ const App = () => {
                   element={<CustomersPayment />}
                 />
                 <Route path="/properties/form" element={<General />} />
+                {/* <Route path="/properties/form/:id" element={<GeneralEdeting/>} /> */}
                 <Route
                   path="/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
@@ -268,6 +278,24 @@ const App = () => {
                   element={<Error500 />}
                 />
               </Route>
+
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
+
+              <Route
+                path="/human-resources/view-job/:jobId"
+                element={<SingleJob />}
+              ></Route>
+
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
+
+              <Route
+                path="/human-resources/view-job/:jobId"
+                element={<SingleJob />}
+              ></Route>
+
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
+
+              <Route path="/human-resources" element={<HRDashboard />}></Route>
             </Routes>
           </AppLayout>
           {isInfrastructure && (

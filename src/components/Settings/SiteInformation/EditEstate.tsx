@@ -12,12 +12,12 @@ import {
   TestimonialPayload,
 } from "../../../pages/Properties/types/TestimonialTypes";
 import ImageUploadField from "../../SoosarImageInput";
-import { PropertyLocation } from "../../../pages/Properties/types/EstateLocationTypes";
+import { Location } from "../../../pages/Properties/types/EstateLocationTypes";
 
 interface ModalProps {
   isOpen?: boolean;
   onClose?: () => void;
-  item: PropertyLocation | undefined;
+  item: Location | undefined;
 }
 
 const validationSchema = Yup.object().shape({
@@ -76,7 +76,7 @@ export default function EditEstate({
       <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-h-[95%] overflow-y-scroll scrollbar-hide max-w-xs sm:max-w-md mx-auto my-2 sm:my-4 p-3 sm:p-4 md:p-10 px-10">
         <div className="flex justify-between items-center mb-1 sm:mb-2 md:mb-[10px]">
           <h2 className="text-lg sm:text-xl md:text-2xl font-[350] text-dark">
-            Edit Estate{" "}
+            Edit Estate Location
           </h2>
           <button
             onClick={onClose}

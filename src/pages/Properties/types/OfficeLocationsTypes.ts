@@ -18,14 +18,15 @@ export interface CreateOfficeLocationPayload {
   office_name: string;
   first_contact: string;
   second_contact: string;
-  third_contact: string | null;
+  // third_contact: string | null;
   office_address: string;
+  email?: string;
 }
 export interface EditOfficeLocationPayload {
   id?: number;
   office_name?: string;
   first_contact?: string;
   second_contact?: string;
-  third_contact?: string | null;
+  email?: string | null;
   office_address?: string;
 }

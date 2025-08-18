@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
-import { logout, resetLogoutSuccess } from '../components/Redux/Login/login_slice';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../components/Redux/store';
-import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from './icon';
+import {
+  logout,
+  resetLogoutSuccess,
+} from "../components/Redux/Login/login_slice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../components/Redux/store";
+import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from "./icon";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/dashboard" },
   { label: "Customers", icon: Icon2, path: "/customers" },
   { label: "Payments", icon: Icon3, path: "/payments" },
   // { label: "Transactions", icon: Icon5, path: "/transactions" },
-   { label: "Contracts", icon: Icon7, path: "/contracts" },
+  { label: "Contracts", icon: Icon7, path: "/contracts" },
   { label: "Properties", icon: Icon5, path: "/properties" },
   { label: "Personnel", icon: Icon6, path: "/personnel" },
   { label: "Requests & Enquiries", icon: Icon7, path: "/Requests-Enquiries" },
@@ -26,30 +29,31 @@ export default function Sidebar() {
   const currentPath = location.pathname;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const logoutSuccess = useSelector((state: RootState) => state.auth.logoutSuccess);
+  const logoutSuccess = useSelector(
+    (state: RootState) => state.auth.logoutSuccess
+  );
 
   const isActive = (path: string) =>
-    currentPath === path || (path !== '/' && currentPath.startsWith(path));
+    currentPath === path || (path !== "/" && currentPath.startsWith(path));
   const dispatch = useDispatch();
-const handleLogout = () => {
-  dispatch(logout());
-  window.location.reload(); 
-};
+  const handleLogout = () => {
+    dispatch(logout());
+    window.location.reload();
+  };
 
-
-// useEffect(() => {
-//   if (logoutSuccess) {
-//     navigate('/');
-//     dispatch(resetLogoutSuccess()); 
-//   }
-// }, [logoutSuccess]);
+  // useEffect(() => {
+  //   if (logoutSuccess) {
+  //     navigate('/');
+  //     dispatch(resetLogoutSuccess());
+  //   }
+  // }, [logoutSuccess]);
 
   const DesktopSidebar = () => (
     <div className="hidden lg:block pl-4 md:pl-[40px] pt-12 md:pt-[52px] pr-[20px] bg-white max-h-screen w-[280px]">
-      <img 
-        src="/andron.svg" 
-        alt='andron' 
-        className='mb-6 md:mb-[41px] max-w-[150px]' 
+      <img
+        src="/andron.svg"
+        alt="andron"
+        className="mb-6 md:mb-[41px] max-w-[150px]"
       />
 
       <div className="space-y-[40px] lg:space-y-[32px]">
@@ -75,15 +79,26 @@ const handleLogout = () => {
             </div>
           );
         })}
-        
+
         {/* Logout Button */}
-        <div 
-          className='flex items-center space-x-2 md:space-x-[10px] cursor-pointer hover:opacity-80 transition-opacity mt-10'
+        <div
+          className="flex items-center space-x-2 md:space-x-[10px] cursor-pointer hover:opacity-80 transition-opacity mt-10"
           onClick={handleLogout}
         >
           <div>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#767676]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-[#767676]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
             </svg>
           </div>
           <div className="font-[325] text-sm md:text-[16px] leading-[1] tracking-[0] w-full md:w-[169px] text-[#767676]">
@@ -116,11 +131,7 @@ const handleLogout = () => {
           <div className="fixed inset-y-0 left-0 w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden">
             <div className="w-full pl-4 pt-12 pr-[20px]">
               <div className="flex justify-between items-center mb-6">
-                <img 
-                  src="/andron.svg" 
-                  alt='andron' 
-                  className='max-w-[100px]' 
-                />
+                <img src="/andron.svg" alt="andron" className="max-w-[100px]" />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 text-gray-500 hover:text-gray-700"
@@ -155,18 +166,29 @@ const handleLogout = () => {
                     </div>
                   );
                 })}
-                
+
                 {/* Logout Button for Mobile */}
-                <div 
-                  className='flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity mt-10'
+                <div
+                  className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity mt-10"
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
                 >
                   <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#767676]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-[#767676]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
                     </svg>
                   </div>
                   <div className="font-[325] text-[16px] leading-[1] tracking-[0] w-full text-[#767676]">
