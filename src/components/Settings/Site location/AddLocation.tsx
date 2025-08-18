@@ -23,6 +23,7 @@ const stateOptions = [
 
 const validationSchema = Yup.object().shape({
   office_name: Yup.string().required("Office name is required"),
+  email: Yup.string().required("Email is required"),
   office_address: Yup.string().required("Address is required"),
   first_contact: Yup.string().required("Phone number is required"),
   second_contact: Yup.string().required("Alternative Phone number is required"),

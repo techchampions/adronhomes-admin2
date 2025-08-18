@@ -282,8 +282,7 @@ export const editOfficeLocation = async (
     formData.append("first_contact", payload.first_contact);
   if (payload.second_contact)
     formData.append("second_contact", payload.second_contact);
-  if (payload.third_contact)
-    formData.append("third_contact", payload.third_contact);
+  if (payload.email) formData.append("email", payload.email);
 
   const response = await adminApi.post(
     `/update-office-info/${payload.id}`,

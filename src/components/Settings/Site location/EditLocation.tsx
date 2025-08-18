@@ -26,6 +26,7 @@ const stateOptions = [
 
 const validationSchema = Yup.object().shape({
   office_name: Yup.string().required("Office name is required"),
+  email: Yup.string().required("Email is required"),
   office_address: Yup.string().required("Address is required"),
   first_contact: Yup.string().required("Phone number is required"),
   second_contact: Yup.string().required("Alternative Phone number is required"),
@@ -41,7 +42,7 @@ export default function EditLocationModal({
     office_name: item?.office_name,
     first_contact: item?.first_contact,
     second_contact: item?.second_contact,
-    third_contact: item?.third_contact,
+    email: item?.email,
     office_address: item?.office_address,
     id: item?.id,
   };
@@ -134,9 +135,9 @@ export default function EditLocationModal({
               </div>
               <div className="mb-2">
                 <label htmlFor="" className="text-xs text-gray-400">
-                  Alt Phone Number 2
+                  Email Address
                 </label>
-                <SoosarInputField name="third_contact" />
+                <SoosarInputField name="email" />
               </div>
 
               <div className="flex justify-between items-center gap-2 mt-[50px]">
