@@ -1,27 +1,41 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { fetchPropertyData, Property, SavedPropertyUser } from '../../components/Redux/Properties/propertiesDetails/propertiesDetails_thunk';
-import { clearPropertyData } from '../../components/Redux/Properties/propertiesDetails/propetiesDetailsSlice';
-import { useAppDispatch, useAppSelector } from '../../components/Redux/hook';
-import { UpdateProperty } from '../../components/Redux/addProperty/UpdateProperties/updateThunk';
-import { edit_property_detail } from '../../components/Redux/addProperty/addFees/edithFees';
-import { publishDraft } from '../../components/Redux/Properties/publishPropertythunk';
-import { PropertyType } from '../../components/Redux/Properties/propertiesDetails/types';
-import NotFound from '../../components/NotFound';
-import LoadingAnimations from '../../components/LoadingAnimations';
-import { RootState } from '../../components/Redux/store';
-import { resetPropertyState } from '../../components/Redux/addProperty/UpdateProperties/update_slice';
-import { PropertyContext } from '../../MyContext/MyContext';
-import { resetPublishDraftState } from '../../components/Redux/Properties/publishpropertySlice';
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  fetchPropertyData,
+  Property,
+  SavedPropertyUser,
+} from "../../components/Redux/Properties/propertiesDetails/propertiesDetails_thunk";
+import { clearPropertyData } from "../../components/Redux/Properties/propertiesDetails/propetiesDetailsSlice";
+import { useAppDispatch, useAppSelector } from "../../components/Redux/hook";
+import { UpdateProperty } from "../../components/Redux/addProperty/UpdateProperties/updateThunk";
+import { edit_property_detail } from "../../components/Redux/addProperty/addFees/edithFees";
+import { publishDraft } from "../../components/Redux/Properties/publishPropertythunk";
+import { PropertyType } from "../../components/Redux/Properties/propertiesDetails/types";
+import NotFound from "../../components/NotFound";
+import LoadingAnimations from "../../components/LoadingAnimations";
+import { RootState } from "../../components/Redux/store";
+import { resetPropertyState } from "../../components/Redux/addProperty/UpdateProperties/update_slice";
+import { PropertyContext } from "../../MyContext/MyContext";
+import { resetPublishDraftState } from "../../components/Redux/Properties/publishpropertySlice";
+import { EdithBackgroung } from "../../components/Tables/forProperties";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 const PropertyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data, loading, error } = useAppSelector((state) => state.propertyDetails);
-  const { loading: publishLoading,success:publishSuccess,  error:publishError } = useAppSelector((state) => state.publishDraft);
-  const { success: Updatesuccess,  error:UpdateError} = useAppSelector((state: RootState) => state.updateproperty);
+  const { data, loading, error } = useAppSelector(
+    (state) => state.propertyDetails
+  );
+  const {
+    loading: publishLoading,
+    success: publishSuccess,
+    error: publishError,
+  } = useAppSelector((state) => state.publishDraft);
+  const { success: Updatesuccess, error: UpdateError } = useAppSelector(
+    (state: RootState) => state.updateproperty
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Property>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,11 +44,11 @@ const PropertyDetailsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [newDisplayImage, setNewDisplayImage] = useState<File | null>(null);
-  const [newGalleryImages, setNewGalleryImages] = useState<(File | string | null)[]>([]);
+  const [newGalleryImages, setNewGalleryImages] = useState<
+    (File | string | null)[]
+  >([]);
   // const { isLandProperty } = useContext(PropertyContext)!;
-const isLandProperty = data?.properties?.[0]?.category === 'estate';
-
-
+  const isLandProperty = data?.properties?.[0]?.category === "estate";
 
   // Initialize form data and gallery previews
   useEffect(() => {
@@ -54,8 +68,8 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
       if (!isNaN(propertyId)) {
         dispatch(fetchPropertyData({ id: propertyId }));
       } else {
-        toast.error('Invalid property ID');
-        navigate('/properties');
+        toast.error("Invalid property ID");
+        navigate("/properties");
       }
     }
     return () => {
@@ -67,39 +81,43 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
     if (publishSuccess) {
       dispatch(resetPublishDraftState());
     }
-     if (publishError) {
+    if (publishError) {
       dispatch(resetPublishDraftState());
     }
-  }, [dispatch, Updatesuccess,UpdateError]);
+  }, [dispatch, Updatesuccess, UpdateError]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (Updatesuccess) {
       dispatch(resetPropertyState());
     }
-     if (UpdateError) {
+    if (UpdateError) {
       dispatch(resetPropertyState());
     }
-  }, [dispatch, Updatesuccess,UpdateError]);
+  }, [dispatch, Updatesuccess, UpdateError]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      setFormData(prev => ({
+    if (type === "checkbox") {
+      setFormData((prev) => ({
         ...prev,
-        [name]: (e.target as HTMLInputElement).checked
+        [name]: (e.target as HTMLInputElement).checked,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
 
   const handleArrayInputChange = (field: keyof Property, value: string[]) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -115,22 +133,23 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
     }
   };
 
-  const handleGalleryImageChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const newPreviews = [...galleryPreviews];
-        newPreviews[index] = reader.result as string;
-        setGalleryPreviews(newPreviews);
-        
-        const newImages = [...newGalleryImages];
-        newImages[index] = file;
-        setNewGalleryImages(newImages);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleGalleryImageChange =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const newPreviews = [...galleryPreviews];
+          newPreviews[index] = reader.result as string;
+          setGalleryPreviews(newPreviews);
+
+          const newImages = [...newGalleryImages];
+          newImages[index] = file;
+          setNewGalleryImages(newImages);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -146,44 +165,66 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
 
   const handlePublishToggle = async () => {
     if (!id) {
-      toast.error('Property ID not found');
+      toast.error("Property ID not found");
       return;
     }
 
     try {
       await dispatch(publishDraft(parseInt(id))).unwrap();
-      toast.success(`Property ${property?.is_active === 1 ? 'drafted' : 'published'} successfully!`);
+      toast.success(
+        `Property ${
+          property?.is_active === 1 ? "drafted" : "published"
+        } successfully!`
+      );
       dispatch(fetchPropertyData({ id: parseInt(id) }));
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update property status');
+      toast.error(error.message || "Failed to update property status");
     }
   };
 
   const validateFormData = () => {
     const errors: Record<string, string> = {};
-    
-    if (!formData.name) errors.name = 'Property name is required';
-    if (!formData.price) errors.price = 'Price is required';
-    if (!formData.size) errors.size = 'Size is required';
+
+    if (!formData.name) errors.name = "Property name is required";
+    if (!formData.price) errors.price = "Price is required";
+    if (!formData.size) errors.size = "Size is required";
     if (!isLandProperty) {
-      if (formData.no_of_bedroom === undefined || formData.no_of_bedroom === null) errors.no_of_bedroom = 'Bedrooms is required';
-      if (formData.number_of_bathroom === undefined || formData.number_of_bathroom === null) errors.number_of_bathroom = 'Bathrooms is required';
-      if (formData.toilets === undefined || formData.toilets === null) errors.toilets = 'Toilets is required';
-      if (!formData.building_condition) errors.building_condition = 'Building condition is required';
-      if (!formData.year_built) errors.year_built = 'Year built is required';
+      if (
+        formData.no_of_bedroom === undefined ||
+        formData.no_of_bedroom === null
+      )
+        errors.no_of_bedroom = "Bedrooms is required";
+      if (
+        formData.number_of_bathroom === undefined ||
+        formData.number_of_bathroom === null
+      )
+        errors.number_of_bathroom = "Bathrooms is required";
+      if (formData.toilets === undefined || formData.toilets === null)
+        errors.toilets = "Toilets is required";
+      if (!formData.building_condition)
+        errors.building_condition = "Building condition is required";
+      if (!formData.year_built) errors.year_built = "Year built is required";
     }
-    if (!formData.number_of_unit) errors.number_of_unit = 'Total units is required';
-    if (formData.unit_available === undefined || formData.unit_available === null) errors.unit_available = 'Units available is required';
-    if (formData.unit_sold === undefined || formData.unit_sold === null) errors.unit_sold = 'Units sold is required';
-    if (!formData.street_address) errors.street_address = 'Street address is required';
-    if (!formData.state) errors.state = 'State is required';
-    if (!formData.country) errors.country = 'Country is required';
-    if (!formData.lga) errors.lga = 'LGA is required';
-    if (!formData.status) errors.status = 'Status is required';
-    if (!formData.contact_number) errors.contact_number = 'Contact number is required';
+    if (!formData.number_of_unit)
+      errors.number_of_unit = "Total units is required";
+    if (
+      formData.unit_available === undefined ||
+      formData.unit_available === null
+    )
+      errors.unit_available = "Units available is required";
+    if (formData.unit_sold === undefined || formData.unit_sold === null)
+      errors.unit_sold = "Units sold is required";
+    if (!formData.street_address)
+      errors.street_address = "Street address is required";
+    if (!formData.state) errors.state = "State is required";
+    if (!formData.country) errors.country = "Country is required";
+    if (!formData.lga) errors.lga = "LGA is required";
+    if (!formData.status) errors.status = "Status is required";
+    if (!formData.contact_number)
+      errors.contact_number = "Contact number is required";
 
     if (Object.keys(errors).length > 0) {
-      Object.values(errors).forEach(error => toast.error(error));
+      Object.values(errors).forEach((error) => toast.error(error));
       return false;
     }
     return true;
@@ -192,7 +233,7 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+
     if (!validateFormData()) {
       setIsSubmitting(false);
       return;
@@ -204,27 +245,31 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
       setIsSubmitting(false);
       return;
     }
-  
+
     try {
       const mainFormData = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'details' || key === 'photos' || key === 'display_image') {
+        if (key === "details" || key === "photos" || key === "display_image") {
           return;
         }
-        
+
         if (Array.isArray(value)) {
           value.forEach((item) => {
-            if (typeof item === 'string' || typeof item === 'number') {
+            if (typeof item === "string" || typeof item === "number") {
               mainFormData.append(`${key}[]`, String(item));
             }
           });
-        } else if (value !== null && value !== undefined && typeof value !== 'object') {
+        } else if (
+          value !== null &&
+          value !== undefined &&
+          typeof value !== "object"
+        ) {
           mainFormData.append(key, String(value));
         }
       });
 
       if (newDisplayImage) {
-        mainFormData.append('display_image', newDisplayImage);
+        mainFormData.append("display_image", newDisplayImage);
       }
 
       newGalleryImages.forEach((image, index) => {
@@ -233,18 +278,34 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
         }
       });
 
-      mainFormData.append('is_discount', formData.is_discount ? '1' : '0');
+      mainFormData.append("is_discount", formData.is_discount ? "1" : "0");
 
       if (formData.is_discount) {
-        if (formData.discount_name) mainFormData.append('discount_name', formData.discount_name);
-        if (formData.discount_percentage) mainFormData.append('discount_percentage', String(formData.discount_percentage));
-        if (formData.discount_units) mainFormData.append('discount_units', String(formData.discount_units));
-        if (formData.discount_start_date) mainFormData.append('discount_start_date', formData.discount_start_date);
-        if (formData.discount_end_date) mainFormData.append('discount_end_date', formData.discount_end_date);
+        if (formData.discount_name)
+          mainFormData.append("discount_name", formData.discount_name);
+        if (formData.discount_percentage)
+          mainFormData.append(
+            "discount_percentage",
+            String(formData.discount_percentage)
+          );
+        if (formData.discount_units)
+          mainFormData.append(
+            "discount_units",
+            String(formData.discount_units)
+          );
+        if (formData.discount_start_date)
+          mainFormData.append(
+            "discount_start_date",
+            formData.discount_start_date
+          );
+        if (formData.discount_end_date)
+          mainFormData.append("discount_end_date", formData.discount_end_date);
       }
-  
-      await dispatch(UpdateProperty({ UpdateId: propertyId, credentials: mainFormData })).unwrap();
-  
+
+      await dispatch(
+        UpdateProperty({ UpdateId: propertyId, credentials: mainFormData })
+      ).unwrap();
+
       if (formData.details) {
         const detailUpdates = formData.details.map((detail) => {
           const detailFormData = {
@@ -254,24 +315,34 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
             type: detail.type,
             purpose: detail.purpose,
           };
-  
-          return dispatch(edit_property_detail({ detailId: detail.id, formData: detailFormData })).unwrap();
+
+          return dispatch(
+            edit_property_detail({
+              detailId: detail.id,
+              formData: detailFormData,
+            })
+          ).unwrap();
         });
-        
+
         await Promise.all(detailUpdates);
       }
-  
-      toast.success('Property updated successfully!');
+
+      toast.success("Property updated successfully!");
       setIsEditing(false);
     } catch (error) {
-      console.error('Update failed:', error);
-      toast.error('Failed to update property. Please check the form data.');
+      console.error("Update failed:", error);
+      toast.error("Failed to update property. Please check the form data.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center w-full h-screen"><LoadingAnimations loading={loading} /></div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center w-full h-screen">
+        <LoadingAnimations loading={loading} />
+      </div>
+    );
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!data?.properties?.[0]) {
     return (
@@ -283,30 +354,56 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
 
   const property = data.properties[0];
 
+
+const handleGoBack = () => {
+  navigate(-1); 
+};
   return (
-    <section className='m'>
-      <div className=" px-4 py-8 overflow-auto max-w-[1100px]">
+    <section className="w-full lg:pl-[38px] lg:pr-[64px] pr-[15px] pl-[15px] pt-8">
+      <EdithBackgroung>
+    <div>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">
-            {isEditing ? 'Edit Property' : 'Property Details'}
-          </h1>
-          <div className="flex space-x-4">
-            <button
-              onClick={isEditing ? handleSubmit : handleToggleEdit}
-              className={`px-4 py-2 font-bold text-sm rounded-[60px] ${isEditing ? 'bg-[#79B833]' : 'bg-[#79B833]'} text-white`}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Saving...' : isEditing ? 'Save Changes' : 'Edit Property'}
-            </button>
-            <button
-              onClick={handlePublishToggle}
-              className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#272727] text-white`}
-              disabled={publishLoading}
-            >
-              {publishLoading ? 'Processing...' : property.is_active === 1 ? 'Add to Draft' : 'Publish'}
-            </button>
-          </div>
-        </div>
+  <div className="flex items-center space-x-4">
+    <button
+      onClick={handleGoBack} // <- Replace with your actual back handler
+      className="text-gray-700 hover:text-gray-900 text-xl flex items-center"
+    >
+      <IoArrowBackSharp className="mr-2" />
+
+    </button>
+    <h1 className="text-3xl font-bold text-gray-800">
+      {isEditing ? "Edit Property" : "Property Details"}
+    </h1>
+  </div>
+
+  <div className="flex space-x-4">
+    <button
+      onClick={isEditing ? handleSubmit : handleToggleEdit}
+      className={`px-4 py-2 font-bold text-sm rounded-[60px] ${
+        isEditing ? "bg-[#79B833]" : "bg-[#79B833]"
+      } text-white`}
+      disabled={isSubmitting}
+    >
+      {isSubmitting
+        ? "Saving..."
+        : isEditing
+        ? "Save Changes"
+        : "Edit Property"}
+    </button>
+    <button
+      onClick={handlePublishToggle}
+      className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#272727] text-white`}
+      disabled={publishLoading}
+    >
+      {publishLoading
+        ? "Processing..."
+        : property.is_active === 1
+        ? "Add to Draft"
+        : "Publish"}
+    </button>
+  </div>
+</div>
+
 
         <div className="bg-white rounded-lg overflow-hidden">
           {/* Main Image */}
@@ -358,56 +455,69 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <h2 className="text-2xl font-semibold mb-4">Basic Information</h2>
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Property Name:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Property Name:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="name"
-                      value={formData.name || ''}
+                      value={formData.name || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.name}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.name}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Price:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Price:
+                  </label>
                   {isEditing ? (
                     <input
                       type="number"
                       name="price"
-                     
                       value={formData.price || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">₦{property.price.toLocaleString()}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      ₦{property.price.toLocaleString()}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Size:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Size:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="size"
-                      value={formData.size || ''}
+                      value={formData.size || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.size}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.size}
+                    </p>
                   )}
                 </div>
-                
+
                 {!isLandProperty && (
                   <>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Bedrooms:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Bedrooms:
+                      </label>
                       {isEditing ? (
                         <input
                           type="number"
@@ -418,11 +528,15 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                           required
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.no_of_bedroom}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.no_of_bedroom}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Bathrooms:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Bathrooms:
+                      </label>
                       {isEditing ? (
                         <input
                           type="number"
@@ -433,11 +547,15 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                           required
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.number_of_bathroom}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.number_of_bathroom}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Toilets:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Toilets:
+                      </label>
                       {isEditing ? (
                         <input
                           type="number"
@@ -448,11 +566,15 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                           required
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.toilets}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.toilets}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Parking Space:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Parking Space:
+                      </label>
                       {isEditing ? (
                         <input
                           type="number"
@@ -462,14 +584,18 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.parking_space || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.parking_space || "N/A"}
+                        </p>
                       )}
                     </div>
                   </>
                 )}
-                
+
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Total Units:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Total Units:
+                  </label>
                   {isEditing ? (
                     <input
                       type="number"
@@ -480,11 +606,15 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.number_of_unit}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.number_of_unit}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Units Available:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Units Available:
+                  </label>
                   {isEditing ? (
                     <input
                       type="number"
@@ -495,11 +625,15 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.unit_available}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.unit_available}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Units Sold:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Units Sold:
+                  </label>
                   {isEditing ? (
                     <input
                       type="number"
@@ -510,7 +644,9 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.unit_sold}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.unit_sold}
+                    </p>
                   )}
                 </div>
               </div>
@@ -521,29 +657,42 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <h2 className="text-2xl font-semibold mb-4">Description</h2>
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Overview:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Overview:
+                  </label>
                   {isEditing ? (
                     <textarea
                       name="overview"
-                      value={formData.overview || ''}
+                      value={formData.overview || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-32"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3 break-words">{property.overview}</p>
+                    <div className="w-full md:w-2/3 flex justify-start">
+                      <div className="text-gray-900 break-words max-w-2xl text-left">
+                        {property.overview || "N/A"}
+                      </div>
+                    </div>
                   )}
                 </div>
+
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Description:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Description:
+                  </label>
                   {isEditing ? (
                     <textarea
                       name="description"
-                      value={formData.description || ''}
+                      value={formData.description || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-32"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3 break-words">{property.description}</p>
+                    <div className="w-full md:w-2/3 flex justify-start">
+                      <div className="text-gray-900 break-words max-w-2xl text-left">
+                        {property.description || "N/A"}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -554,91 +703,115 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <h2 className="text-2xl font-semibold mb-4">Address</h2>
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Street Address:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Street Address:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="street_address"
-                      value={formData.street_address || ''}
+                      value={formData.street_address || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.street_address}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.street_address}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">State:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    State:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="state"
-                      value={formData.state || ''}
+                      value={formData.state || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.state}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.state}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Country:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Country:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="country"
-                      value={formData.country || ''}
+                      value={formData.country || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.country}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.country}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">LGA:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    LGA:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="lga"
-                      value={formData.lga || ''}
+                      value={formData.lga || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.lga}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.lga}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Area:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Area:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="area"
-                      value={formData.area || ''}
+                      value={formData.area || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.area || 'N/A'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.area || "N/A"}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Nearby Landmarks:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Nearby Landmarks:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="nearby_landmarks"
-                      value={formData.nearby_landmarks || ''}
+                      value={formData.nearby_landmarks || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.nearby_landmarks || 'N/A'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.nearby_landmarks || "N/A"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -649,23 +822,36 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <h2 className="text-2xl font-semibold mb-4">Features</h2>
               {isEditing ? (
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Features:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Features:
+                  </label>
                   <div className="w-full md:w-2/3">
                     <textarea
-                      value={formData.features?.join(', ') || ''}
-                      onChange={(e) => handleArrayInputChange('features', e.target.value.split(',').map(item => item.trim()))}
+                      value={formData.features?.join(", ") || ""}
+                      onChange={(e) =>
+                        handleArrayInputChange(
+                          "features",
+                          e.target.value.split(",").map((item) => item.trim())
+                        )
+                      }
                       className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"
                       placeholder="Enter features separated by commas"
                     />
-                    <p className="text-sm text-gray-500 mt-1">Separate features with commas</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Separate features with commas
+                    </p>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Features:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Features:
+                  </label>
                   <ul className="w-full md:w-2/3 list-disc pl-5">
                     {property.features?.map((feature: any, index: any) => (
-                      <li key={index} className="text-gray-900">{feature}</li>
+                      <li key={index} className="text-gray-900">
+                        {feature}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -674,10 +860,14 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
 
             {/* Payment Information */}
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Payment Information</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                Payment Information
+              </h2>
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Initial Deposit:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Initial Deposit:
+                  </label>
                   {isEditing ? (
                     <input
                       type="number"
@@ -687,74 +877,101 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">₦{property.initial_deposit.toLocaleString()}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      ₦{property.initial_deposit.toLocaleString()}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Total Amount:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Total Amount:
+                  </label>
                   {isEditing ? (
                     <input
                       type="number"
                       name="total_amount"
-                      disabled
+                      // disabled
                       value={formData.total_amount || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">₦{property.total_amount.toLocaleString()}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      ₦{property.total_amount.toLocaleString()}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Payment Schedule:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Payment Schedule:
+                  </label>
                   {isEditing ? (
                     <textarea
-                    disabled
-                      value={formData.payment_schedule?.join('\n') || ''}
-                      onChange={(e) => handleArrayInputChange('payment_schedule', e.target.value.split('\n'))}
+                      // disabled
+                      value={formData.payment_schedule?.join("\n") || ""}
+                      onChange={(e) =>
+                        handleArrayInputChange(
+                          "payment_schedule",
+                          e.target.value.split("\n")
+                        )
+                      }
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"
                       placeholder="Enter each payment schedule on a new line"
                     />
                   ) : (
                     <ul className="w-full md:w-2/3 list-disc pl-5">
-                      {property.payment_schedule?.map((schedule: any, index: any) => (
-                        <li key={index} className="text-gray-900">{schedule}</li>
-                      ))}
+                      {property.payment_schedule?.map(
+                        (schedule: any, index: any) => (
+                          <li key={index} className="text-gray-900">
+                            {schedule}
+                          </li>
+                        )
+                      )}
                     </ul>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Payment Type:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Payment Type:
+                  </label>
                   {isEditing ? (
                     <input
-                    disabled
+                      // disabled
                       type="text"
                       name="payment_type"
-                      value={formData.payment_type || ''}
+                      value={formData.payment_type || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.payment_type}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.payment_type}
+                    </p>
                   )}
                 </div>
-                <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Fees & Charges:</label>
+                {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Fees & Charges:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="fees_charges"
-                      value={formData.fees_charges || ''}
+                      value={formData.fees_charges || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.fees_charges || 'N/A'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.fees_charges || "N/A"}
+                    </p>
                   )}
-                </div>
+                </div> */}
                 {/* Discount Section */}
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Discount:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Discount:
+                  </label>
                   {isEditing ? (
                     <input
                       type="checkbox"
@@ -764,27 +981,35 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                       className="w-full md:w-2/3 h-5 w-5 text-[#79B833] focus:ring-[#79B833] border-gray-300 rounded"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.is_discount ? 'Yes' : 'No'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.is_discount ? "Yes" : "No"}
+                    </p>
                   )}
                 </div>
                 {formData.is_discount && (
                   <div className="space-y-4 pl-4 border-l-2 border-red-400">
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Discount Name:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Discount Name:
+                      </label>
                       {isEditing ? (
                         <input
                           type="text"
                           name="discount_name"
-                          value={formData.discount_name || ''}
+                          value={formData.discount_name || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.discount_name || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.discount_name || "N/A"}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Discount Percentage:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Discount Percentage:
+                      </label>
                       {isEditing ? (
                         <input
                           type="number"
@@ -794,11 +1019,17 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.discount_percentage ? `${property.discount_percentage}%` : 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.discount_percentage
+                            ? `${property.discount_percentage}%`
+                            : "N/A"}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Discount Units:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Discount Units:
+                      </label>
                       {isEditing ? (
                         <input
                           type="number"
@@ -808,35 +1039,45 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.discount_units || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.discount_units || "N/A"}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Discount Start Date:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Discount Start Date:
+                      </label>
                       {isEditing ? (
                         <input
                           type="date"
                           name="discount_start_date"
-                          value={formData.discount_start_date || ''}
+                          value={formData.discount_start_date || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.discount_start_date || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.discount_start_date || "N/A"}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Discount End Date:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Discount End Date:
+                      </label>
                       {isEditing ? (
                         <input
                           type="date"
                           name="discount_end_date"
-                          value={formData.discount_end_date || ''}
+                          value={formData.discount_end_date || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.discount_end_date || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.discount_end_date || "N/A"}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -849,119 +1090,149 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <h2 className="text-2xl font-semibold mb-4">Property Details</h2>
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Property Type:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Property Type:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
-                      value={formData.type?.name || ''}
-                      onChange={(e) => setFormData(prev => ({
-                        ...prev,
-                        type: { ...prev.type!, name: e.target.value }
-                      }))}
+                      value={formData.type?.name || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          type: { ...prev.type!, name: e.target.value },
+                        }))
+                      }
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.type.name}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.type.name}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Status:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Status:
+                  </label>
                   {isEditing ? (
                     <select
                       name="status"
-                      value={formData.status || ''}
+                      value={formData.status || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     >
                       <option value="Rent">Rent</option>
                       <option value="For Sale">For Sale</option>
-                      <option value="Reserved">Reserved</option>
+                      <option value="Reserved">Rent</option>
                     </select>
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3 capitalize">{property.status}</p>
+                    <p className="text-gray-900 w-full md:w-2/3 capitalize">
+                      {property.status}
+                    </p>
                   )}
                 </div>
-                
+
                 {!isLandProperty && (
                   <>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Year Built:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Year Built:
+                      </label>
                       {isEditing ? (
                         <input
                           type="text"
                           name="year_built"
-                          value={formData.year_built || ''}
+                          value={formData.year_built || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                           required
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.year_built}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.year_built}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Building Condition:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Building Condition:
+                      </label>
                       {isEditing ? (
                         <input
                           type="text"
                           name="building_condition"
-                          value={formData.building_condition || ''}
+                          value={formData.building_condition || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                           required
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.building_condition}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.building_condition}
+                        </p>
                       )}
                     </div>
                   </>
                 )}
-                
+
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Category:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Category:
+                  </label>
                   {isEditing ? (
                     <input
-                    disabled
+                      // disabled
                       type="text"
                       name="category"
-                      value={formData.category || ''}
+                      value={formData.category || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.category}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.category}
+                    </p>
                   )}
                 </div>
-                
+
                 {isLandProperty && (
                   <>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Gated Estate:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Gated Estate:
+                      </label>
                       {isEditing ? (
                         <input
                           type="text"
                           name="gated_estate"
-                          value={formData.gated_estate || ''}
+                          value={formData.gated_estate || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.gated_estate || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.gated_estate || "N/A"}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                      <label className="text-gray-700 font-medium w-full md:w-1/3">Fencing:</label>
+                      <label className="text-gray-700 font-medium w-full md:w-1/3">
+                        Fencing:
+                      </label>
                       {isEditing ? (
                         <input
                           type="text"
                           name="fencing"
-                          value={formData.fencing || ''}
+                          value={formData.fencing || ""}
                           onChange={handleInputChange}
                           className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                         />
                       ) : (
-                        <p className="text-gray-900 w-full md:w-2/3">{property.fencing || 'N/A'}</p>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          {property.fencing || "N/A"}
+                        </p>
                       )}
                     </div>
                   </>
@@ -971,77 +1242,101 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
 
             {/* Additional Property Information */}
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Additional Information</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                Additional Information
+              </h2>
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Property Map URL:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Property Map URL:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="property_map"
-                      value={formData.property_map || ''}
+                      value={formData.property_map || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.property_map || 'N/A'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.property_map || "N/A"}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Property Video URL:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Property Video URL:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="property_video"
-                      value={formData.property_video || ''}
+                      value={formData.video_link || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.property_video || 'N/A'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.video_link || "N/A"}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Virtual Tour URL:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Virtual Tour URL:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="virtual_tour"
-                      value={formData.virtual_tour || ''}
+                      value={formData.virtual_tour || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.virtual_tour || 'N/A'}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.virtual_tour || "N/A"}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">Contact Number:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Contact Number:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="contact_number"
-                      value={formData.contact_number || ''}
+                      value={formData.contact_number || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                       required
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.contact_number}</p>
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.contact_number}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                  <label className="text-gray-700 font-medium w-full md:w-1/3">WhatsApp Link:</label>
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    WhatsApp Link:
+                  </label>
                   {isEditing ? (
                     <input
                       type="text"
                       name="whatsapp_link"
-                      value={formData.whatsapp_link || ''}
+                      value={formData.whatsapp_link || ""}
                       onChange={handleInputChange}
                       className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                     />
                   ) : (
-                    <p className="text-gray-900 w-full md:w-2/3">{property.whatsapp_link || 'N/A'}</p>
+                    <div className="w-full md:w-2/3 flex justify-start">
+                      <p className="text-gray-900 break-words max-w-2xl text-left">
+                        {property.whatsapp_link || "N/A"}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1052,9 +1347,12 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <h2 className="text-2xl font-semibold mb-4">Property Gallery</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {galleryPreviews.map((photo, index) => (
-                  <div key={index} className="relative aspect-video rounded-md overflow-hidden">
+                  <div
+                    key={index}
+                    className="relative aspect-video rounded-md overflow-hidden"
+                  >
                     <img
-                      src={photo || ''}
+                      src={photo || ""}
                       alt={`Property Photo ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -1062,7 +1360,9 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <input
                           type="file"
-                          ref={(el: any) => galleryInputRefs.current[index] = el}
+                          ref={(el: any) =>
+                            (galleryInputRefs.current[index] = el)
+                          }
                           onChange={handleGalleryImageChange(index)}
                           accept="image/*"
                           className="hidden"
@@ -1087,30 +1387,53 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
               <div className="space-y-4">
                 {isEditing ? (
                   (formData.details || []).map((detail, index) => (
-                    <div key={detail.id || index} className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <div
+                      key={detail.id || index}
+                      className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
+                    >
                       <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-1/3">
-                        <label className="text-gray-700 font-medium">Detail {index + 1} Name:</label>
+                        <label className="text-gray-700 font-medium">
+                          Detail {index + 1} Name:
+                        </label>
                         <input
                           type="text"
                           value={detail.name}
                           onChange={(e) => {
-                            const updatedDetails = [...(formData.details || [])];
-                            updatedDetails[index] = { ...updatedDetails[index], name: e.target.value };
-                            setFormData(prev => ({ ...prev, details: updatedDetails }));
+                            const updatedDetails = [
+                              ...(formData.details || []),
+                            ];
+                            updatedDetails[index] = {
+                              ...updatedDetails[index],
+                              name: e.target.value,
+                            };
+                            setFormData((prev) => ({
+                              ...prev,
+                              details: updatedDetails,
+                            }));
                           }}
                           className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                           placeholder="Detail Name"
                         />
                       </div>
                       <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-2/3">
-                        <label className="text-gray-700 font-medium">Value:</label>
+                        <label className="text-gray-700 font-medium">
+                          Value:
+                        </label>
                         <input
                           type="number"
                           value={detail.value}
                           onChange={(e) => {
-                            const updatedDetails = [...(formData.details || [])];
-                            updatedDetails[index] = { ...updatedDetails[index], value: Number(e.target.value) };
-                            setFormData(prev => ({ ...prev, details: updatedDetails }));
+                            const updatedDetails = [
+                              ...(formData.details || []),
+                            ];
+                            updatedDetails[index] = {
+                              ...updatedDetails[index],
+                              value: Number(e.target.value),
+                            };
+                            setFormData((prev) => ({
+                              ...prev,
+                              details: updatedDetails,
+                            }));
                           }}
                           className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                           placeholder="Value"
@@ -1121,9 +1444,16 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
                 ) : (
                   <div className="space-y-4">
                     {property.details?.map((detail: any, index: any) => (
-                      <div key={index} className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                        <label className="text-gray-700 font-medium w-full md:w-1/3">{detail.name} ({detail.purpose}):</label>
-                        <p className="text-gray-900 w-full md:w-2/3">₦{detail.value.toLocaleString()}</p>
+                      <div
+                        key={index}
+                        className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
+                      >
+                        <label className="text-gray-700 font-medium w-full md:w-1/3">
+                          {detail.name} ({detail.purpose}):
+                        </label>
+                        <p className="text-gray-900 w-full md:w-2/3">
+                          ₦{detail.value.toLocaleString()}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -1132,7 +1462,8 @@ const isLandProperty = data?.properties?.[0]?.category === 'estate';
             </div>
           </div>
         </div>
-      </div>
+    </div>
+      </EdithBackgroung>
     </section>
   );
 };

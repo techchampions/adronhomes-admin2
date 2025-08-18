@@ -141,7 +141,7 @@ interface PropertyContextType {
   setMedia: (data: MediaFormValues) => void;
   setDiscount: (data: DiscountFormValues) => void;
   setPaymentStructure: (data: PaymentStructureFormValues) => void;
-  submitForm: () => Promise<void>;
+ submitForm: (displayStatus: "draft" | "publish") => Promise<void>;
   currentStep: number;
   setCurrentStep: (step: number) => void;
   isLandProperty: boolean;
@@ -393,324 +393,253 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       paymentStructure: data,
     }));
   };
+// PropertyContext.tsx
+const submitForm = async (displayStatus: "draft" | "publish") => {
+  try {
+    setIsSubmitting(true);
 
-  const submitForm = async () => {
-    try {
-      setIsSubmitting(true);
+    const {
+      basicDetails,
+      bulkDetails,
+      specifications,
+      landForm,
+      features,
+      media,
+      discount,
+      paymentStructure,
+    } = formData;
 
-      const {
-        basicDetails,
-        bulkDetails,
-        specifications,
-        landForm,
-        features,
-        media,
-        discount,
-        paymentStructure,
+    console.log("Submitting with displayStatus:", displayStatus); // Debug log
 
-        
-        display,
+    const formPayload = new FormData();
 
-      } = formData;
+    // Populate formPayload based on isBulk and isLandProperty
+    if (isBulk) {
+      formPayload.append("name", bulkDetails.propertyName);
+      formPayload.append("type", bulkDetails.propertyType);
+      formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
+      formPayload.append("price", bulkDetails.price);
+      formPayload.append("street_address", bulkDetails.address);
+      formPayload.append("city", bulkDetails.city || "");
+      formPayload.append("country", bulkDetails.country);
+      formPayload.append("state", bulkDetails.state);
+      formPayload.append("lga", bulkDetails.lga);
+      formPayload.append("category", "bulk");
+      formPayload.append("initial_deposit", bulkDetails.initialDeposit || "0");
+    } else {
+      formPayload.append("name", basicDetails.propertyName);
+      formPayload.append("type", basicDetails.propertyType);
+      formPayload.append("price", basicDetails.price);
+      formPayload.append("initial_deposit", basicDetails.initialDeposit || "0");
+      formPayload.append("country", basicDetails.country);
+      formPayload.append("state", basicDetails.state);
+      formPayload.append("lga", basicDetails.lga);
+      formPayload.append("street_address", basicDetails.address);
+      formPayload.append("location_type", basicDetails.locationType || "");
 
-      console.log("Complete form data:", formData);
-
-      const formPayload = new FormData();
-
-      if (isBulk) {
-        formPayload.append("name", bulkDetails.propertyName);
-        formPayload.append("type", bulkDetails.propertyType);
-        formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
-        formPayload.append("price", bulkDetails.price);
-        formPayload.append("street_address", bulkDetails.address);
-        formPayload.append("city", bulkDetails.city || "");
-
-        formPayload.append("name", basicDetails.propertyName);
-        formPayload.append("type", basicDetails.propertyType);
-        formPayload.append("price", basicDetails.price);
-
-        formPayload.append("country", basicDetails.country);
-        formPayload.append("state", basicDetails.state);
-        formPayload.append("lga", basicDetails.lga);
-
-        formPayload.append("category", "bulk");
-        formPayload.append(
-          "initial_deposit",
-          basicDetails.initialDeposit || "0"
-        );
-      } else {
-        formPayload.append("name", basicDetails.propertyName);
-        formPayload.append("type", basicDetails.propertyType);
-        formPayload.append("price", basicDetails.price);
-
-        formPayload.append(
-          "initial_deposit",
-          basicDetails.initialDeposit || "0"
-        );
-        formPayload.append("country", basicDetails.country);
-        formPayload.append("state", basicDetails.state);
-        formPayload.append("lga", basicDetails.lga);
-        formPayload.append("street_address", basicDetails.address);
-        formPayload.append("location_type", basicDetails.locationType || "");
-
-
-
-        // Fixed purpose field to be properly formatted as array
-        if (Array.isArray(basicDetails.purpose)) {
-          basicDetails.purpose.forEach((purpose, index) => {
-            formPayload.append(`purpose[${index}]`, purpose);
-          });
-        } else {
-          formPayload.append("purpose", basicDetails.purpose || "");
-        }
-
-        formPayload.append("category", "single");
-      }
-
-      if (isLandProperty) {
-        formPayload.append("size", landForm.propertySize);
-        formPayload.append("shape", landForm.plotShape || "");
-        formPayload.append("topography", landForm.topography || "");
-          formPayload.append("category",  "estate");
-        formPayload.append(
-          "nearbyLandmarks",
-          Array.isArray(landForm.nearbyLandmarks)
-            ? landForm.nearbyLandmarks.join(", ")
-            : landForm.nearbyLandmarks || ""
-        );
-
-        formPayload.append(
-          "road_access",
-          Array.isArray(landForm.roadAccess)
-            ? landForm.roadAccess.join(", ")
-            : landForm.roadAccess || ""
-        );
-
-        formPayload.append(
-          "title_document_type",
-          Array.isArray(landForm.titleDocumentType)
-            ? landForm.titleDocumentType.join(", ")
-            : landForm.titleDocumentType || ""
-        );
-
-        formPayload.append("overview", landForm.overview);
-        formPayload.append("description", landForm.description);
-
-
-        // Fixed number_of_unit to ensure it's a number
-        const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
-        formPayload.append("number_of_unit", unitsAvailable.toString());
-
-
-        formPayload.append("director_id", landForm.director_id || "1");
-
-        // New fields for land properties
-        formPayload.append("fencing", landForm.fencing || "");
-        formPayload.append("gated_estate", landForm.gatedEstate || "");
-        formPayload.append("contact_number", landForm.contactNumber || "");
-        formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
-      } else {
-        formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
-        formPayload.append(
-          "number_of_bathroom",
-          specifications.bathrooms || "0"
-        );
-
-        formPayload.append(
-
-          "title_document_type",
-          Array.isArray(specifications.titleDocumentTypeProp)
-            ? specifications.titleDocumentTypeProp.join(", ")
-            : specifications.titleDocumentTypeProp || ""
-        );
-        formPayload.append("toilets", specifications.toilets || "0");
-
-        formPayload.append("size", specifications.propertySize);
-        formPayload.append(
-          "parking_space",
-          specifications.parkingSpaces || "0"
-        );
-        formPayload.append("overview", specifications.overview);
-        formPayload.append("description", specifications.description);
-        formPayload.append("year_built", specifications.yearBuilt || "");
-
-
-        // Fixed number_of_unit to ensure it's a number
-        const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
-        formPayload.append("number_of_unit", unitsAvailable.toString());
-
-
-        formPayload.append("director_id", specifications.director_id || "1");
-
-        formPayload.append(
-          "nearby_landmarks",
-          Array.isArray(specifications.nearbyLandmarks)
-            ? specifications.nearbyLandmarks.join(", ")
-            : specifications.nearbyLandmarks || ""
-        );
-        formPayload.append("rent_duration", specifications.rentDuration || "");
-        formPayload.append(
-          "building_condition",
-          specifications.buildingCondition || ""
-        );
-     // Fixed purpose field to be properly formatted as array
-        formPayload.append(
-
-          "title_document_type",
-          Array.isArray(landForm.titleDocumentType)
-            ? landForm.titleDocumentType.join(", ")
-            : landForm.titleDocumentType || ""
-        );
-
-
-        formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
-        formPayload.append(
-          "contact_number",
-          specifications.contactNumber || ""
-        );
-      }
-
-      if (Array.isArray(features.features)) {
-        features.features.forEach((feature, index) => {
-          formPayload.append(`features[${index}]`, feature);
+      if (Array.isArray(basicDetails.purpose)) {
+        basicDetails.purpose.forEach((purpose, index) => {
+          formPayload.append(`purpose[${index}]`, purpose);
         });
-      }
-
-      if (Array.isArray(media.images)) {
-        media.images.forEach((image, index) => {
-          if (image instanceof File) {
-            formPayload.append(`photos[${index}]`, image);
-            if (index === 0) {
-              formPayload.append("display_image", image);
-            }
-          }
-        });
-      }
-
-      if (media.tourLink) {
-        formPayload.append("virtual_tour", media.tourLink);
-      }
-
-      if (media.videoLink) {
-        formPayload.append("video_link", media.videoLink);
-      }
-
-      if (Array.isArray(media.videoFile) && media.videoFile.length > 0) {
-        media.videoFile.forEach((video, index) => {
-          if (video instanceof File) {
-            formPayload.append(`video_file[${index}]`, video);
-          }
-        });
-      }
-
-      formPayload.append("payment_type", paymentStructure.paymentType);
-      formPayload.append(
-        "property_duration_limit",
-        paymentStructure.paymentDuration
-      );
-
-      if (Array.isArray(paymentStructure.paymentSchedule)) {
-        paymentStructure.paymentSchedule.forEach((schedule, index) => {
-          formPayload.append(`payment_schedule[${index}]`, schedule);
-        });
-      }
-
-      formPayload.append("fees_charges", paymentStructure.feesCharges);
-
-      if (discount.discountName) {
-        formPayload.append("is_discount", "1");
-        formPayload.append("discount_name", discount.discountName);
-        formPayload.append("discount_percentage", discount.discountOff);
-        formPayload.append("discount_units", discount.unitsRequired);
-        formPayload.append("discount_start_date", discount.validFrom);
-        formPayload.append("discount_end_date", discount.validTo);
       } else {
-        formPayload.append("is_discount", "0");
+        formPayload.append("purpose", basicDetails.purpose || "");
       }
-
-
-      formPayload.append("is_active", display.status === "draft" ? "0" : "1");
-
-
-      if (isLandProperty) {
-        formPayload.append(`property_agreement`, landForm.documents);
-      } else {
-        formPayload.append(`property_agreement`, specifications.documents);
-      }
-
-      const result = await dispatch(
-        createProperty({ credentials: formPayload })
-      ).unwrap();
-
-      const createdPropertyId = result.data.property.id || 0;
-
-      if (createdPropertyId) {
-        const feePromises = fees
-          .filter((fee) => fee.checked)
-          .map((fee) => ({
-            property_id: createdPropertyId.toString(),
-            name: fee.name,
-            value: fee.amount.replace(/[^\d.]/g, ""),
-            type: fee.type,
-            purpose: fee.purpose,
-          }))
-          .map((feeDetail) =>
-            dispatch(add_property_detail({ credentials: feeDetail }))
-              .then((result) => {
-                console.log(`Successfully added fee: ${feeDetail.name}`);
-                return result;
-              })
-              .catch((error) => {
-                console.error(`Failed to add fee ${feeDetail.name}:`, error);
-                toast.error(`Failed to add fee ${feeDetail.name}`);
-                throw error;
-              })
-          );
-
-        const feeResults = await Promise.allSettled(feePromises);
-
-        const successfulFees = feeResults.filter(
-          (r) => r.status === "fulfilled"
-        ).length;
-        const failedFees = feeResults.filter(
-          (r) => r.status === "rejected"
-        ).length;
-
-        if (failedFees === 0) {
-          toast.success("All fees added successfully!");
-        } else {
-          toast.warning(
-            `Property created but ${failedFees} fee(s) failed to add`
-          );
-        }
-
-        resetFormData();
-        dispatch(resetPropertyState());
-      } else {
-        toast.error(
-          "Property created but couldn't add fees - missing property ID"
-        );
-      }
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-
-      if (error.response) {
-        toast.error(
-          `Server error: ${
-            error.response.data.message || error.response.statusText
-          }`
-        );
-      } else if (error.request) {
-        toast.error(
-          "No response from server. Please check your network connection."
-        );
-      } else {
-        toast.error(`Request error: ${error.message}`);
-      }
-    } finally {
-      setIsSubmitting(false);
+      formPayload.append("category", "single");
     }
-  };
+
+    if (isLandProperty) {
+      formPayload.append("size", landForm.propertySize);
+      formPayload.append("shape", landForm.plotShape || "");
+      formPayload.append("topography", landForm.topography || "");
+      formPayload.append("category", "estate");
+      formPayload.append(
+        "nearbyLandmarks",
+        Array.isArray(landForm.nearbyLandmarks)
+          ? landForm.nearbyLandmarks.join(", ")
+          : landForm.nearbyLandmarks || ""
+      );
+      formPayload.append(
+        "road_access",
+        Array.isArray(landForm.roadAccess)
+          ? landForm.roadAccess.join(", ")
+          : landForm.roadAccess || ""
+      );
+      formPayload.append(
+        "title_document_type",
+        Array.isArray(landForm.titleDocumentType)
+          ? landForm.titleDocumentType.join(", ")
+          : landForm.titleDocumentType || ""
+      );
+      formPayload.append("overview", landForm.overview);
+      formPayload.append("description", landForm.description);
+      const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
+      formPayload.append("number_of_unit", unitsAvailable.toString());
+      formPayload.append("director_id", landForm.director_id || "1");
+      formPayload.append("fencing", landForm.fencing || "");
+      formPayload.append("gated_estate", landForm.gatedEstate || "");
+      formPayload.append("contact_number", landForm.contactNumber || "");
+      formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
+      formPayload.append("property_agreement", landForm.documents);
+    } else {
+      formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
+      formPayload.append("number_of_bathroom", specifications.bathrooms || "0");
+      formPayload.append(
+        "title_document_type",
+        Array.isArray(specifications.titleDocumentTypeProp)
+          ? specifications.titleDocumentTypeProp.join(", ")
+          : specifications.titleDocumentTypeProp || ""
+      );
+      formPayload.append("toilets", specifications.toilets || "0");
+      formPayload.append("size", specifications.propertySize);
+      formPayload.append("parking_space", specifications.parkingSpaces || "0");
+      formPayload.append("overview", specifications.overview);
+      formPayload.append("description", specifications.description);
+      formPayload.append("year_built", specifications.yearBuilt || "");
+      const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
+      formPayload.append("number_of_unit", unitsAvailable.toString());
+      formPayload.append("director_id", specifications.director_id || "1");
+      formPayload.append(
+        "nearby_landmarks",
+        Array.isArray(specifications.nearbyLandmarks)
+          ? specifications.nearbyLandmarks.join(", ")
+          : specifications.nearbyLandmarks || ""
+      );
+      formPayload.append("rent_duration", specifications.rentDuration || "");
+      formPayload.append("building_condition", specifications.buildingCondition || "");
+      formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
+      formPayload.append("contact_number", specifications.contactNumber || "");
+      formPayload.append("property_agreement", specifications.documents);
+    }
+
+    if (Array.isArray(features.features)) {
+      features.features.forEach((feature, index) => {
+        formPayload.append(`features[${index}]`, feature);
+      });
+    }
+
+    if (Array.isArray(media.images)) {
+      media.images.forEach((image, index) => {
+        if (image instanceof File) {
+          formPayload.append(`photos[${index}]`, image);
+          if (index === 0) {
+            formPayload.append("display_image", image);
+          }
+        }
+      });
+    }
+
+    if (media.tourLink) {
+      formPayload.append("virtual_tour", media.tourLink);
+    }
+
+    if (media.videoLink) {
+      formPayload.append("video_link", media.videoLink);
+    }
+
+    if (Array.isArray(media.videoFile) && media.videoFile.length > 0) {
+      media.videoFile.forEach((video, index) => {
+        if (video instanceof File) {
+          formPayload.append(`video_file[${index}]`, video);
+        }
+      });
+    }
+
+    formPayload.append("payment_type", paymentStructure.paymentType);
+    formPayload.append("property_duration_limit", paymentStructure.paymentDuration);
+    if (Array.isArray(paymentStructure.paymentSchedule)) {
+      paymentStructure.paymentSchedule.forEach((schedule, index) => {
+        formPayload.append(`payment_schedule[${index}]`, schedule);
+      });
+    }
+    formPayload.append("fees_charges", paymentStructure.feesCharges);
+
+    if (discount.discountName) {
+      formPayload.append("is_discount", "1");
+      formPayload.append("discount_name", discount.discountName);
+      formPayload.append("discount_percentage", discount.discountOff);
+      formPayload.append("discount_units", discount.unitsRequired);
+      formPayload.append("discount_start_date", discount.validFrom);
+      formPayload.append("discount_end_date", discount.validTo);
+    } else {
+      formPayload.append("is_discount", "0");
+    }
+
+    // Use the displayStatus parameter directly
+    formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
+
+    const result = await dispatch(
+      createProperty({ credentials: formPayload })
+    ).unwrap();
+
+    const createdPropertyId = result.data.property.id || 0;
+
+    if (createdPropertyId) {
+      const feePromises = fees
+        .filter((fee) => fee.checked)
+        .map((fee) => ({
+          property_id: createdPropertyId.toString(),
+          name: fee.name,
+          value: fee.amount.replace(/[^\d.]/g, ""),
+          type: fee.type,
+          purpose: fee.purpose,
+        }))
+        .map((feeDetail) =>
+          dispatch(add_property_detail({ credentials: feeDetail }))
+            .then((result) => {
+              console.log(`Successfully added fee: ${feeDetail.name}`);
+              return result;
+            })
+            .catch((error) => {
+              console.error(`Failed to add fee ${feeDetail.name}:`, error);
+              toast.error(`Failed to add fee ${feeDetail.name}`);
+              throw error;
+            })
+        );
+
+      const feeResults = await Promise.allSettled(feePromises);
+
+      const successfulFees = feeResults.filter(
+        (r) => r.status === "fulfilled"
+      ).length;
+      const failedFees = feeResults.filter(
+        (r) => r.status === "rejected"
+      ).length;
+
+      if (failedFees === 0) {
+        toast.success("All fees added successfully!");
+      } else {
+        toast.warning(
+          `Property created but ${failedFees} fee(s) failed to add`
+        );
+      }
+
+      resetFormData();
+      dispatch(resetPropertyState());
+    } else {
+      toast.error(
+        "Property created but couldn't add fees - missing property ID"
+      );
+    }
+  } catch (error: any) {
+    console.error("Error submitting form:", error);
+    if (error.response) {
+      toast.error(
+        `Server error: ${
+          error.response.data.message || error.response.statusText
+        }`
+      );
+    } else if (error.request) {
+      toast.error(
+        "No response from server. Please check your network connection."
+      );
+    } else {
+      toast.error(`Request error: ${error.message}`);
+    }
+    throw error; // Re-throw to allow handleDraftPublishSelect to handle it
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <PropertyContext.Provider

@@ -58,7 +58,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({
             )}
             
                <p className="text-sm md:text-base text-gray-600">
-              Contrsct Id: {unique_contract_id}
+              Contract Id: {unique_contract_id}
             </p>
             <p className="text-sm md:text-base text-gray-600">
               Initial PaymentDate: {joinDate}
