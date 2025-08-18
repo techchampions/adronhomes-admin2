@@ -27,6 +27,6 @@ export interface EditOfficeLocationPayload {
   office_name?: string;
   first_contact?: string;
   second_contact?: string;
-  third_contact?: string | null;
+  email?: string | null;
   office_address?: string;
 }
