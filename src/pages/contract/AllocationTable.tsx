@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
+// import { formatDateTime } from "../../utils/formatDateTime"; // Import the new utility
 import { User } from "../../components/Redux/Contract/contracts_thunk";
 import ContractInputModal from "./ContractInputModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,8 +11,9 @@ import {
   updateContract,
   UpdateContractPayload,
 } from "../../components/Redux/UpdateContract/UpdateContract";
-import { FaEdit } from "react-icons/fa"; // Import the edit icon
+import { FaEdit } from "react-icons/fa";
 import { RiPencilFill } from "react-icons/ri";
+import { formatDateTime } from "../../utils/date";
 
 export interface Contract {
   id: number;
@@ -73,7 +75,7 @@ export default function AllocationTable({
   const { loading: updateContractLoading } = useSelector(
     (state: RootState) => state.contract
   );
-   const location = useLocation();
+  const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [selectedContractForInput, setSelectedContractForInput] =
     useState<Contract | null>(null);
@@ -128,11 +130,10 @@ export default function AllocationTable({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[1000px] md:min-w-0">
+        <div className="max-w-[1000px] md:min-w-0">
           <table className="w-full">
             <thead>
               <tr className="text-left">
-                {/* New S/N column header */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[50px]">
                   S/N
                 </th>
@@ -151,172 +152,179 @@ export default function AllocationTable({
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[150px]">
                   Marketer
                 </th>
+                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
+                  Date
+                </th>
+                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
+                  Time
+                </th>
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] whitespace-nowrap max-w-[200px] text-center">
                   Action
                 </th>
               </tr>
             </thead>
             <tbody>
-              {data.map((contract, index) => ( // Add index to map function
-                <tr
-                  key={contract.id}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
-                  {/* S/N column data */}
-                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[50px] truncate pr-4">
-                    {(pagination.currentPage - 1) * pagination.perPage + index + 1}
-                  </td>
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                          onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                    
+              {data.map((contract, index) => {
+                const { date, time } = formatDateTime(contract.created_at);
+                return (
+                  <tr
+                    key={contract.id}
+                    className="cursor-pointer hover:bg-gray-50"
                   >
-                    <div className="truncate">
-                      {contract.property?.name || "N/A"}
-                    </div>
-                    {contract.property?.name && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                        <div className="font-medium">Property</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{contract.property.name}</div>
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[50px] truncate pr-4">
+                      {(pagination.currentPage - 1) * pagination.perPage + index + 1}
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {contract.property?.name || "N/A"}
                       </div>
-                    )}
-                  </td>
-
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                          onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {contract.user
-                        ? `${contract.user.first_name} ${contract.user.last_name}`
-                        : "N/A"}
-                    </div>
-                    {contract.user && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                        <div className="font-medium">Customer</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{`${contract.user.first_name} ${contract.user.last_name}`}</div>
+                      {contract.property?.name && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                          <div className="font-medium">Property</div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <div>{contract.property.name}</div>
+                        </div>
+                      )}
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {contract.user
+                          ? `${contract.user.first_name} ${contract.user.last_name}`
+                          : "N/A"}
                       </div>
-                    )}
-                  </td>
-
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                          onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {formatAsNaira(contract.total_amount)}
-                    </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                      <div className="font-medium">Total Amount</div>
-                      <div className="border-t border-gray-600 my-1"></div>
-                      <div>{formatAsNaira(contract.total_amount)}</div>
-                    </div>
-                  </td>
-
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                          onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {formatAsNaira(contract.paid_amount)}
-                    </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                      <div className="font-medium">Amount Paid</div>
-                      <div className="border-t border-gray-600 my-1"></div>
-                      <div>{formatAsNaira(contract.paid_amount)}</div>
-                    </div>
-                  </td>
-
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                          onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {contract.marketer
-                        ? `${contract.marketer.first_name} ${contract.marketer.last_name}`
-                        : "N/A"}
-                    </div>
-                    {contract.marketer && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                        <div className="font-medium">Marketer</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{`${contract.marketer.first_name} ${contract.marketer.last_name}`}</div>
+                      {contract.user && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                          <div className="font-medium">Customer</div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <div>{`${contract.user.first_name} ${contract.user.last_name}`}</div>
+                        </div>
+                      )}
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {formatAsNaira(contract.total_amount)}
                       </div>
-                    )}
-                  </td>
-
-                  <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[200px] overflow-x-auto truncate relative group text-center">
-                    <div className="flex items-center justify-center space-x-2">
-                      <button
-                        onClick={() => {
-                          const basePath = location.pathname.startsWith(
-                            "/payments/contracts"
-                          )
-                            ? "/payments/contracts/details"
-                            : "/contracts/details";
-                          navigation(
-                            `${basePath}/${contract.user_id}/${contract.id}`
-                          );
-                        }}
-                        className="bg-[#272727] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
-                        aria-label="View contract details"
-                      >
-                        View Details
-                      </button>
-
-                 <button
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                        <div className="font-medium">Total Amount</div>
+                        <div className="border-t border-gray-600 my-1"></div>
+                        <div>{formatAsNaira(contract.total_amount)}</div>
+                      </div>
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {formatAsNaira(contract.paid_amount)}
+                      </div>
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                        <div className="font-medium">Amount Paid</div>
+                        <div className="border-t border-gray-600 my-1"></div>
+                        <div>{formatAsNaira(contract.paid_amount)}</div>
+                      </div>
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {contract.marketer
+                          ? `${contract.marketer.first_name} ${contract.marketer.last_name}`
+                          : "N/A"}
+                      </div>
+                      {contract.marketer && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                          <div className="font-medium">Marketer</div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <div>{`${contract.marketer.first_name} ${contract.marketer.last_name}`}</div>
+                        </div>
+                      )}
+                    </td>
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4">
+                      {date}
+                    </td>
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4">
+                      {time}
+                    </td>
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[200px] overflow-x-auto truncate relative group text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => {
+                            const basePath = location.pathname.startsWith(
+                              "/payments/contracts"
+                            )
+                              ? "/payments/contracts/details"
+                              : "/contracts/details";
+                            navigation(
+                              `${basePath}/${contract.user_id}/${contract.id}`
+                            );
+                          }}
+                          className="bg-[#272727] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
+                          aria-label="View contract details"
+                        >
+                          View Details
+                        </button>
+                        <button
                           aria-label="Edit property"
-                        //   onClick={() => handleEditClick(property)} .
+                          // onClick={() => handleEditClick(property)}
                         >
                           <img
                             src="/ic_round-edit.svg"
                             className="w-[18px] h-[18px]"
                           />
                         </button>
-                    </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                      Manage contract actions
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                        Manage contract actions
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -326,7 +334,13 @@ export default function AllocationTable({
         onPageChange={onPageChange}
         className="mt-8 mb-4"
       />
-      
+      {/* {showModal && (
+        <ContractInputModal
+          onClose={() => setShowModal(false)}
+          onSubmit={handleSubmit}
+          contract={selectedContractForInput}
+        />
+      )} */}
     </>
   );
 }

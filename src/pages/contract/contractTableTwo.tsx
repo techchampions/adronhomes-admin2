@@ -2,7 +2,9 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
+
 import { User } from "../../components/Redux/Contract/contracts_thunk";
+import { formatDateTime } from "../../utils/date";
 
 export interface Contract {
   id: number;
@@ -57,11 +59,11 @@ export default function ContractsTableComponenTwo({
   data,
   pagination,
   onPageChange,
-  getStatusText, 
+  getStatusText,
 }: ContractsTableProps) {
   const navigation = useNavigate();
+  const location = useLocation();
 
-    const location = useLocation();
   const getStatusBadgeClass = (status: number) => {
     switch (status) {
       case 1: // Active
@@ -78,161 +80,160 @@ export default function ContractsTableComponenTwo({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[1000px] md:min-w-0">
+        <div className="max-w-[800px] md:min-w-0">
           <table className="w-full">
             <thead>
               <tr className="text-left">
-                {/* Property Name */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[150px]">
                   Property Name
                 </th>
-                {/* Customer Name */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Customer Name
                 </th>
-                {/* Amount (corresponds to Total Amount) */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Amount
                 </th>
-                {/* Amount Paid */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Amount Paid
                 </th>
-                {/* Marketer */}
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[150px]">
                   Marketer
                 </th>
-               
+                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
+                  Date
+                </th>
+                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
+                  Time
+                </th>
               </tr>
             </thead>
             <tbody>
-              {data.map((contract) => (
-                <tr
-                  key={contract.id}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
-          
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                   onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
+              {data.map((contract) => {
+                const { date, time } = formatDateTime(contract.created_at);
+                return (
+                  <tr
+                    key={contract.id}
+                    className="cursor-pointer hover:bg-gray-50"
                   >
-                    <div className="truncate">
-                      {contract.property?.name || "N/A"}
-                    </div>
-                    {contract.property?.name && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                        <div className="font-medium">Property</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{contract.property.name}</div>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {contract.property?.name || "N/A"}
                       </div>
-                    )}
-                  </td>
-
-                  {/* Customer Name */}
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                   onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {contract.user
-                        ? `${contract.user.first_name} ${contract.user.last_name}`
-                        : "N/A"}
-                    </div>
-                    {contract.user && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                        <div className="font-medium">Customer</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{`${contract.user.first_name} ${contract.user.last_name}`}</div>
+                      {contract.property?.name && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                          <div className="font-medium">Property</div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <div>{contract.property.name}</div>
+                        </div>
+                      )}
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {contract.user
+                          ? `${contract.user.first_name} ${contract.user.last_name}`
+                          : "N/A"}
                       </div>
-                    )}
-                  </td>
-
-                  {/* Amount (Total Amount) */}
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                   onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {formatAsNaira(contract.total_amount)}
-                    </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                      <div className="font-medium">Total Amount</div>
-                      <div className="border-t border-gray-600 my-1"></div>
-                      <div>{formatAsNaira(contract.total_amount)}</div>
-                    </div>
-                  </td>
-
-                  {/* Amount Paid */}
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
-                   onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {formatAsNaira(contract.paid_amount)}
-                    </div>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                      <div className="font-medium">Amount Paid</div>
-                      <div className="border-t border-gray-600 my-1"></div>
-                      <div>{formatAsNaira(contract.paid_amount)}</div>
-                    </div>
-                  </td>
-
-                  {/* Marketer */}
-                  <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
-                   onClick={() => {
-                      const basePath = location.pathname.startsWith(
-                        "/payments/contracts"
-                      )
-                        ? "/payments/customers"
-                        : "/customers";
-                      navigation(`${basePath}/${contract.user.id}`);
-                    }}
-                  >
-                    <div className="truncate">
-                      {contract.marketer
-                        ? `${contract.marketer.first_name} ${contract.marketer.last_name}`
-                        : "N/A"}
-                    </div>
-                    {contract.marketer && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
-                        <div className="font-medium">Marketer</div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <div>{`${contract.marketer.first_name} ${contract.marketer.last_name}`}</div>
+                      {contract.user && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                          <div className="font-medium">Customer</div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <div>{`${contract.user.first_name} ${contract.user.last_name}`}</div>
+                        </div>
+                      )}
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {formatAsNaira(contract.total_amount)}
                       </div>
-                    )}
-                  </td>
-
-                </tr>
-              ))}
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                        <div className="font-medium">Total Amount</div>
+                        <div className="border-t border-gray-600 my-1"></div>
+                        <div>{formatAsNaira(contract.total_amount)}</div>
+                      </div>
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {formatAsNaira(contract.paid_amount)}
+                      </div>
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                        <div className="font-medium">Amount Paid</div>
+                        <div className="border-t border-gray-600 my-1"></div>
+                        <div>{formatAsNaira(contract.paid_amount)}</div>
+                      </div>
+                    </td>
+                    <td
+                      className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
+                      onClick={() => {
+                        const basePath = location.pathname.startsWith(
+                          "/payments/contracts"
+                        )
+                          ? "/payments/customers"
+                          : "/customers";
+                        navigation(`${basePath}/${contract.user.id}`);
+                      }}
+                    >
+                      <div className="truncate">
+                        {contract.marketer
+                          ? `${contract.marketer.first_name} ${contract.marketer.last_name}`
+                          : "N/A"}
+                      </div>
+                      {contract.marketer && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">
+                          <div className="font-medium">Marketer</div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <div>{`${contract.marketer.first_name} ${contract.marketer.last_name}`}</div>
+                        </div>
+                      )}
+                    </td>
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4">
+                      {date}
+                    </td>
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4">
+                      {time}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
