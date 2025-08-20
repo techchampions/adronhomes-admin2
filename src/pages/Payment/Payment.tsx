@@ -11,15 +11,20 @@ import NotFound from "../../components/NotFound";
 import { toast } from "react-toastify";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import { resetErrorMessage, resetPayments } from "../../components/Redux/Payment/payment_slice";
+import { useLocation } from "react-router-dom";
 
 export default function Payment() {
   const dispatch = useDispatch<AppDispatch>();
   const tabs = ["All", "Approved", "Pending", "Rejected"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
-
+const location = useLocation();
   const { data, error, loading } = useSelector(
     (state: RootState) => state.payments
   );
+    const basePath = location.pathname.startsWith(
+                        "/payments/payments"
+                      )
+                      
 
   useEffect(() => {
     dispatch(payments());
@@ -78,22 +83,25 @@ export default function Payment() {
           value={
             data?.amount_total ? `${data.amount_total.toLocaleString()}` : "0"
           }
-          change="Includes all property plans"
+          // change="Includes all property plans"
+       change= {basePath?"Includes all  payments":"Includes all  contracts"}
+        
         />
         <MatrixCard
           currency={true}
-          title="Total Pending Contracts"
+          title={basePath?"Total Pending payments":"Total Pending Contracts"}
           value={
             data?.amount_pending
               ? `${data.amount_pending.toLocaleString()}`
               : "0"
           }
-          change="Includes all customers on a property plan"
+          change= {basePath?"Includes all pending payments":"Includes all pending contracts"}
         />
         <MatrixCard
-          title="Total Active Contracts"
+          // title="
+                 title={basePath?"Total Active payments":"Total Active Contracts"}
           value={data?.total ? data.total.toString() : "0"}
-          change="Includes all active property plans"
+          change= {basePath?"Includes all active payments":"Includes all active contracts"}
         />
       </div>
       {loading ? (

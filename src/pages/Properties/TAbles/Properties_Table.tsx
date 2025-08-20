@@ -371,7 +371,7 @@ const handleRowClick = (propertyId: number) => {
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="max-w-[800px] md:min-w-0">
+        <div className="min-w-[800px] md:min-w-0">
          <table className="w-full min-w-[800px]">
   <thead>
     <tr className="text-left">
@@ -384,9 +384,9 @@ const handleRowClick = (propertyId: number) => {
       <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
         Property Type
       </th>
-      <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
+      {/* <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
         Bedrooms
-      </th>
+      </th> */}
       <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
         Status
       </th>
@@ -458,14 +458,14 @@ const handleRowClick = (propertyId: number) => {
               </div>
             </div>
           </td>
-          <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
+          {/* <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
             <div className="group relative">
               <span className="truncate block">{property.no_of_bedroom || "N/A"}</span>
               <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
                 {property.no_of_bedroom || "N/A"}
               </div>
             </div>
-          </td>
+          </td> */}
           <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
             <div className="group relative">
               <span className="truncate block">
@@ -486,7 +486,7 @@ const handleRowClick = (propertyId: number) => {
           </td>
           <td className="w-1/6 py-4 pl-4 text-sm">
             <div className="flex space-x-2">
-              <button
+              {/* <button
                 aria-label="Edit property"
                 onClick={() => handleEditClick(property)}
               >
@@ -494,7 +494,7 @@ const handleRowClick = (propertyId: number) => {
                   src="/ic_round-edit.svg"
                   className="w-[18px] h-[18px]"
                 />
-              </button>
+              </button> */}
               <button
                 aria-label="Delete property"
                 onClick={() => handleDeleteClick(property)}

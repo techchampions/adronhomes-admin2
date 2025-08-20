@@ -7,12 +7,14 @@ interface PublishDraftState {
   loading: boolean;
   data: PublishDraftSuccessResponse | null;
   error: ErrorResponse | null;
+  success:boolean
 }
 
 const initialState: PublishDraftState = {
   loading: false,
   data: null,
   error: null,
+  success:false
 };
 
 // Create the slice
@@ -24,6 +26,7 @@ const publishDraftSlice = createSlice({
       state.loading = false;
       state.data = null;
       state.error = null;
+      state.success=false
     },
   },
   extraReducers: (builder) => {
@@ -32,6 +35,7 @@ const publishDraftSlice = createSlice({
         state.loading = true;
         state.data = null;
         state.error = null;
+        state.success=false
       })
       .addCase(
         publishDraft.fulfilled,
@@ -42,6 +46,7 @@ const publishDraftSlice = createSlice({
           state.loading = false;
           state.data = action.payload;
           state.error = null;
+          state.success=true
         }
       )
       .addCase(

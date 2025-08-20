@@ -17,6 +17,7 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import DraftPublishModal from "./DraftPublishModal";
 import BasicDetails from "./BasicDetails/BasicDetails";
 import BasicDetailsLand from "./BasicDetails/BasicDetailsLand";
+import { toast } from "react-toastify";
 
 
 
@@ -108,14 +109,13 @@ const { loading, error, success, propertyId } = useSelector(
         }
         break;
       case 6:
-        // Show modal at final submission (Confirm & Submit)
         if (canProceed) {
           setShowDraftPublishModal(true);
-          return; // Don't proceed to next step yet
+          return;
         }
         break;
-      case 7:
-        await submitForm();
+      // case 7:
+      //   await submitForm();
         return;
     }
 
@@ -124,22 +124,19 @@ const { loading, error, success, propertyId } = useSelector(
     }
   };
 
+// General.tsx
 const handleDraftPublishSelect = async (option: "draft" | "publish") => {
   try {
     setIsSubmitting(true);
     setShowDraftPublishModal(false);
+    setDisplayStatus(option); // Set the display status
 
-    setDisplayStatus(option === "draft" ? "draft" : "publish");
-
-    const result = await submitForm();
-
-    // Assume submitForm returns a success flag or throws on failure
-    if (success) {
-      setCurrentStep(7); // Only move to final step if successful
-    } 
+    // Call submitForm with the selected option directly
+    await submitForm(option);
+    setCurrentStep(7); // Move to the final step after successful submission
   } catch (error) {
     console.error("Submission failed:", error);
-    // Stay on step 6 if there's an error
+    toast.error("Failed to submit property. Please try again.");
   } finally {
     setIsSubmitting(false);
   }

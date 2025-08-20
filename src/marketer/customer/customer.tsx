@@ -46,9 +46,9 @@ export default function MarketerCustomer() {
           change="Total customers referred by you"
         />
         <MatrixCard
-          title="Active Plans"
+         title="Total Active Contracts"
           value={totalActivePlans.toString()}
-          change="All customers on a property plan"
+          change="includes all customers on  active Contracts"
         />
         <MatrixCard
           title="Fully Paid Plans"

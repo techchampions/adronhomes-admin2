@@ -69,8 +69,6 @@ import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 
-// import GeneralEdeting from "./pages/Properties/GeneralEditing";
-
 const AuthGuard = () => {
   const token = Cookies.get("token");
   if (!token) {
@@ -213,15 +211,6 @@ const App = () => {
                   element={<AccountDetails />}
                 />
                 <Route path="/customers/:id" element={<CustomerSinglePage />} />
-
-                <Route
-                  path="/customers/transactions/:id"
-                  element={<UserPayments />}
-                />
-                <Route
-                  path="/customers/wallet-transactions/:id"
-                  element={<WalletTransactionsPage />}
-                />
 
                 <Route
                   path="/customers/transactions/:id"
