@@ -37,7 +37,7 @@ const SiteInformationPage = () => {
         <SocialLinks />
         <EstateLocation />
         {/* <ContactInfo /> */}
-        <TermsAndConditions />
+        {/* <TermsAndConditions /> */}
       </div>
     </div>
   );
