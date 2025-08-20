@@ -49,6 +49,9 @@ import toggleFeaturedReducer from './Properties/toggle_featured_slice'
 import ViewApplicationReducer from './carreer/ViewApplicationSlice'
 import propertyDetailsReducer from './Properties/propertiesDetails/propetiesDetailsSlice'
 import publishDraftReducer from './Properties/publishpropertySlice'
+import exportPaymentsReducer from './export/exportPaymentsSlice'
+import exportCustomersReducer from './export/exportCustomersSlice'
+
 
 export const store = configureStore({
   reducer: {
@@ -100,7 +103,9 @@ export const store = configureStore({
     toggleFeatured:toggleFeaturedReducer,
     ViewApplication:ViewApplicationReducer,
     propertyDetails:propertyDetailsReducer,
-    publishDraft:publishDraftReducer
+    publishDraft:publishDraftReducer,
+    exportPayments: exportPaymentsReducer,
+  exportCustomers: exportCustomersReducer,
   },
 });
 

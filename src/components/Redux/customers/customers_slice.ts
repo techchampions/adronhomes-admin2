@@ -13,6 +13,7 @@ interface CustomerState {
     totalItems: number;
     perPage: number;
   };
+  search: string;
 }
 
 const initialState: CustomerState = {
@@ -26,6 +27,7 @@ const initialState: CustomerState = {
     totalItems: 0,
     perPage: 10,
   },
+  search: '',
 };
 
 const customerSlice = createSlice({
@@ -38,6 +40,10 @@ const customerSlice = createSlice({
     },
     setCustomersPage: (state, action: PayloadAction<number>) => {
       state.pagination.currentPage = action.payload;
+    },
+    setCustomersSearch: (state, action: PayloadAction<string>) => {
+      state.search = action.payload;
+      state.pagination.currentPage = 1;
     },
   },
   extraReducers: (builder) => {
@@ -73,7 +79,7 @@ const customerSlice = createSlice({
 });
 
 // Export actions
-export const { clearCustomersError, setCustomersPage } = customerSlice.actions;
+export const { clearCustomersError, setCustomersPage, setCustomersSearch } = customerSlice.actions;
 
 // Export reducer
 export default customerSlice.reducer;
@@ -93,3 +99,6 @@ export const selectCustomersError = (state: { customers: CustomerState }) =>
 
 export const selectCustomersPagination = (state: { customers: CustomerState }) =>
   state.customers.pagination;
+
+export const selectCustomersSearch = (state: { customers: CustomerState }) =>
+  state.customers.search;

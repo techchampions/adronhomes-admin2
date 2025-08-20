@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -10,15 +10,17 @@ import { formatDate } from "../../utils/formatdate";
 import NotFound from "../../components/NotFound";
 import { toast } from "react-toastify";
 import LoadingAnimations from "../../components/LoadingAnimations";
-import { resetErrorMessage, resetPayments } from "../../components/Redux/Payment/payment_slice";
+import { resetErrorMessage, resetPayments, setPaymentSearch } from "../../components/Redux/Payment/payment_slice";
 import { useLocation } from "react-router-dom";
+import ExportPaymentsModal from "../../components/exportModal/PaymentsExportModal";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 export default function Payment() {
   const dispatch = useDispatch<AppDispatch>();
   const tabs = ["All", "Approved", "Pending", "Rejected"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 const location = useLocation();
-  const { data, error, loading } = useSelector(
+  const { data, error, loading, pagination, search } = useSelector(
     (state: RootState) => state.payments
   );
     const basePath = location.pathname.startsWith(
@@ -27,8 +29,8 @@ const location = useLocation();
                       
 
   useEffect(() => {
-    dispatch(payments());
-  }, [dispatch]);
+    dispatch(payments({ page: pagination.currentPage, search }));
+  }, [dispatch, pagination.currentPage, search]);
 
   useEffect(() => {
     if (error) {
@@ -68,13 +70,19 @@ const location = useLocation();
 
   const filteredData = paymentData();
   const isEmpty = filteredData.length === 0;
-
+  const paymentsModalRef = useRef<ExportModalRef>(null);
+    const openPaymentsModal = () => {
+    if (paymentsModalRef.current) {
+      paymentsModalRef.current.openModal();
+    }
+  };
   return (
     <div className="pb-[52px] relative">
       <Header
         title="Payments"
         subtitle="Manage the list of payments made by customers"
         buttonText="export"
+        onButtonClick={openPaymentsModal}
       />
       <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] items-center lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
@@ -104,14 +112,10 @@ const location = useLocation();
           change= {basePath?"Includes all active payments":"Includes all active contracts"}
         />
       </div>
-      {loading ? (
-        <div className=" absolute top-96 left-96 right-96">
-          {" "}
-          <LoadingAnimations loading={loading} />
-        </div>
-      ) : (
+      
         <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
           <ReusableTable
+           onSearch={(value) => dispatch(setPaymentSearch(value))}
             activeTab={activeTab}
             onTabChange={setActiveTab}
             tabs={tabs}
@@ -123,12 +127,17 @@ const location = useLocation();
                 </p>
                 <NotFound />
               </div>
-            ) : (
+            )
+            :loading ? (
+    
+          <LoadingAnimations loading={loading} />
+
+      )  : (
               <PaymentTableComponent data={filteredData} />
             )}
           </ReusableTable>
         </div>
-      )}
+<ExportPaymentsModal ref={paymentsModalRef} />
     </div>
   );
 }

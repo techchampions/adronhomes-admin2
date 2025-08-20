@@ -36,9 +36,9 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
   const pagination = useSelector(selectCustomersPagination);
   const location = useLocation();
 
-  const handlePageChange = async (page: number) => {
+  const handlePageChange = async (page: any) => {
     await dispatch(setCustomersPage(page));
-    await dispatch(customer());
+    await dispatch(customer( page ));
   };
   const navigate = useNavigate();
   return (

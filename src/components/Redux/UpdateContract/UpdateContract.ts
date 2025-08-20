@@ -113,25 +113,26 @@ export const updateContract = createAsyncThunk<
 
       if (axiosError.response?.status === 401) {
         Cookies.remove("token");
-        toast.error("Session expired. Please login again.");
+        // toast.error("Session expired. Please login again.");
       }
 
       if (axiosError.response) {
         // Handle validation errors
         if (axiosError.response.data.errors) {
-          // Join all error messages into a single string
+      
           const errorMessages = Object.values(axiosError.response.data.errors)
             .flat()
-            .join(', ');
+            .join(", ");
           toast.error(errorMessages);
           return rejectWithValue({
             message: errorMessages,
             errors: axiosError.response.data.errors,
           });
         }
-        
-        // Handle other error messages
-        const errorMessage = axiosError.response.data.message || "Failed to update contract.";
+
+      
+        const errorMessage =
+          axiosError.response.data.message || "Failed to update contract.";
         toast.error(errorMessage);
         return rejectWithValue({
           message: errorMessage,
@@ -139,9 +140,12 @@ export const updateContract = createAsyncThunk<
       }
 
       if (axiosError.request) {
-        toast.error("No response from server. Please check your network connection.");
+        toast.error(
+          "No response from server. Please check your network connection."
+        );
         return rejectWithValue({
-          message: "No response from server. Please check your network connection.",
+          message:
+            "No response from server. Please check your network connection.",
         });
       }
 

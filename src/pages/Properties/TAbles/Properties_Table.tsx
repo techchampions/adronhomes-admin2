@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
 import {
-  selectPropertiesagination,
+  // selectPropertiesagination,
+  selectPropertiesPagination,
   setPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
 import InputField from "../../../components/input/inputtext";
@@ -79,9 +80,10 @@ export interface PropertyData {
 
 interface PropertyTableProps {
   data: PropertyData[];
+  CurrentPage:any
 }
 
-export default function PropertyTableComponent({ data }: PropertyTableProps) {
+export default function PropertyTableComponent({ data,CurrentPage }: PropertyTableProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(
@@ -124,7 +126,10 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
       toast.success("Property deleted successfully!");
-      dispatch(fetchProperties());
+     dispatch(fetchProperties({ 
+        page:   CurrentPage,
+   
+      }));
       handleCloseDeleteModal();
     }
 
@@ -158,16 +163,19 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
 
   const handlePageChange = async (page: any) => {
     await dispatch(setPropertiesPage(page));
-    await dispatch(fetchProperties());
+    await dispatch(fetchProperties(page));
   };
 
-  const pagination = useSelector(selectPropertiesagination);
+  const pagination = useSelector(selectPropertiesPagination);
 
   // Handle success and error states
   useEffect(() => {
     if (success) {
       toast.success("Property updated successfully!");
-      dispatch(fetchProperties());
+     dispatch(fetchProperties({ 
+        page:   CurrentPage,
+   
+      }));
       handleCloseModal();
     }
 
@@ -350,7 +358,10 @@ const handleRowClick = (propertyId: number) => {
   useEffect(() => {
     if (toggleSuccess) {
       // toast.success("Featured status updated successfully!");
-      dispatch(fetchProperties());
+     dispatch(fetchProperties({ 
+        page:   CurrentPage,
+   
+      }));
       dispatch(resetToggleFeaturedState());
     }
 

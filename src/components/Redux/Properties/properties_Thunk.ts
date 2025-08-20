@@ -8,6 +8,7 @@ export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
 }
+
 export interface Property {
   id: number;
   name: string;
@@ -79,17 +80,19 @@ export interface PaginationData<T> {
   to: number;
   total: number;
 }
+
 export interface PropertiesResponse {
   status: string;
   message: string;
   total_properties: number;
-    total_published: number,
-    total_drafted: number,
+  total_published: number;
+  total_drafted: number;
   total_sold: number;
   drafted_properties: PaginationData<Property>;
   published_properties: PaginationData<Property>;
   sold_properties: PaginationData<Property>;
 }
+
 export interface PropertiesState {
   drafted: {
     data: Property[];
@@ -101,6 +104,7 @@ export interface PropertiesState {
       totalItems: number;
       totalPages: number;
     };
+    search: string;
   };
   published: {
     data: Property[];
@@ -112,6 +116,7 @@ export interface PropertiesState {
       totalItems: number;
       totalPages: number;
     };
+    search: string;
   };
   sold: {
     data: Property[];
@@ -123,27 +128,27 @@ export interface PropertiesState {
       totalItems: number;
       totalPages: number;
     };
+    search: string;
   };
   stats: {
     totalProperties: number;
     totalSold: number;
-    total_published: number,
-    total_drafted: number,
+    total_published: number;
+    total_drafted: number;
   };
   loading: boolean;
   error: ErrorResponse | null;
 }
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const fetchProperties = createAsyncThunk<
   PropertiesResponse,
-  void,
+  { page?: number; search?: string },
   { rejectValue: ErrorResponse; state: RootState }
->("properties/fetch", async (_, { rejectWithValue, getState }) => {
+>("properties/fetch", async ({ page = 1, search = "" }, { rejectWithValue }) => {
   const token = Cookies.get("token");
-  const state = getState() as RootState;
-  const currentPage = state.properties?.published.pagination.currentPage || 1;
-  const page = state.properties?.published.pagination.currentPage || 1;
+
   if (!token) {
     return rejectWithValue({
       message: "No authentication token found. Please login again.",
@@ -161,8 +166,9 @@ export const fetchProperties = createAsyncThunk<
           device_id: "1010l0010l1",
         },
         params: {
-          page: currentPage,
-        },
+          page,
+          ...(search && { search }) // Only include search if it has value
+        }
       }
     );
     return response.data;

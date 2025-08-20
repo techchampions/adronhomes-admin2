@@ -76,11 +76,11 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const payments = createAsyncThunk<
   PaymentsResponse,
-  void,
+  { page?: number; search?: string },
   { rejectValue: ErrorResponse; state: RootState }
 >(
   "payments/fetch",
-  async (_, { rejectWithValue, getState }) => {
+  async ({ page = 1, search = "" }, { rejectWithValue, getState }) => {
     const token = Cookies.get('token');
     const state = getState();
     const currentPage = state.payments?.pagination?.currentPage || 1; 
@@ -101,9 +101,9 @@ export const payments = createAsyncThunk<
             "identifier": "dMNOcdMNOPefFGHIlefFGHIJKLmno",
             "device_id": "1010l0010l1",
           },
-          params: {
-            page: currentPage,
-            per_page: 50 // Match the API's default pagination size
+           params: {
+            page,
+            search
           }
         }
       );
