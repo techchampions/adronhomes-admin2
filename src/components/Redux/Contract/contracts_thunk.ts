@@ -183,7 +183,7 @@ export const fetchContracts = createAsyncThunk<
     status?: number | null; 
     search?: string | null;
     per_page?: number;
-    contract?: number | null; // New parameter for contract type
+    contract?: number | null; 
   },
   {
     state: RootState;

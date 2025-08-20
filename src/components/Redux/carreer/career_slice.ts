@@ -19,6 +19,7 @@ interface CareersState {
   totalCareer: number | null;
   totalCareerViews: string | null;
   totalApplications: string | null;
+    search: string;
 }
 
 const initialState: CareersState = {
@@ -32,6 +33,7 @@ const initialState: CareersState = {
     totalItems: 0,
     totalPages: 1,
   },
+    search: '',
   name: null,
   totalCareer: null,
   totalCareerViews: null,
@@ -49,6 +51,11 @@ const careersSlice = createSlice({
       }
       state.pagination.currentPage = action.payload;
     },
+     setCareerSearch: (state, action: PayloadAction<string>) => {
+  state.search = action.payload;
+  state.pagination.currentPage = 1;
+},
+
   },
   extraReducers: (builder) => {
     builder
@@ -86,7 +93,7 @@ const careersSlice = createSlice({
 });
 
 // Export actions
-export const { resetCareersState, setCurrentPage } = careersSlice.actions;
+export const { resetCareersState, setCurrentPage,setCareerSearch } = careersSlice.actions;
 
 // Export selectors
 export const selectCareerPagination = (state: { getcareers: CareersState }) =>

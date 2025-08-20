@@ -14,7 +14,7 @@ export default function PaymentTableComponent({ data }: { data: any }) {
   const dispatch = useDispatch<AppDispatch>();
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
-    await dispatch(payments());
+    await dispatch(payments({}));
   };
   const pagination = useSelector(selectPaymentsPagination);
   const location = useLocation();

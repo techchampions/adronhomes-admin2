@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Header from "../../general/Header";
 import PropertyTableComponent, { PropertyData } from "./TAbles/Properties_Table";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -8,38 +8,79 @@ import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProperties } from "../../components/Redux/Properties/properties_Thunk";
+import { setPropertiesSearch } from "../../components/Redux/Properties/propertiesTable_slice";
 
 const tabs = ['Published', 'Sold', 'Drafted'];
 
 export default function Properties() {
   const [activeTab, setActiveTab] = useState('Published');
+  const [isSearching, setIsSearching] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const { drafted, published, sold, stats, loading } = useSelector(
-    (state: RootState) => state.properties
-  );
+  
+  const { drafted, published, sold, stats, loading } = useSelector((state: RootState) => state.properties);
 
-  useEffect(() => {
-    dispatch(fetchProperties());
-  }, [dispatch]);
+  const getFilteredProperties = useCallback((properties: PropertyData[], searchTerm: string) => {
+    if (!searchTerm.trim()) return properties;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return properties.filter(property => 
+      property.name.toLowerCase().includes(searchLower) ||
+      (property.street_address && property.street_address.toLowerCase().includes(searchLower)) ||
+      (property.state && property.state.toLowerCase().includes(searchLower)) ||
+      (property.lga && property.lga.toLowerCase().includes(searchLower)) ||
+      (property.category && property.category.toLowerCase().includes(searchLower))
+    );
+  }, []);
 
-  const selectDataForTab = (tab: string) => {
-    switch (tab) {
+  const getCurrentState = () => {
+    switch (activeTab) {
       case 'Published':
-        return published.data;
+        return published;
       case 'Sold':
-        return sold.data;
+        return sold;
       case 'Drafted':
-        return drafted.data;
+        return drafted;
       default:
-        return [...published.data, ...sold.data, ...drafted.data];
+        return published;
     }
   };
 
-  const filteredProperties = selectDataForTab(activeTab);
+  const currentState = getCurrentState();
+  
+  const filteredProperties = useMemo(() => {
+    return getFilteredProperties(currentState.data as PropertyData[], currentState.search);
+  }, [currentState.data, currentState.search, getFilteredProperties]);
+
   const isEmpty = filteredProperties.length === 0;
 
+  useEffect(() => {
+    const fetchData = () => {
+      dispatch(fetchProperties({ 
+        page: currentState.pagination.currentPage,
+        search: currentState.search
+      }));
+    };
+
+    const debounceTimer = setTimeout(fetchData, 500);
+    return () => clearTimeout(debounceTimer);
+  }, [dispatch, currentState.pagination.currentPage, currentState.search, activeTab]);
+
+  const handleSearch = (value: string) => {
+    const type = activeTab.toLowerCase() as "drafted" | "published" | "sold";
+    dispatch(setPropertiesSearch({ type, search: value }));
+    setIsSearching(true);
+    
+    setTimeout(() => setIsSearching(false), 1000);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setIsSearching(true);
+    setTimeout(() => setIsSearching(false), 500);
+  };
+
   const getLoadingState = () => {
-    // Use the loading state for the specific tab being viewed.
+    if (isSearching) return true;
     switch (activeTab) {
       case 'Published':
         return published.loading;
@@ -68,13 +109,11 @@ export default function Properties() {
         />
         <MatrixCard
           title="Published Properties"
-          // Correctly accessing the 'total_published' key from the stats object
           value={stats.total_published}
           change="Includes all Published Properties"
         />
         <MatrixCard
           title="Drafted Properties"
-          // Correctly accessing the 'total_drafted' key from the stats object
           value={stats.total_drafted}
           change="Includes all Drafted Properties"
         />
@@ -86,22 +125,29 @@ export default function Properties() {
       </div>
 
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] relative">
-        <ReusableTable
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        >
+      <ReusableTable
+  tabs={tabs}
+  activeTab={activeTab}
+  onTabChange={handleTabChange}
+  onSearch={handleSearch}
+  searchPlaceholder="Search properties by name, address, state..."
+>
+
           {currentLoading ? (
-            <div className="w-full flex items-center justify-center">
+            <div className="w-full flex items-center justify-center py-8">
               <LoadingAnimations loading={currentLoading} />
             </div>
           ) : isEmpty ? (
-            <div className="max-h-screen">
-              <p className="text-center font-normal text-[#767676]">No data found</p>
+            <div className="max-h-screen py-8">
+              <p className="text-center font-normal text-[#767676] mb-4">
+                {currentState.search ? 'No properties found matching your search' : 'No data found'}
+              </p>
               <NotFound />
             </div>
           ) : (
-            <PropertyTableComponent data={filteredProperties as PropertyData[]} />
+            <PropertyTableComponent 
+                  data={filteredProperties as PropertyData[]} CurrentPage={currentState.pagination.currentPage}          
+            />
           )}
         </ReusableTable>
       </div>

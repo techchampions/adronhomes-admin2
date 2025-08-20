@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -7,23 +7,33 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { customer } from "../../components/Redux/customers/customers_thunk";
 import LoadingAnimations from "../../components/LoadingAnimations";
+import { setCustomersSearch } from "../../components/Redux/customers/customers_slice"; // Assuming the slice file is named customers_slice
+import ExportCustomersModal from "../../components/exportModal/customerExport";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 export default function Customers() {
   const dispatch = useDispatch<AppDispatch>();
-  useEffect(() => {
-    dispatch(customer());
-  }, [dispatch]);
-
-  const { data, customers, loading, error, pagination } = useSelector(
+  const { data, customers, loading, error, pagination, search } = useSelector(
     (state: RootState) => state.customers
   );
   const tabs = ['Customers'];
+
+  useEffect(() => {
+    dispatch(customer({ page: pagination.currentPage, search }));
+  }, [dispatch, pagination.currentPage, search]);
+ const customersModalRef = useRef<ExportModalRef>(null);
+   const openCustomersModal = () => {
+    if (customersModalRef.current) {
+      customersModalRef.current.openModal();
+    }
+  };
   return (
     <div className="pb-[52px] relative">
       <Header
         title="Customers"
         subtitle="Manage the list of registered customers"
-         buttonText="export"
+         buttonText="Export"
+         onButtonClick={openCustomersModal}
       />
       <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen 
@@ -39,18 +49,20 @@ export default function Customers() {
           change="Includes all active Contracts"
         />
       </div>
-      {loading ? (
-     <div className=" absolute top-96 left-96 right-96">   <LoadingAnimations loading={loading} /></div>
-      ) :
-     ( <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
           tabs={tabs}
           searchPlaceholder={"Search Customer"}
           activeTab={"Customers"}
-        >
-          <CustomersTableComponent data={customers} />
+          onSearch={(value) => dispatch(setCustomersSearch(value))}
+        >{loading ? (
+   <LoadingAnimations loading={loading} />
+      ) :
+     (
+          <CustomersTableComponent data={customers} />)}
         </ReusableTable>
-      </div>)}
+      </div>
+        <ExportCustomersModal ref={customersModalRef} />
     </div>
   );
 }

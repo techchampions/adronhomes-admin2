@@ -95,7 +95,7 @@ const AddCareerModal: React.FC<AddCareerModalProps> = ({
     if (createJobSuccess) {
       // toast.success("Job added successfully!");
       dispatch(resetCreateJobState());
-        dispatch(fetchCareers());
+        dispatch(fetchCareers({}));
       onClose();
     }
     if (createJobError) {
