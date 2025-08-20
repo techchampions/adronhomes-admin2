@@ -87,14 +87,14 @@ export default function DashboardHeader({
           </div>
 
           {/* Action Button */}
-          <button
+          {/* <button
             className={`text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap ${
               isCancelState ? "bg-[#D70E0E] hover:bg-red-600" : "bg-[#79B833] hover:bg-[#6aa22c]"
             }`}
             onClick={handleButtonClick}
           >
             {getButtonText()}
-          </button>
+          </button> */}
         </div>
       </div>
 

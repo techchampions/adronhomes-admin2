@@ -81,7 +81,7 @@ const location = useLocation();
       <Header
         title="Payments"
         subtitle="Manage the list of payments made by customers"
-        buttonText="export"
+        buttonText="Export"
         onButtonClick={openPaymentsModal}
       />
       <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] items-center lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">

@@ -37,8 +37,8 @@ const ExportModal = forwardRef<ExportModalRef, ExportModalProps>(({
   baseUrl = ''
 }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [startDate, setStartDate] = useState('2025-05-14');
-  const [endDate, setEndDate] = useState('2025-06-04');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Expose methods to parent component via ref
   useImperativeHandle(ref, () => ({

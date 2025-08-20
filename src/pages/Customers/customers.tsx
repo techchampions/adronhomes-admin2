@@ -32,7 +32,7 @@ export default function Customers() {
       <Header
         title="Customers"
         subtitle="Manage the list of registered customers"
-         buttonText="export"
+         buttonText="Export"
          onButtonClick={openCustomersModal}
       />
       <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
