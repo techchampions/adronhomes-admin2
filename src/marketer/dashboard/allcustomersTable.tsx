@@ -29,6 +29,9 @@ const CustomersTableAll = ({currentItems}:{currentItems:any}) => {
           <table className="w-full">
             <thead>
               <tr className="text-left ">
+                  <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
+                 Customer's Contract_id
+                </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
                  Customer’s Name
                 </th>
@@ -50,6 +53,9 @@ const CustomersTableAll = ({currentItems}:{currentItems:any}) => {
             <tbody>
               {currentItems.map((row:any) => (
                 <tr key={row.id} className="cursor-pointer">
+                    <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
+                    {row.unique_customer_id ?? 'N/A'}
+                  </td>
                   <td className="pb-8 font-[325]  text-dark text-sm max-w-xs truncate whitespace-nowrap">
                     {row.name ?? 'N/A'}
                   </td>
