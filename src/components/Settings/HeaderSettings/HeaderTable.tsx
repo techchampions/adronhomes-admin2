@@ -9,7 +9,7 @@ import { HeaderItem } from "../../../pages/Properties/types/HeaderDataTypes";
 
 export default function HeaderTable() {
   const { data, isError, isLoading } = useGetHeaders();
-  const headers = data?.data.data || [];
+  const headers = data?.data || [];
   const [page] = useState(1);
   const navigate = useNavigate();
   const [editModal, setEditModal] = useState(false);

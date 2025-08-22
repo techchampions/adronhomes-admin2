@@ -36,7 +36,7 @@ export interface HeadersData {
 
 export interface HeadersResponse {
   success: boolean;
-  data: HeadersData;
+  data: HeaderItem[];
 }
 
 export interface UpdateHeaderPayload {
