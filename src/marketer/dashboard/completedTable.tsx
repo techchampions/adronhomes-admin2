@@ -33,6 +33,9 @@ const navigate=useNavigate()
           <table className="w-full">
             <thead>
               <tr className="text-left ">
+                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
+                 Customer's Contract_id
+                </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
                   Customer's Name
                 </th>
@@ -61,6 +64,11 @@ const navigate=useNavigate()
     >
      
       <td className="pr-2 max-w-xs">
+           <td className="pr-2 max-w-xs">
+        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+          {row.unique_customer_id}
+        </div>
+      </td>
         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
           {row.name ?? "N/A"}
         </div>

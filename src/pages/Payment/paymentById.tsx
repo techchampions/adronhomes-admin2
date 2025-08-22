@@ -85,6 +85,7 @@ export default function PaymentById() {
           title="Payments"
           subtitle="Manage the list of payments made by customers"
           history={true}
+          
         />
         <div className="flex items-center justify-center h-screen text-center ">
           <LoadingAnimations loading={loading} />
@@ -153,6 +154,7 @@ export default function PaymentById() {
         title="Payments"
         subtitle="Manage the list of payments made by customers"
         history={true}
+        showSearchAndButton={false}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[40px]">
         <PaymentCard

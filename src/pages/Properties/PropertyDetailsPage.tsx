@@ -20,6 +20,7 @@ import { PropertyContext } from "../../MyContext/MyContext";
 import { resetPublishDraftState } from "../../components/Redux/Properties/publishpropertySlice";
 import { EdithBackgroung } from "../../components/Tables/forProperties";
 import { IoArrowBackSharp } from "react-icons/io5";
+import { string } from "yup";
 
 const PropertyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -357,6 +358,11 @@ const PropertyDetailsPage = () => {
   const handleGoBack = () => {
     navigate(-1);
   };
+
+
+  const uniquePurposes = [...new Set(formData.details?.map(d => d.purpose).filter(p => p !== undefined && p !== null) || [])];
+
+
   return (
     <section className="w-full lg:pl-[38px] lg:pr-[64px] pr-[15px] pl-[15px] pt-8">
       <EdithBackgroung>
@@ -1500,7 +1506,9 @@ const PropertyDetailsPage = () => {
                 <div className="space-y-4">
                   {isEditing ? (
                     (formData.details || []).map((detail, index) => (
-                      <div
+
+                      <><div
+
                         key={detail.id || index}
                         className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
                       >
@@ -1523,10 +1531,11 @@ const PropertyDetailsPage = () => {
                                 ...prev,
                                 details: updatedDetails,
                               }));
-                            }}
+
+                            } }
                             className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
-                            placeholder="Detail Name"
-                          />
+                            placeholder="Detail Name" />
+
                         </div>
                         <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-2/3">
                           <label className="text-gray-700 font-medium">
@@ -1547,12 +1556,41 @@ const PropertyDetailsPage = () => {
                                 ...prev,
                                 details: updatedDetails,
                               }));
-                            }}
+
+                            } }
                             className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
-                            placeholder="Value"
-                          />
+                            placeholder="Value" />
                         </div>
-                      </div>
+
+                      </div><div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-2/3">
+                          <label className="text-gray-700 font-medium">
+                            Purpose:
+                          </label>
+                          <select
+                            value={detail.purpose || ""}
+                            onChange={(e) => {
+                              const updatedDetails = [
+                                ...(formData.details || []),
+                              ];
+                              updatedDetails[index] = {
+                                ...updatedDetails[index],
+                                purpose: e.target.value,
+                              };
+                              setFormData((prev) => ({
+                                ...prev,
+                                details: updatedDetails,
+                              }));
+                            } }
+                            className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                          >
+                            {uniquePurposes.map((p) => (
+                              <option key={p} value={p}>
+                                {p}
+                              </option>
+                            ))}
+                          </select>
+                        </div></>
+
                     ))
                   ) : (
                     <div className="space-y-4">
@@ -1562,13 +1600,23 @@ const PropertyDetailsPage = () => {
                           className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
                         >
                           <label className="text-gray-700 font-medium w-full md:w-1/3">
-                            {detail.name} ({detail.purpose}):
+
+                            {detail.name} :
                           </label>
+                          
                           <p className="text-gray-900 w-full md:w-2/3">
                             ₦{detail.value.toLocaleString()}
                           </p>
+
+                           <label className="text-gray-700 font-medium w-full md:w-1/3">
+                            purpose : {detail.purpose}
+                          </label>
                         </div>
+                        
                       ))}
+
+                      
+
                     </div>
                   )}
                 </div>
