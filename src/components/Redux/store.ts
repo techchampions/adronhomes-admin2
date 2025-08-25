@@ -51,7 +51,7 @@ import propertyDetailsReducer from './Properties/propertiesDetails/propetiesDeta
 import publishDraftReducer from './Properties/publishpropertySlice'
 import exportPaymentsReducer from './export/exportPaymentsSlice'
 import exportCustomersReducer from './export/exportCustomersSlice'
-
+import countriesReducer from './country/countrythunkand slice'
 
 export const store = configureStore({
   reducer: {
@@ -106,6 +106,7 @@ export const store = configureStore({
     publishDraft:publishDraftReducer,
     exportPayments: exportPaymentsReducer,
   exportCustomers: exportCustomersReducer,
+  countries:countriesReducer
   },
 });
 

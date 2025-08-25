@@ -19,9 +19,8 @@ interface HeaderProps {
   history?: boolean;
   showBulkModal?: boolean;
   setShowBulkModal?: (show: boolean) => void;
-handleViewPurchaseFormClick?: () => void;
+  handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
-
   viewForm?: boolean;
 }
 
@@ -46,9 +45,11 @@ export default function Header({
     setPersonnelModal,
     isUserBulk,
     setIsUserBulk,
-        role,
-        setRole,
-        isLandProperty, setIsLandProperty,resetFormData
+    role,
+    setRole,
+    isLandProperty, 
+    setIsLandProperty,
+    resetFormData
   } = useContext(PropertyContext)!;
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
@@ -56,17 +57,27 @@ export default function Header({
   const navigate = useNavigate();
 
   const isPersonnelPage = location.pathname === "/personnel";
+  const isFormPage = location.pathname === "/properties/form";
+
+  // Set cancel state based on URL when component mounts or location changes
+  useEffect(() => {
+    if (isFormPage) {
+      setIsCancelState(true);
+    } else {
+      setIsCancelState(false);
+    }
+  }, [location.pathname, setIsCancelState]);
 
   const handleButtonClick = () => {
     if (onButtonClick) {
       setIsCancelState(false);
       onButtonClick();
-    } else if (isCancelState) {
-      // When in cancel state, navigate back
+    } else if (isCancelState || isFormPage) {
+      // When in cancel state or on form page, navigate back
       navigate(isPersonnelPage ? "/personnel" : "/properties");
       setIsCancelState(false);
-         resetFormData()
-    setIsLandProperty(false);
+      resetFormData();
+      setIsLandProperty(false);
     } else {
       // Normal state behavior
       if (isPersonnelPage) {
@@ -74,97 +85,95 @@ export default function Header({
         setcreatepersonnel(true);
       } else {
         // Property-specific action
-        setIsCancelState(true);
         setShowBulkModal(true);
       }
     }
   };
 
-
   // Determine button text based on page and state
   const getButtonText = () => {
-    if (isCancelState) return "Cancel";
+    if (isCancelState || isFormPage) return "Cancel";
     return isPersonnelPage ? "Create Personnel" : buttonText;
   };
 
   return (
     <>
-      <div className="w-full flex-col lg:flex-row justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] flex overflow-hidden relative">
-        <div className="w-full sm:w-auto -4 sm:mb-0 lg:ml-0 ml-10">
-          <h2 className="font-[325] text-2xl sm:text-3xl md:text-[34px] leading-tight text-dark mb-2">
+      <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
+        <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0 lg:ml-10">
+          <h2 className="font-[325] text-xl sm:text-2xl md:text-3xl lg:text-[34px] leading-tight text-dark mb-2 break-words lg:break-normal">
             {title}
           </h2>
-          <p className="leading-tight font-[325] text- md:text-base text-[#767676]">
+          <p className="leading-tight font-[325] text-sm md:text-base text-[#767676] break-words lg:break-normal">
             {subtitle}
           </p>
           {history && (
             <>
               <p
                 onClick={() => navigate(-1)}
-                className="cursor-pointer text-dark font-meduim text-base lg:flex items-center mt-4 hidden"
+                className="cursor-pointer text-dark font-medium text-base lg:flex items-center mt-4 hidden"
               >
                 <IoMdArrowBack className="mr-2" /> Back
               </p>
               <p
                 onClick={() => navigate(-1)}
-                className="cursor-pointer text-dark font-meduim text-base lg:hidden absolute top-0 right-10 items-center mt-4 flex"
+                className="cursor-pointer text-dark font-medium text-sm lg:text-base lg:hidden absolute top-4 right-4 items-center flex"
               >
-                <IoMdArrowBack className="mr-2" /> Back
+                <IoMdArrowBack className="mr-1 lg:mr-2" /> Back
               </p>
             </>
           )}
         </div>
 
- 
-        
-          <div className="w-full lg:w-auto flex flex-col lg:flex-row items-center gap-4 mt-4 sm:mt-0">
-           {showSearchAndButton && ( <><div
-            className={`relative h-[51px] w-full sm:w-64 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${isSearchFocused
-                ? "border-[#79B833] shadow-sm"
-                : "border-[#D8D8D8]"} bg-white overflow-hidden`}
-          >
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              className="w-full h-full px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)} />
-          </div><button
-            className={`text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4  whitespace-nowrap ${isCancelState
-                ? "bg-[#D70E0E] hover:bg-red-600"
-                : "bg-[#79B833] hover:bg-[#6aa22c]"}`}
-            onClick={handleButtonClick}
-          >
-              {getButtonText()}
-            </button></>
-     )}
-            {viewForm && (
-              <button
-                className="text-[#79B833] border-2 border-[#79B833] md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap "
-                onClick={()=>handleViewPurchaseFormClick?.()}
+        <div className="w-full lg:w-auto flex flex-col lg:flex-row lg:flex-wrap items-center gap-3 lg:gap-4 mt-4 sm:mt-0">
+          {showSearchAndButton && (
+            <>
+              <div
+                className={`relative h-[45px] lg:h-[51px] w-full sm:w-64 lg:w-[410px] rounded-full border transition-all font-[400] ${isSearchFocused
+                  ? "border-[#79B833] shadow-sm"
+                  : "border-[#D8D8D8]"} bg-white overflow-hidden`}
               >
-                View Purchase Form
+                <input
+                  type="text"
+                  placeholder={searchPlaceholder}
+                  className="w-full h-full px-4 lg:px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                />
+              </div>
+              <button
+                className={`text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap ${isCancelState || isFormPage
+                  ? "bg-[#D70E0E] hover:bg-red-600"
+                  : "bg-[#79B833] hover:bg-[#6aa22c]"}`}
+                onClick={handleButtonClick}
+              >
+                {getButtonText()}
               </button>
-            )}
-          </div>
-   
+            </>
+          )}
+          {viewForm && (
+            <button
+              className="text-[#79B833] border-2 border-[#79B833] text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap"
+              onClick={() => handleViewPurchaseFormClick?.()}
+            >
+              View Purchase Form
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Modals */}
       {!isPersonnelPage && showBulkModal && (
         <BulkSelectModal
           onSelect={(isBulk) => {
             navigate("/properties/form");
-            // setIsBulk(true);
-             setIsLandProperty(true);
-            
+            setIsLandProperty(true);
             setShowBulkModal(false);
             setIsCancelState(true);
           }}
           onSelects={(isBulk) => {
             navigate("/properties/form");
-            // setIsBulk(false);
             setShowBulkModal(false);
-             setIsLandProperty(false);
+            setIsLandProperty(false);
             setIsCancelState(true);
           }}
           onClose={() => setShowBulkModal(false)}
@@ -205,8 +214,10 @@ export default function Header({
             />
           ) : (
             <PersonnelModal
-                isOpen={showPersonnelModal}
-                onClose={() => setPersonnelModal(false)} role={role}            />
+              isOpen={showPersonnelModal}
+              onClose={() => setPersonnelModal(false)}
+              role={role}
+            />
           )}
         </>
       )}

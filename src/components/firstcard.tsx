@@ -152,7 +152,7 @@ interface MatrixCardGreenProps {
 export function MatrixCardGreen({
   title = "Total Registered Customers",
   value = "704",
-  change = "+203 last month",
+  change = "includes all registered customers",
   currency = false, // Default to false
 }: MatrixCardGreenProps) {
   return (

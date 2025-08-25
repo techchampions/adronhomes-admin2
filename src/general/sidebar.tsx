@@ -49,7 +49,7 @@ export default function Sidebar() {
   // }, [logoutSuccess]);
 
   const DesktopSidebar = () => (
-    <div className="hidden lg:block pl-4 md:pl-[40px] pt-12 md:pt-[52px] pr-[20px] bg-white max-h-screen w-[280px]">
+    <div className="hidden lg:block pl-4 md:pl-[40px] pt-12 md:pt-[52px] pr-[20px] bg-white min-h-screen w-[280px]">
       <img
         src="/andron.svg"
         alt="andron"

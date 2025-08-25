@@ -43,9 +43,12 @@ export default function Personnel() {
 
   const sortOptions = [
   { value: 2, name: "Marketer" },
-  { value: 3, name: "Director" },
+  { value: 3, name: "Sales Director" },
   { value: 4, name: "Accountant" },
-  { value: 1, name: "Admin" }
+  { value: 1, name: "Admin" },
+    { value:5, name: "Human Resourses" },
+      { value:6, name: "Legal" },
+  { value: 0, name: "All" }
 ];
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -119,7 +122,7 @@ useEffect(() => {
           onSearch={handleSearch}
           sortOptions={sortOptions}
           onSortChange={setOption}
-      defaultSort={option.value}
+      defaultSort={0}
           
         >
           {loading ? (
