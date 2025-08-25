@@ -133,7 +133,7 @@ const location = useLocation();
             </div>
 
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-              <StatsCard stats={Transactionstat} tag="Transactions" />
+              <StatsCard stats={Transactionstat} tag="web analytics" />
               <StatsCard stats={PaymentsStat} tag="Payments" />
             </div>
             <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">

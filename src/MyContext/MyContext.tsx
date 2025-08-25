@@ -33,6 +33,7 @@ interface BasicDetailsFormValues {
   country: any;
   state: any;
   lga: any;
+  category:any
 }
 
 interface BulkDetailsFormValues {
@@ -195,6 +196,7 @@ const initialFormData: PropertyFormData = {
     country: "",
     state: "",
     lga: "",
+    category:""
   },
   bulkDetails: {
     propertyName: "",
@@ -293,7 +295,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [isCancelState, setIsCancelState] = useState(false);
   const [isInfrastructure, setIsCancelInfrastructure] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [option, setOption] = useState(2);
+  const [option, setOption] = useState(0);
   const [fees, setFees] = useState<Fee[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [sales, setSales] = useState<boolean>(false);
