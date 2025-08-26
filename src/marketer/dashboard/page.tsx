@@ -39,7 +39,8 @@ export default function MarketersDashboard() {
       user_id: item.user_id,
       total_amount: item.total_amount,
       remaining_balance: item.remaining_balance,
-      unique_customer_id: item.user?.contract_id || "N/A"
+
+      unique_customer_id: item.user?.unique_customer_id || "N/A"
     }));
   };
 
@@ -56,7 +57,8 @@ export default function MarketersDashboard() {
       phoneNumber: item.user?.phone_number || "N/A",
       plan_id: item.id,
       user_id: item.user_id,
-      unique_customer_id: item.user?.contract_id || "N/A"
+
+      unique_customer_id: item.user?.unique_customer_id || "N/A"
     }));
   };
 
@@ -74,7 +76,9 @@ export default function MarketersDashboard() {
       plan_id: item.plan_id,
       total_amount: item.property_plan.total_amount,
       remaining_balance: item.property_plan.remaining_balance,
-      unique_customer_id: item.property_plan.user?.contract_id || "N/A"
+
+      unique_customer_id: item.property_plan.user?.unique_customer_id || "N/A"
+
     }));
   };
 
