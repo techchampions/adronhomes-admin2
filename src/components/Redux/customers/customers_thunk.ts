@@ -1,5 +1,3 @@
-// customers_thunk.ts
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
@@ -85,14 +83,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const customer = createAsyncThunk<
   CustomersResponse,
-  void,
-  { rejectValue: ErrorResponse; state: RootState }
+  { page?: number; search?: string },
+  { rejectValue: ErrorResponse }
 >(
   "customers/fetch",
-  async (_, { rejectWithValue, getState }) => {
-    const token = Cookies.get('token');
-    const state = getState() as RootState;
-    const currentPage = state.customers.pagination.currentPage;
+  async ({ page = 1, search = "" }, { rejectWithValue }) => {
+    const token = Cookies.get("token");
     
     if (!token) {
       return rejectWithValue({
@@ -111,7 +107,8 @@ export const customer = createAsyncThunk<
             device_id: "1010l0010l1",
           },
           params: {
-            page: currentPage 
+            page,
+            search
           }
         }
       );
@@ -120,7 +117,7 @@ export const customer = createAsyncThunk<
       const axiosError = error as AxiosError<ErrorResponse>;
 
       if (axiosError.response?.status === 401) {
-        Cookies.remove('token');
+        Cookies.remove("token");
       }
 
       if (axiosError.response) {

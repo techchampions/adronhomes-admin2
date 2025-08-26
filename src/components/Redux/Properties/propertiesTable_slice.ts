@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import {
   fetchProperties,
   PropertiesResponse,
@@ -17,6 +16,7 @@ const initialState: PropertiesState = {
       totalItems: 0,
       totalPages: 1,
     },
+    search: "",
   },
   published: {
     data: [],
@@ -28,6 +28,7 @@ const initialState: PropertiesState = {
       totalItems: 0,
       totalPages: 1,
     },
+    search: "",
   },
   sold: {
     data: [],
@@ -39,10 +40,11 @@ const initialState: PropertiesState = {
       totalItems: 0,
       totalPages: 1,
     },
+    search: "",
   },
   stats: {
     totalProperties: 0,
-   total_published: 0,
+    total_published: 0,
     total_drafted: 0,
     totalSold: 0,
   },
@@ -64,17 +66,43 @@ const propertiesSlice = createSlice({
       const { type, page } = action.payload;
       state[type].pagination.currentPage = page;
     },
+    setPropertiesSearch: (
+      state,
+      action: PayloadAction<{
+        type: "drafted" | "published" | "sold";
+        search: string;
+      }>
+    ) => {
+      const { type, search } = action.payload;
+      state[type].search = search;
+      state[type].pagination.currentPage = 1;
+    },
+    clearPropertiesSearch: (
+      state,
+      action: PayloadAction<"drafted" | "published" | "sold">
+    ) => {
+      const type = action.payload;
+      state[type].search = "";
+      state[type].pagination.currentPage = 1;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProperties.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.drafted.loading = true;
+        state.published.loading = true;
+        state.sold.loading = true;
       })
       .addCase(
         fetchProperties.fulfilled,
         (state, action: PayloadAction<PropertiesResponse>) => {
           state.loading = false;
+          state.drafted.loading = false;
+          state.published.loading = false;
+          state.sold.loading = false;
+          
           state.drafted.data = action.payload.drafted_properties.data;
           state.published.data = action.payload.published_properties.data;
           state.sold.data = action.payload.sold_properties.data;
@@ -103,13 +131,16 @@ const propertiesSlice = createSlice({
           state.stats = {
             totalProperties: action.payload.total_properties,
             totalSold: action.payload.total_sold,
-              total_published: action.payload.total_published,
-         total_drafted: action.payload.total_drafted,
+            total_published: action.payload.total_published,
+            total_drafted: action.payload.total_drafted,
           };
         }
       )
       .addCase(fetchProperties.rejected, (state, action) => {
         state.loading = false;
+        state.drafted.loading = false;
+        state.published.loading = false;
+        state.sold.loading = false;
         state.error = action.payload || {
           message: "Failed to fetch properties",
         };
@@ -117,9 +148,9 @@ const propertiesSlice = createSlice({
   },
 });
 
-export const { setPropertiesPage } = propertiesSlice.actions;
+export const { setPropertiesPage, setPropertiesSearch, clearPropertiesSearch } = propertiesSlice.actions;
 export default propertiesSlice.reducer;
 
-export const selectPropertiesagination = (state: {
+export const selectPropertiesPagination = (state: {
   properties: PropertiesState;
-}) => state.properties.drafted.pagination; // or .published.pagination or .sold.pagination
+}) => state.properties.drafted.pagination;

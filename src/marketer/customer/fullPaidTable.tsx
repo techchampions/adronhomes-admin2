@@ -13,7 +13,7 @@ import { formatDate } from "../../utils/formatdate";
 import NotFound from "../../components/NotFound"; // Make sure this path is correct
 import LoadingAnimations from "../../components/LoadingAnimations";
 
-const UpcomingPayments = () => {
+const UpcomingPayments = ({searchTerm}:{searchTerm:any}) => {
   const dispatch = useAppDispatch();
   const upcomingPayments = useAppSelector(selectUpcomingPayments);
   const pagination = useAppSelector(selectUpcomingPaymentsPagination);
@@ -27,6 +27,22 @@ const UpcomingPayments = () => {
   const handlePageChange = (page: number) => {
     dispatch(setUpcomingPaymentsCurrentPage(page));
   };
+
+  const filteredUpcomingPayments = upcomingPayments.filter((payment) => {
+  const searchLower = searchTerm.toLowerCase();
+
+  const fullName = `${payment.property_plan.user.first_name} ${payment.property_plan.user.last_name}`.toLowerCase();
+  const dueDate = payment.due_date?.toLowerCase?.() || "";
+  const totalAmount = payment.property_plan.total_amount?.toString() || "";
+  const paidAmount = payment.property_plan.paid_amount?.toString() || "";
+
+  return (
+    fullName.includes(searchLower) ||
+    dueDate.includes(searchLower) ||
+    totalAmount.includes(searchLower) ||
+    paidAmount.includes(searchLower)
+  );
+});
 
   return (
     <div className="w-full">
@@ -54,6 +70,9 @@ const UpcomingPayments = () => {
               <table className="w-full">
                 <thead>
                   <tr className="text-left">
+                     <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
+                      Payment's Id
+                    </th>
                     <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
                       Customer's Name
                     </th>
@@ -75,8 +94,13 @@ const UpcomingPayments = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {upcomingPayments.map((payment) => (
+                  {filteredUpcomingPayments.map((payment) => (
                     <tr key={payment.id} className="cursor-pointer">
+                         <td className="pr-6 max-w-[130px]">
+                        <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+                          {(payment.id) || "N/A"}
+                        </div>
+                      </td>
                       <td className="pr-6 max-w-[130px]">
                         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
                           {`${payment.property_plan.user.first_name} ${payment.property_plan.user.last_name}` ||

@@ -3,7 +3,7 @@ import Pagination from "../../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../components/Redux/store";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
-import { selectPropertiesagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
+import { selectPropertiesPagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
 
 export interface PropertyData {
   id: number;
@@ -29,10 +29,10 @@ export default function PropertyTableComponent({ data }: PropertyTableProps) {
   
   const handlePageChange = async (page: any) => {
     await dispatch(setPropertiesPage(page));
-    await dispatch(fetchProperties());
+    await dispatch(fetchProperties({}));
   };
 
- const pagination = useSelector(selectPropertiesagination);
+ const pagination = useSelector(selectPropertiesPagination);
 
   const getPropertyType = (type: number) => {
     switch(type) {

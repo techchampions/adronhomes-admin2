@@ -9,7 +9,7 @@ import LoadingAnimations from "../../components/LoadingAnimations";
 
 
 
-const ReferredUsers = () => {
+const ReferredUsers = ({searchTerm}:{searchTerm:any}) => {
   const dispatch = useAppDispatch();
   const referredUsers = useAppSelector(selectReferredUsers);
   const pagination = useAppSelector(selectReferredUsersPagination);
@@ -24,6 +24,23 @@ const ReferredUsers = () => {
     dispatch(setReferredUsersCurrentPage(page));
   };
 
+const filteredReferredUsers = referredUsers.filter((user) => {
+  const searchLower = searchTerm.toLowerCase();
+
+  const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+  const phoneNumber = user.phone_number?.toLowerCase?.() || "";
+  const joinedDate = user.created_at?.toLowerCase?.() || "";
+  const plans = user.property_plan_total?.toString() || "";
+  const savedProps = user.saved_property_total?.toString() || "";
+
+  return (
+    fullName.includes(searchLower) ||
+    phoneNumber.includes(searchLower) ||
+    joinedDate.includes(searchLower) ||
+    plans.includes(searchLower) ||
+    savedProps.includes(searchLower)
+  );
+});
 
 
  return (
@@ -45,15 +62,18 @@ const ReferredUsers = () => {
             <table className="w-full">
               <thead>
                 <tr className="text-left">
+                    <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
+                    Customer's Id
+                  </th>
                   <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
                     Customer's Name
                   </th>
                   <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
                     Date Joined
                   </th>
-                  <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
+                  {/* <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
                     Property Plans
-                  </th>
+                  </th> */}
                   <th className="pb-6 font-[325] text-[#757575] pr-6 whitespace-nowrap text-[12px]">
                     Saved Properties
                   </th>
@@ -63,9 +83,16 @@ const ReferredUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {referredUsers.map((user) => (
+                {filteredReferredUsers.map((user) => (
                   <tr key={user.id} className="cursor-pointer">
+                        <td className="max-w-[130px] pr-2">
+                      <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
+                        {user.id || "N/A"}
+                      </div>
+                      
+                    </td>
                     <td className="pr-2 max-w-[130px]">
+                   
                       <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
                         {`${user.first_name} ${user.last_name}` || "N/A"}
                       </div>
@@ -75,11 +102,11 @@ const ReferredUsers = () => {
                         {formatDate(user.created_at) || "N/A"}
                       </div>
                     </td>
-                    <td className="pr-2 max-w-[130px]">
+                    {/* <td className="pr-2 max-w-[130px]">
                       <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
                         {user.property_plan_total ?? "0"}
                       </div>
-                    </td>
+                    </td> */}
                     <td className="pr-2 max-w-[130px]">
                       <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
                         {user.saved_property_total ?? "0"}

@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCareers } from "../components/Redux/carreer/career_thunk";
 import App from "./ApplicationDetails";
 import { error } from "console";
+import { setCareerSearch } from "../components/Redux/carreer/career_slice";
+
 
 // Define the expected structure of the data returned by useGetDirectorDashboard
 interface DirectorDashboardData {
@@ -121,7 +123,8 @@ export default function HRDashboard() {
     name,
     totalCareer,
     totalCareerViews,
-    totalApplications
+    totalApplications,
+    pagination, search
   } = useSelector((state: RootState) => state.getcareers);
   const tabs = ["Jobs"];
   const [activeTab, setActiveTab] = useState("Jobs"); 
@@ -129,14 +132,52 @@ export default function HRDashboard() {
 
     const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
-    dispatch(fetchCareers());
-  }, [dispatch]);
+    dispatch(fetchCareers({ page: pagination.currentPage, search }));
+  }, [dispatch, pagination.currentPage, search]);
 
  
   if (carreerError) {
     return <NotFound  text={carreerError}/>; 
   }
+ const [searchTerm, setSearchTerm] = useState("");
+// const filteredData = (carreerData ?? []).filter((item:Career) => {
+//   const searchLower = searchTerm.toLowerCase();
+//   return (
+//     item.job_title.toLowerCase().includes(searchLower) ||
+//     (item.created_at?.toLowerCase().includes(searchLower) ?? false)
+//   );
+// });
 
+  const CareerData = (): any[] => {
+    if (!carreerData?.data) return [];
+
+    return carreerData.data.map((item) => ({
+      id: item.id,
+      job_title: item.job_title,
+      total_applications: item.total_applications,
+      compensation: item.compensation,
+      created_at: item.created_at,
+      views:item.views
+    
+    }));
+  };
+  
+const allData=CareerData()
+  const filteredData = allData.filter((item) => {
+  const searchLower = searchTerm.toLowerCase();
+  return (
+    String(item.id).toLowerCase().includes(searchLower) ||
+    String(item.job_title).toLowerCase().includes(searchLower) ||
+    String(item.total_applications).toLowerCase().includes(searchLower) ||
+    String(item.compensation).toLowerCase().includes(searchLower) ||
+    String(item.created_at).toLowerCase().includes(searchLower) ||
+    String(item.views).toLowerCase().includes(searchLower)
+  );
+});
+
+    const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
   return (
     <><div className="mb-[52px]">
       <Header title="Dashboard" subtitle="Human Resources" />
@@ -178,9 +219,10 @@ export default function HRDashboard() {
             searchPlaceholder="Search Jobs"
             activeTab={activeTab}
             onTabChange={setActiveTab}
+                  onSearch={handleSearch}
           >
             {/* The HumanResources component now receives the isLoading prop */}
-            <HumanResources data={carreerData?.data} isLoading={carreerLoading} />
+            <HumanResources data={filteredData} isLoading={carreerLoading} currentPage={pagination.currentPage} />
           </ReusableTable>
 
           {showModal && <ReferralModal onClose={() => setShowModal(false)} />}

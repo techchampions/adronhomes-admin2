@@ -26,7 +26,7 @@ import Customers from "./pages/Customers/customers";
 import Payment from "./pages/Payment/Payment";
 import MarketersDashboard from "./marketer/dashboard/page";
 import SettingsPage from "./marketer/settingsPage/SettingsPage";
-import MarketerInvoice from "./marketer/Payment/customers_payment";
+// import MarketerInvoice from "./marketer/Payment/customers_payment";
 import Transactions from "./pages/Transactions/Transactions";
 import Properties from "./pages/Properties/Properties";
 import Personnel from "./pages/Personnel/Personnel";
@@ -68,6 +68,7 @@ import PaymentBar from "./components/Payments/PaymentNavBar";
 import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
+import MarketerInvoice from "./marketer/Payment/customers_payment";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -239,7 +240,7 @@ const App = () => {
                   element={<MarketerCustomer />}
                 />
                 <Route path="/director" element={<DirectorsDashboard />} />
-                <Route path="/marketer-settings" element={<SettingsPage />} />
+                {/* <Route path="/marketer-settings" element={<SettingsPage />} /> */}
                 <Route
                   path="/marketer-payment/:plan_id/:user_id"
                   element={<MarketerInvoice />}

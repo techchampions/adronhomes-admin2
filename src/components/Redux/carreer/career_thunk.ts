@@ -1,4 +1,3 @@
-// career_thunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
@@ -53,21 +52,17 @@ export interface CareerResponse {
   data: CareerData;
 }
 
-// const BASE_URL = "https://adron.microf10.sg-host.com";
-
 export const fetchCareers = createAsyncThunk<
   CareerResponse, 
-  void, 
+  { page?: number; search?: string }, 
   {
     state: RootState;
     rejectValue: ErrorResponse;
   }
 >(
   "careers/fetch",
-  async (_, { rejectWithValue, getState }) => {
+  async ({ page = 1, search = "" }, { rejectWithValue }) => {
     const token = Cookies.get("token");
-    const state = getState();
-    const currentPage = state.getcareers?.data?.current_page || 1;
 
     if (!token) {
       toast.error("Authentication required. Please login.");
@@ -87,23 +82,12 @@ export const fetchCareers = createAsyncThunk<
             device_id: "1010l0010l1",
           },
           params: {
-            page: currentPage,
-          },
+            page,
+            ...(search && search.trim() !== '' && { search: search.trim() })
+          }
         }
       );
       
-      // // Validate the response structure matches our interface
-      // if (
-      //   !response.data.success ||
-      //   typeof response.data.name !== "string" ||
-      //   typeof response.data.total_career !== "number" ||
-      //   typeof response.data.total_career_views !== "string" ||
-      //   typeof response.data.total_applications !== "string" ||
-      //   !response.data.data
-      // ) {
-      //   throw new Error("Invalid response structure from server");
-      // }
-
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError<ErrorResponse>;
@@ -130,7 +114,6 @@ export const fetchCareers = createAsyncThunk<
         });
       }
 
-      // Handle cases where the error might be from our validation
       if (error instanceof Error) {
         toast.error(error.message);
         return rejectWithValue({

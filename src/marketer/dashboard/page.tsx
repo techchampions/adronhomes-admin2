@@ -39,6 +39,7 @@ export default function MarketersDashboard() {
       user_id: item.user_id,
       total_amount: item.total_amount,
       remaining_balance: item.remaining_balance,
+      unique_customer_id: item.user?.contract_id || "N/A"
     }));
   };
 
@@ -55,6 +56,7 @@ export default function MarketersDashboard() {
       phoneNumber: item.user?.phone_number || "N/A",
       plan_id: item.id,
       user_id: item.user_id,
+      unique_customer_id: item.user?.contract_id || "N/A"
     }));
   };
 
@@ -68,23 +70,48 @@ export default function MarketersDashboard() {
       StartDate: item.created_at,
       nextPayment: item.due_date,
       paid_amount: item.amount,
-      // phoneNumber: item.property_plan.user?.phone_number || "N/A",
       user_id: item.property_plan.user_id,
       plan_id: item.plan_id,
       total_amount: item.property_plan.total_amount,
       remaining_balance: item.property_plan.remaining_balance,
+      unique_customer_id: item.property_plan.user?.contract_id || "N/A"
     }));
   };
 
   const activePlans = getActivePlansData();
   const completedPlans = getCompletedPlansData(); 
   const upcomingPayments = getUpcomingdata();
-
+  const [searchTerm, setSearchTerm] = useState("");
+  
   // Check if data arrays are empty
   const isActivePlansEmpty = activePlans.length === 0;
   const isCompletedPlansEmpty = completedPlans.length === 0; 
   const isUpcomingEmpty = upcomingPayments.length === 0;
 
+  // Generic filter function that searches through all object values
+  const filterData = (data: any[], searchTerm: string) => {
+    if (!searchTerm) return data;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return data.filter((item) => {
+      // Check all values in the object
+      return Object.values(item).some((value) => {
+        if (value === null || value === undefined) return false;
+        
+        // Convert value to string and check if it contains the search term
+        return value.toString().toLowerCase().includes(searchLower);
+      });
+    });
+  };
+
+  const filteredActivePlans = filterData(activePlans, searchTerm);
+  const filteredCompletedPlans = filterData(completedPlans, searchTerm);
+  const filteredUpcomingPayments = filterData(upcomingPayments, searchTerm);
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+  
   return (
     <div className="mb-[52px]">
       <Header
@@ -124,6 +151,7 @@ export default function MarketersDashboard() {
             searchPlaceholder="Search Customer"
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            onSearch={handleSearch}
           >
             {loading ? (
               <div className="w-full flex items-center justify-center">
@@ -145,7 +173,7 @@ export default function MarketersDashboard() {
                   <NotFound />
                 </div>
               ) : (
-                <CustomersTableAllActive customerData={activePlans} />
+                <CustomersTableAllActive customerData={filteredActivePlans} />
               )
             ) : activeTab === "Completed Plans" ? (
               isCompletedPlansEmpty ? (
@@ -156,7 +184,7 @@ export default function MarketersDashboard() {
                   <NotFound />
                 </div>
               ) : (
-                <CompletedPlans customerData={completedPlans} />
+                <CompletedPlans customerData={filteredCompletedPlans} />
               )
             ) : activeTab === "Upcoming Payments" ? (
               isUpcomingEmpty ? (
@@ -167,7 +195,7 @@ export default function MarketersDashboard() {
                   <NotFound />
                 </div>
               ) : (
-                <Upcomingdata customerData={upcomingPayments} />
+                <Upcomingdata customerData={filteredUpcomingPayments} />
               )
             ) : null}
           </ReusableTable>

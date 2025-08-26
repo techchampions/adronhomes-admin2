@@ -78,6 +78,7 @@ interface PaymentsState {
     totalItems: number;
     totalPages: number;
   };
+   search: string;
 }
 
 const initialState: PaymentsState = {
@@ -90,6 +91,7 @@ const initialState: PaymentsState = {
     totalItems: 0,
     totalPages: 1,
   },
+    search: '',
 };
 
 const paymentsSlice = createSlice({
@@ -102,6 +104,10 @@ const paymentsSlice = createSlice({
       resetErrorMessage: (state) => {
       state.loading = true;
       state.error = null;
+    },
+       setPaymentSearch: (state, action: PayloadAction<string>) => {
+      state.search = action.payload;
+      state.pagination.currentPage = 1;
     },
     resetPayments: () => initialState,
   },
@@ -133,7 +139,7 @@ const paymentsSlice = createSlice({
   },
 });
 
-export const { setCurrentPage, resetPayments,resetErrorMessage } = paymentsSlice.actions;
+export const { setCurrentPage, resetPayments,resetErrorMessage,setPaymentSearch } = paymentsSlice.actions;
 
 export default paymentsSlice.reducer;
 
@@ -156,3 +162,5 @@ export const selectPaymentStats = (state: { payments: PaymentsState }) => ({
   amount_approved: state.payments.data?.amount_approved || 0,
   amount_pending: state.payments.data?.amount_pending || 0,
 });
+// export const setPaymentSearch = (state: { payments: PaymentsState }) =>
+//   state.payments.search;
