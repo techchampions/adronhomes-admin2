@@ -405,8 +405,7 @@ export const updateTestimonial = async (
   if (payload.client_name) formData.append("client_name", payload.client_name);
   if (payload.client_comment)
     formData.append("client_comment", payload.client_comment);
-  if (payload.client_country)
-    formData.append("client_country", payload.client_country);
+  if (payload.video_link) formData.append("video_link", payload.video_link);
   if (payload.client_image)
     formData.append("client_image", payload.client_image);
 
@@ -428,8 +427,7 @@ export const createTestimony = async (
   if (payload.client_name) formData.append("client_name", payload.client_name);
   if (payload.client_comment)
     formData.append("client_comment", payload.client_comment);
-  if (payload.client_country)
-    formData.append("client_country", payload.client_country);
+  if (payload.video_link) formData.append("video_link", payload.video_link);
   if (payload.client_image)
     formData.append("client_image", payload.client_image);
 

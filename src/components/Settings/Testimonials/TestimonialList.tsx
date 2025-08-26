@@ -40,7 +40,7 @@ const TestimonialList: React.FC = () => {
             "
             >
               {/* <div className="bg-black/20 absolute inset-0"></div> */}
-              {item.client_country ? (
+              {item.video_link ? (
                 <FaYoutube className="h-full w-full" />
               ) : (
                 <PiImageBrokenDuotone className="h-full w-full" />
