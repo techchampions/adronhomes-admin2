@@ -39,9 +39,10 @@ export interface JobData {
 interface JobTableProps {
   data: any 
   isLoading: boolean;
+  currentPage:any
 }
 
-const HumanResources: React.FC<JobTableProps> = ({ data, isLoading }) => {
+const HumanResources: React.FC<JobTableProps> = ({ data, isLoading,currentPage }) => {
   const dispatch = useDispatch<AppDispatch>();
 const navigate =useNavigate()
   // State for delete modal
@@ -67,7 +68,7 @@ const navigate =useNavigate()
   // Handle page change for career listings
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchCareers());
+    await dispatch(fetchCareers({page:page}));
   };
 
   // --- Delete Job Handlers ---
@@ -93,7 +94,7 @@ const navigate =useNavigate()
     if (deleteSuccess) {
       // toast.success("Job deleted successfully!");
       handleCloseDeleteModal();
-      dispatch(fetchCareers());
+      dispatch(fetchCareers({page:currentPage}));
     }
     if (deleteError) {
       // Error toast is already handled in the thunk, but you can add more logic here if needed
@@ -124,7 +125,7 @@ const navigate =useNavigate()
     if (editSuccess) {
       // toast.success("Job updated successfully!");
       handleCloseEditModal();
-      dispatch(fetchCareers()); 
+      dispatch(fetchCareers({page:currentPage})); 
     }
     if (editError) {
       handleCloseEditModal();

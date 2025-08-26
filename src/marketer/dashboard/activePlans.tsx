@@ -31,6 +31,9 @@ const navigate=useNavigate()
           <table className="w-full">
             <thead>
               <tr className="text-left ">
+                  <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
+                  Customer's Contract_id
+                </th>
                 <th className="pb-6 font-[325] text-[#757575]  pr-6 whitespace-nowrap text-[12px] ">
                   Customer's Name
                 </th>
@@ -61,6 +64,11 @@ const navigate=useNavigate()
         navigate(`/marketer-payment/${row.plan_id}/${row.user_id}`)
       }
     >
+       <td className="pr-2 whitespace-nowrap">
+        <div className="pb-8 font-[325] text-dark text-sm">
+          {row.unique_customer_id ?? "N/A"}
+        </div>
+      </td>
       <td className="pr-2 max-w-xs">
         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
           {row.name ?? "N/A"}
@@ -88,6 +96,7 @@ const navigate=useNavigate()
           {formatAsNaira(row.paid_amount) ?? "N/A"}
         </div>
       </td>
+        
       {/* <td className="pr-2 max-w-xs">
         <div className="pb-8 font-[325] text-dark text-sm truncate whitespace-nowrap">
           {row.phoneNumber ?? "N/A"}

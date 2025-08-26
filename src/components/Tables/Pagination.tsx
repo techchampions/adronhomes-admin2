@@ -3,9 +3,10 @@ import { IoCaretBack, IoCaretForward } from 'react-icons/io5';
 export interface Pagination {
   currentPage: number;
   totalPages: number;
-  totalItems: number;
-  perPage: number;
+  totalItems?: number;
+  perPage?: number;
 }
+
 
 export interface PaginationProps {
   pagination: Pagination;

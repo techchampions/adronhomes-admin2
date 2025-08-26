@@ -29,7 +29,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
   searchPlaceholder = "Search Payment",
   sortOptions = [
     { value: 1, name: "Newest" },
-    { value: 2, name: "Oldest" }
+    { value: 2, name: "Oldest" },
   ],
   defaultSort = 1,
   children,
@@ -109,7 +109,11 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
                 onClick={() => setIsSortOpen(!isSortOpen)}
               >
                 {selectedSort.name}
-                <FaCaretDown className={`w-[20px] h-[20px] ml-2 transition-transform ${isSortOpen ? "transform rotate-180" : ""}`} />
+                <FaCaretDown
+                  className={`w-[20px] h-[20px] ml-2 transition-transform ${
+                    isSortOpen ? "transform rotate-180" : ""
+                  }`}
+                />
               </button>
               {isSortOpen && (
                 <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1">
@@ -117,7 +121,9 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
                     <button
                       key={option.value}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                        selectedSort.value === option.value ? "bg-gray-100 font-medium" : ""
+                        selectedSort.value === option.value
+                          ? "bg-gray-100 font-medium"
+                          : ""
                       }`}
                       onClick={() => handleSortSelect(option)}
                     >

@@ -2,8 +2,9 @@ import React from "react";
 import Pagination from "../../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../components/Redux/store";
-import { selectPropertiesagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
+// import { selectPropertiesagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
+import { selectPropertiesPagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
 
 export interface PropertyDataActivePlan {
   name: string;
@@ -26,9 +27,9 @@ export default function PropertyTableComponentActivePlan({
    const dispatch = useDispatch<AppDispatch>();
   const handlePageChange = async (page: any) => {
     await dispatch(setPropertiesPage(page));
-    await dispatch(fetchProperties());
+    await dispatch(fetchProperties({}));
   };
-  const pagination = useSelector(selectPropertiesagination);
+  const pagination = useSelector(selectPropertiesPagination);
   return (
     <><div className="w-full overflow-x-auto">
       <div className="min-w-[800px] md:min-w-0"> 

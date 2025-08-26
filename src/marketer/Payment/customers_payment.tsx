@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ProfileCard from "../../general/SmallProfileCard";
 import { RiFolderCheckFill } from "react-icons/ri";
 import PaymentListCard from "../../general/PaymentListCard";
-import Header from "../../general/Header";
+// import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import Pagination from "../../components/Pagination";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,8 +31,9 @@ import { PropertyDocumentsModal } from "../../pages/contract/PropertyDocumentsMo
 import PropertyBadge from "../../pages/Customers/PropertyBadge";
 import { formatDate } from "../../utils/formatdate";
 import { ContractDocumentsModal } from "../../pages/contract/ContractDocumentsModal";
+import Header from "../../general/Header";
 
-export default function ContractInvoice() {
+export default function MarketerInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentListOpen, setIsPaymentListOpen] = useState(false);
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
@@ -297,14 +298,16 @@ export default function ContractInvoice() {
           View Purchase Form
         </button> */}
         <Header
-          viewForm={true}
+          viewForm={false}
           title="Contracts"
           subtitle="Manage contracts for property bought by user"
           history={true}
           buttonText={"Upload Document"}
           onButtonClick={() => setShowModal(true)}
           showSearchAndButton={false}
-          handleViewPurchaseFormClick={() => setShowContractModal(true)}
+
+        
+          // handleViewPurchaseFormClick={() => setShowContractModal(true)}
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
