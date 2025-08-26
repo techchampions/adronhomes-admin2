@@ -39,16 +39,14 @@ const SoosarInputField: React.FC<InputFieldProps> = ({
   return (
     <div className="w-full">
       <div
-        className={`w-full relative flex ${
+        className={`w-full relative flex gap-2 px-3 ${
           isTextarea ? "flex-col rounded-xl" : "flex-row rounded-full"
         } border bg-adron-body py-2 ${
           hasError ? "border-red-500" : "border-transparent"
         } ${className}`}
       >
         {/* Left Icon */}
-        {icon && !isTextarea && (
-          <div className="flex items-center px-3">{icon}</div>
-        )}
+        {icon && !isTextarea && <div className="flex items-center">{icon}</div>}
 
         {/* Field */}
         <Field
@@ -59,7 +57,7 @@ const SoosarInputField: React.FC<InputFieldProps> = ({
           rows={isTextarea ? rows : undefined}
           readOnly={isReadOnly}
           autoComplete={autocomplete}
-          className={` text-gray-900 text-sm rounded-lg focus:ring-0 block w-full px-5 outline-none resize-none ${
+          className={` text-gray-900 text-sm rounded-lg focus:ring-0 block w-full px-0 outline-none resize-none ${
             isTextarea ? "min-h-[60px]" : ""
           }`}
         />
@@ -72,7 +70,7 @@ const SoosarInputField: React.FC<InputFieldProps> = ({
         )}
 
         {/* Right Icon */}
-        {rightIcon && <div className="flex items-center pr-3">{rightIcon}</div>}
+        {rightIcon && <div className="flex items-center">{rightIcon}</div>}
       </div>
 
       {/* Error Message */}
