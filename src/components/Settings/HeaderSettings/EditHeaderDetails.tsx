@@ -144,31 +144,16 @@ const EditHeaderDetails: React.FC<ModalProps> = ({
                       )}
                     </label>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 px-7">
+                  <div className="grid gap-4 px-7">
                     <div className="">
                       <label htmlFor="" className="text-sm text-gray-500">
                         Name
                       </label>
                       <SoosarInputField name="name" placeholder="Enter Name" />
                     </div>
-                    <div className="">
-                      <label htmlFor="" className="text-sm text-gray-500">
-                        Slug
-                      </label>
-                      <SoosarInputField name="slu" placeholder="Enter Slug" />
-                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className=" px-7">
-                      <label htmlFor="" className="text-sm text-gray-500">
-                        Action Link
-                      </label>
-                      <SoosarInputField
-                        name="action_link"
-                        placeholder="Enter Action link"
-                      />
-                    </div>
+                  <div className="grid gap-4">
                     <div className=" px-7">
                       <label htmlFor="" className="text-sm text-gray-500">
                         Header
@@ -211,6 +196,7 @@ const EditHeaderDetails: React.FC<ModalProps> = ({
                             key={index}
                             label=""
                             value={list}
+                            disabled
                             placeholder="Input list item"
                             onChange={(e) => {
                               const value = e.target.value;

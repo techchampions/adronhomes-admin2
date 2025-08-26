@@ -24,6 +24,7 @@ import {
   TestimonialPayload,
 } from "../../../pages/Properties/types/TestimonialTypes";
 import ImageUploadField from "../../SoosarImageInput";
+import { FaYoutube } from "react-icons/fa";
 
 interface ModalProps {
   isOpen?: boolean;
@@ -116,19 +117,13 @@ export default function EditTestimonial({
               </div>
               <div className=" px-7 ">
                 <label htmlFor="" className="text-sm text-gray-500">
-                  Client Country
+                  Video Link
                 </label>
-                <div className="flex items-center bg-adron-body px-4 rounded-full">
-                  <img
-                    src={values.client_country}
-                    alt=""
-                    className="w-5 h-5 rounded-md"
-                  />
-                  <SoosarInputField
-                    name="client_country"
-                    placeholder="Enter country Flag link "
-                  />
-                </div>
+                <SoosarInputField
+                  icon={<FaYoutube />}
+                  name="client_country"
+                  placeholder="Enter country Flag link "
+                />
               </div>
 
               <div className=" px-7">

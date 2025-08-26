@@ -13,31 +13,12 @@ const SiteInformationPage = () => {
         subtitle="Manage settings"
         history={true}
         showSearchAndButton={false}
-        //   onButtonClick={() => {
-        //     setShowAddModal(!showAddModal);
-        //     setIsCancelState(false);
-        //   }}
-        //   buttonText={accounts.length < 4 ? `Add Account` : undefined}
       />
-      {/* <AddAccount
-      isOpen={showAddModal}
-      onClose={() => setShowAddModal(false)}
-    />
-    <EditAccount
-      isOpen={showEditModal}
-      onClose={() => setShowEditModal(false)}
-      account={account}
-    />
-    <DeleteAccount
-      isOpen={showDeleteModal}
-      onClose={() => setShowDeleteModal(false)}
-      accountId={account?.id}
-    /> */}
       <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <SocialLinks />
         <EstateLocation />
         {/* <ContactInfo /> */}
-        {/* <TermsAndConditions /> */}
+        <TermsAndConditions />
       </div>
     </div>
   );
