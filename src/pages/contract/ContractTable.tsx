@@ -146,7 +146,7 @@ export default function ContractsTableComponent({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="max-w-[800px] md:min-w-0">
+        <div className="xl:max-w-[800px] md:min-w-0 xl:max-w-">
           <table className="w-full">
             <thead>
               <tr className="text-left">

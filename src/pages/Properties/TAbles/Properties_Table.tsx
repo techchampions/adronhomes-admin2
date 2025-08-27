@@ -22,9 +22,12 @@ import OptionInputField from "../../../components/input/drop_down";
 import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
 import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
 import { useNavigate } from "react-router-dom";
+import { resetToggleLatestState } from "../../../components/Redux/Properties/toggleLatestslice";
+import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatestThunk";
 
 export interface PropertyData {
   is_featured: any;
+  is_offer:any
   id: number;
   name: string;
   display_image: string;
@@ -381,7 +384,33 @@ export default function PropertyTableComponent({
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
   };
+  const {
+    loading: toggleLatestLoading,
+    success: toggleLatestSuccess,
+    error: toggleLatestError,
+  } = useSelector((state: RootState) => state.toggleLatest);
+   const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<number | null>(
+    null
+  );
+useEffect(() => {
+    if (toggleLatestSuccess) {
+      dispatch(
+        fetchProperties({
+          page: CurrentPage,
+        })
+      );
+      dispatch(resetToggleLatestState());
+    }
 
+    if (toggleLatestError) {
+      dispatch(resetToggleLatestState());
+    }
+  }, [toggleLatestSuccess, toggleLatestError, dispatch]);
+   const handleToggleLatest = async (propertyId: number) => {
+    setLoadingLatestPropertyId(propertyId);
+    await dispatch(toggleLatest({ id: propertyId }));
+    setLoadingLatestPropertyId(null);
+  }
   return (
     <>
         <div className="w-full overflow-x-auto">
@@ -398,9 +427,7 @@ export default function PropertyTableComponent({
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Property Type
                 </th>
-                {/* <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
-        Bedrooms
-      </th> */}
+         
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
@@ -410,6 +437,9 @@ export default function PropertyTableComponent({
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Featured
                 </th>
+                <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
+                  Latest
+                </th> 
               </tr>
             </thead>
             <tbody>
@@ -490,14 +520,7 @@ export default function PropertyTableComponent({
                         </div>
                       </div>
                     </td>
-                    {/* <td className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]" onClick={() => handleRowClick(property.id)}>
-            <div className="group relative">
-              <span className="truncate block">{property.no_of_bedroom || "N/A"}</span>
-              <div className="absolute invisible group-hover:visible z-10 bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-0">
-                {property.no_of_bedroom || "N/A"}
-              </div>
-            </div>
-          </td> */}
+               
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -521,15 +544,7 @@ export default function PropertyTableComponent({
                     </td>
                     <td className="w-1/6 py-4 pl-4 text-sm">
                       <div className="flex space-x-2">
-                        {/* <button
-                aria-label="Edit property"
-                onClick={() => handleEditClick(property)}
-              >
-                <img
-                  src="/ic_round-edit.svg"
-                  className="w-[18px] h-[18px]"
-                />
-              </button> */}
+                     
                         <button
                           aria-label="Delete property"
                           onClick={() => handleDeleteClick(property)}
@@ -576,6 +591,41 @@ export default function PropertyTableComponent({
                         </span>
                       </label>
                     </td>
+                    <td className="w-1/6 py-4 px-6 text-sm"> {/* Add this new cell */}
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={property.is_offer === 1}
+                          onChange={() => handleToggleLatest(property.id)}
+                          disabled={
+                            toggleLatestLoading && loadingLatestPropertyId === property.id
+                          }
+                        />
+                        <div
+                          className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
+                            toggleLatestLoading && loadingLatestPropertyId === property.id
+                              ? "bg-gray-300"
+                              : property.is_offer === 1
+                              ? "bg-[#79B833]"
+                              : "bg-gray-400"
+                          } peer-checked:bg-[#79B833] peer-disabled:opacity-70 relative`}
+                        >
+                          <div
+                            className={`absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform ${
+                              property.is_offer === 1 ? "translate-x-5" : ""
+                            }`}
+                          ></div>
+                        </div>
+                        <span className="ml-3 text-sm font-medium text-gray-700">
+                          {toggleLatestLoading && loadingLatestPropertyId === property.id
+                            ? "Updating..."
+                            : property.is_offer === 1
+                            ? "On"
+                            : "Off"}
+                        </span>
+                      </label>
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -603,43 +653,7 @@ export default function PropertyTableComponent({
           cancelButtonText="Cancel"
         />
       )}
-      {/* {isPropertyModalOpen && selectedProperty && (
-        <PropertyModal
-          isOpen={isPropertyModalOpen}
-          onClose={() => setIsPropertyModalOpen(false)}
-          property={selectedProperty}
-        />
-      )} */}
-      {/* // Update the form inside the modal with all fields */}{" "}
-      {/* {isModalOpen && editingProperty && (
-        <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[30px] w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Edit Property</h2>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
+      
       <div className="w-full">
         <Pagination
           pagination={pagination}

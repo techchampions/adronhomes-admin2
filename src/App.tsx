@@ -64,6 +64,8 @@ import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 import MarketerInvoice from "./marketer/Payment/customers_payment";
 import Page from "./Legal/page";
+import LegalSideBar from "./Legal/sidenavlegal";
+import LegalContractInvoice from "./Legal/contractDetails";
 
 const AuthGuard = () => {
   const token = Cookies.get('token');
@@ -98,7 +100,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <DirectorSideBar />
           ) : isPayments ? (
             <PaymentBar />
-          ) : (
+
+          ) :isLegal?(<LegalSideBar/>): (
             <AdminSidebar />
           )}
         </div>
@@ -303,6 +306,10 @@ const App = () => {
 
               {/* isLegal */}
               <Route path="/legal" element={<Page />}></Route>
+                 <Route
+                  path="/legal/contracts/details/:user_id/:plan_id"
+                  element={<LegalContractInvoice />}
+                />
             </Routes>
           </AppLayout>
           {isInfrastructure && (
