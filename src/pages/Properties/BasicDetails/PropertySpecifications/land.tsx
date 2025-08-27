@@ -221,23 +221,23 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
           }
         />
       </div>
-      <div className="grid md:grid-cols-2 gap-12">
-        <OptionInputField
+      <div className=" gap-12">
+        {/* <OptionInputField
           label="Plot Shape"
           placeholder="Select Plot Shape"
           name="plotShape"
           value={formik.values.plotShape}
           onChange={(value) => formik.setFieldValue("plotShape", value)}
           options={plotShapeOptions}
-        />
-        <OptionInputField
+        /> */}
+        {/* <OptionInputField
           label="Topography"
           placeholder="Select Topography"
           name="topography"
           value={formik.values.topography}
           onChange={(value) => formik.setFieldValue("topography", value)}
           options={topographyOptions}
-        />
+        /> */}
       </div>
 
       <div className="grid md:grid-cols-2 gap-12">
@@ -295,7 +295,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
 
       <div className="grid md:grid-cols-2 gap-12">
         <InputField
-          label="Units Available"
+          label="plots Available"
           placeholder="Enter Units Available"
           name="unitsAvailable"
           value={formik.values.unitsAvailable}

@@ -33,6 +33,7 @@ export interface User {
   updated_at: string;
   personnel: string;
   contract_id: number | null;
+  unique_customer_id: number | null;
 }
 
 export interface PaginationLinks {
