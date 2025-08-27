@@ -67,6 +67,7 @@ import MarketerInvoice from "./marketer/Payment/customers_payment";
 import Page from "./Legal/page";
 import LegalSideBar from "./Legal/sidenavlegal";
 import LegalContractInvoice from "./Legal/contractDetails";
+import ClientSidebar from "./components/ClientSideBar";
 
 
 const AuthGuard = () => {
@@ -90,6 +91,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isPayments = location.pathname.startsWith('/payments/');
 
    const isLegal = location.pathname.startsWith('/legal');
+   const client =location.pathname.startsWith('/client/')
 
 
   return (
@@ -105,7 +107,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           ) : isPayments ? (
             <PaymentBar />
 
-          ) :isLegal?(<LegalSideBar/>): (
+          ):client?(<ClientSidebar/>) :isLegal?(<LegalSideBar/>): (
             <AdminSidebar />
           )}
         </div>
@@ -146,7 +148,10 @@ const App = () => {
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
-                <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+                <Route
+                  path="/properties/:id"
+                  element={<PropertyDetailsPage />}
+                />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
                 <Route path="/contracts" element={<Contract />} />
@@ -218,7 +223,6 @@ const App = () => {
                   element={<WalletTransactionsPage />}
                 />
                 <Route
-         
                   path="/customers/singlepage/payment"
                   element={<CustomersPayment />}
                 />
@@ -248,7 +252,7 @@ const App = () => {
                   element={<SingleJob />}
                 />
                 <Route path="/human-resources" element={<HRDashboard />} />
-                
+
                 {/* Payment Routes */}
                 <Route path="/payments/dashboard" element={<Dashboard />} />
                 <Route path="/payments/customers" element={<Customers />} />
@@ -262,7 +266,10 @@ const App = () => {
                   path="/payments/contracts/details/:user_id/:plan_id"
                   element={<ContractInvoice />}
                 />
-                <Route path="/payments/customers/:id" element={<CustomerSinglePage />} />
+                <Route
+                  path="/payments/customers/:id"
+                  element={<CustomerSinglePage />}
+                />
                 <Route
                   path="/payments/customers/transactions/:id"
                   element={<UserPayments />}
@@ -279,14 +286,8 @@ const App = () => {
                   path="/payments/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
                 />
-                 <Route
-                  path="*"
-                  element={<Error404 />}
-                />
-                   <Route
-                  path="/error-500"
-                  element={<Error500 />}
-                />
+                <Route path="*" element={<Error404 />} />
+                <Route path="/error-500" element={<Error500 />} />
               </Route>
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
@@ -307,14 +308,41 @@ const App = () => {
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
 
-
               {/* isLegal */}
               <Route path="/legal" element={<Page />}></Route>
-                 <Route
-                  path="/legal/contracts/details/:user_id/:plan_id"
-                  element={<LegalContractInvoice />}
-                />
+              <Route
+                path="/legal/contracts/details/:user_id/:plan_id"
+                element={<LegalContractInvoice />}
+              />
+
+
+            {/* client */}
+            <Route path="/client/customers" element={<Customers />} />
+            <Route path="/client/customers/:id" element={<CustomerSinglePage />} />
+            <Route
+              path="/client/customers/transactions/:id"
+              element={<UserPayments />}
+            />
+            <Route
+              path="/client/customers/wallet-transactions/:id"
+              element={<WalletTransactionsPage />}
+            />
+            <Route
+              path="/client/customers/singlepage/payment"
+              element={<CustomersPayment />}
+            />
+            <Route
+              path="/client/customers/payment/:user_id/:plan_id"
+              element={<Customers_payment />}
+            />
+            <Route path="/client/contracts" element={<Contract />} />
+            <Route
+              path="/client/contracts/details/:user_id/:plan_id"
+              element={<ContractInvoice />}
+            />
             </Routes>
+
+         
           </AppLayout>
           {isInfrastructure && (
             <InfrastructureFeesModal
