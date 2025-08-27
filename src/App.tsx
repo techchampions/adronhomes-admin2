@@ -69,6 +69,7 @@ import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 import MarketerInvoice from "./marketer/Payment/customers_payment";
+import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -169,7 +170,7 @@ const App = () => {
                 />
                 <Route
                   path="/client-partnership-requests"
-                  element={<RequestsEnquiries />}
+                  element={<ClientsPartnership />}
                 />
                 <Route
                   path="/director/requests-enquiries/:id"
