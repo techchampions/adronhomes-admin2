@@ -99,7 +99,9 @@ export default function Header({
   return (
     <>
       <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
+
         <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0 ">
+
           <h2 className="font-[325] text-xl sm:text-2xl md:text-3xl lg:text-[34px] leading-tight text-dark mb-2 break-words lg:break-normal">
             {title}
           </h2>
@@ -127,7 +129,9 @@ export default function Header({
         <div className="w-full lg:w-auto flex flex-col lg:flex-row lg:flex-wrap items-center gap-3 lg:gap-4 mt-4 sm:mt-0">
           {showSearchAndButton && (
             <>
+
               {/* <div
+
                 className={`relative h-[45px] lg:h-[51px] w-full sm:w-64 lg:w-[410px] rounded-full border transition-all font-[400] ${isSearchFocused
                   ? "border-[#79B833] shadow-sm"
                   : "border-[#D8D8D8]"} bg-white overflow-hidden`}
@@ -139,7 +143,9 @@ export default function Header({
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setIsSearchFocused(false)}
                 />
+
               </div> */}
+
               <button
                 className={`text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap ${isCancelState || isFormPage
                   ? "bg-[#D70E0E] hover:bg-red-600"

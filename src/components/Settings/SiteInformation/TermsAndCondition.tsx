@@ -1,29 +1,17 @@
-import React from "react";
-import { Formik, Form, Field, FormikHelpers } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import InputField from "../../input/inputtext";
 import SoosarInputField from "../../soosarInput";
-import {
-  IoLogoFacebook,
-  IoLogoInstagram,
-  IoLogoLinkedin,
-  IoLogoTiktok,
-  IoLogoTwitter,
-  IoLogoWhatsapp,
-} from "react-icons/io5";
 import Button from "../../input/Button";
 
 const TermsAndConditions = () => {
   const initialValues = {
     terms: "",
-    conditions: "",
-    policy: "",
+    title: "",
   };
 
   const validationSchema = Yup.object().shape({
     terms: Yup.string().required("Terms are required"),
-    conditions: Yup.string().required("Conditions is required"),
-    policy: Yup.string().required("Policy is required"),
+    title: Yup.string().required("Conditions is required"),
   });
   const handleSubmit = (values: typeof initialValues) => {
     console.log("Form submitted", values);
@@ -46,23 +34,12 @@ const TermsAndConditions = () => {
         }) => (
           <Form className="flex flex-col gap-2">
             <h4 className="mb-4">Site Terms and Conditions</h4>
+            <SoosarInputField name="title" />
             <SoosarInputField
               name="terms"
               type="textarea"
               rows={7}
               placeholder="Enter Terms"
-            />
-            <SoosarInputField
-              name="conditions"
-              type="textarea"
-              rows={7}
-              placeholder="Enter Conditions"
-            />
-            <SoosarInputField
-              name="policy"
-              type="textarea"
-              rows={7}
-              placeholder="Enter site Policy"
             />
             <div className="flex justify-end mt-4">
               <Button label="Save" className="!w-fit px-8" />

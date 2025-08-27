@@ -427,7 +427,9 @@ useEffect(() => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Property Type
                 </th>
+
          
+
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
@@ -437,9 +439,11 @@ useEffect(() => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Featured
                 </th>
+
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Latest
                 </th> 
+
               </tr>
             </thead>
             <tbody>
@@ -448,6 +452,7 @@ useEffect(() => {
                   <tr
                     key={`property-${property.id}`}
                     className="hover:bg-gray-50 cursor-pointer"
+
                   >
                     <td
                       className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]"

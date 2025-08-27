@@ -11,8 +11,8 @@ const HeaderSettings = () => {
         title="Settings"
         subtitle="Manage settings"
         history={true}
+        showSearchAndButton={false}
         onButtonClick={() => navigate("new")}
-        buttonText="New Header"
       />
       <div className="p-8">
         <HeaderTable />

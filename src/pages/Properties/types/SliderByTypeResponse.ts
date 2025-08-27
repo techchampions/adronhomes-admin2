@@ -5,4 +5,5 @@ export interface SliderByTypeRes {
 export interface SliderByTypeData {
   id: number;
   image: string;
+  mobile_image: string;
 }

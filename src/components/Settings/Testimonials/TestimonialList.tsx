@@ -12,6 +12,8 @@ import EditTestimonial from "./EditTestimonial";
 import { Testimonial } from "../../../pages/Properties/types/TestimonialTypes";
 import CreateTestimony from "./CreateTestimony";
 import DeleteTestimonial from "./DeleteTestimony";
+import { FaYoutube } from "react-icons/fa";
+import { PiImageBrokenDuotone } from "react-icons/pi";
 
 const tabs = ["All", "Approved", "Pending"] as const;
 type Tab = (typeof tabs)[number];
@@ -38,11 +40,11 @@ const TestimonialList: React.FC = () => {
             "
             >
               {/* <div className="bg-black/20 absolute inset-0"></div> */}
-              <img
-                src={item.client_country}
-                alt={item.client_name}
-                className="object-cover w-full h-full"
-              />
+              {item.client_country ? (
+                <FaYoutube className="h-full w-full" />
+              ) : (
+                <PiImageBrokenDuotone className="h-full w-full" />
+              )}
             </div>
             <div
               className="h-10 min-w-10 max-w-10 relative rounded-md overflow-hidden
