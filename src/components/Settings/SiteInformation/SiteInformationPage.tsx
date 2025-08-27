@@ -18,7 +18,8 @@ const SiteInformationPage = () => {
         history={true}
         showSearchAndButton={false}
       />
-      <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-2">
+
+      <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
         <SocialLinks />
         <div className="space-y-2">
           <EnquiryContactInfo />

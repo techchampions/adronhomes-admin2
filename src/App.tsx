@@ -71,6 +71,9 @@ import Error404 from "./components/Error404";
 import MarketerInvoice from "./marketer/Payment/customers_payment";
 import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 
+import Page from "./Legal/page";
+
+
 const AuthGuard = () => {
   const token = Cookies.get("token");
   if (!token) {
@@ -90,6 +93,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
   const isPayments = location.pathname.startsWith("/payments/");
+   const isLegal = location.pathname.startsWith('/legal');
+
 
   return (
     <div className="flex">
@@ -311,6 +316,10 @@ const App = () => {
               <Route path="/human-resources" element={<HRDashboard />}></Route>
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
+
+
+              {/* isLegal */}
+              <Route path="/legal" element={<Page />}></Route>
             </Routes>
           </AppLayout>
           {isInfrastructure && (
