@@ -168,6 +168,10 @@ const App = () => {
                   element={<RequestsEnquiries />}
                 />
                 <Route
+                  path="/client-partnership-requests"
+                  element={<RequestsEnquiries />}
+                />
+                <Route
                   path="/director/requests-enquiries/:id"
                   element={<PropertyEnquiries />}
                 />

@@ -11,11 +11,15 @@ const EstateLocation = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const estateData = data?.locations || [];
   if (isLoading) {
-    return <SmallLoader />;
+    return (
+      <div className="p-4 rounded-4xl bg-white">
+        <SmallLoader />;
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white p-6 rounded-4xl">
+    <div className="bg-white p-6 rounded-2xl">
       <EditEstate
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}

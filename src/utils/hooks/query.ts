@@ -15,6 +15,7 @@ import {
   getPropertyByID,
   getPropertyRequest,
   getPropertyRequestByID,
+  getSettings,
   getSliderByType,
   getSocials,
   getTestimonials,
@@ -151,6 +152,42 @@ export const useGetSocials = () => {
   return useQuery<SettingsResponse>({
     queryKey: ["socials"],
     queryFn: getSocials,
+  });
+};
+export const useGetDigits = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["settings", "digits"],
+    queryFn: () => getSettings("digits"),
+  });
+};
+export const useGetEquiryInfo = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["settings", "enquiry"],
+    queryFn: () => getSettings("enquiry"),
+  });
+};
+export const useGetComplainsContact = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["settings", "complain"],
+    queryFn: () => getSettings("complain"),
+  });
+};
+export const useGetClientsContact = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["settings", "client"],
+    queryFn: () => getSettings("client"),
+  });
+};
+export const useGetMainAddress = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["settings", "mainaddress"],
+    queryFn: () => getSettings("mainaddress"),
+  });
+};
+export const useGetCallContact = () => {
+  return useQuery<SettingsResponse>({
+    queryKey: ["settings", "call"],
+    queryFn: () => getSettings("call"),
   });
 };
 export const useGetFAQs = () => {

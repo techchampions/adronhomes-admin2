@@ -455,6 +455,10 @@ export const getSocials = async (): Promise<SettingsResponse> => {
   const response = await adminApi.get("/settings?type=social");
   return response.data;
 };
+export const getSettings = async (type: string): Promise<SettingsResponse> => {
+  const response = await adminApi.get(`/settings?type=${type}`);
+  return response.data;
+};
 export const getEstateLocation =
   async (): Promise<PropertyLocationsResponse> => {
     const response = await adronApi.get("/property-locations");
@@ -462,6 +466,25 @@ export const getEstateLocation =
   };
 
 export const updateSocial = async (
+  payload: Partial<SocialPayload>
+): Promise<SettingItem> => {
+  const formData = new FormData();
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.type) formData.append("type", payload.type);
+  if (payload.value) formData.append("value", payload.value);
+
+  const response = await adminApi.post(
+    `/update-setting/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+export const updateSettings = async (
   payload: Partial<SocialPayload>
 ): Promise<SettingItem> => {
   const formData = new FormData();
