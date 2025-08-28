@@ -21,7 +21,11 @@ const SocialLinks = () => {
   const { data, isLoading } = useGetSocials();
   const { mutate: update, isPending } = useUpdateSocial();
   if (isLoading) {
-    return <SmallLoader />;
+    return (
+      <div className="p-4 bg-white rounded-4xl">
+        <SmallLoader />
+      </div>
+    );
   }
   const socials = data?.data.data || [];
   const facebook = socials.find((item) => item.name === "Facebook");
@@ -81,17 +85,29 @@ const SocialLinks = () => {
       value: values.linkedin_link,
       id: linkedin?.id,
     };
-    update(facebookPayload);
-    update(linkedinPayload);
-    update(instagramPayload);
-    update(twitterPayload);
-    update(tiktokPayload);
-    update(whatsappPayload);
+    if (values.facebook_link != facebook?.value) {
+      update(facebookPayload);
+    }
+    if (values.linkedin_link != linkedin?.value) {
+      update(linkedinPayload);
+    }
+    if (values.instagram_link != instagram?.value) {
+      update(instagramPayload);
+    }
+    if (values.twitter_link != twitter?.value) {
+      update(twitterPayload);
+    }
+    if (values.tiktok_link != tiktok?.value) {
+      update(tiktokPayload);
+    }
+    if (values.whatsapp_link != whatsapp?.value) {
+      update(whatsappPayload);
+    }
     console.log("Form submitted", values);
   };
 
   return (
-    <div className="bg-white p-6 rounded-4xl">
+    <div className="bg-white p-6 rounded-2xl">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

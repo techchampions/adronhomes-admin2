@@ -63,6 +63,7 @@ import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
 import Error404 from "./components/Error404";
 import MarketerInvoice from "./marketer/Payment/customers_payment";
+import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 
 import Page from "./Legal/page";
 import LegalSideBar from "./Legal/sidenavlegal";
@@ -88,8 +89,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isMarketerRoute = location.pathname.startsWith("/marketer");
   const isDirectorRoute = location.pathname.startsWith("/director");
   const shouldShowSidebar = location.pathname !== "/";
-  const isPayments = location.pathname.startsWith('/payments/');
-
+  const isPayments = location.pathname.startsWith("/payments/");
    const isLegal = location.pathname.startsWith('/legal');
    const client =location.pathname.startsWith('/client/')
 
@@ -167,6 +167,10 @@ const App = () => {
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
+                />
+                <Route
+                  path="/client-partnership-requests"
+                  element={<ClientsPartnership />}
                 />
                 <Route
                   path="/director/requests-enquiries/:id"

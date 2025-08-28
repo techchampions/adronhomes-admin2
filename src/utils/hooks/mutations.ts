@@ -18,6 +18,7 @@ import {
   updateEstate,
   updateFAQs,
   updateHeaderData,
+  updateSettings,
   updateSocial,
   updateTestimonial,
   uploadSliderByType,
@@ -253,6 +254,22 @@ export const useUpdateSocial = () => {
       toast.success("Successfully updated link");
       queryClient.invalidateQueries({
         queryKey: ["socials"],
+      });
+    },
+    onError: () => {
+      toast.error("Failed to Update");
+    },
+  });
+};
+export const useUpdateSettingsInfo = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateSettings,
+    onSuccess: () => {
+      // Refetch relevant data if needed
+      toast.success("Successfully updated info");
+      queryClient.invalidateQueries({
+        queryKey: ["settings"],
       });
     },
     onError: () => {
