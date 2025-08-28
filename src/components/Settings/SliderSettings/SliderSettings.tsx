@@ -22,7 +22,7 @@ const SliderSettings = () => {
     "https://unblast.com/wp-content/uploads/2021/01/Space-Background-Images.jpg";
   return (
     <div className="max-w-6xl mx-auto">
-      <Header title="Settings" subtitle="Manage settings" history={true} />
+      <Header title="Settings" subtitle="Manage settings" history={true}  showSearchAndButton={false}/>
       <div className="px-4">
         <div className="p-8 bg-white rounded-4xl">
           {isLoadingHome ? (
