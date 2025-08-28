@@ -1,50 +1,34 @@
 import React, { useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
-import {
-  useGetDirectorDashboard,
-  useGetPropertyRequest,
-} from "../../utils/hooks/query";
+import { useGetPartnershipRequest } from "../../utils/hooks/query";
 import SoosarPagination from "../../components/SoosarPagination";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
-import PropertyTableComponent from "../Requests_Enquiries/Requests_Enquiries_Tables";
+import PartnershipListTable from "./PartnershipListTable";
 
 export default function ClientsPartnership() {
   const [page, setpage] = useState(1);
-  const {
-    data: directorData,
-    isLoading: loadingDR,
-    isError: errorDR,
-  } = useGetDirectorDashboard();
-  const isDirectorRoute = location.pathname.startsWith("/director");
-  const director_id = directorData?.director.id || undefined;
-  const { data, isLoading, isError } = useGetPropertyRequest(page, director_id);
+  const { data, isLoading, isError } = useGetPartnershipRequest(page);
   const propertyData = data?.data.data || [];
   const totalPages = data?.data.last_page || 1;
   const tab = ["Requests"];
   return (
     <div className="pb-[52px]">
       <Header
-        title="Requests & Enquiries"
-        subtitle="Attend to requests and enquiries on properties"
+        title="Client Partnership Requests"
+        subtitle="Attend to requests client partnership"
         history={true}
+        showSearchAndButton={false}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        <ReusableTable
-          activeTab={tab[0]}
-          tabs={tab}
-          searchPlaceholder="Search Requests..."
-        >
+        <ReusableTable activeTab={tab[0]} tabs={tab} showSearchandSort={false}>
           {isLoading ? (
             <LoadingAnimations loading={isLoading} />
           ) : propertyData.length < 1 ? (
             <NotFound />
           ) : (
-            <PropertyTableComponent
-              data={propertyData}
-              isDirector={isDirectorRoute}
-            />
+            <PartnershipListTable data={propertyData} />
           )}
         </ReusableTable>
         {/* Pagination */}

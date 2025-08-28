@@ -12,6 +12,8 @@ import {
   getLeadersData,
   getNotifications,
   getOfficeLocations,
+  getPartnershipByID,
+  getPartnershipRequests,
   getPropertyByID,
   getPropertyRequest,
   getPropertyRequestByID,
@@ -39,6 +41,10 @@ import { ApiResponse } from "../../pages/Properties/types/TestimonialTypes";
 import { SettingsResponse } from "../../pages/Properties/types/SocialsTypes";
 import { FAQResponse } from "../../pages/Properties/types/FAQsTypes";
 import { PropertyLocationsResponse } from "../../pages/Properties/types/EstateLocationTypes";
+import {
+  PartnershipRequestByIDResponse,
+  PartnershipRequestResponse,
+} from "../../pages/Properties/types/ClientsTypes";
 
 // Query hook for properties and filtering
 export const useGetSlidersByType = (type: string) => {
@@ -96,6 +102,13 @@ export const useGetPropertyRequestByID = (id: number) => {
   });
 };
 
+export const useGetPartnershipRequest = (page: number) => {
+  return useQuery<PartnershipRequestResponse>({
+    queryKey: ["partnership-requests", page],
+    queryFn: () => getPartnershipRequests(page),
+  });
+};
+
 // Query hook for properties page data with
 export const useGetPropertyByID = (id?: number | string) => {
   return useQuery<GetPropertyByIdResponse>({
@@ -108,6 +121,13 @@ export const useGetEnquryByID = (id?: number | string) => {
   return useQuery<GetPropertyByIdResponse>({
     queryKey: ["request", id], // include id in the key to avoid collisions
     queryFn: () => getEnquiryByID(id),
+    enabled: !!id, // prevents the query from running if id is undefined/null
+  });
+};
+export const useGetPartnerShipByID = (id?: number | string) => {
+  return useQuery<PartnershipRequestByIDResponse>({
+    queryKey: ["partnership-requests", id],
+    queryFn: () => getPartnershipByID(id),
     enabled: !!id, // prevents the query from running if id is undefined/null
   });
 };
