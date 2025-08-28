@@ -2,6 +2,10 @@ import {
   AccountDetailsResponse,
   CreateAccountPayload,
 } from "../../pages/Properties/types/AccountDetailsTypes";
+import {
+  PartnershipRequestByIDResponse,
+  PartnershipRequestResponse,
+} from "../../pages/Properties/types/ClientsTypes";
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
@@ -315,6 +319,19 @@ export const getDirectorDashboardData =
     return response.data;
   };
 
+export const getPartnershipRequests = async (
+  page: number
+): Promise<PartnershipRequestResponse> => {
+  const params = new URLSearchParams();
+  if (page) {
+    params.append("page", page.toString());
+  }
+  const response = await adminApi.get(`/clients`, {
+    params: params,
+  });
+  return response.data;
+};
+
 //Get All Property Requests
 export const getPropertyRequest = async (
   page: number,
@@ -352,6 +369,12 @@ export const getEnquiryByID = async (
   id?: number | string
 ): Promise<GetPropertyByIdResponse> => {
   const response = await adronApi.get(`/director/request/${id}`);
+  return response.data;
+};
+export const getPartnershipByID = async (
+  id?: number | string
+): Promise<PartnershipRequestByIDResponse> => {
+  const response = await adminApi.get(`/client/${id}`);
   return response.data;
 };
 
