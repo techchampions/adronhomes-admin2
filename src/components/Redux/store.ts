@@ -52,6 +52,9 @@ import publishDraftReducer from './Properties/publishpropertySlice'
 import exportPaymentsReducer from './export/exportPaymentsSlice'
 import exportCustomersReducer from './export/exportCustomersSlice'
 import countriesReducer from './country/countrythunkand slice'
+import legalDashboardSliceReducer  from './legalDashboard/legalDashboardSlice'
+import toggleLatestReducer from './Properties/toggleLatestslice'
+import exportContractsReducer from './export/exportContractSlice'
 
 export const store = configureStore({
   reducer: {
@@ -106,7 +109,10 @@ export const store = configureStore({
     publishDraft:publishDraftReducer,
     exportPayments: exportPaymentsReducer,
   exportCustomers: exportCustomersReducer,
-  countries:countriesReducer
+  countries:countriesReducer,
+  legalDashboard:legalDashboardSliceReducer,
+   toggleLatest: toggleLatestReducer,
+   exportContracts:exportContractsReducer
   },
 });
 

@@ -1,15 +1,9 @@
-import {
-  Routes,
-  Route,
-  useLocation,
-  Outlet,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { Routes, Route, useLocation, Outlet, Navigate, useNavigate } from "react-router-dom";
 import { Provider, useDispatch } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import Cookies from "js-cookie";
 import { ReactNode, useContext, useEffect } from "react";
+
 
 // Context
 import { PropertyContext, PropertyProvider } from "./MyContext/MyContext";
@@ -72,10 +66,13 @@ import MarketerInvoice from "./marketer/Payment/customers_payment";
 import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 
 import Page from "./Legal/page";
+import LegalSideBar from "./Legal/sidenavlegal";
+import LegalContractInvoice from "./Legal/contractDetails";
+import ClientSidebar from "./components/ClientSideBar";
 
 
 const AuthGuard = () => {
-  const token = Cookies.get("token");
+  const token = Cookies.get('token');
   if (!token) {
     return <Navigate to="/" replace />;
   }
@@ -94,6 +91,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const shouldShowSidebar = location.pathname !== "/";
   const isPayments = location.pathname.startsWith("/payments/");
    const isLegal = location.pathname.startsWith('/legal');
+   const client =location.pathname.startsWith('/client/')
 
 
   return (
@@ -108,7 +106,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <DirectorSideBar />
           ) : isPayments ? (
             <PaymentBar />
-          ) : (
+
+          ):client?(<ClientSidebar/>) :isLegal?(<LegalSideBar/>): (
             <AdminSidebar />
           )}
         </div>
@@ -127,7 +126,7 @@ const App = () => {
     isInfrastructure,
     setIsCancelInfrastructure,
   } = useContext(PropertyContext)!;
-
+  
   // Initialize axios interceptor
   useAxiosInterceptor();
 
@@ -148,10 +147,6 @@ const App = () => {
                 <Route
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
-                />
-                <Route
-                  path="/properties/:id"
-                  element={<PropertyDetailsPage />}
                 />
                 <Route
                   path="/properties/:id"
@@ -317,10 +312,41 @@ const App = () => {
 
               <Route path="/human-resources" element={<HRDashboard />}></Route>
 
-
               {/* isLegal */}
               <Route path="/legal" element={<Page />}></Route>
+              <Route
+                path="/legal/contracts/details/:user_id/:plan_id"
+                element={<LegalContractInvoice />}
+              />
+
+
+            {/* client */}
+            <Route path="/client/customers" element={<Customers />} />
+            <Route path="/client/customers/:id" element={<CustomerSinglePage />} />
+            <Route
+              path="/client/customers/transactions/:id"
+              element={<UserPayments />}
+            />
+            <Route
+              path="/client/customers/wallet-transactions/:id"
+              element={<WalletTransactionsPage />}
+            />
+            <Route
+              path="/client/customers/singlepage/payment"
+              element={<CustomersPayment />}
+            />
+            <Route
+              path="/client/customers/payment/:user_id/:plan_id"
+              element={<Customers_payment />}
+            />
+            <Route path="/client/contracts" element={<Contract />} />
+            <Route
+              path="/client/contracts/details/:user_id/:plan_id"
+              element={<ContractInvoice />}
+            />
             </Routes>
+
+         
           </AppLayout>
           {isInfrastructure && (
             <InfrastructureFeesModal

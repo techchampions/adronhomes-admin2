@@ -1,100 +1,161 @@
-import React, { useState } from "react";
-import NewContractsTable from "../pages/contract/activeContractTable";
+// LegalDashboardPage.tsx
+
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+// import ContractsTableComponenTwo from "../pages/contract/activeContractTable";
 import { ReusableTable } from "../components/Tables/Table_one";
 import LoadingAnimations from "../components/LoadingAnimations";
-import { MatrixCard, MatrixCardGreen } from "../components/firstcard";
+import { MatrixCard } from "../components/firstcard";
 import Header from "../general/Header";
 import NotFound from "../components/NotFound";
+import { AppDispatch, RootState } from "../components/Redux/store";
+import { fetchNewContracts, fetchUploadedContracts } from "../components/Redux/legalDashboard/legalDashboardSlice";
+import ContractsTableComponentTwo from "./legalTable";
+// import ContractsTableComponenTwo from "../pages/contract/contractTableTwo";
 
-export default function Page() {
-  const [loading] = useState(false);
+export default function LegalDashboardPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const [activeTab, setActiveTab] = useState("New");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Demo metrics
-  const totalContracts = 12;
-  const totalInvoice = 2500000;
-  const totalPaidContract = 1500000;
-  const totalUnpaidContract = 1000000;
+  // Select data from Redux store
+  const {
+    totalContracts,
+    totalUploadedContracts,
+    contractList,
+    loading,
+    error,
+    total_new_contract
+  } = useSelector((state: RootState) => state.legalDashboard);
 
-  // Demo contracts
-  const contractList = [
-    { id: "C-001", email: "user1@example.com", status: "New" },
-    { id: "C-002", email: "user2@example.com", status: "Active" },
-    { id: "C-003", email: "user3@example.com", status: "Completed" },
-    { id: "C-004", email: "user4@example.com", status: "Allocated" },
-  ];
+  useEffect(() => {
+    if (activeTab === "New") {
+      dispatch(fetchNewContracts());
+    } else {
+      dispatch(fetchUploadedContracts());
+    }
+  }, [dispatch, activeTab]);
 
-  const contractPagination = { currentPage: 1, totalPages: 2 };
+  // Filter contracts based on search query
+  const filteredContracts = contractList?.filter((contract:any) => 
+    contract.unique_contract_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contract.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contract.user?.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contract.user?.last_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
-  const formatAsNaira = (value:any) =>
+  const formatAsNaira = (value: number | null) =>
     new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
-    }).format(value);
+    }).format(value || 0);
 
-  const handlePageChange = (page:any) => {
+  const handlePageChange = (page: number) => {
     console.log("Change to page:", page);
+    // You can implement pagination here by calling the API with page parameter
   };
 
-  const handleSearch = (query:any) => {
-    console.log("Searching for:", query);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSearchQuery(""); // Reset search when changing tabs
+  };
+
+  const tabs = ['New', 'Uploads'];
+
+  // Calculate metrics based on active tab
+  const getMetrics = () => {
+    if (activeTab === "New") {
+      return {
+        total: totalContracts || 0,
+        uploaded: totalUploadedContracts || 0,
+            new:total_new_contract|| 0,
+     
+      };
+    } else {
+      return {
+       total: totalContracts || 0,
+        uploaded: totalUploadedContracts || 0,
+        new:total_new_contract|| 0,
+    
+      };
+    }
+  };
+
+  const metrics = getMetrics();
 
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Contracts"
-        subtitle="Manage the list of contracts for each property bought by user"
-        buttonText="export"
+        showSearchAndButton ={false}
+        title="Legal"
+        subtitle="Manage the list of Legal contracts "
+        // buttonText="export"
       />
 
       {/* Summary Cards */}
-      <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
-        <MatrixCardGreen title="Total Contracts" value={totalContracts} />
-
+      <div className="grid md:grid-cols-2 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCard
-          title="Total Invoice"
-          value={formatAsNaira(totalInvoice)}
-          change="Includes all contracts on a property plan"
+          title={activeTab === "New" ? "Total Contracts" : "Total  Contracts"}
+          value={`${metrics.total}`}
+          change={`Includes all contracts`}
         />
 
         <MatrixCard
-          title="Total Amount Paid"
-          value={formatAsNaira(totalPaidContract)}
-          change="Includes all paid contract amounts"
-        />
-
-        <MatrixCard
-          title="Total Amount Unpaid"
-          value={formatAsNaira(totalUnpaidContract)}
-          change="Includes all unpaid contract amounts"
+          title={activeTab === "New" ? "Contracts Ready for Upload" : "Successfully Uploaded"}
+          value={activeTab === "New" ?`${metrics.new} `:`${metrics.uploaded} `}
+          change={`Includes all contracts`}
         />
       </div>
 
-      {/* Completed Contracts Table */}
+      {/* Contracts Table */}
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
-                  searchPlaceholder={"Search by contract ID or email"}
-                  showTabs={false} // 👈 hide tabs
-                  onSearch={handleSearch} activeTab={"Completed"}        >
+          searchPlaceholder={"Search by contract ID, name or email"}
+          showTabs={true}
+          onSearch={handleSearch}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          tabs={tabs}
+          sort={false}
+        >
           {loading ? (
-            <div className="w-full flex items-center justify-center">
+            <div className="w-full flex items-center justify-center py-8">
               <LoadingAnimations loading={loading} />
             </div>
-          ) : contractList.filter((c) => c.status === "Completed").length ===
-            0 ? (
-            <div className="max-h-screen">
+          ) : error ? (
+            <div className="w-full flex items-center justify-center py-8">
+              <p className="text-center text-red-500">{error}</p>
+            </div>
+          ) : filteredContracts.length === 0 ? (
+            <div className="max-h-screen py-8">
               <p className="text-center font-normal text-[#767676]">
-                No completed contracts found
+                {searchQuery ? "No contracts match your search" : `No ${activeTab.toLowerCase()} contracts found`}
               </p>
               <NotFound />
             </div>
           ) : (
-            <></>
-            // <NewContractsTable
-            // //   data={contractList.filter((c) => c.status === "Completed")}
-            // //   pagination={contractPagination}
-            // //   onPageChange={handlePageChange}
-            // />
+            <ContractsTableComponentTwo
+              data={filteredContracts} 
+              pagination={{
+                currentPage: 1,
+                perPage: 10,
+                totalItems: filteredContracts.length,
+                totalPages: Math.ceil(filteredContracts.length / 10)
+              }}
+              onPageChange={handlePageChange}
+              getStatusText={(status: number) => {
+                switch (status) {
+                  case 1: return "Active";
+                  case 2: return "Completed";
+                  case 3: return "Pending";
+                  default: return "Unknown";
+                }
+              }}
+            />
           )}
         </ReusableTable>
       </div>

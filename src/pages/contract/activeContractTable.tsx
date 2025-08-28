@@ -134,13 +134,23 @@ export default function NewContractsTable({
                   <tr
                     key={contract.id}
                     className="hover:bg-gray-50 transition-colors duration-200"
+
                   >
-                    <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[50px] truncate">
+                    <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[50px] truncate" >
                       {(pagination.currentPage - 1) * pagination.perPage +
                         index +
                         1}
                     </td>
-                    <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group">
+                    <td className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group cursor-pointer"  onClick={() => {
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
+                          ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
+                          : "/customers";
+
+                        navigate(`${basePath}/${contract.user.id}`);
+                      }}>
                       <div className="truncate">
                         {contract?.contract?.unique_contract_id || "N/A"}
                       </div>
@@ -155,11 +165,13 @@ export default function NewContractsTable({
                     <td
                       className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group cursor-pointer"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigate(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -177,11 +189,13 @@ export default function NewContractsTable({
                     <td
                       className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[120px] truncate relative group cursor-pointer"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigate(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -201,11 +215,13 @@ export default function NewContractsTable({
                     <td
                       className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[120px] truncate relative group cursor-pointer"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigate(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -230,11 +246,13 @@ export default function NewContractsTable({
                     <td
                       className="py-4 pr-4 font-gotham font-[325] text-dark text-sm max-w-[150px] truncate relative group cursor-pointer"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigate(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -260,11 +278,15 @@ export default function NewContractsTable({
                     <td className="py-4 pr-4 text-center max-w-[150px]">
                       <button
                         onClick={() => {
-                          const basePath = location.pathname.startsWith(
+                          const path = location.pathname;
+                          const basePath = path.startsWith(
                             "/payments/contracts"
                           )
                             ? "/payments/contracts/details"
+                            : path.startsWith("/client/contracts")
+                            ? "/client/contracts/details"
                             : "/contracts/details";
+
                           navigate(
                             `${basePath}/${contract.user_id}/${contract.id}`
                           );

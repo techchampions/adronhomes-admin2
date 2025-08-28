@@ -38,7 +38,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
 
   const handlePageChange = async (page: any) => {
     await dispatch(setCustomersPage(page));
-    await dispatch(customer( page ));
+    await dispatch(customer(page));
   };
   const navigate = useNavigate();
   return (
@@ -74,11 +74,16 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   key={row.id}
                   className="cursor-pointer"
                   onClick={() => {
-                    const basePath = location.pathname.startsWith(
-                      "/payments/customers"
-                    )
-                      ? "/payments/customers"
-                      : "/customers";
+                    let basePath = "/customers"; // default fallback
+
+                    if (location.pathname.startsWith("/payments/customers")) {
+                      basePath = "/payments/customers";
+                    } else if (
+                      location.pathname.startsWith("/client/customers")
+                    ) {
+                      basePath = "/client/customers";
+                    }
+
                     navigate(`${basePath}/${row.id}`);
                   }}
                 >
