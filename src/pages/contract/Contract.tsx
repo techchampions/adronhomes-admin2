@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -26,6 +26,8 @@ import { getContract } from "../../components/Redux/UpdateContract/viewcontractF
 import NewContractsTable from "./activeContractTable";
 import { useAppSelector } from "../../components/Redux/hook";
 import AllocationTable from "./AllocationTable";
+import ExportContractModal from "../../components/exportModal/contractExport";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 export default function Contract() {
   const dispatch = useDispatch<AppDispatch>();
@@ -115,7 +117,12 @@ export default function Contract() {
       </div>
     );
   }
-
+ const contractModalRef = useRef<ExportModalRef>(null);
+  const openPaymentsModal = () => {
+    if (contractModalRef.current) {
+      contractModalRef.current.openModal();
+    }
+  };
   return (
     <div className="pb-[52px] relative">
       <Header
@@ -123,7 +130,7 @@ export default function Contract() {
         subtitle="Manage the list of contracts for each property bought by user"
         // showSearchAndButton={false}
          buttonText="export"
-     
+        onButtonClick={openPaymentsModal}
       />
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
@@ -217,7 +224,7 @@ export default function Contract() {
 </ReusableTable>
 
       </div>
-     
+     <ExportContractModal ref={contractModalRef} />
     </div>
   );
 }
