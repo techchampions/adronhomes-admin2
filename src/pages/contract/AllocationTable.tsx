@@ -172,16 +172,20 @@ export default function AllocationTable({
                     className="cursor-pointer hover:bg-gray-50"
                   >
                     <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[50px] truncate pr-4">
-                      {(pagination.currentPage - 1) * pagination.perPage + index + 1}
+                      {(pagination.currentPage - 1) * pagination.perPage +
+                        index +
+                        1}
                     </td>
                     <td
                       className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -199,11 +203,13 @@ export default function AllocationTable({
                     <td
                       className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -223,11 +229,13 @@ export default function AllocationTable({
                     <td
                       className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -243,11 +251,13 @@ export default function AllocationTable({
                     <td
                       className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4 relative group"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -263,11 +273,13 @@ export default function AllocationTable({
                     <td
                       className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
                     >

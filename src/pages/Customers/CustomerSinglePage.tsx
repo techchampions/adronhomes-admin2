@@ -322,17 +322,19 @@ export default function CustomerSinglePage() {
 
       <div className="grid md:grid-cols-2 gap-[20px]">
         <div className=" w-full relative ">
-          <button
-            className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1  px-2 rounded-full   border "
-            // onClick={() => navigate(`/customers/transactions/${id}`)}
-            onClick={() => {
-  const basePath = location.pathname.startsWith("/payments/customers")
-    ? "/payments/customers/transactions"
-    : "/customers/transactions";
-  navigate(`${basePath}/${id}`);
-}}
+     <button
+  className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1 px-2 rounded-full border"
+  onClick={() => {
+    const path = location.pathname;
+    const basePath = path.startsWith("/payments/customers")
+      ? "/payments/customers/transactions"
+      : path.startsWith("/client/customers")
+      ? "/client/customers/transactions"
+      : "/customers/transactions";
 
-          >
+    navigate(`${basePath}/${id}`);
+  }}
+>
             view Transactions
           </button>
           <MatrixCardGreen
@@ -343,16 +345,19 @@ export default function CustomerSinglePage() {
         </div>
 
           <div className=" w-full relative ">
-          <button
-            className="absolute z-50 right-5 top-5 text-xs font-semibold text-[#57713A]  py-1  px-2 rounded-full   border "
-            // onClick={() => navigate(`/customers/wallet-transactions/${id}`)}
-                       onClick={() => {
-  const basePath = location.pathname.startsWith("/payments/customers")
-    ? "/payments/customers/wallet-transactions"
-    : "/customers/wallet-transactions";
-  navigate(`${basePath}/${id}`);
-}}
-          >
+   <button
+  className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1 px-2 rounded-full border"
+  onClick={() => {
+    const path = location.pathname;
+    const basePath = path.startsWith("/payments/customers")
+      ? "/payments/customers/transactions"
+      : path.startsWith("/client/customers")
+      ? "/client/customers/transactions"
+      : "/customers/transactions";
+
+    navigate(`${basePath}/${id}`);
+  }}
+>
             view Wallet Trnx
           </button>
       <MatrixCard

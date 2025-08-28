@@ -146,7 +146,7 @@ export default function ContractsTableComponent({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="max-w-[800px] md:min-w-0">
+        <div className="xl:max-w-[800px] md:min-w-0 xl:max-w-">
           <table className="w-full">
             <thead>
               <tr className="text-left">
@@ -195,11 +195,13 @@ export default function ContractsTableComponent({
                     <td
                       className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[150px] truncate pr-4 relative group"
                       onClick={() => {
-                        const basePath = location.pathname.startsWith(
-                          "/payments/contracts"
-                        )
+                        const path = location.pathname;
+                        const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
+                          : path.startsWith("/client/contracts")
+                          ? "/client/customers"
                           : "/customers";
+
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
                     >
@@ -272,11 +274,15 @@ export default function ContractsTableComponent({
                       <div className="flex items-center justify-center space-x-2">
                         <button
                           onClick={() => {
-                            const basePath = location.pathname.startsWith(
+                            const path = location.pathname;
+                            const basePath = path.startsWith(
                               "/payments/contracts"
                             )
                               ? "/payments/contracts/details"
+                              : path.startsWith("/client/contracts")
+                              ? "/client/contracts/details"
                               : "/contracts/details";
+
                             navigation(
                               `${basePath}/${contract.user_id}/${contract.id}`
                             );

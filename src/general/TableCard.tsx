@@ -91,19 +91,21 @@ const TableCard = <T extends Record<string, any>>({
           </thead>
           <tbody>
             {data.map((row, index) => (
-              <tr
-                key={getRowKey(row, index)}
-                className="text-sm text-dark font-[325] cursor-pointer hover:bg-gray-50"
-                // onClick={() =>
-                //   navigate(`/customers/payment/${row.user_id}/${row.plan_id}`)
-                // }
-                  onClick={() => {
-  const basePath = location.pathname.startsWith("/payments/customers")
-    ? "/payments/customers/payment"
-    : "/customers/payment";
-  navigate(`${basePath}/${row.user_id}/${row.plan_id}`);
-}}
-              >
+    <tr
+  key={getRowKey(row, index)}
+  className="text-sm text-dark font-[325] cursor-pointer hover:bg-gray-50"
+  onClick={() => {
+    const path = location.pathname;
+    const basePath = path.startsWith("/payments/customers")
+      ? "/payments/customers/payment"
+      : path.startsWith("/client/customers")
+      ? "/client/customers/payment"
+      : "/customers/payment";
+
+    navigate(`${basePath}/${row.user_id}/${row.plan_id}`);
+  }}
+>
+
                 {columns.map((column) => {
                   const cellValue = row[column.key];
                   const cellContent = column.render
