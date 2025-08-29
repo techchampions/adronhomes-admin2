@@ -14,10 +14,15 @@ const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/dashboard" },
   { label: "Customers", icon: Icon2, path: "/customers" },
   { label: "Payments", icon: Icon3, path: "/payments" },
-  // { label: "Transactions", icon: Icon5, path: "/transactions" },
   { label: "Contracts", icon: Icon7, path: "/contracts" },
   { label: "Properties", icon: Icon5, path: "/properties" },
+  {
+    label: "partnership & requests",
+    icon: Icon7,
+    path: "/partnership-requests",
+  },
   { label: "Personnel", icon: Icon6, path: "/personnel" },
+
   { label: "Requests & Enquiries", icon: Icon7, path: "/Requests-Enquiries" },
   { label: "Notifications", icon: Icon8, path: "/notifications" },
   { label: "Settings", icon: Icon9, path: "/settings" },

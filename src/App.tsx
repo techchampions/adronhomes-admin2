@@ -144,6 +144,10 @@ const App = () => {
               {/* Protected Routes */}
               <Route element={<AuthGuard />}>
                 {/* Admin Routes */}
+                  <Route
+                  path="/partnership-requests"
+                  element={<ClientsPartnership />}
+                />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
