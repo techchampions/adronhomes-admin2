@@ -17,10 +17,10 @@ interface UsersTable {
   Role: string;
   Created: string;
   user: User;
-  referral_code:any
+  referral_code: any;
 }
 
-const getRoleName = (roleId: number) => {
+const getRoleName = (roleId: number): string => {
   switch (roleId) {
     case 0:
       return "Customer";
@@ -32,27 +32,37 @@ const getRoleName = (roleId: number) => {
       return "Director";
     case 4:
       return "Accountant";
-          case 5:
-      return "Hr";
+    case 5:
+      return "HR";
+    case 6:
+      return "Legal";
+    case 7:
+      return "Info Tech";
+    case 8:
+      return "Customer Manager";
     default:
       return "Unknown";
   }
 };
 
-export default function Personnel() {
 
+export default function Personnel() {
   const sortOptions = [
-  { value: 2, name: "Marketer" },
-  { value: 3, name: "Sales Director" },
-  { value: 4, name: "Accountant" },
-  { value: 1, name: "Admin" },
-    { value:5, name: "Human Resourses" },
-      { value:6, name: "Legal" },
-  { value: 0, name: "All" }
-];
+    { value: 0, name: "All" },
+    { value: 1, name: "Admin" },
+    { value: 2, name: "Marketer" },
+    { value: 3, name: "Sales Director" },
+    { value: 4, name: "Accountant" },
+    { value: 5, name: "Human Resources" },
+    { value: 6, name: "Legal", },
+    { value: 7, name: "Info Tech", },
+    { value: 8, name: "Customers", }
+  ];
+
+
+
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
-
 
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch<AppDispatch>();
@@ -60,16 +70,12 @@ export default function Personnel() {
     (state: RootState) => state.getpersonnel
   );
 
-  const {
-option,
-setOption
-  } = useContext(PropertyContext)!;
+  const { option, setOption } = useContext(PropertyContext)!;
 
-
-useEffect(() => {
-  // const roleValues = sortOptions.map(option => option.value);
-  dispatch(personnels({ role: option.value }));
-}, [dispatch,option]);
+  useEffect(() => {
+    // const roleValues = sortOptions.map(option => option.value);
+    dispatch(personnels({ role: option.value }));
+  }, [dispatch, option]);
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
@@ -80,7 +86,7 @@ useEffect(() => {
       Email: item.email,
       Role: getRoleName(item.role),
       Created: item.created_at,
-      referral_code:item.referral_code,
+      referral_code: item.referral_code,
       user: {
         ...item,
         country: item.country || "",
@@ -89,7 +95,7 @@ useEffect(() => {
   };
 
   const allData = personnelData();
-  
+
   // Filter data based on search term
   const filteredData = allData.filter((item) => {
     const searchLower = searchTerm.toLowerCase();
@@ -122,8 +128,7 @@ useEffect(() => {
           onSearch={handleSearch}
           sortOptions={sortOptions}
           onSortChange={setOption}
-      defaultSort={0}
-          
+          defaultSort={0}
         >
           {loading ? (
             <div className=" w-full flex items-center justify-center">
