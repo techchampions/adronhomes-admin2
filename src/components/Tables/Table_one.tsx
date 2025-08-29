@@ -21,6 +21,7 @@ interface ReusableTableProps {
   sort?: boolean;
   // New prop to control visibility of tabs
   showTabs?: boolean;
+  showSearchandSort?: boolean;
 }
 
 export const ReusableTable: React.FC<ReusableTableProps> = ({
@@ -39,6 +40,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
   sort = true,
   // Set default to true so it displays by default
   showTabs = true,
+  showSearchandSort = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<SortOption>(

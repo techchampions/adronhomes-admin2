@@ -48,7 +48,7 @@ export default function EditTestimonial({
     client_image: client?.client_image || "",
     client_comment: client?.client_comment || "",
     client_name: client?.client_name || "",
-    client_country: client?.client_country || "",
+    video_link: client?.video_link || "",
   };
   const { mutate: update, isPending } = useUpdateTestimonial();
   const handleSubmit = (values: typeof initialValues) => {
@@ -59,7 +59,7 @@ export default function EditTestimonial({
       client_comment: values.client_comment,
       client_name: values.client_name,
       client_image: image,
-      client_country: values.client_country,
+      video_link: values.video_link,
     };
     update(payload);
     onClose();
@@ -121,7 +121,7 @@ export default function EditTestimonial({
                 </label>
                 <SoosarInputField
                   icon={<FaYoutube />}
-                  name="client_country"
+                  name="video_link"
                   placeholder="Enter country Flag link "
                 />
               </div>

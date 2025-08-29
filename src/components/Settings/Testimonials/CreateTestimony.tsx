@@ -28,7 +28,7 @@ export default function CreateTestimony({
     client_image: "",
     client_comment: "",
     client_name: "",
-    client_country: "http://adron.microf10.sg-host.com/flag.png",
+    video_link: "http://adron.microf10.sg-host.com/flag.png",
   };
   const { mutate: create, isPending } = useCreateTestimony();
   if (isPending) {
@@ -48,7 +48,7 @@ export default function CreateTestimony({
       client_comment: values.client_comment,
       client_name: values.client_name,
       client_image: image,
-      client_country: values.client_country,
+      video_link: values.video_link,
     };
     create(payload, {
       onSuccess(data, variables, context) {
@@ -114,7 +114,7 @@ export default function CreateTestimony({
 
                 <SoosarInputField
                   icon={<FaYoutube />}
-                  name="client_country"
+                  name="video_link"
                   placeholder="Enter YouTube video link "
                 />
               </div>

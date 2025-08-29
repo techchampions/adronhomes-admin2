@@ -70,7 +70,7 @@ import InfoTechSidebar from "./components/ItAdmin/sideNav";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
-  const token = Cookies.get("token");
+  const token = Cookies.get('token');
   if (!token) {
     return <Navigate to="/" replace />;
   }
@@ -168,6 +168,10 @@ const App = () => {
                 <Route
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
+                />
+                <Route
+                  path="/client-partnership-requests"
+                  element={<ClientsPartnership />}
                 />
                 <Route
                   path="/director/requests-enquiries/:id"
@@ -411,6 +415,8 @@ const App = () => {
               {/* Top-Level Catch-All for Unmatched Routes */}
               <Route path="*" element={<Error404 />} />
             </Routes>
+
+         
           </AppLayout>
           {isInfrastructure && (
             <InfrastructureFeesModal

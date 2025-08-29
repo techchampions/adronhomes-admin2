@@ -2,6 +2,10 @@ import {
   AccountDetailsResponse,
   CreateAccountPayload,
 } from "../../pages/Properties/types/AccountDetailsTypes";
+import {
+  PartnershipRequestByIDResponse,
+  PartnershipRequestResponse,
+} from "../../pages/Properties/types/ClientsTypes";
 import { CustomersResponse } from "../../pages/Properties/types/CustomerTypes";
 import { DirectorDashboardResponse } from "../../pages/Properties/types/DirectorDataTypes";
 import {
@@ -315,6 +319,19 @@ export const getDirectorDashboardData =
     return response.data;
   };
 
+export const getPartnershipRequests = async (
+  page: number
+): Promise<PartnershipRequestResponse> => {
+  const params = new URLSearchParams();
+  if (page) {
+    params.append("page", page.toString());
+  }
+  const response = await adminApi.get(`/clients`, {
+    params: params,
+  });
+  return response.data;
+};
+
 //Get All Property Requests
 export const getPropertyRequest = async (
   page: number,
@@ -352,6 +369,12 @@ export const getEnquiryByID = async (
   id?: number | string
 ): Promise<GetPropertyByIdResponse> => {
   const response = await adronApi.get(`/director/request/${id}`);
+  return response.data;
+};
+export const getPartnershipByID = async (
+  id?: number | string
+): Promise<PartnershipRequestByIDResponse> => {
+  const response = await adminApi.get(`/client/${id}`);
   return response.data;
 };
 
@@ -405,8 +428,7 @@ export const updateTestimonial = async (
   if (payload.client_name) formData.append("client_name", payload.client_name);
   if (payload.client_comment)
     formData.append("client_comment", payload.client_comment);
-  if (payload.client_country)
-    formData.append("client_country", payload.client_country);
+  if (payload.video_link) formData.append("video_link", payload.video_link);
   if (payload.client_image)
     formData.append("client_image", payload.client_image);
 
@@ -428,8 +450,7 @@ export const createTestimony = async (
   if (payload.client_name) formData.append("client_name", payload.client_name);
   if (payload.client_comment)
     formData.append("client_comment", payload.client_comment);
-  if (payload.client_country)
-    formData.append("client_country", payload.client_country);
+  if (payload.video_link) formData.append("video_link", payload.video_link);
   if (payload.client_image)
     formData.append("client_image", payload.client_image);
 
@@ -457,6 +478,10 @@ export const getSocials = async (): Promise<SettingsResponse> => {
   const response = await adminApi.get("/settings?type=social");
   return response.data;
 };
+export const getSettings = async (type: string): Promise<SettingsResponse> => {
+  const response = await adminApi.get(`/settings?type=${type}`);
+  return response.data;
+};
 export const getEstateLocation =
   async (): Promise<PropertyLocationsResponse> => {
     const response = await adronApi.get("/property-locations");
@@ -464,6 +489,25 @@ export const getEstateLocation =
   };
 
 export const updateSocial = async (
+  payload: Partial<SocialPayload>
+): Promise<SettingItem> => {
+  const formData = new FormData();
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.type) formData.append("type", payload.type);
+  if (payload.value) formData.append("value", payload.value);
+
+  const response = await adminApi.post(
+    `/update-setting/${payload.id}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+export const updateSettings = async (
   payload: Partial<SocialPayload>
 ): Promise<SettingItem> => {
   const formData = new FormData();

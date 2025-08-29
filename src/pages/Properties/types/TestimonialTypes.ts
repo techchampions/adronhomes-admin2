@@ -4,7 +4,7 @@ export interface Testimonial {
   client_name: string;
   client_image: string;
   client_comment: string;
-  client_country: string;
+  video_link: string;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -42,7 +42,7 @@ export interface ApiResponse {
 export interface TestimonialPayload {
   id?: number;
   client_name?: string;
-  client_country?: string;
+  video_link?: string;
   client_image?: File;
   client_comment?: string;
 }
