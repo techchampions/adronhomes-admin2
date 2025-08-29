@@ -39,7 +39,9 @@ const getRoleName = (roleId: number): string => {
     case 7:
       return "Info Tech";
     case 8:
+
       return "Customer service";
+
     default:
       return "Unknown";
   }
@@ -57,6 +59,8 @@ export default function Personnel() {
     { value: 6, name: "Legal", },
     { value: 7, name: "Info Tech", },
     { value: 8, name: "Customer service", }
+
+
   ];
 
 
