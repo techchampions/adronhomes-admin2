@@ -67,6 +67,7 @@ import Page from "./Legal/page";
 import LegalContractInvoice from "./Legal/contractDetails";
 import Dashboard_It from "./components/ItAdmin/Dashboard_It";
 import InfoTechSidebar from "./components/ItAdmin/sideNav";
+import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -169,10 +170,7 @@ const App = () => {
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
                 />
-                <Route
-                  path="/client-partnership-requests"
-                  element={<ClientsPartnership />}
-                />
+             
                 <Route
                   path="/director/requests-enquiries/:id"
                   element={<PropertyEnquiries />}
@@ -334,6 +332,10 @@ const App = () => {
 
               {/* Client Routes (Unprotected) */}
               <Route path="/client" element={<AuthGuard />}>
+                 <Route
+                  path="partnership-requests"
+                  element={<ClientsPartnership />}
+                />
                 <Route path="customers" element={<Customers />} />
                 <Route path="customers/:id" element={<CustomerSinglePage />} />
                 <Route
@@ -409,7 +411,11 @@ const App = () => {
                 <Route
                   path="settings/add-account"
                   element={<AccountDetails />}
+                
                 />
+
+                  <Route path="error-500" element={<Error500 />} />
+                  <Route path="*" element={<Error404 />} />
               </Route>
 
               {/* Top-Level Catch-All for Unmatched Routes */}
