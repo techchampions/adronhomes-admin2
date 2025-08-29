@@ -88,7 +88,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
         )}
 
         {/* Search and Sort - Conditionally rendered */}
-      
+        {showSearchandSort && (
           <div className="flex w-full lg:flex-row gap-3 lg:gap-[100px] lg:w-auto justify-between">
             {/* Search */}
             <div className="relative h-[39px] w-full lg:w-[296px] rounded-[40px] bg-[#F6F6F8] overflow-hidden flex-2/3">
@@ -105,39 +105,40 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
             </div>
 
             {/* Sort Dropdown */}
-              {sort && (
-            <div className="w-full lg:w-auto flex-1/3 relative">
-              <button
-                className="lg:w-[130px] h-[42px] py-[13px] pr-[17px] pl-[20px] border border-[#272727] rounded-[50px] flex justify-center items-center text-sm text-dark"
-                onClick={() => setIsSortOpen(!isSortOpen)}
-              >
-                {selectedSort.name}
-                <FaCaretDown
-                  className={`w-[20px] h-[20px] ml-2 transition-transform ${
-                    isSortOpen ? "transform rotate-180" : ""
-                  }`}
-                />
-              </button>
-              {isSortOpen && (
-                <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1">
-                  {sortOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                        selectedSort.value === option.value
-                          ? "bg-gray-100 font-medium"
-                          : ""
-                      }`}
-                      onClick={() => handleSortSelect(option)}
-                    >
-                      {option.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>     )}
+            {sort && (
+              <div className="w-full lg:w-auto flex-1/3 relative">
+                <button
+                  className="lg:w-[130px] h-[42px] py-[13px] pr-[17px] pl-[20px] border border-[#272727] rounded-[50px] flex justify-center items-center text-sm text-dark"
+                  onClick={() => setIsSortOpen(!isSortOpen)}
+                >
+                  {selectedSort.name}
+                  <FaCaretDown
+                    className={`w-[20px] h-[20px] ml-2 transition-transform ${
+                      isSortOpen ? "transform rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {isSortOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1">
+                    {sortOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                          selectedSort.value === option.value
+                            ? "bg-gray-100 font-medium"
+                            : ""
+                        }`}
+                        onClick={() => handleSortSelect(option)}
+                      >
+                        {option.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-   
+        )}
       </div>
 
       <div className="w-full overflow-x-auto">{children}</div>
