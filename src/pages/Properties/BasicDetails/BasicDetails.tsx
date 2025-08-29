@@ -51,8 +51,8 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   ];
 
   const categoryOptions = [
-    { value: "adrone court", label: "Adrone Court" },
-    { value: "vidsco series", label: "Vidsco Series" },
+    { value: "1", label: "Adrone Court" },
+    { value: "2", label: "Vidsco Series" },
   ];
 
   const locationTypeOptions = [
@@ -69,7 +69,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const validationSchema = Yup.object().shape({
     propertyName: Yup.string().required("Property name is required"),
     propertyType: Yup.string().required("Property type is required"),
-    category: Yup.string().required("Category is required"),
+    // category_id: Yup.string().required("Category is required"),
     price: Yup.number()
       .typeError("Price must be a number")
       .positive("Price must be positive")
@@ -107,7 +107,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     if (initialLoad && formData.basicDetails) {
       formik.setValues({
         ...formData.basicDetails,
-        category: formData.basicDetails.category || "",
+        category_id: formData.basicDetails.category_id || "",
         purpose: formData.basicDetails.purpose || [],
       });
       setPurpose(formData.basicDetails.purpose || []);
@@ -229,12 +229,12 @@ const lgaOptions = lgas
       <OptionInputField
         label="Category"
         placeholder="Select category"
-        name="category"
-        value={formik.values.category}
-        onChange={(value) => formik.setFieldValue("category", value)}
+        name="category_id"
+        value={formik.values.category_id}
+        onChange={(value) => formik.setFieldValue("category_id", value)}
         options={categoryOptions}
         dropdownTitle="Categories"
-        error={formik.touched.category && formik.errors.category}
+        error={formik.touched.category_id && formik.errors.category_id}
       />
 
       <InputField

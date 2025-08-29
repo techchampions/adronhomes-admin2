@@ -34,6 +34,7 @@ interface BasicDetailsFormValues {
   state: any;
   lga: any;
   category:any
+   category_id:any
 }
 
 interface BulkDetailsFormValues {
@@ -47,6 +48,7 @@ interface BulkDetailsFormValues {
   initialDeposit: string;
   country: any;
   lga: any;
+
 }
 
 interface PropertySpecificationsFormValues {
@@ -196,7 +198,8 @@ const initialFormData: PropertyFormData = {
     country: "",
     state: "",
     lga: "",
-    category:""
+    category:"",
+     category_id:""
   },
   bulkDetails: {
     propertyName: "",
@@ -427,6 +430,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       formPayload.append("state", bulkDetails.state);
       formPayload.append("lga", bulkDetails.lga);
       formPayload.append("category", "bulk");
+    
       formPayload.append("initial_deposit", bulkDetails.initialDeposit || "0");
     } else {
       formPayload.append("name", basicDetails.propertyName);
@@ -439,6 +443,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       formPayload.append("street_address", basicDetails.address);
       formPayload.append("location_type", basicDetails.locationType || "");
 
+        formPayload.append(" category_id", basicDetails.category_id);
       if (Array.isArray(basicDetails.purpose)) {
         basicDetails.purpose.forEach((purpose, index) => {
           formPayload.append(`purpose[${index}]`, purpose);

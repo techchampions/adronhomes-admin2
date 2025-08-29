@@ -69,15 +69,15 @@ const location = useLocation();
   const Transactionstat = [
     {
       value: dashdata?.transactions.total_orders || 0,
-      label: "Total Transactions",
+      label: "Total",
     },
     {
       value: dashdata?.transactions.approved_orders || 0,
-      label: "Approved",
+      label: "Today",
     },
     {
       value: dashdata?.transactions.pending_orders || 0,
-      label: "Pending",
+      label: "This Month",
     },
   ];
   const PaymentsStat = [
@@ -133,7 +133,7 @@ const location = useLocation();
             </div>
 
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-              <StatsCard stats={Transactionstat} tag="web analytics" />
+              <StatsCard stats={Transactionstat} tag="Website Visits" />
               <StatsCard stats={PaymentsStat} tag="Payments" />
             </div>
             <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">

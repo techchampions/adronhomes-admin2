@@ -1,5 +1,30 @@
 import React from "react";
 
+
+
+
+
+export function CardGreen({ tag = "Slider", note = "Click here to manage the control" ,  icon = "/arrw.svg",icon2='/iticon1.svg'}) {
+  return (
+  <div className="md:min-h-[164px] min-h-full rounded-[20px] cursor-pointer relative p-5 md:pr-16 bg-gradient-to-b from-[#F9FFF9] to-[#DFF0DF]">
+    {/* Icon */}
+    <div className="mb-4">
+      <img src={icon2} alt="icon" />
+    </div>
+    
+    {/* Tag */}
+    <p className="text-xl font-[350] text-[#272727] mb-2">{tag}</p>
+    
+    {/* Note */}
+    <p className="text-base max-w-[164px] text-[#272727] font-[325]">{note}</p>
+    
+    {/* Arrow Icon */}
+    <div className="absolute top-1/2 right-6 transform -translate-y-1/2">
+      <img src={icon} alt="icon" />
+    </div>
+  </div>
+);
+}
 // FirstCard (Stats Card)
 interface StatsCardProps {
   tag?: string;

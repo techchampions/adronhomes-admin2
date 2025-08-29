@@ -23,8 +23,9 @@ const roleRoutes: Record<number, string> = {
   3: "/director",
   4: "/payments/dashboard",
   5: "/human-resources",
-  6:'/legal',
-    8:'/client/customers'
+  6: "/legal",
+  7: "/info-tech",
+  8: "/client/customers",
 };
 
 export default function Login() {
@@ -32,8 +33,12 @@ export default function Login() {
   const { loading, token, success, message, error } = useSelector(
     (state: RootState) => state.auth
   );
-  const { loading: userLoading, success: userSuccess, error: userError, user } =
-    useSelector((state: RootState) => state.user);
+  const {
+    loading: userLoading,
+    success: userSuccess,
+    error: userError,
+    user,
+  } = useSelector((state: RootState) => state.user);
   const { forgotPassword, setForgotPassword } = useContext(PropertyContext)!;
   const navigate = useNavigate();
 
@@ -90,13 +95,15 @@ export default function Login() {
     }
   }, [userError, userSuccess, user?.role, navigate]);
 
-
-
   return (
     <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6">
       <div className="bg-white w-full max-w-[841px] flex flex-col items-center rounded-[20px] md:rounded-[50px] px-6 sm:px-12 md:px-[233px] py-8 sm:py-12 md:py-[54px] relative">
         <div>
-          <img src="/loginlogo.svg" alt="loginlogo" className="w-16 sm:w-auto" />
+          <img
+            src="/loginlogo.svg"
+            alt="loginlogo"
+            className="w-16 sm:w-auto"
+          />
         </div>
         <p className="text-dark font-bold text-2xl sm:text-3xl md:text-[36px] xl:text-[36px] lg:text-[36px] mt-4 sm:mt-[22px] mb-8 sm:mb-[56px] font-cormorant">
           Admin Login

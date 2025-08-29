@@ -1,34 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-
-// import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
 import {
-  logout,
-  resetLogoutSuccess,
-} from "../components/Redux/Login/login_slice";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../components/Redux/store";
-import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from "./icon";
+  Icon1,
+  Icon2,
+  Icon3,
+  Icon7,
+  Icon5,
+  Icon6,
+  Icon8,
+  Icon9,
+} from "../../general/icon";
+import { logout } from "../Redux/Login/login_slice";
+import { RootState } from "../Redux/store";
 
 const navItems = [
-  { label: "Dashboard", icon: Icon1, path: "/dashboard" },
-  { label: "Customers", icon: Icon2, path: "/customers" },
-  { label: "Payments", icon: Icon3, path: "/payments" },
-  { label: "Contracts", icon: Icon7, path: "/contracts" },
-  { label: "Properties", icon: Icon5, path: "/properties" },
-  {
-    label: "partnership & requests",
-    icon: Icon7,
-    path: "/partnership-requests",
-  },
-  { label: "Personnel", icon: Icon6, path: "/personnel" },
-
-  { label: "Requests & Enquiries", icon: Icon7, path: "/Requests-Enquiries" },
-  { label: "Notifications", icon: Icon8, path: "/notifications" },
-  { label: "Settings", icon: Icon9, path: "/settings" },
+  { label: "Dashboard", icon: Icon1, path: "/info-tech" },
+  { label: "Requests & Enquiries", icon: Icon7, path: "/info-tech/Requests-Enquiries" },
+  { label: "Settings", icon: Icon9, path: "/info-tech/settings" },
 ];
 
-export default function Sidebar() {
+export default function InfoTechSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -38,20 +30,21 @@ export default function Sidebar() {
     (state: RootState) => state.auth.logoutSuccess
   );
 
-  const isActive = (path: string) =>
-    currentPath === path || (path !== "/" && currentPath.startsWith(path));
+  const isActive = (path: string) => {
+    // Dashboard should only be active when exactly on "/info-tech"
+    if (path === "/info-tech") {
+      return currentPath === "/info-tech";
+    }
+    
+    // Other routes can use startsWith for nested routes
+    return currentPath.startsWith(path);
+  };
+
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
-    window.location.reload();
+    window.location.href = '/';
   };
-
-  // useEffect(() => {
-  //   if (logoutSuccess) {
-  //     navigate('/');
-  //     dispatch(resetLogoutSuccess());
-  //   }
-  // }, [logoutSuccess]);
 
   const DesktopSidebar = () => (
     <div className="hidden lg:block pl-4 md:pl-[40px] pt-12 md:pt-[52px] pr-[20px] bg-white min-h-screen w-[280px]">
