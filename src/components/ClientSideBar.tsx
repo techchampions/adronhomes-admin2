@@ -9,7 +9,7 @@ import { Icon2, Icon3, Icon5, Icon6, Icon7, Icon8 } from "../general/icon";
 
 const navItems = [
   { label: "Customers", icon: Icon2, path: "/client/customers" },
-//   { label: "Customer Payment", icon: Icon6, path: "/client/customers/singlepage/payment" },
+  { label: "partnership & requests", icon: Icon7, path: "/client/partnership-requests" },
   { label: "Contracts", icon: Icon7, path: "/client/contracts" },
 
 ];

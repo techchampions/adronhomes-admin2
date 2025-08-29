@@ -55,6 +55,7 @@ import countriesReducer from './country/countrythunkand slice'
 import legalDashboardSliceReducer  from './legalDashboard/legalDashboardSlice'
 import toggleLatestReducer from './Properties/toggleLatestslice'
 import exportContractsReducer from './export/exportContractSlice'
+import itDashboardSliceReducer from './info-tech/itDashboardSlice'
 
 export const store = configureStore({
   reducer: {
@@ -112,7 +113,8 @@ export const store = configureStore({
   countries:countriesReducer,
   legalDashboard:legalDashboardSliceReducer,
    toggleLatest: toggleLatestReducer,
-   exportContracts:exportContractsReducer
+   exportContracts:exportContractsReducer,
+   itDashboard:itDashboardSliceReducer
   },
 });
 

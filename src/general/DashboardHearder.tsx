@@ -74,7 +74,7 @@ export default function DashboardHeader({
         {/* Search and Button Container */}
         <div className="w-full lg:w-auto flex flex-col lg:flex-row items-center gap-4 mt-4 sm:mt-0">
           {/* Search Input */}
-          <div className={`relative h-[51px] w-full sm:w-64 md:w-80 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${
+          {/* <div className={`relative h-[51px] w-full sm:w-64 md:w-80 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${
             isSearchFocused ? "border-[#79B833] shadow-sm" : "border-[#D8D8D8]"
           } bg-white overflow-hidden`}>
             <input
@@ -84,7 +84,7 @@ export default function DashboardHeader({
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
             />
-          </div>
+          </div> */}
 
           {/* Action Button */}
           {/* <button

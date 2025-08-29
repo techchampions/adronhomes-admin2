@@ -32,7 +32,7 @@ const AccountDetails = () => {
             setShowAddModal(!showAddModal);
             setIsCancelState(false);
           }}
-          buttonText={accounts.length < 4 ? `Add Account` : undefined}
+          buttonText={ `Add Account`}
         />
         <AddAccount
           isOpen={showAddModal}
