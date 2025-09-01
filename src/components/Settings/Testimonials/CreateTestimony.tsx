@@ -15,9 +15,9 @@ interface ModalProps {
 
 const validationSchema = Yup.object().shape({
   client_name: Yup.string().required("Name is required"),
-  client_comment: Yup.string().required("Comment is required"),
+  // client_comment: Yup.string().required("Comment is required"),
   client_image: Yup.mixed().required("Image is required"),
-  client_country: Yup.mixed().required("Country is required"),
+  video_link: Yup.mixed().required("Video Link is required"),
 });
 
 export default function CreateTestimony({
@@ -26,9 +26,9 @@ export default function CreateTestimony({
 }: ModalProps) {
   const initialValues = {
     client_image: "",
-    client_comment: "",
+    // client_comment: "",
     client_name: "",
-    video_link: "http://adron.microf10.sg-host.com/flag.png",
+    video_link: "",
   };
   const { mutate: create, isPending } = useCreateTestimony();
   if (isPending) {
@@ -45,13 +45,13 @@ export default function CreateTestimony({
     const image =
       typeof values.client_image === "string" ? undefined : values.client_image;
     const payload: TestimonialPayload = {
-      client_comment: values.client_comment,
+      // client_comment: values.client_comment,
       client_name: values.client_name,
       client_image: image,
       video_link: values.video_link,
     };
     create(payload, {
-      onSuccess(data, variables, context) {
+      onSuccess() {
         onClose();
       },
     });
@@ -83,14 +83,7 @@ export default function CreateTestimony({
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({
-            errors,
-            touched,
-            handleChange,
-            setFieldValue,
-            values,
-            isSubmitting,
-          }) => (
+          {({ isSubmitting }) => (
             <Form className="flex flex-col gap-5">
               <div className="mb-1.5 flex justify-center gap-4 px-4">
                 <ImageUploadField
@@ -119,7 +112,7 @@ export default function CreateTestimony({
                 />
               </div>
 
-              <div className=" px-7">
+              {/* <div className=" px-7">
                 <label htmlFor="" className="text-sm text-gray-500">
                   Client Comment
                 </label>
@@ -128,7 +121,7 @@ export default function CreateTestimony({
                   type="textarea"
                   placeholder="Enter Client Comment"
                 />
-              </div>
+              </div> */}
 
               <div className="flex justify-between items-center gap-2 mt-[20px]">
                 <Button
