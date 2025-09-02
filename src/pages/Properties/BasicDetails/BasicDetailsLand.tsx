@@ -4,19 +4,18 @@ import React, {
   useEffect,
   useImperativeHandle,
   useState,
+  useMemo,
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../components/input/inputtext";
-import OptionInputField from "../../../components/input/drop_down";
+// import EnhancedOptionInputField from "../../../components/input/enhanced_drop_down"; // Updated import
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
-import { personnels } from "../../../components/Redux/personnel/personnel_thunk";
 import { formatToNaira } from "../../../utils/formatcurrency";
 import TagInputField from "../../../components/input/TagInputField";
-// import { fetchCountryStates } from "../../../components/Redux/country/countrythunkand slice";
 
 // Import the Redux actions and selectors
 import {
@@ -32,29 +31,29 @@ import {
   selectLoadingStates,
   selectErrorStates,
 } from "../../../components/Redux/country/countrythunkand slice";
+import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 
-  const validationSchema = Yup.object().shape({
-    propertyName: Yup.string().required("Property name is required"),
-    propertyType: Yup.string().required("Property type is required"),
-    category: Yup.string().required("Category is required"),
-    price: Yup.number()
-      .typeError("Price must be a number")
-      .positive("Price must be positive")
-      .required("Price is required"),
-    initialDeposit: Yup.number()
-      .typeError("Initial deposit must be a number")
-      .positive("Initial deposit must be positive")
-      .required("Initial deposit is required"),
-    address: Yup.string().required("Address is required"),
-    country: Yup.string().required("Country is required"),
-    state: Yup.string().required("State is required"),
-    lga: Yup.string().required("LGA is required"),
-    purpose: Yup.array()
-      .of(Yup.string())
-      .min(1, "At least one purpose is required")
-      .required("Purpose is required"),
-  });
-
+const validationSchema = Yup.object().shape({
+  propertyName: Yup.string().required("Property name is required"),
+  propertyType: Yup.string().required("Property type is required"),
+  // category: Yup.string().required("Category is required"),
+  price: Yup.number()
+    .typeError("Price must be a number")
+    .positive("Price must be positive")
+    .required("Price is required"),
+  initialDeposit: Yup.number()
+    .typeError("Initial deposit must be a number")
+    .positive("Initial deposit must be positive")
+    .required("Initial deposit is required"),
+  address: Yup.string().required("Address is required"),
+  country: Yup.string().required("Country is required"),
+  state: Yup.string().required("State is required"),
+  lga: Yup.string().required("LGA is required"),
+  purpose: Yup.array()
+    .of(Yup.string())
+    .min(1, "At least one purpose is required")
+    .required("Purpose is required"),
+});
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const { formData, setBasicDetails } = useContext(PropertyContext)!;
@@ -64,10 +63,10 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const dispatch = useDispatch<AppDispatch>();
   
   // Get data from Redux store
-    const formik = useFormik({
+  const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-      category: formData.basicDetails.category || "",
+      // category: formData.basicDetails.category || "",
       purpose: purpose,
     },
     validationSchema,
@@ -78,43 +77,15 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       });
     },
   });
+  
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
-  
-  // Format countries for dropdown with proper null checks
-  const countriesOptions = (countries || [])
-    .map((country: any) => ({ 
-      value: country.name || '', 
-      label: country.name || '' 
-    }))
-    .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-
-  // Get states and LGAs based on selected values with proper null checks
-  const states = useSelector((state: RootState) => 
-    selectCountryStates(state, formik.values.country)
-  );
-  const statesOptions = (states || [])
-    .map((state: any) => ({ 
-      value: state.name || '', 
-      label: state.name || '' 
-    }))
-    .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-
-  const lgas = useSelector((state: RootState) => 
-    selectStateLGAs(state, formik.values.country, formik.values.state)
-  );
-const lgaOptions = lgas
-  .filter((lga) => lga?.name?.trim())
-  .map((lga) => ({ value: lga.name, label: lga.name }))
-  .sort((a, b) => a.label.localeCompare(b.label));
-
 
   const propertyTypeOptions = [
-    { value: 1, label: "Land" },
+    { value: "1", label: "Land" },
   ];
 
-  // Added category options
   const categoryOptions = [
     { value: "residential", label: "Residential" },
     { value: "commercial", label: "Commercial" },
@@ -143,13 +114,49 @@ const lgaOptions = lgas
     { value: "semi_detached", label: "Semi-Detached House" },
   ];
 
+  // Format countries for dropdown with proper null checks
+  const countriesOptions = useMemo(() => 
+    (countries || [])
+      .map((country: any) => ({ 
+        value: country.name || '', 
+        label: country.name || '' 
+      }))
+      .sort((a, b) => (a.label || '').localeCompare(b.label || '')),
+    [countries]
+  );
 
+  // Get states and LGAs based on selected values with proper null checks
+  const states = useSelector((state: RootState) => 
+    selectCountryStates(state, formik.values.country)
+  );
+  
+  const statesOptions = useMemo(() => 
+    (states || [])
+      .map((state: any) => ({ 
+        value: state.name || '', 
+        label: state.name || '' 
+      }))
+      .sort((a, b) => (a.label || '').localeCompare(b.label || '')),
+    [states]
+  );
+
+  const lgas = useSelector((state: RootState) => 
+    selectStateLGAs(state, formik.values.country, formik.values.state)
+  );
+  
+  const lgaOptions = useMemo(() => 
+    lgas
+      .filter((lga) => lga?.name?.trim())
+      .map((lga) => ({ value: lga.name, label: lga.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [lgas]
+  );
 
   useEffect(() => {
     if (initialLoad && formData.basicDetails) {
       formik.setValues({
         ...formData.basicDetails,
-        category: formData.basicDetails.category || "",
+        // category: formData.basicDetails.category || "",
         purpose: formData.basicDetails.purpose || [],
       });
       setPurpose(formData.basicDetails.purpose || []);
@@ -231,7 +238,7 @@ const lgaOptions = lgas
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
         name="propertyType"
@@ -240,10 +247,11 @@ const lgaOptions = lgas
         options={propertyTypeOptions}
         dropdownTitle="Property Types"
         error={formik.touched.propertyType && formik.errors.propertyType}
+        isSearchable={false}
       />
 
-      {/* Added Category Field
-      <OptionInputField
+      {/* Uncomment if you want to use the category field */}
+      {/* <EnhancedOptionInputField
         label="Category"
         placeholder="Select category"
         name="category"
@@ -252,6 +260,7 @@ const lgaOptions = lgas
         options={categoryOptions}
         dropdownTitle="Categories"
         error={formik.touched.category && formik.errors.category}
+        isSearchable={true}
       /> */}
 
       <InputField
@@ -291,7 +300,7 @@ const lgaOptions = lgas
         error={formik.touched.address && formik.errors.address}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="Country"
         placeholder={loading.countries ? "Loading countries..." : "Select country"}
         name="country"
@@ -304,10 +313,11 @@ const lgaOptions = lgas
         options={countriesOptions}
         dropdownTitle="Countries"
         error={formik.touched.country && formik.errors.country}
-        // loading={loading.countries}
+        isLoading={loading.countries}
+        isSearchable={true}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="State"
         placeholder={loading.states ? "Loading states..." : "Select state"}
         name="state"
@@ -319,11 +329,12 @@ const lgaOptions = lgas
         options={statesOptions}
         dropdownTitle="States"
         error={formik.touched.state && formik.errors.state}
-        disabled={!formik.values.country || loading.states}
-        // loading={loading.states}
+        disabled={!formik.values.country}
+        isLoading={loading.states}
+        isSearchable={true}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
         name="lga"
@@ -332,13 +343,14 @@ const lgaOptions = lgas
         options={lgaOptions}
         dropdownTitle="LGAs"
         error={formik.touched.lga && formik.errors.lga}
-        disabled={!formik.values.state || loading.lgas}
-        // loading={loading.lgas}
+        disabled={!formik.values.state}
+        isLoading={loading.lgas}
+        isSearchable={true}
       />
 
       <TagInputField
-        label="purpose"
-        placeholder="Add purpose (e.g.,Bongalo)"
+        label="Purpose"
+        placeholder="Add purpose (e.g., Bungalow)"
         values={purpose}
         onChange={(newPurpose) => setPurpose(newPurpose)}
         error={formik.touched.purpose && formik.errors.purpose}
