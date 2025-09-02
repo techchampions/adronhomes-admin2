@@ -5,13 +5,14 @@ import { useDispatch } from "react-redux";
 import { logout } from "../components/Redux/Login/login_slice";
 import { Icon2, Icon3, Icon5, Icon6, Icon7, Icon8 } from "../general/icon";
 
-
-
 const navItems = [
   { label: "Customers", icon: Icon2, path: "/client/customers" },
-  { label: "partnership & requests", icon: Icon7, path: "/client/partnership-requests" },
+  {
+    label: "Client Partnership",
+    icon: Icon7,
+    path: "/client/partnership-requests",
+  },
   { label: "Contracts", icon: Icon7, path: "/client/contracts" },
-
 ];
 
 export default function ClientSidebar() {
@@ -25,10 +26,9 @@ export default function ClientSidebar() {
   const isActive = (path: string) =>
     currentPath === path || currentPath.startsWith(path);
 
- const handleLogout = () => {
+  const handleLogout = () => {
     dispatch(logout());
-   window.location.href = '/';
-
+    window.location.href = "/";
   };
 
   // Desktop Sidebar

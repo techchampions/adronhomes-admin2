@@ -417,7 +417,7 @@ export const getUser = async (): Promise<GetUserResponse> => {
 };
 // Get Testimonials
 export const getTestimonials = async (): Promise<ApiResponse> => {
-  const response = await adminApi.get("/testimonials");
+  const response = await adronApi.get("/testimonials");
   return response.data;
 };
 

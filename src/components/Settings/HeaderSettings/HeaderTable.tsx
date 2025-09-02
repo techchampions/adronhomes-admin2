@@ -56,15 +56,15 @@ export default function HeaderTable() {
                   <td className="px-4 py-2 truncate max-w-[150px]">
                     {row.action_link}
                   </td>
-                  <td className="px-4 py-2 flex space-x-2">
+                  <td className="px-4 py-2 flex justify-between space-x-2">
                     <IoPencil
-                      className="w-4 h-4 text-gray-600 cursor-pointer"
+                      className="w-4 h-4 text-blue-600 cursor-pointer"
                       onClick={() => {
                         setEditModal(true);
                         setHeaderItem(row);
                       }}
                     />
-                    <IoCopy className="w-4 h-4 text-gray-600 cursor-pointer" />
+                    {/* <IoCopy className="w-4 h-4 text-gray-600 cursor-pointer" /> */}
                     <IoTrash className="w-4 h-4 text-red-600 cursor-pointer" />
                   </td>
                 </tr>
