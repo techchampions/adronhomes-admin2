@@ -3,17 +3,17 @@ import React, {
   useContext,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useState,
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../components/input/inputtext";
-import OptionInputField from "../../../components/input/drop_down";
+// import EnhancedOptionInputField from "../../../components/input/enhanced_drop_down"; // New component
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
-import { personnels } from "../../../components/Redux/personnel/personnel_thunk";
 import { formatToNaira } from "../../../utils/formatcurrency";
 
 // Import the Redux actions and selectors
@@ -30,24 +30,23 @@ import {
   selectLoadingStates,
   selectErrorStates,
 } from "../../../components/Redux/country/countrythunkand slice";
+import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails, isLandProperty, setIsLandProperty, sales, setSales } = useContext(PropertyContext)!;
+  const { formData, setBasicDetails, setSales } = useContext(PropertyContext)!;
   const [initialLoad, setInitialLoad] = useState(true);
   const [purpose, setPurpose] = useState<string[]>(formData.basicDetails.purpose || []);
 
   const dispatch = useDispatch<AppDispatch>();
-  
   // Get data from Redux store
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
-  
 
   const propertyTypeOptions = [
-    { value: 2, label: "Residential" },
-    { value: 3, label: "Industrial" },
-    { value: 4, label: "Commercial" },
+    { value: "2", label: "Residential" },
+    { value: "3", label: "Industrial" },
+    { value: "4", label: "Commercial" },
   ];
 
   const categoryOptions = [
@@ -69,7 +68,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const validationSchema = Yup.object().shape({
     propertyName: Yup.string().required("Property name is required"),
     propertyType: Yup.string().required("Property type is required"),
-    // category_id: Yup.string().required("Category is required"),
     price: Yup.number()
       .typeError("Price must be a number")
       .positive("Price must be positive")
@@ -165,9 +163,9 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   // Fetch LGAs when state changes
   useEffect(() => {
     if (formik.values.country && formik.values.state) {
-      dispatch(fetchStateLGAs({ 
-        countryName: formik.values.country, 
-        stateName: formik.values.state 
+      dispatch(fetchStateLGAs({
+        countryName: formik.values.country,
+        stateName: formik.values.state
       }));
       dispatch(setSelectedState(formik.values.state));
     } else {
@@ -183,26 +181,36 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       dispatch(setSelectedLGA(null));
     }
   }, [formik.values.lga, dispatch]);
+
   // Format countries for dropdown
-  const countriesOptions = countries
-    .map((country: any) => ({ value: country.name, label: country.name }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const countriesOptions = useMemo(() => 
+    countries
+      .map((country: any) => ({ value: country.name, label: country.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [countries]
+  );
 
   // Get states and LGAs based on selected values
-  const states = useSelector((state: RootState) => 
+  const states = useSelector((state: RootState) =>
     selectCountryStates(state, formik.values.country)
   );
-  const statesOptions = states
-    .map((state: any) => ({ value: state.name, label: state.name }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const statesOptions = useMemo(() => 
+    states
+      .map((state: any) => ({ value: state.name, label: state.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [states]
+  );
 
-  const lgas = useSelector((state: RootState) => 
+  const lgas = useSelector((state: RootState) =>
     selectStateLGAs(state, formik.values.country, formik.values.state)
   );
-const lgaOptions = lgas
-  .filter((lga) => lga?.name?.trim())
-  .map((lga) => ({ value: lga.name, label: lga.name }))
-  .sort((a, b) => a.label.localeCompare(b.label));
+  const lgaOptions = useMemo(() => 
+    lgas
+      .filter((lga) => lga?.name?.trim())
+      .map((lga) => ({ value: lga.name, label: lga.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [lgas]
+  );
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
@@ -215,7 +223,7 @@ const lgaOptions = lgas
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
         name="propertyType"
@@ -224,9 +232,10 @@ const lgaOptions = lgas
         options={propertyTypeOptions}
         dropdownTitle="Property Types"
         error={formik.touched.propertyType && formik.errors.propertyType}
+        isSearchable={false}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="Category"
         placeholder="Select category"
         name="category_id"
@@ -235,6 +244,7 @@ const lgaOptions = lgas
         options={categoryOptions}
         dropdownTitle="Categories"
         error={formik.touched.category_id && formik.errors.category_id}
+        isSearchable={false}
       />
 
       <InputField
@@ -274,7 +284,7 @@ const lgaOptions = lgas
         error={formik.touched.address && formik.errors.address}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="Country"
         placeholder="Select country"
         name="country"
@@ -287,10 +297,10 @@ const lgaOptions = lgas
         options={countriesOptions}
         dropdownTitle="Countries"
         error={formik.touched.country && formik.errors.country}
-        // loading={loading.countries}
+        isLoading={loading.countries}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="State"
         placeholder={loading.states ? "Loading states..." : "Select state"}
         name="state"
@@ -302,11 +312,11 @@ const lgaOptions = lgas
         options={statesOptions}
         dropdownTitle="States"
         error={formik.touched.state && formik.errors.state}
-        disabled={!formik.values.country || loading.states}
-        // loading={loading.states}
+        disabled={!formik.values.country}
+        isLoading={loading.states}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
         name="lga"
@@ -315,11 +325,11 @@ const lgaOptions = lgas
         options={lgaOptions}
         dropdownTitle="LGAs"
         error={formik.touched.lga && formik.errors.lga}
-        disabled={!formik.values.state || loading.lgas}
-        // loading={loading.lgas}
+        disabled={!formik.values.state}
+        isLoading={loading.lgas}
       />
 
-      <OptionInputField
+      <EnhancedOptionInputField
         label="Purpose"
         placeholder="Select purpose"
         name="purpose"
@@ -328,6 +338,7 @@ const lgaOptions = lgas
         options={purposeOptions}
         dropdownTitle="Purpose"
         error={formik.touched.purpose && formik.errors.purpose}
+        isSearchable={false}
       />
 
       {/* Display error messages if any */}
