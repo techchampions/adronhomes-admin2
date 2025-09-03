@@ -16,8 +16,9 @@ interface MediaFORMHandles {
 interface MediaFormValues {
   tourLink: string;
   videoLink: string;
+  mapUrl: string;
   images: File[];
-  videoFile: File[];
+
 }
 
 const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
@@ -25,8 +26,9 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
   const [initialValues, setInitialValues] = useState<MediaFormValues>({
     tourLink: '',
     videoLink: '',
+    mapUrl: '',
     images: [],
-    videoFile: []
+
   });
 
   const validationSchema = Yup.object().shape({
@@ -35,6 +37,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
       .required("Images are required"),
     // tourLink: Yup.string().url("Must be a valid URL").required(),
     // videoLink: Yup.string().url("Must be a valid URL").required(),
+    // mapUrl: Yup.string().url("Must be a valid URL").required(),
     // videoFile:Yup.array()
     //   .min(1, "At least one video is required")
     //   .required("video are required"),
@@ -47,8 +50,9 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
       setInitialValues({
         tourLink: formData.media.tourLink || '',
         videoLink: formData.media.videoLink || '',
+        mapUrl: formData.media.mapUrl || '',
         images: formData.media.images || [],
-        videoFile: formData.media.videoFile || []
+      
       });
     }
   }, [formData.media]);
@@ -59,6 +63,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
         formikRef.current.setTouched({
           tourLink: true,
           videoLink: true,
+          mapUrl: true,
           images: true,
           videoFile: true
         });
@@ -72,6 +77,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
         formikRef.current?.setTouched({
           tourLink: true,
           videoLink: true,
+          mapUrl: true,
           images: true,
           videoFile: true
         });
@@ -91,7 +97,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
       onSubmit={(values: MediaFormValues) => {
         setMedia({
           ...values,
-          videoFile: values.videoFile || []
+          // videoFile: values.videoFile || []
         });
       }}
     >
@@ -111,13 +117,13 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
           />
 
           {/* Video File Upload */}
-          <div className="mt-8">
+          {/* <div className="mt-8">
             <h2 className="text-[20px] font-[325] text-dark mb-2">Property Video</h2>
             <p className="text-[#767676] text-sm font-[325] mb-3">
               Upload a video file of the property (MP4 format recommended)
             </p>
             <VideoUpload name="videoFile" />
-          </div>
+          </div> */}
 
           {/* Virtual Tour Link */}
           <div className="mt-8">
@@ -155,7 +161,24 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
             />
           </div>
 
-      
+          {/* Map URL */}
+          <div className="mt-4">
+            <h2 className="text-[20px] font-[325] text-dark mb-2">Map Location</h2>
+            <p className="text-[#767676] text-sm font-[325] mb-3">
+              Provide a Google Maps link to the property location.
+            </p>
+            <InputField
+              label="Map URL"
+              placeholder="Enter map location link"
+              name="mapUrl"
+              value={values.mapUrl}
+              onChange={handleChange}
+              error={
+                touched.mapUrl && errors.mapUrl ? errors.mapUrl : undefined
+              }
+            />
+          </div>
+
         </Form>
       )}
     </Formik>

@@ -316,7 +316,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.states}
       />
 
-      <EnhancedOptionInputField
+      {/* <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
         name="lga"
@@ -327,7 +327,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         error={formik.touched.lga && formik.errors.lga}
         disabled={!formik.values.state}
         isLoading={loading.lgas}
-      />
+      /> */}
 
       <EnhancedOptionInputField
         label="Purpose"
