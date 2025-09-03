@@ -48,7 +48,7 @@ const validationSchema = Yup.object().shape({
   address: Yup.string().required("Address is required"),
   country: Yup.string().required("Country is required"),
   state: Yup.string().required("State is required"),
-  lga: Yup.string().required("LGA is required"),
+  // lga: Yup.string().required("LGA is required"),
   purpose: Yup.array()
     .of(Yup.string())
     .min(1, "At least one purpose is required")
@@ -78,12 +78,13 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     },
   });
   
+  
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
 
   const propertyTypeOptions = [
-    { value: "1", label: "Land" },
+    { value: "3", label: "Land" },
   ];
 
   const categoryOptions = [
@@ -334,7 +335,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isSearchable={true}
       />
 
-      <EnhancedOptionInputField
+      {/* <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
         name="lga"
@@ -346,7 +347,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         disabled={!formik.values.state}
         isLoading={loading.lgas}
         isSearchable={true}
-      />
+      /> */}
 
       <TagInputField
         label="Purpose"

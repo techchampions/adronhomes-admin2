@@ -78,9 +78,9 @@ const [titleDocumentTypeProp, setTitleDocumentType] = useState<string[]>(
   bedrooms: Yup.string().required("Number of bedrooms is required"),
   bathrooms: Yup.string().required("Number of bathrooms is required"),
   toilets: Yup.string().required("Number of toilets is required"),  
-  propertySize: Yup.string().required("Property size is required"),
+  // propertySize: Yup.string().required("Property size is required"),
   description: Yup.string().required("Description is required"),
-  overview: Yup.string().required("Overview is required"),
+  // overview: Yup.string().required("Overview is required"),
   director_id: Yup.string().required("Director is required"),
   documents: Yup.string().required("Property Agreement details are required"),
   nearbyLandmarks: Yup.array()
@@ -266,8 +266,8 @@ useEffect(() => {
   />
 </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
-          <div className="relative">
+        <div className=" gap-12">
+          {/* <div className="relative">
             <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">
               Sq M
             </p>
@@ -288,8 +288,11 @@ useEffect(() => {
                   : undefined
               }
             />
-          </div>
-
+          </div> */}
+ <div className="relative">
+          <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">
+            Sq M
+          </p>
           <InputField
             label="Land Size"
             placeholder="Enter Land Size"
@@ -303,7 +306,7 @@ useEffect(() => {
             }}
           />
         </div>
-
+    </div>
         <div className="grid md:grid-cols-2 gap-12">
           <InputField
             label="Parking Spaces"
@@ -357,7 +360,7 @@ useEffect(() => {
               : undefined
           }
         />
-
+{/* 
         <InputAreaField
           label="Overview"
           placeholder="Enter your Overview"
@@ -371,7 +374,7 @@ useEffect(() => {
               ? formik.errors.overview
               : undefined
           }
-        />
+        /> */}
 
         <div className="grid md:grid-cols-2 gap-12">
        { sales  &&(<OptionInputField

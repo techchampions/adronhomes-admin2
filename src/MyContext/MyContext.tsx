@@ -101,7 +101,8 @@ interface MediaFormValues {
   tourLink: string;
   videoLink: string;
   images: File[];
-  videoFile: File[];
+  // videoFile: File[];
+  mapUrl:string;
 }
 
 interface DiscountFormValues {
@@ -256,10 +257,11 @@ const initialFormData: PropertyFormData = {
     features: ["Gym", "Swimming Pool", "Drainage", "Super Market"],
   },
   media: {
+    mapUrl:"",
     tourLink: "",
     videoLink: "",
     images: [],
-    videoFile: [],
+    // videoFile: [],
   },
   discount: {
     discountName: "",
@@ -477,7 +479,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
           ? landForm.titleDocumentType.join(", ")
           : landForm.titleDocumentType || ""
       );
-      formPayload.append("overview", landForm.overview);
+      // formPayload.append("overview", landForm.overview);
       formPayload.append("description", landForm.description);
       const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
       formPayload.append("number_of_unit", unitsAvailable.toString());
@@ -499,7 +501,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       formPayload.append("toilets", specifications.toilets || "0");
       formPayload.append("size", specifications.propertySize);
       formPayload.append("parking_space", specifications.parkingSpaces || "0");
-      formPayload.append("overview", specifications.overview);
+      // formPayload.append("overview", specifications.overview);
       formPayload.append("description", specifications.description);
       formPayload.append("year_built", specifications.yearBuilt || "");
       const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
@@ -542,14 +544,17 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
     if (media.videoLink) {
       formPayload.append("video_link", media.videoLink);
     }
-
-    if (Array.isArray(media.videoFile) && media.videoFile.length > 0) {
-      media.videoFile.forEach((video, index) => {
-        if (video instanceof File) {
-          formPayload.append(`video_file[${index}]`, video);
-        }
-      });
+      if (media.mapUrl) {
+      formPayload.append("map_link", media.mapUrl);
     }
+
+    // if (Array.isArray(media.videoFile) && media.videoFile.length > 0) {
+    //   media.videoFile.forEach((video, index) => {
+    //     if (video instanceof File) {
+    //       formPayload.append(`video_file[${index}]`, video);
+    //     }
+    //   });
+    // }
 
     formPayload.append("payment_type", paymentStructure.paymentType);
     formPayload.append("property_duration_limit", paymentStructure.paymentDuration);

@@ -133,7 +133,7 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
 
     // Call submitForm with the selected option directly
     await submitForm(option);
-    setCurrentStep(7); // Move to the final step after successful submission
+    setCurrentStep(1); // Move to the final step after successful submission
   } catch (error) {
     console.error("Submission failed:", error);
     toast.error("Failed to submit property. Please try again.");
@@ -273,7 +273,7 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
         )}
 
         {currentStep === 6 && <PropertyListing />}
-        {currentStep === 7 && <FinalSubmission />}
+        {/* {currentStep === 7 && <FinalSubmission />} */}
 
         <div className="grid grid-cols-2 mb-[69px] w-full mt-20">
           <div className="w-full justify-start flex">
