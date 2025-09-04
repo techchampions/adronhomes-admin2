@@ -18,6 +18,7 @@ interface HeaderProps {
   history?: boolean;
   showBulkModal?: boolean;
   setShowBulkModal?: (show: boolean) => void;
+  isbutton?:boolean
 }
 
 export default function Header({
@@ -27,6 +28,7 @@ export default function Header({
   buttonText = "Add Property",
   onButtonClick,
   history = false,
+  isbutton=true
 }: HeaderProps) {
   const {
     showBulkModal,
@@ -109,7 +111,7 @@ export default function Header({
         </div>
 
         <div className="w-full lg:w-auto flex flex-row lg:flex-row items-center gap-4 mt-4 sm:mt-0">
-          <div
+          {/* <div
             className={`relative h-[51px] w-full sm:w-64 lg:w-[410px] flex-3/4 rounded-full border transition-all font-[400] ${
               isSearchFocused
                 ? "border-[#79B833] shadow-sm"
@@ -123,9 +125,9 @@ export default function Header({
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
             />
-          </div>
+          </div> */}
 
-          <button
+   {     isbutton &&(  <button
             className={`text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-auto py-3 px-6 md:px-10 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4  whitespace-nowrap ${
               isCancelState
                 ? "bg-[#D70E0E] hover:bg-red-600"
@@ -134,7 +136,7 @@ export default function Header({
             onClick={handleButtonClick}
           >
             {getButtonText()}
-          </button>
+          </button>)}
         </div>
       </div>
 
