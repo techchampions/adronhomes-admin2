@@ -28,7 +28,7 @@ export default function Dashboard() {
     error: userError,
     user,
   } = useSelector((state: RootState) => state.user);
-const location = useLocation();
+  const location = useLocation();
   const {
     loading: dashLoading,
     error: dashError,
@@ -66,20 +66,21 @@ const location = useLocation();
     },
   ];
 
-  const Transactionstat = [
+  const VisitStats = [
     {
-      value: dashdata?.transactions.total_orders || 0,
+      value: dashdata?.visit?.total || "0",
       label: "Total",
     },
     {
-      value: dashdata?.transactions.approved_orders || 0,
+      value: dashdata?.visit?.today || 0,
       label: "Today",
     },
     {
-      value: dashdata?.transactions.pending_orders || 0,
+      value: dashdata?.visit?.this_month || "0",
       label: "This Month",
     },
   ];
+
   const PaymentsStat = [
     {
       value: dashdata?.payments.total_count || 0,
@@ -95,11 +96,12 @@ const location = useLocation();
     },
   ];
   const basePath = location.pathname.startsWith(
-                        "/payments/dashboard"
-                      )
-                      const basePath2 = location.pathname.startsWith(
-                        "/dashboard"
-                      )
+    "/payments/dashboard"
+  );
+  const basePath2 = location.pathname.startsWith(
+    "/dashboard"
+  );
+
   if (userError || dashError) {
     return (
       <div className="flex h-screen w-full justify-center items-center">
@@ -120,12 +122,12 @@ const location = useLocation();
         </div>
       ) : (
         <>
-       {  <>{basePath2&&<DashboardHeader
-              title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`} />}
-              {basePath &&<Header
-              showSearchAndButton={false}
-                title="Payment Admin"
-                subtitle="Manage the list of payments made by customers" />}</>}
+          {basePath2 && <DashboardHeader
+            title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`} />}
+          {basePath && <Header
+            showSearchAndButton={false}
+            title="Payment Admin"
+            subtitle="Manage the list of payments made by customers" />}
           <div className="space-y-[20px]">
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
               <StatsCard stats={propstats} />
@@ -133,7 +135,7 @@ const location = useLocation();
             </div>
 
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-              <StatsCard stats={Transactionstat} tag="Website Visits" />
+              <StatsCard stats={VisitStats} tag="Website Visits" />
               <StatsCard stats={PaymentsStat} tag="Payments" />
             </div>
             <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">

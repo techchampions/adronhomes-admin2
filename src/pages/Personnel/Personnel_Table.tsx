@@ -215,7 +215,7 @@ setOption
           subjectName={`${personelToDelete.first_name} ${personelToDelete.last_name}`}
           onClose={handleCloseDeleteModal}
           onConfirm={handleConfirmDelete}
-          confirmButtonText="Delete Property"
+          confirmButtonText="Delete Personnel"
           cancelButtonText="Cancel"
           loading={deleteloading}
         />

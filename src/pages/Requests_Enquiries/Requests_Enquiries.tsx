@@ -29,12 +29,14 @@ export default function Requests_Enquiries() {
         title="Requests & Enquiries"
         subtitle="Attend to requests and enquiries on properties"
         history={true}
+         showSearchAndButton={false}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
           activeTab={tab[0]}
           tabs={tab}
           searchPlaceholder="Search Requests..."
+          showSearchandSort={false}
         >
           {isLoading ? (
             <LoadingAnimations loading={isLoading} />

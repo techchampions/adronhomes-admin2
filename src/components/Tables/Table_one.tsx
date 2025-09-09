@@ -70,7 +70,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
       <div className="w-full flex lg:flex-row items-start lg:items-center pb-[20px] lg:pb-[30px] justify-between gap-4 lg:gap-0 flex-col-reverse">
         {/* Tabs - Conditionally rendered */}
         {showTabs && (
-          <div className="flex w-full overflow-x-auto flex-nowrap gap-[10px] lg:gap-[20px] pb-2 lg:pb-0 scrollbar-thin scrollbar-thumb-gray-300">
+          <div className="flex w-full overflow-x-auto flex-nowrap gap-[10px] lg:gap-[20px] pb-2 lg:pb-0 scrollbar- scrollbar-thumb-gray-300 scrollbar-hide">
             {tabs.map((tab) => (
               <button
                 key={tab}

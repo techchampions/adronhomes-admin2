@@ -115,12 +115,12 @@ const PropertyDetailsPage = () => {
     }
   };
 
-  const handleArrayInputChange = (field: keyof Property, value: string[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
+  setFormData((prev) => ({
+    ...prev,
+    [field]: value,
+  }));
+};
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -670,7 +670,7 @@ const PropertyDetailsPage = () => {
                 <h2 className="text-2xl font-semibold mb-4">Description</h2>
                 <div className="space-y-4">
                   {/* Overview */}
-                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                     <label className="text-gray-700 font-medium w-full md:w-1/3">
                       Overview:
                     </label>
@@ -688,7 +688,7 @@ const PropertyDetailsPage = () => {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Description */}
                   <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
@@ -741,7 +741,7 @@ const PropertyDetailsPage = () => {
                   </div>
 
                   {/* Area */}
-                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                     <label className="text-gray-700 font-medium w-full md:w-1/3">
                       Area:
                     </label>
@@ -760,7 +760,7 @@ const PropertyDetailsPage = () => {
                         </p>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Nearby Landmarks */}
                   <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
@@ -831,7 +831,7 @@ const PropertyDetailsPage = () => {
                   </div>
 
                   {/* LGA */}
-                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                     <label className="text-gray-700 font-medium w-full md:w-1/3">
                       LGA:
                     </label>
@@ -851,8 +851,8 @@ const PropertyDetailsPage = () => {
                         </p>
                       </div>
                     )}
-                  </div>
-                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                  </div> */}
+                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                     <label className="text-gray-700 font-medium w-full md:w-1/3">
                       Area:
                     </label>
@@ -871,8 +871,8 @@ const PropertyDetailsPage = () => {
                         </p>
                       </div>
                     )}
-                  </div>
-
+                  </div> */}
+{/* 
                   <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                     <label className="text-gray-700 font-medium w-full md:w-1/3">
                       Nearby Landmarks:
@@ -892,7 +892,7 @@ const PropertyDetailsPage = () => {
                         </p>
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -907,10 +907,18 @@ const PropertyDetailsPage = () => {
                     <div className="w-full md:w-2/3">
                       <textarea
                         value={formData.features?.join(", ") || ""}
-                        onChange={(e) =>
+//                         onChange={(e) => {
+//   const input = e.target.value;
+//   const array = input
+//     .split(",")
+//     .map((item) => item.trim())
+//     .filter((item) => item.length > 0); // removes empty entries
+//   handleArrayInputChange("features", array);
+// }}
+  onChange={(e) =>
                           handleArrayInputChange(
                             "features",
-                            e.target.value.split(",").map((item) => item.trim())
+                            e.target.value.split("\n")
                           )
                         }
                         className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"

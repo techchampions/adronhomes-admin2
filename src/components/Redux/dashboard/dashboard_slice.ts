@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { DashboardData, ErrorResponse, getDashboardData } from "./dashboard_thunk";
 
-
 interface DashboardState {
-  data: DashboardData | null;
+  data: DashboardData['data'] | null;
   loading: boolean;
   error: ErrorResponse | null;
 }

@@ -120,8 +120,7 @@ export default function SingleJob() {
               data={applications || []}
               isLoading={isLoading}
               pagination={pagination}
-              handlePageChange={handlePageChange}
-            />
+              handlePageChange={handlePageChange} currentPage={pagination.currentPage}            />
           </ReusableTable>
         </div>
       </div>
