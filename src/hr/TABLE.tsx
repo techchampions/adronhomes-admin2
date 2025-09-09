@@ -17,9 +17,6 @@ import { editJob } from "../components/Redux/carreer/edit_job_thunk";
 import EditJobModal from "./EdithHr";
 import { useNavigate } from "react-router-dom";
 
-
-
-
 export interface JobData {
   id: number;
   job_title: string;
@@ -44,7 +41,8 @@ interface JobTableProps {
 
 const HumanResources: React.FC<JobTableProps> = ({ data, isLoading,currentPage }) => {
   const dispatch = useDispatch<AppDispatch>();
-const navigate =useNavigate()
+  const navigate =useNavigate()
+
   // State for delete modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [jobToDelete, setJobToDelete] = useState<JobData | null>(null);
@@ -64,6 +62,10 @@ const navigate =useNavigate()
   const editError = useSelector(selectEditJobError);
 
   const pagination = useSelector(selectCareerPagination);
+
+  // Calculate starting index for serial numbers based on current page and items per page
+  const itemsPerPage = pagination.perPage || 10;
+  const serialNumberStart = ((currentPage || 1) - 1) * itemsPerPage + 1;
 
   // Handle page change for career listings
   const handlePageChange = async (page: number) => {
@@ -92,12 +94,10 @@ const navigate =useNavigate()
   // Effect for delete operation feedback
   useEffect(() => {
     if (deleteSuccess) {
-      // toast.success("Job deleted successfully!");
       handleCloseDeleteModal();
       dispatch(fetchCareers({page:currentPage}));
     }
     if (deleteError) {
-      // Error toast is already handled in the thunk, but you can add more logic here if needed
       handleCloseDeleteModal();
     }
   }, [deleteSuccess, deleteError, dispatch]);
@@ -123,7 +123,6 @@ const navigate =useNavigate()
   // Effect for edit operation feedback
   useEffect(() => {
     if (editSuccess) {
-      // toast.success("Job updated successfully!");
       handleCloseEditModal();
       dispatch(fetchCareers({page:currentPage})); 
     }
@@ -144,8 +143,11 @@ const navigate =useNavigate()
           <thead>
             <tr className="text-left">
               <th className="py-4 font-normal text-[#757575] text-xs w-[60px]">
-                ID
+                S/N
               </th>
+              {/* <th className="py-4 font-normal text-[#757575] text-xs w-[60px]">
+                ID
+              </th> */}
               <th className="py-4 px-6 font-normal text-[#757575] text-xs w-[300px]">
                 Role
               </th>
@@ -168,11 +170,14 @@ const navigate =useNavigate()
           </thead>
           <tbody>
             {data && data.length > 0 ? (
-              data.map((job: JobData) => (
+              data.map((job: JobData, index: number) => (
                 <tr key={`job-${job.id}`} className="cursor-pointer">
                   <td className="py-4 text-dark text-sm truncate w-[60px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
-                    {job.id}
+                    {serialNumberStart + index}
                   </td>
+                  {/* <td className="py-4 text-dark text-sm truncate w-[60px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
+                    {job.id}
+                  </td> */}
                   <td className="py-4 px-6 font-[325] text-dark text-sm truncate w-[300px]" onClick={()=>navigate(`/human-resources/view-job/${job.id}`)}>
                     {job.job_title}
                   </td>
@@ -216,7 +221,7 @@ const navigate =useNavigate()
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="py-10 text-center text-gray-500">
+                <td colSpan={8} className="py-10 text-center text-gray-500">
                   <div className="flex flex-col items-center justify-center">
                     No job data found
                     <NotFound />

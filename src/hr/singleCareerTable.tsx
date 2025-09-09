@@ -11,16 +11,22 @@ interface ApplicantsTableProps {
   isLoading: boolean;
   pagination: any;
   handlePageChange: (page: number) => void;
+  currentPage: number;
 }
 
 const ApplicantsTable: React.FC<ApplicantsTableProps> = ({ 
   data, 
   isLoading, 
   pagination, 
-  handlePageChange 
+  handlePageChange,
+  currentPage
 }) => {
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Calculate starting index for serial numbers based on current page and items per page
+  const itemsPerPage = pagination.per_page || 10;
+  const serialNumberStart = ((currentPage || 1) - 1) * itemsPerPage + 1;
 
   if (isLoading) {
     return <LoadingAnimations loading={isLoading} />;
@@ -51,7 +57,12 @@ const ApplicantsTable: React.FC<ApplicantsTableProps> = ({
           <table className="w-full min-w-[800px]">
             <thead>
               <tr className="text-left">
-                <th className="py-4 font-normal text-[#757575] text-xs">ID</th>
+                <th className="py-4 font-normal text-[#757575] text-xs w-[60px]">
+                  S/N
+                </th>
+                {/* <th className="py-4 font-normal text-[#757575] text-xs w-[60px]">
+                  ID
+                </th> */}
                 <th className="py-4 px-6 font-normal text-[#757575] text-xs">Name</th>
                 <th className="py-4 px-6 font-normal text-[#757575] text-xs">Email</th>
                 <th className="py-4 px-6 font-normal text-[#757575] text-xs">Phone</th>
@@ -59,13 +70,18 @@ const ApplicantsTable: React.FC<ApplicantsTableProps> = ({
               </tr>
             </thead>
             <tbody>
-              {data.map((applicant) => (
+              {data.map((applicant, index) => (
                 <tr 
                   key={`applicant-${applicant.id}`} 
                   className="cursor-pointer hover:bg-gray-50"
                   onClick={() => handleRowClick(applicant.id)}
                 >
-                  <td className="py-4 text-dark text-sm truncate">{applicant.id}</td>
+                  <td className="py-4 text-dark text-sm truncate w-[60px]">
+                    {serialNumberStart + index}
+                  </td>
+                  {/* <td className="py-4 text-dark text-sm truncate w-[60px]">
+                    {applicant.id}
+                  </td> */}
                   <td className="py-4 px-6 font-[325] text-dark text-sm truncate">
                     {applicant.name}
                   </td>
