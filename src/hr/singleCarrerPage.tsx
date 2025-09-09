@@ -78,7 +78,7 @@ export default function SingleJob() {
 
   return (
     <div className="mb-[52px]">
-      <Header title="Job Details" subtitle={jobDetails.job_title} />
+      <Header title="Job Details" subtitle={jobDetails.job_title} isbutton={false}/>
 
       <div className="space-y-[30px]">
         <div className="grid lg:grid-cols-3 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
@@ -120,8 +120,7 @@ export default function SingleJob() {
               data={applications || []}
               isLoading={isLoading}
               pagination={pagination}
-              handlePageChange={handlePageChange}
-            />
+              handlePageChange={handlePageChange} currentPage={pagination.currentPage}            />
           </ReusableTable>
         </div>
       </div>

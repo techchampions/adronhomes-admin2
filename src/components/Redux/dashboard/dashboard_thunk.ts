@@ -4,49 +4,44 @@ import Cookies from "js-cookie";
 import api from "../middleware";
 
 
-// Define the response data structure based on your example
 export interface DashboardData {
-  data: any;
-  properties: {
-    total: number;
-    sold: number;
-    publish: number;
-  };
-  transactions: {
-    total_orders: number;
-    approved_orders: number;
-    pending_orders: number;
-  };
-  payments: {
-    total_count: number;
-    approved_count: number;
-    pending_count: number;
-    total_amount: number;
-    approved_amount: number;
-    pending_amount: number;
-    total_amount_this_month:number
-  };
-
-  contracts: {
-            total: number,
-          active: number,
-            completed: number,
-            allocated: number
-        }
-
-  customers: {
-    total: number;
-    active: number;
-  };
-  plans: {
-    active: number;
-  };
-  revenue: {
-    total: number;
-    percentage: number;
+  success: boolean;
+  data: {
+    properties: {
+      total: number;
+      sold: number;
+      publish: number;
+    };
+    visit: {
+      total: string;
+      today: number;
+      this_month: string;
+    };
+    payments: {
+      total_count: number;
+      approved_count: number;
+      pending_count: number;
+      total_amount: number;
+      approved_amount: number;
+      pending_amount: number;
+      total_amount_this_month: number;
+    };
+    contracts: {
+      total: number;
+      active: number;
+      completed: number;
+      allocated: number;
+    };
+    customers: {
+      total: number;
+      active: number;
+    };
+    revenue: {
+      total: number;
+      percentage: number;
+    };
   };
 }
-
 
 export interface ErrorResponse {
   message: string;
