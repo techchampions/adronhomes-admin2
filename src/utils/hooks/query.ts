@@ -83,9 +83,12 @@ export const useGetOfficeLocations = () => {
 };
 // Directors Dashboard
 export const useGetDirectorDashboard = () => {
+  const isDirectorRoute = location.pathname.startsWith("/director");
+
   return useQuery<DirectorDashboardResponse>({
     queryKey: ["Directors-dashboard"],
     queryFn: getDirectorDashboardData,
+    enabled: isDirectorRoute,
   });
 };
 // Property Request List

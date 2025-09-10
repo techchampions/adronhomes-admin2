@@ -342,7 +342,7 @@ export const getPropertyRequest = async (
   if (page) {
     params.append("page", page.toString());
   }
-  const response = await adronApi.get(`/director/properties-requests`, {
+  const response = await adronApi.get(`/admin/properties-requests`, {
     params: params,
   });
   return response.data;
