@@ -66,7 +66,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-      // category: formData.basicDetails.category || "",
       purpose: purpose,
     },
     validationSchema,
@@ -141,17 +140,9 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [states]
   );
 
-  const lgas = useSelector((state: RootState) => 
-    selectStateLGAs(state, formik.values.country, formik.values.state)
-  );
   
-  const lgaOptions = useMemo(() => 
-    lgas
-      .filter((lga) => lga?.name?.trim())
-      .map((lga) => ({ value: lga.name, label: lga.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)),
-    [lgas]
-  );
+  
+ 
 
   useEffect(() => {
     if (initialLoad && formData.basicDetails) {

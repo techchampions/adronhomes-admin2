@@ -183,7 +183,7 @@ const validationSchema = Yup.object().shape({
           className="w-full py-3 px-4 bg-[#79B833] text-white rounded-[80px] font-medium max-w-xl 
         "
         >
-          Add Infrastructure Fees
+          Add Allocation Fees
         </button>
 
         <InfrastructureFeesModal

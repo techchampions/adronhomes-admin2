@@ -18,7 +18,7 @@ const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/marketer" },
   { label: 'Customers', icon: Icon2, path: '/marketer-customer' },
   // { label: 'Notifications', icon: Icon8, path: '/notifications' },
-  { label: "Settings", icon: Icon9, path: "/marketer-settings" },
+  // { label: "Settings", icon: Icon9, path: "/marketer-settings" },
 ];
 
 export default function SideBar() {
