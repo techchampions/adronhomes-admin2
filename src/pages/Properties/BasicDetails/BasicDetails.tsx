@@ -50,8 +50,8 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   ];
 
   const categoryOptions = [
-    { value: "1", label: "Adrone Court" },
-    { value: "2", label: "Vidsco Series" },
+    { value: "1", label: "Adron Court" },
+    { value: "2", label: "Vidco Series" },
   ];
 
   const locationTypeOptions = [
@@ -79,7 +79,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     address: Yup.string().required("Address is required"),
     country: Yup.string().required("Country is required"),
     state: Yup.string().required("State is required"),
-    lga: Yup.string().required("LGA is required"),
+    // lga: Yup.string().required("LGA is required"),
     purpose: Yup.array()
       .of(Yup.string())
       .min(1, "At least one purpose is required")
@@ -201,16 +201,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [states]
   );
 
-  const lgas = useSelector((state: RootState) =>
-    selectStateLGAs(state, formik.values.country, formik.values.state)
-  );
-  const lgaOptions = useMemo(() => 
-    lgas
-      .filter((lga) => lga?.name?.trim())
-      .map((lga) => ({ value: lga.name, label: lga.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)),
-    [lgas]
-  );
+
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">

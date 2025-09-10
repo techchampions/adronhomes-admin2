@@ -108,7 +108,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
             name="images"
             label="Property Images"
             multiple={true}
-            maxSize={5}
+            maxSize={2}
             minResolution={{ width: 1500, height: 1000 }}
             recommendedRatio="3:2"
             supportedFormats={["JPG", "JPEG", "PNG"]}
