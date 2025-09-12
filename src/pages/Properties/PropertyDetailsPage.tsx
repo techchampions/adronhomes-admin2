@@ -219,7 +219,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
       errors.street_address = "Street address is required";
     if (!formData.state) errors.state = "State is required";
     if (!formData.country) errors.country = "Country is required";
-    if (!formData.lga) errors.lga = "LGA is required";
+    // if (!formData.lga) errors.lga = "LGA is required";
     if (!formData.status) errors.status = "Status is required";
     if (!formData.contact_number)
       errors.contact_number = "Contact number is required";
