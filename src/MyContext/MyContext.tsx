@@ -457,7 +457,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
     }
 
     if (isLandProperty) {
-      formPayload.append("size", landForm.propertySize);
+      formPayload.append("size", landForm.landSize);
       formPayload.append("shape", landForm.plotShape || "");
       formPayload.append("topography", landForm.topography || "");
       formPayload.append("category", "estate");
@@ -499,7 +499,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
           : specifications.titleDocumentTypeProp || ""
       );
       formPayload.append("toilets", specifications.toilets || "0");
-      formPayload.append("size", specifications.propertySize);
+      formPayload.append("size", specifications.landSize);
       formPayload.append("parking_space", specifications.parkingSpaces || "0");
       // formPayload.append("overview", specifications.overview);
       formPayload.append("description", specifications.description);

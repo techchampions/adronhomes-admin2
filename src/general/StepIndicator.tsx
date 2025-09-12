@@ -24,7 +24,7 @@ const StepIndicator = ({setCurrentStep,currentStep}:{setCurrentStep:any,currentS
             <div className="flex items-center">
               <div
                 className={`flex items-center justify-center`}
-                onClick={() => handleStepChange(step.id)}
+                // onClick={() => handleStepChange(step.id)}
               >
                 {currentStep > step.id ? (
                   <img src="/good.svg" />
