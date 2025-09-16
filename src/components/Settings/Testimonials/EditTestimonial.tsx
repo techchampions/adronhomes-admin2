@@ -34,7 +34,7 @@ interface ModalProps {
 
 const validationSchema = Yup.object().shape({
   client_name: Yup.string().required("Name is required"),
-  client_comment: Yup.string().required("Comment is required"),
+  video_link: Yup.string().required("Required"),
   client_image: Yup.mixed().required("Image is required"),
   // client_flag: Yup.mixed().required("Country is required"),
 });
@@ -46,7 +46,7 @@ export default function EditTestimonial({
 }: ModalProps) {
   const initialValues = {
     client_image: client?.client_image || "",
-    client_comment: client?.client_comment || "",
+    // client_comment: client?.client_comment || "",
     client_name: client?.client_name || "",
     video_link: client?.video_link || "",
   };
@@ -56,7 +56,6 @@ export default function EditTestimonial({
       typeof values.client_image === "string" ? undefined : values.client_image;
     const payload: TestimonialPayload = {
       id: client?.id || 0,
-      client_comment: values.client_comment,
       client_name: values.client_name,
       client_image: image,
       video_link: values.video_link,
@@ -123,17 +122,6 @@ export default function EditTestimonial({
                   icon={<FaYoutube />}
                   name="video_link"
                   placeholder="Enter country Flag link "
-                />
-              </div>
-
-              <div className=" px-7">
-                <label htmlFor="" className="text-sm text-gray-500">
-                  Client Comment
-                </label>
-                <SoosarInputField
-                  name="client_comment"
-                  type="textarea"
-                  placeholder="Enter Client Comment"
                 />
               </div>
 

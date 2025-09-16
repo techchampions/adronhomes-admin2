@@ -201,6 +201,36 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     }
   }, [formik.values.lga, dispatch]);
 
+  // Format countries for dropdown
+  // const countriesOptions = useMemo(() => 
+  //   countries
+  //     .map((country: any) => ({ value: country.name, label: country.name }))
+  //     .sort((a, b) => a.label.localeCompare(b.label)),
+  //   [countries]
+  // );
+
+  // // Get states and LGAs based on selected values
+  // const states = useSelector((state: RootState) =>
+  //   selectCountryStates(state, formik.values.country)
+  // );
+  // const statesOptions = useMemo(() => 
+  //   states
+  //     .map((state: any) => ({ value: state.name, label: state.name }))
+  //     .sort((a, b) => a.label.localeCompare(b.label)),
+  //   [states]
+  // );
+
+  const lgas = useSelector((state: RootState) =>
+    selectStateLGAs(state, formik.values.country, formik.values.state)
+  );
+  const lgaOptions = useMemo(() => 
+    lgas
+      .filter((lga) => lga?.name?.trim())
+      .map((lga) => ({ value: lga.name, label: lga.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [lgas]
+  );
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
       <InputField

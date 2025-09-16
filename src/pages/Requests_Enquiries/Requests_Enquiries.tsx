@@ -18,7 +18,7 @@ export default function Requests_Enquiries() {
     isError: errorDR,
   } = useGetDirectorDashboard();
   const isDirectorRoute = location.pathname.startsWith("/director");
-  const director_id = directorData?.director.id || undefined;
+  const director_id = isDirectorRoute ? directorData?.director.id : undefined;
   const { data, isLoading, isError } = useGetPropertyRequest(page, director_id);
   const propertyData = data?.data.data || [];
   const totalPages = data?.data.last_page || 1;
