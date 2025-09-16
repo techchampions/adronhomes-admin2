@@ -34,25 +34,25 @@ import {
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 
 const validationSchema = Yup.object().shape({
-  propertyName: Yup.string().required("Property name is required"),
-  propertyType: Yup.string().required("Property type is required"),
-  // category: Yup.string().required("Category is required"),
-  price: Yup.number()
-    .typeError("Price must be a number")
-    .positive("Price must be positive")
-    .required("Price is required"),
-  initialDeposit: Yup.number()
-    .typeError("Initial deposit must be a number")
-    .positive("Initial deposit must be positive")
-    .required("Initial deposit is required"),
-  address: Yup.string().required("Address is required"),
-  country: Yup.string().required("Country is required"),
-  state: Yup.string().required("State is required"),
-  // lga: Yup.string().required("LGA is required"),
-  purpose: Yup.array()
-    .of(Yup.string())
-    .min(1, "At least one purpose is required")
-    .required("Purpose is required"),
+  // propertyName: Yup.string().required("Property name is required"),
+  // propertyType: Yup.string().required("Property type is required"),
+  // // category: Yup.string().required("Category is required"),
+  // price: Yup.number()
+  //   .typeError("Price must be a number")
+  //   .positive("Price must be positive")
+  //   .required("Price is required"),
+  // initialDeposit: Yup.number()
+  //   .typeError("Initial deposit must be a number")
+  //   .positive("Initial deposit must be positive")
+  //   .required("Initial deposit is required"),
+  // address: Yup.string().required("Address is required"),
+  // country: Yup.string().required("Country is required"),
+  // state: Yup.string().required("State is required"),
+  // // lga: Yup.string().required("LGA is required"),
+  // purpose: Yup.array()
+  //   .of(Yup.string())
+  //   .min(1, "At least one purpose is required")
+  //   .required("Purpose is required"),
 });
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {

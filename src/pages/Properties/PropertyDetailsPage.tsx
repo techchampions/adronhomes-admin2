@@ -381,10 +381,21 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
             </div>
 
             <div className="flex space-x-4 justify-center md:justify-end">
-              <button
+              {/* <button
                 onClick={isEditing ? handleSubmit : handleToggleEdit}
                 className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
                 disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditing
+                  ? "Save Changes"
+                  : "Edit Property"}
+              </button> */}
+                <button
+                onClick={()=>navigate(`/properties/property-edith/${property.id}`)}
+                className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
+                // disabled={isSubmitting}
               >
                 {isSubmitting
                   ? "Saving..."

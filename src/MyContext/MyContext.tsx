@@ -100,9 +100,8 @@ interface FeaturesFormValues {
 interface MediaFormValues {
   tourLink: string;
   videoLink: string;
-  images: File[];
-  // videoFile: File[];
-  mapUrl:string;
+  mapUrl: string;
+  images: (File | string)[]; 
 }
 
 interface DiscountFormValues {
@@ -177,6 +176,7 @@ interface PropertyContextType {
   setDisplayStatus: (status: "draft" | "publish") => void;
   sales: boolean;
   setSales: (sales: boolean) => void;
+  imagePreview:any, setImagePreview:(imagePreview: any) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(
@@ -304,6 +304,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [fees, setFees] = useState<Fee[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [sales, setSales] = useState<boolean>(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const resetFormData = () => {
@@ -698,6 +699,8 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
         setDisplayStatus,
         sales,
         setSales,
+        imagePreview,
+         setImagePreview
       }}
     >
       {children}

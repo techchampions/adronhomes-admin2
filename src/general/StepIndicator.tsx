@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FaCircleDot } from 'react-icons/fa6';
 
 const StepIndicator = ({setCurrentStep,currentStep}:{setCurrentStep:any,currentStep:any}) => {
 
@@ -24,7 +25,7 @@ const StepIndicator = ({setCurrentStep,currentStep}:{setCurrentStep:any,currentS
             <div className="flex items-center">
               <div
                 className={`flex items-center justify-center`}
-                // onClick={() => handleStepChange(step.id)}
+                onClick={() => handleStepChange(step.id)}
               >
                 {currentStep > step.id ? (
                   <img src="/good.svg" />
@@ -33,7 +34,7 @@ const StepIndicator = ({setCurrentStep,currentStep}:{setCurrentStep:any,currentS
                     {step.name}
                   </button>
                 ) : (
-                  <img src="/dot.svg" />
+                 <FaCircleDot className='h-6 w-6 text-[#767676]'/>
                 )}
               </div>
             </div>

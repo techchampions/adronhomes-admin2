@@ -9,7 +9,6 @@ import React, {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../components/input/inputtext";
-// import EnhancedOptionInputField from "../../../components/input/enhanced_drop_down"; // New component
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,14 +33,14 @@ import EnhancedOptionInputField from "../../../components/input/enhancedSelecet"
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const { formData, setBasicDetails, setSales } = useContext(PropertyContext)!;
-  const [initialLoad, setInitialLoad] = useState(true);
-  const [purpose, setPurpose] = useState<string[]>(formData.basicDetails.purpose || []);
-
   const dispatch = useDispatch<AppDispatch>();
+  
   // Get data from Redux store
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
+
+  const [purpose, setPurpose] = useState<string[]>(formData.basicDetails.purpose || []);
 
   const propertyTypeOptions = [
     { value: "2", label: "Residential" },
@@ -54,36 +53,29 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     { value: "2", label: "Vidco Series" },
   ];
 
-  const locationTypeOptions = [
-    { value: "urban", label: "Urban" },
-    { value: "suburban", label: "Suburban" },
-    { value: "rural", label: "Rural" },
-  ];
-
   const purposeOptions = [
     { value: "sale", label: "Sale" },
     { value: "rent", label: "Rent" },
   ];
 
   const validationSchema = Yup.object().shape({
-    propertyName: Yup.string().required("Property name is required"),
-    propertyType: Yup.string().required("Property type is required"),
-    price: Yup.number()
-      .typeError("Price must be a number")
-      .positive("Price must be positive")
-      .required("Price is required"),
-    initialDeposit: Yup.number()
-      .typeError("Initial deposit must be a number")
-      .positive("Initial deposit must be positive")
-      .required("Initial deposit is required"),
-    address: Yup.string().required("Address is required"),
-    country: Yup.string().required("Country is required"),
-    state: Yup.string().required("State is required"),
-    // lga: Yup.string().required("LGA is required"),
-    purpose: Yup.array()
-      .of(Yup.string())
-      .min(1, "At least one purpose is required")
-      .required("Purpose is required"),
+    // propertyName: Yup.string().required("Property name is required"),
+    // propertyType: Yup.string().required("Property type is required"),
+    // price: Yup.number()
+    //   .typeError("Price must be a number")
+    //   .positive("Price must be positive")
+    //   .required("Price is required"),
+    // initialDeposit: Yup.number()
+    //   .typeError("Initial deposit must be a number")
+    //   .positive("Initial deposit must be positive")
+    //   .required("Initial deposit is required"),
+    // address: Yup.string().required("Address is required"),
+    // country: Yup.string().required("Country is required"),
+    // state: Yup.string().required("State is required"),
+    // purpose: Yup.array()
+    //   .of(Yup.string())
+    //   .min(1, "At least one purpose is required")
+    //   .required("Purpose is required"),
   });
 
   const formik = useFormik({
@@ -99,23 +91,50 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         purpose: purpose,
       });
     },
+    enableReinitialize: true, // This allows formik to reinitialize when initialValues change
   });
 
-  useEffect(() => {
-    if (initialLoad && formData.basicDetails) {
-      formik.setValues({
-        ...formData.basicDetails,
-        category_id: formData.basicDetails.category_id || "",
-        purpose: formData.basicDetails.purpose || [],
-      });
-      setPurpose(formData.basicDetails.purpose || []);
-      setInitialLoad(false);
-    }
-  }, [formData.basicDetails, initialLoad]);
+  // Format countries for dropdown
+  const countriesOptions = useMemo(() => 
+    (countries || [])
+      .map((country: any) => ({ value: country.name, label: country.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [countries]
+  );
 
+  // Get states based on selected values
+  const states = useSelector((state: RootState) =>
+    selectCountryStates(state, formik.values.country)
+  );
+  const statesOptions = useMemo(() => 
+    (states || [])
+      .map((state: any) => ({ value: state.name, label: state.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [states]
+  );
+
+  // // Get LGAs based on selected state
+  // const lgas = useSelector((state: RootState) =>
+  //   selectStateLGAs(state, formik.values.country, formik.values.state)
+  // );
+  // const lgaOptions = useMemo(() => 
+  //   (lgas || [])
+  //     .map((lga: any) => ({ value: lga.name, label: lga.name }))
+  //     .sort((a, b) => a.label.localeCompare(b.label)),
+  //   [lgas]
+  // );
+
+  // Sync purpose with formik values
   useEffect(() => {
     formik.setFieldValue("purpose", purpose);
   }, [purpose]);
+
+  // Update purpose when formData changes (on refresh)
+  useEffect(() => {
+    if (formData.basicDetails.purpose) {
+      setPurpose(formData.basicDetails.purpose);
+    }
+  }, [formData.basicDetails.purpose]);
 
   const handlePurposeChange = (value: string) => {
     const normalized = value.toLowerCase();
@@ -181,27 +200,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       dispatch(setSelectedLGA(null));
     }
   }, [formik.values.lga, dispatch]);
-
-  // Format countries for dropdown
-  const countriesOptions = useMemo(() => 
-    countries
-      .map((country: any) => ({ value: country.name, label: country.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)),
-    [countries]
-  );
-
-  // Get states and LGAs based on selected values
-  const states = useSelector((state: RootState) =>
-    selectCountryStates(state, formik.values.country)
-  );
-  const statesOptions = useMemo(() => 
-    states
-      .map((state: any) => ({ value: state.name, label: state.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)),
-    [states]
-  );
-
-
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
@@ -277,7 +275,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
 
       <EnhancedOptionInputField
         label="Country"
-        placeholder="Select country"
+        placeholder={loading.countries ? "Loading countries..." : "Select country"}
         name="country"
         value={formik.values.country}
         onChange={(value) => {
@@ -289,6 +287,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         dropdownTitle="Countries"
         error={formik.touched.country && formik.errors.country}
         isLoading={loading.countries}
+        isSearchable={true}
       />
 
       <EnhancedOptionInputField
@@ -305,6 +304,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         error={formik.touched.state && formik.errors.state}
         disabled={!formik.values.country}
         isLoading={loading.states}
+        isSearchable={true}
       />
 
       {/* <EnhancedOptionInputField
@@ -318,6 +318,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         error={formik.touched.lga && formik.errors.lga}
         disabled={!formik.values.state}
         isLoading={loading.lgas}
+        isSearchable={true}
       /> */}
 
       <EnhancedOptionInputField
