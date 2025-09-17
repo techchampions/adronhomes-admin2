@@ -474,7 +474,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       } else {
         formPayload.append("purpose", basicDetails.purpose || "");
       }
-      formPayload.append("category", "single");
+      formPayload.append("category", "house");
     }
 
     if (isLandProperty) {
