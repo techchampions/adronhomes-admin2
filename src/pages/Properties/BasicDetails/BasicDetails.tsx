@@ -5,6 +5,8 @@ import React, {
   useImperativeHandle,
   useMemo,
   useState,
+  ChangeEvent,
+  useRef
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -14,6 +16,8 @@ import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { formatToNaira } from "../../../utils/formatcurrency";
+import { AiOutlineUpload } from "react-icons/ai";
+import { MdClose } from "react-icons/md";
 
 // Import the Redux actions and selectors
 import {
@@ -30,17 +34,152 @@ import {
   selectErrorStates,
 } from "../../../components/Redux/country/countrythunkand slice";
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
+import MultipleFileUploadField from "../../../components/input/multiplefile";
 
+// Modified FileUploadField component (kept as-is since it's a separate concern)
+// interface FileUploadFieldProps {
+//   label: string;
+//   placeholder: string;
+//   onChange: (files: File[] | null) => void;
+//   required?: boolean;
+//   error?: any;
+//   disabled?: boolean;
+//   accept?: string;
+//   multiple?: boolean;
+//   value?: File[];
+// }
+
+// const FileUploadField: React.FC<FileUploadFieldProps> = ({
+//   label,
+//   placeholder,
+//   onChange,
+//   required = false,
+//   error,
+//   disabled = false,
+//   accept,
+//   multiple = false,
+//   value = []
+// }) => {
+//   const fileInputRef = useRef<HTMLInputElement>(null);
+//   const [duplicateError, setDuplicateError] = useState<string | null>(null);
+
+//   const handleClick = () => {
+//     if (!disabled && fileInputRef.current) {
+//       fileInputRef.current.value = "";
+//       fileInputRef.current.click();
+//     }
+//   };
+
+//   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+//     const files = e.target.files;
+//     if (!files) {
+//       onChange(null);
+//       return;
+//     }
+
+//     const newFiles = Array.from(files);
+//     let hasDuplicate = false;
+//     let newFileArray: File[] = [...value];
+
+//     for (const newFile of newFiles) {
+//       if (value.some(existingFile => existingFile.name === newFile.name)) {
+//         setDuplicateError(`File already exists: ${newFile.name}`);
+//         hasDuplicate = true;
+//         break;
+//       }
+//       newFileArray.push(newFile);
+//     }
+
+//     if (!hasDuplicate) {
+//       onChange(newFileArray);
+//       setDuplicateError(null);
+//     }
+//   };
+
+//   const handleRemoveFile = (fileToRemove: File) => {
+//     const filteredFiles = value.filter(file => file.name !== fileToRemove.name);
+//     onChange(filteredFiles);
+//     setDuplicateError(null);
+//   };
+
+//   return (
+//     <div className="w-full">
+//       <label className="block text-[#4F4F4F] font-[325] text-[14px] mb-2">
+//         {label} {required && <span className="text-red-500">*</span>}
+//       </label>
+
+//       <div className="relative">
+//         <div
+//           className={`w-full bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
+//             (error || duplicateError) ? "border border-red-500" : ""
+//           } ${disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"}`}
+//           onClick={handleClick}
+//         >
+//           {value.length > 0 ? (
+//             <div className="flex flex-wrap gap-2 pr-10">
+//               {value.map((file, index) => (
+//                 <div
+//                   key={index}
+//                   className="flex items-center bg-gray-200 rounded-full px-3 py-1 text-sm"
+//                 >
+//                   <span className="truncate">{file.name}</span>
+//                   <button
+//                     type="button"
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       handleRemoveFile(file);
+//                     }}
+//                     className="ml-2 text-gray-500 hover:text-gray-800 focus:outline-none"
+//                   >
+//                     <MdClose size={16} />
+//                   </button>
+//                 </div>
+//               ))}
+//             </div>
+//           ) : (
+//             <span className="truncate">{placeholder}</span>
+//           )}
+
+//           <AiOutlineUpload
+//             className={`absolute top-3 right-3 ${
+//               disabled ? "text-gray-400" : "text-[#4F4F4F]"
+//             }`}
+//             size={20}
+//           />
+//         </div>
+
+//         <input
+//           type="file"
+//           ref={fileInputRef}
+//           onChange={handleFileChange}
+//           disabled={disabled}
+//           accept={accept}
+//           multiple={multiple}
+//           className="hidden"
+//         />
+//       </div>
+
+//       {(error || duplicateError) && (
+//         <p className="text-red-500 text-sm mt-1">
+//           {duplicateError || (Array.isArray(error) ? error[0] : error)}
+//         </p>
+//       )}
+//     </div>
+//   );
+// };
+
+// Main BasicDetails component
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const { formData, setBasicDetails, setSales } = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
+    const [propertyFiles, setPropertyFiles] = useState<File[]>(
+      formData.basicDetails.propertyFiles || []
+    );
   
   // Get data from Redux store
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
-
-  const [purpose, setPurpose] = useState<string[]>(formData.basicDetails.purpose || []);
 
   const propertyTypeOptions = [
     { value: "2", label: "Residential" },
@@ -72,29 +211,33 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     // address: Yup.string().required("Address is required"),
     // country: Yup.string().required("Country is required"),
     // state: Yup.string().required("State is required"),
+    // // lga: Yup.string().required("LGA is required"),
     // purpose: Yup.array()
     //   .of(Yup.string())
     //   .min(1, "At least one purpose is required")
     //   .required("Purpose is required"),
+    // propertyFiles: Yup.array()
+    //   .of(Yup.mixed<File>())
+    //   .min(1, "At least one file is required")
+    //   .required("Property files are required"),
   });
 
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-      category: formData.basicDetails.category || "",
-      purpose: purpose,
+      category_id: formData.basicDetails.category_id || "",
+      purpose: formData.basicDetails.purpose || [],
+      propertyFiles: propertyFiles,
     },
     validationSchema,
     onSubmit: (values) => {
-      setBasicDetails({
-        ...values,
-        purpose: purpose,
-      });
+      setBasicDetails(values);
+      const salePurpose = values.purpose.find(p => p.toLowerCase() === 'sale');
+      setSales(salePurpose ? false : true);
     },
-    enableReinitialize: true, // This allows formik to reinitialize when initialValues change
+    enableReinitialize: true,
   });
 
-  // Format countries for dropdown
   const countriesOptions = useMemo(() => 
     (countries || [])
       .map((country: any) => ({ value: country.name, label: country.name }))
@@ -102,7 +245,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [countries]
   );
 
-  // Get states based on selected values
   const states = useSelector((state: RootState) =>
     selectCountryStates(state, formik.values.country)
   );
@@ -113,32 +255,39 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [states]
   );
 
-  // // Get LGAs based on selected state
-  // const lgas = useSelector((state: RootState) =>
-  //   selectStateLGAs(state, formik.values.country, formik.values.state)
-  // );
-  // const lgaOptions = useMemo(() => 
-  //   (lgas || [])
-  //     .map((lga: any) => ({ value: lga.name, label: lga.name }))
-  //     .sort((a, b) => a.label.localeCompare(b.label)),
-  //   [lgas]
-  // );
+  const lgas = useSelector((state: RootState) =>
+    selectStateLGAs(state, formik.values.country, formik.values.state)
+  );
+  const lgaOptions = useMemo(() => 
+    (lgas || [])
+      .filter((lga) => lga?.name?.trim())
+      .map((lga) => ({ value: lga.name, label: lga.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [lgas]
+  );
 
-  // Sync purpose with formik values
-  useEffect(() => {
-    formik.setFieldValue("purpose", purpose);
-  }, [purpose]);
+  // No longer need these useEffects as Formik manages state directly
+  // useEffect(() => {
+  //   formik.setFieldValue("purpose", purpose);
+  // }, [purpose]);
 
-  // Update purpose when formData changes (on refresh)
-  useEffect(() => {
-    if (formData.basicDetails.purpose) {
-      setPurpose(formData.basicDetails.purpose);
-    }
-  }, [formData.basicDetails.purpose]);
+  // useEffect(() => {
+  //   formik.setFieldValue("propertyFiles", propertyFiles);
+  // }, [propertyFiles]);
+
+  // No longer need to manually set state from context
+  // useEffect(() => {
+  //   if (formData.basicDetails.purpose) {
+  //     setPurpose(formData.basicDetails.purpose);
+  //   }
+  //   if (formData.basicDetails.propertyFiles) {
+  //     setPropertyFiles(formData.basicDetails.propertyFiles);
+  //   }
+  // }, [formData.basicDetails.purpose, formData.basicDetails.propertyFiles]);
 
   const handlePurposeChange = (value: string) => {
     const normalized = value.toLowerCase();
-    setPurpose([normalized]);
+    formik.setFieldValue("purpose", [normalized]);
     setSales(normalized === "sale" ? false : true);
   };
 
@@ -164,12 +313,10 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     isValid: formik.isValid,
   }));
 
-  // Fetch countries on component mount
   useEffect(() => {
     dispatch(fetchAllCountries());
   }, [dispatch]);
 
-  // Fetch states when country changes
   useEffect(() => {
     if (formik.values.country) {
       dispatch(fetchCountryStates(formik.values.country));
@@ -179,7 +326,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     }
   }, [formik.values.country, dispatch]);
 
-  // Fetch LGAs when state changes
   useEffect(() => {
     if (formik.values.country && formik.values.state) {
       dispatch(fetchStateLGAs({
@@ -192,7 +338,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     }
   }, [formik.values.country, formik.values.state, dispatch]);
 
-  // Set LGA when it changes
   useEffect(() => {
     if (formik.values.lga) {
       dispatch(setSelectedLGA(formik.values.lga));
@@ -200,36 +345,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       dispatch(setSelectedLGA(null));
     }
   }, [formik.values.lga, dispatch]);
-
-  // Format countries for dropdown
-  // const countriesOptions = useMemo(() => 
-  //   countries
-  //     .map((country: any) => ({ value: country.name, label: country.name }))
-  //     .sort((a, b) => a.label.localeCompare(b.label)),
-  //   [countries]
-  // );
-
-  // // Get states and LGAs based on selected values
-  // const states = useSelector((state: RootState) =>
-  //   selectCountryStates(state, formik.values.country)
-  // );
-  // const statesOptions = useMemo(() => 
-  //   states
-  //     .map((state: any) => ({ value: state.name, label: state.name }))
-  //     .sort((a, b) => a.label.localeCompare(b.label)),
-  //   [states]
-  // );
-
-  const lgas = useSelector((state: RootState) =>
-    selectStateLGAs(state, formik.values.country, formik.values.state)
-  );
-  const lgaOptions = useMemo(() => 
-    lgas
-      .filter((lga) => lga?.name?.trim())
-      .map((lga) => ({ value: lga.name, label: lga.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)),
-    [lgas]
-  );
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
@@ -336,7 +451,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.states}
         isSearchable={true}
       />
-
+      
       {/* <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
@@ -355,7 +470,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         label="Purpose"
         placeholder="Select purpose"
         name="purpose"
-        value={purpose[0] || ""}
+        value={Array.isArray(formik.values.purpose) ? formik.values.purpose[0] : ''}
         onChange={handlePurposeChange}
         options={purposeOptions}
         dropdownTitle="Purpose"
@@ -363,7 +478,19 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isSearchable={false}
       />
 
-      {/* Display error messages if any */}
+        <MultipleFileUploadField
+        label="Upload Files"
+        placeholder="Drag and drop or click to upload files"
+        name="propertyFiles"
+        multiple={true}
+        onChange={(files) => {
+          formik.setFieldValue("propertyFiles", files);
+          setPropertyFiles(files || []);
+        }}
+        value={propertyFiles}
+        error={formik.touched.propertyFiles && formik.errors.propertyFiles}
+      />
+
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}
@@ -374,11 +501,11 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
           Error loading states: {errors.states.message}
         </div>
       )}
-      {errors.lgas && (
+      {/* {errors.lgas && (
         <div className="text-red-500 text-sm">
           Error loading LGAs: {errors.lgas.message}
         </div>
-      )}
+      )} */}
     </form>
   );
 });

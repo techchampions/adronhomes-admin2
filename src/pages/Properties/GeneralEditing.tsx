@@ -31,6 +31,7 @@ import BulkBasicDetails from "./BasicDetails/BulkBasicDetails";
 import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesModal";
 import MediaFORM from "./Media/MediaFORM2";
 import { add_property_detail } from "../../components/Redux/addProperty/addFees/addFees_thunk";
+import { convertUrlsToMockFiles } from "../../utils/coverturloffiles";
 
 export default function EditProperty() {
   const { id } = useParams<{ id: string }>();
@@ -67,7 +68,9 @@ export default function EditProperty() {
     isSubmitting,
     setIsSubmitting,
     setDisplayStatus,
-      imagePreview, setImagePreview
+      imagePreview, setImagePreview,
+              selectedPropertyId,
+               setSelectedPropertyId,
   } = useContext(PropertyContext)!;
   
 
@@ -93,7 +96,8 @@ const resetFormData = () => {
         state: "",
         lga: "",
         category: "estate",
-        category_id: null
+        category_id: null,
+        propertyFiles:[]
     });
    
     setSpecifications({
@@ -206,7 +210,9 @@ const resetFormData = () => {
   // Pre-populate form with fetched property data
   useEffect(() => {
     if (data?.properties?.[0]) {
+
       const property = data.properties[0];
+     
       setBasicDetails({
         propertyName: property.name,
         propertyType: property.type?.id?.toString() || "",
@@ -219,7 +225,8 @@ const resetFormData = () => {
         state: property.state || "",
         lga: property.lga || "N/A",
         category: property.category || "estate",
-        category_id: null
+        category_id: null,
+        propertyFiles: convertUrlsToMockFiles(property.property_files)
       });
 
        if (property.category !== "estate") {  setBasicDetails({
@@ -235,6 +242,7 @@ const resetFormData = () => {
         lga: property.lga || "N/A",
         category: property.category || "estate",
         category_id: property.category_id?.toString() || "",
+         propertyFiles: convertUrlsToMockFiles(property.property_files)
       });}
 
     if (property.category !== "estate") {
@@ -291,13 +299,14 @@ const resetFormData = () => {
         features: Array.isArray(property.features) && property.features.length > 0
           ? property.features[0].split(',').map(f => f.trim())
           : [],
+        //    setSelectedPropertyId()
       });
 
       setMedia({
         mapUrl: property.property_map || "",
         tourLink: property.virtual_tour || "",
         videoLink: property.video_link || "",
-        images: property.photos || [], // This will now accept string URLs
+        images: property.photos || [],
       });
 
       setDiscount({
@@ -539,8 +548,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       UpdateProperty({ UpdateId: parseInt(propertyId!), credentials: formPayload })
     ).unwrap();
 
-    // If we reach this point, the property update was a success.
-    // Now, we can safely proceed to submit the fees.
+    
     if (propertyId) {
       const feePromises = fees
         .filter((fee) => fee.checked)
@@ -560,7 +568,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
             .catch((error) => {
               console.error(`Failed to add fee ${feeDetail.name}:`, error);
               toast.error(`Failed to add fee ${feeDetail.name}`);
-              throw error; // Re-throw to ensure Promise.allSettled captures the failure
+              throw error; 
             })
         );
 

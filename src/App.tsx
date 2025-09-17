@@ -153,11 +153,11 @@ const App = () => {
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
                 <Route
-                  path="/properties/payment/status/:paymentId"
+                  path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
                 <Route
-                  path="/property-edith/:id"
+                  path="/properties/property-edith/:id"
                   element={<EditProperty />}
                   
                 />

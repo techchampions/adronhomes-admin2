@@ -41,6 +41,7 @@ export interface Property {
   property_duration_limit: number;
   payment_schedule: string[];
   category_id:any
+  propertyFiles:any[]
   category: string;
   is_discount: boolean;
   discount_name: string | null;
@@ -79,7 +80,7 @@ export interface Property {
   is_featured: 0 | 1;
   total_amount: number;
   details: PropertyDetail[];
-  
+  property_files:any
 }
 export interface PropertyDetail {
   id: number;
