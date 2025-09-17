@@ -11,9 +11,10 @@ import {
 } from "../components/Redux/addProperty/addProperty_slice";
 import { add_property_detail } from "../components/Redux/addProperty/addFees/addFees_thunk";
 import { resetPropertyDetailState } from "../components/Redux/addProperty/addFees/add_property_detail_slice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface Fee {
+  [x: string]: any;
   id: number;
   name: string;
   amount: string;
@@ -35,6 +36,7 @@ interface BasicDetailsFormValues {
   lga: any;
   category:any
    category_id:any
+   propertyFiles:File[]
 }
 
 interface BulkDetailsFormValues {
@@ -100,9 +102,8 @@ interface FeaturesFormValues {
 interface MediaFormValues {
   tourLink: string;
   videoLink: string;
-  images: File[];
-  // videoFile: File[];
-  mapUrl:string;
+  mapUrl: string;
+  images: (File | string)[]; 
 }
 
 interface DiscountFormValues {
@@ -177,6 +178,8 @@ interface PropertyContextType {
   setDisplayStatus: (status: "draft" | "publish") => void;
   sales: boolean;
   setSales: (sales: boolean) => void;
+  imagePreview:any, setImagePreview:(imagePreview: any) => void;
+  selectedPropertyId:boolean, setSelectedPropertyId:(selectedPropertyId: any) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(
@@ -200,7 +203,8 @@ const initialFormData: PropertyFormData = {
     state: "",
     lga: "",
     category:"",
-     category_id:""
+     category_id:"",
+     propertyFiles:[]
   },
   bulkDetails: {
     propertyName: "",
@@ -304,8 +308,18 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [fees, setFees] = useState<Fee[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [sales, setSales] = useState<boolean>(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
+useEffect(() => {
+  if (location.pathname.startsWith("/properties/property-edith/")) {
+    setSelectedPropertyId(true);
+  } else {
+    setSelectedPropertyId(false);
+  }
+}, [location.pathname]);
+ const [selectedPropertyId, setSelectedPropertyId] = useState(false);
   const resetFormData = () => {
     setFormData(initialFormData);
     setCurrentStep(1);
@@ -443,8 +457,15 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       formPayload.append("state", basicDetails.state);
       formPayload.append("lga", basicDetails.lga);
       formPayload.append("street_address", basicDetails.address);
-      formPayload.append("location_type", basicDetails.locationType || "");
-
+      formPayload.append("location_type", basicDetails.locationType || "");;
+    if (Array.isArray(basicDetails.propertyFiles)) {
+      basicDetails.propertyFiles.forEach((propertyFiles, index) => {
+        if (propertyFiles instanceof File) {
+          formPayload.append(`property_files[${index}]`, propertyFiles);
+        }
+      });
+    }
+      
         formPayload.append(" category_id", basicDetails.category_id);
       if (Array.isArray(basicDetails.purpose)) {
         basicDetails.purpose.forEach((purpose, index) => {
@@ -453,7 +474,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       } else {
         formPayload.append("purpose", basicDetails.purpose || "");
       }
-      formPayload.append("category", "single");
+      formPayload.append("category", "house");
     }
 
     if (isLandProperty) {
@@ -656,6 +677,9 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
   return (
     <PropertyContext.Provider
       value={{
+        selectedPropertyId,
+         setSelectedPropertyId,
+         
         isInfrastructure,
         setIsCancelInfrastructure,
         fees,
@@ -698,6 +722,8 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
         setDisplayStatus,
         sales,
         setSales,
+        imagePreview,
+         setImagePreview
       }}
     >
       {children}

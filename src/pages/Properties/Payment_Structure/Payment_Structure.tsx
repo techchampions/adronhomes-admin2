@@ -10,7 +10,8 @@ import * as Yup from "yup";
 import OptionInputField from "../../../components/input/drop_down";
 import InputField from "../../../components/input/inputtext";
 import { PropertyContext } from "../../../MyContext/MyContext";
-import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
+import InfrastructureFeesModal from "../../../components/Modals/infrastureModal2";
+import InfrastructureFeesModalss from "../../../components/Modals/InfrastructureFeesModal";
 
 interface PaymentStructureHandles {
   handleSubmit: () => void;
@@ -25,7 +26,7 @@ interface PaymentStructureFormValues {
 }
 
 const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
-  const { formData, setPaymentStructure,isLandProperty } = useContext(PropertyContext)!;
+  const { formData, setPaymentStructure,isLandProperty,selectedPropertyId, setSelectedPropertyId, } = useContext(PropertyContext)!;
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const paymentTypeOptions = [
@@ -186,9 +187,17 @@ const validationSchema = Yup.object().shape({
           Add Allocation Fees
         </button>
 
-        <InfrastructureFeesModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)} />
+     
+{selectedPropertyId ?
+<InfrastructureFeesModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  
+/>:<InfrastructureFeesModalss
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  
+/>}
       </div>)}</>
   );
 });

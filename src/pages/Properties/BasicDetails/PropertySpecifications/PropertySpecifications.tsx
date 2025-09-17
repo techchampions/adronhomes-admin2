@@ -17,6 +17,7 @@ import OptionInputField from "../../../../components/input/drop_down";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../components/Redux/store";
 import { directors } from "../../../../components/Redux/directors/directors_thunk";
+import EnhancedOptionInputField from "../../../../components/input/enhancedSelecet";
 
 interface PropertySpecificationsHandles {
   handleSubmit: () => void;
@@ -75,26 +76,26 @@ const [titleDocumentTypeProp, setTitleDocumentType] = useState<string[]>(
 
 
    const validationSchema = Yup.object().shape({
-  bedrooms: Yup.string().required("Number of bedrooms is required"),
-  bathrooms: Yup.string().required("Number of bathrooms is required"),
-  toilets: Yup.string().required("Number of toilets is required"),  
-  // propertySize: Yup.string().required("Property size is required"),
-  description: Yup.string().required("Description is required"),
-  // overview: Yup.string().required("Overview is required"),
-  director_id: Yup.string().required("Director is required"),
-  documents: Yup.string().required("Property Agreement details are required"),
-  nearbyLandmarks: Yup.array()
-    .of(Yup.string())
-    .min(1, "At least one landmark is required")
-    .required("Nearby Landmarks are required"),
-  // rentDuration: Yup.string().required("Rent duration is required"),
-  buildingCondition: Yup.string().required("Building condition is required"),
-titleDocumentTypeProp: Yup.array()
-    .of(Yup.string())
-    .min(1, "At least one title document type is required")
-    .required("Title document type is required"),
-  whatsAppLink: Yup.string().required("WhatsApp link is required"),
-  contactNumber: Yup.string().required("Contact number is required"),
+//   bedrooms: Yup.string().required("Number of bedrooms is required"),
+//   bathrooms: Yup.string().required("Number of bathrooms is required"),
+//   toilets: Yup.string().required("Number of toilets is required"),  
+//   // propertySize: Yup.string().required("Property size is required"),
+//   description: Yup.string().required("Description is required"),
+//   // overview: Yup.string().required("Overview is required"),
+//   director_id: Yup.string().required("Director is required"),
+//   documents: Yup.string().required("Property Agreement details are required"),
+//   nearbyLandmarks: Yup.array()
+//     .of(Yup.string())
+//     .min(1, "At least one landmark is required")
+//     .required("Nearby Landmarks are required"),
+//   // rentDuration: Yup.string().required("Rent duration is required"),
+//   buildingCondition: Yup.string().required("Building condition is required"),
+// titleDocumentTypeProp: Yup.array()
+//     .of(Yup.string())
+//     .min(1, "At least one title document type is required")
+//     .required("Title document type is required"),
+//   whatsAppLink: Yup.string().required("WhatsApp link is required"),
+//   contactNumber: Yup.string().required("Contact number is required"),
 });
 
 const formik = useFormik<PropertySpecificationsFormValues>({
@@ -172,20 +173,18 @@ useEffect(() => {
 
     return (
       <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-        <OptionInputField
-          label="Agent/Manager Assigned"
-          placeholder="Select director"
-          name="director_id"
-          value={formik.values.director_id}
-          onChange={(value: any) => formik.setFieldValue("director_id", value)}
-          options={labels}
-          dropdownTitle="Roles"
-          error={
-            formik.touched.director_id && formik.errors.director_id
-              ? formik.errors.director_id
-              : undefined
-          }
-        />
+     
+<EnhancedOptionInputField
+  label="Director"
+  placeholder="Select director"
+  name="director_id"
+  value={formik.values.director_id}
+  onChange={(value) => formik.setFieldValue("director_id", value)}
+  options={labels} 
+  dropdownTitle="Directors"
+  error={formik.touched.director_id && formik.errors.director_id}
+  isSearchable={true}
+/>
          <div className="grid md:grid-cols-2 gap-12">
           <InputField
             label="WhatsApp Link"

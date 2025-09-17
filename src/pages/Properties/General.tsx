@@ -11,7 +11,7 @@ import MediaFORM from "./Media/Media";
 import PropertyListing from "./edithFinal/EdithFnal";
 import FeaturesInput from "./Features/Features";
 import LandForm from "./BasicDetails/PropertySpecifications/land";
-import FinalSubmission from "./FinalSubmission";
+// import FinalSubmission from "./FinalSubmission";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import DraftPublishModal from "./DraftPublishModal";

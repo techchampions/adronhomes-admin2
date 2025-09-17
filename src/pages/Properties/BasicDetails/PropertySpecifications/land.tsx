@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../components/Redux/store";
 import { directors } from "../../../../components/Redux/directors/directors_thunk";
 import TagInputField from "../../../../components/input/TagInputField";
+import EnhancedOptionInputField from "../../../../components/input/enhancedSelecet";
 
 interface LandFormHandles {
   handleSubmit: () => void;
@@ -181,20 +182,17 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-      <OptionInputField
-        label="Agent/Manager Assigned"
-        placeholder="Select director"
-        name="director_id"
-        value={formik.values.director_id}
-        onChange={(value: any) => formik.setFieldValue("director_id", value)}
-        options={labels}
-        dropdownTitle="Roles"
-        error={
-          formik.touched.director_id && formik.errors.director_id
-            ? formik.errors.director_id
-            : undefined
-        }
-      />
+     <EnhancedOptionInputField
+  label="Director"
+  placeholder="Select director"
+  name="director_id"
+  value={formik.values.director_id}
+  onChange={(value) => formik.setFieldValue("director_id", value)}
+  options={labels} // This should be the array of {label: "Name", value: "ID"}
+  dropdownTitle="Directors"
+  error={formik.touched.director_id && formik.errors.director_id}
+  isSearchable={true}
+/>
         <div className="grid md:grid-cols-2 gap-12">
         <InputField
           label="WhatsApp Link"
