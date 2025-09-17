@@ -170,9 +170,9 @@ import MultipleFileUploadField from "../../../components/input/multiplefile";
 
 // Main BasicDetails component
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails, setSales } = useContext(PropertyContext)!;
+  const { formData, setBasicDetails, setSales,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
-    const [propertyFiles, setPropertyFiles] = useState<File[]>(
+    const [propertyFiles, setPropertyFiles] = useState<any[]>(
       formData.basicDetails.propertyFiles || []
     );
   
@@ -348,6 +348,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
+      
       <InputField
         label="Property Name"
         placeholder="Enter property name"
@@ -356,7 +357,10 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={formik.handleChange}
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
-
+ {selectedPropertyId&&<p className="text-base text-black">
+  <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
+</p>
+}
       <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"

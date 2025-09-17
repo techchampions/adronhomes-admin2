@@ -52,7 +52,10 @@ interface DropdownOption {
 
 const PropertySpecifications = forwardRef<PropertySpecificationsHandles>(
   (props, ref) => {
-    const { formData, setSpecifications,sales, setSales } = useContext(PropertyContext)!;
+    const { formData, setSpecifications,sales, selectedPropertyId,  director_name,
+        setDirectorName,
+        previousPropType,
+        setpreviousPropType } = useContext(PropertyContext)!;
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
       dispatch(directors());
@@ -173,7 +176,10 @@ useEffect(() => {
 
     return (
       <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-     
+{selectedPropertyId&&<p className="text-base text-black">
+  <span className="text-lg font-bold">Previous director:</span> {director_name}
+</p>
+}
 <EnhancedOptionInputField
   label="Director"
   placeholder="Select director"
@@ -289,7 +295,7 @@ useEffect(() => {
             />
           </div> */}
  <div className="relative">
-          <p className="text-sm font-[325] text-[#768676] absolute top-10 z-20 right-3">
+          <p className="text-sm font-[325] text-[#768676] absolute top-10 z-10 right-3">
             Sq M
           </p>
           <InputField

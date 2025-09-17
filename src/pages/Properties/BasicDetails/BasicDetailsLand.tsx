@@ -52,13 +52,13 @@ const validationSchema = Yup.object().shape({
 });
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails } = useContext(PropertyContext)!;
+  const { formData, setBasicDetails,director_name,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
 
   const [purpose, setPurpose] = useState<string[]>(
     formData.basicDetails.purpose || []
   );
-  const [propertyFiles, setPropertyFiles] = useState<File[]>(
+  const [propertyFiles, setPropertyFiles] = useState<any[]>(
     formData.basicDetails.propertyFiles || []
   );
 
@@ -198,6 +198,11 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={formik.handleChange}
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
+
+  {selectedPropertyId&&<p className="text-base text-black">
+  <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
+</p>
+}
       <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
@@ -209,6 +214,8 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         error={formik.touched.propertyType && formik.errors.propertyType}
         isSearchable={false}
       />
+
+      
       <InputField
         label="Price"
         placeholder="Enter price per unit"
@@ -290,18 +297,18 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.lgas}
         isSearchable={true}
       /> */}
-      <MultipleFileUploadField
-        label="Upload Files"
-        placeholder="Drag and drop or click to upload files"
-        name="propertyFiles"
-        multiple={true}
-        onChange={(files) => {
-          formik.setFieldValue("propertyFiles", files);
-          setPropertyFiles(files || []);
-        }}
-        value={propertyFiles}
-        error={formik.touched.propertyFiles && formik.errors.propertyFiles}
-      />
+    <MultipleFileUploadField
+  label="Upload Files"
+  placeholder="Drag and drop or click to upload files"
+  name="propertyFiles"
+  multiple={true}
+  value={formik.values.propertyFiles} // File[] type
+  onChange={(files) => {
+    formik.setFieldValue("propertyFiles", files);
+    setPropertyFiles(files || []); // This now works perfectly
+  }}
+  error={formik.errors.propertyFiles}
+/>
       <TagInputField
         label="Purpose"
         placeholder="Add purpose (e.g., Bungalow)"

@@ -5,6 +5,17 @@ import Cookies from "js-cookie";
 
 import { toast } from "react-toastify";
 import { RootState } from "../../store";
+interface Director {
+  id: number;
+  first_name: string;
+  last_name: string;
+}
+interface PropertyType {
+  id: number;
+  name: string;
+  created_at: string | null;
+  updated_at: string | null;
+}
 
 export interface Property {
   id: number;
@@ -81,6 +92,8 @@ export interface Property {
   total_amount: number;
   details: PropertyDetail[];
   property_files:any
+  director:Director
+  
 }
 export interface PropertyDetail {
   id: number;

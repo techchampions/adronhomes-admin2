@@ -34,9 +34,9 @@ interface BasicDetailsFormValues {
   country: any;
   state: any;
   lga: any;
-  category:any
-   category_id:any
-   propertyFiles:File[]
+  category: any;
+  category_id: any;
+  propertyFiles: File[];
 }
 
 interface BulkDetailsFormValues {
@@ -50,7 +50,6 @@ interface BulkDetailsFormValues {
   initialDeposit: string;
   country: any;
   lga: any;
-
 }
 
 interface PropertySpecificationsFormValues {
@@ -68,11 +67,9 @@ interface PropertySpecificationsFormValues {
   nearbyLandmarks: string[];
   rentDuration: string;
   buildingCondition: string;
-  // purpose: string[];
   whatsAppLink: string;
   contactNumber: string;
   toilets: string;
-
   titleDocumentTypeProp: string[];
 }
 
@@ -103,7 +100,7 @@ interface MediaFormValues {
   tourLink: string;
   videoLink: string;
   mapUrl: string;
-  images: (File | string)[]; 
+  images: (File | string)[];
 }
 
 interface DiscountFormValues {
@@ -138,6 +135,12 @@ interface PropertyFormData {
 
 interface PropertyContextType {
   formData: PropertyFormData;
+  director_name: any;
+
+   setDirectorName: (director_name: any) => void;
+
+
+   previousPropType: any; setpreviousPropType: (previousPropType: any) => void;
   setBasicDetails: (data: BasicDetailsFormValues) => void;
   setBulkDetails: (data: BulkDetailsFormValues) => void;
   setSpecifications: (data: PropertySpecificationsFormValues) => void;
@@ -146,7 +149,7 @@ interface PropertyContextType {
   setMedia: (data: MediaFormValues) => void;
   setDiscount: (data: DiscountFormValues) => void;
   setPaymentStructure: (data: PaymentStructureFormValues) => void;
- submitForm: (displayStatus: "draft" | "publish") => Promise<void>;
+  submitForm: (displayStatus: "draft" | "publish") => Promise<void>;
   currentStep: number;
   setCurrentStep: (step: number) => void;
   isLandProperty: boolean;
@@ -166,6 +169,7 @@ interface PropertyContextType {
   loading: boolean;
   fees: Fee[];
   setFees: any;
+  newFees :Fee[]; setNewFees: any;
   isInfrastructure: boolean;
   setIsCancelInfrastructure: (isInfrastructure: boolean) => void;
   isSubmitting: boolean;
@@ -178,8 +182,10 @@ interface PropertyContextType {
   setDisplayStatus: (status: "draft" | "publish") => void;
   sales: boolean;
   setSales: (sales: boolean) => void;
-  imagePreview:any, setImagePreview:(imagePreview: any) => void;
-  selectedPropertyId:boolean, setSelectedPropertyId:(selectedPropertyId: any) => void;
+  imagePreview: any;
+  setImagePreview: (imagePreview: any) => void;
+  selectedPropertyId: boolean;
+  setSelectedPropertyId: (selectedPropertyId: any) => void;
 }
 
 const PropertyContext = createContext<PropertyContextType | undefined>(
@@ -202,9 +208,9 @@ const initialFormData: PropertyFormData = {
     country: "",
     state: "",
     lga: "",
-    category:"",
-     category_id:"",
-     propertyFiles:[]
+    category: "",
+    category_id: "",
+    propertyFiles: [],
   },
   bulkDetails: {
     propertyName: "",
@@ -233,7 +239,6 @@ const initialFormData: PropertyFormData = {
     nearbyLandmarks: [],
     rentDuration: "",
     buildingCondition: "",
-    // purpose: [],
     whatsAppLink: "",
     contactNumber: "",
     toilets: "",
@@ -261,11 +266,10 @@ const initialFormData: PropertyFormData = {
     features: ["Gym", "Swimming Pool", "Drainage", "Super Market"],
   },
   media: {
-    mapUrl:"",
+    mapUrl: "",
     tourLink: "",
     videoLink: "",
     images: [],
-    // videoFile: [],
   },
   discount: {
     discountName: "",
@@ -282,10 +286,8 @@ const initialFormData: PropertyFormData = {
     feesCharges: "",
   },
   display: {
-
     status: "draft",
   },
-
 };
 
 const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
@@ -306,20 +308,24 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [option, setOption] = useState(0);
   const [fees, setFees] = useState<Fee[]>([]);
+   const [newFees, setNewFees] = useState<Fee[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [sales, setSales] = useState<boolean>(false);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+   const [director_name, setDirectorName] = useState<string>('');
+    const [previousPropType, setpreviousPropType] = useState<string>('');
 
-useEffect(() => {
-  if (location.pathname.startsWith("/properties/property-edith/")) {
-    setSelectedPropertyId(true);
-  } else {
-    setSelectedPropertyId(false);
-  }
-}, [location.pathname]);
- const [selectedPropertyId, setSelectedPropertyId] = useState(false);
+  useEffect(() => {
+    if (location.pathname.startsWith("/properties/property-edith/")) {
+      setSelectedPropertyId(true);
+    } else {
+      setSelectedPropertyId(false);
+    }
+  }, [location.pathname]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState(false);
+
   const resetFormData = () => {
     setFormData(initialFormData);
     setCurrentStep(1);
@@ -339,7 +345,7 @@ useEffect(() => {
   };
 
   const setBasicDetails = (data: BasicDetailsFormValues) => {
-    const isLand = isLandProperty;
+   const isLand = formData.basicDetails.propertyType==='1';
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -349,7 +355,7 @@ useEffect(() => {
   };
 
   const setBulkDetails = (data: BulkDetailsFormValues) => {
-    const isLand = isLandProperty;
+   const isLand = formData.basicDetails.propertyType==='1';
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -360,7 +366,7 @@ useEffect(() => {
 
   useEffect(() => {
     formData.basicDetails.propertyType;
-    const isLand = isLandProperty;
+    const isLand = formData.basicDetails.propertyType==='1';
     if (isLandProperty !== isLand) {
       setIsLandProperty(isLand);
     }
@@ -414,272 +420,367 @@ useEffect(() => {
       paymentStructure: data,
     }));
   };
-// PropertyContext.tsx
-const submitForm = async (displayStatus: "draft" | "publish") => {
-  try {
-    setIsSubmitting(true);
 
-    const {
-      basicDetails,
-      bulkDetails,
-      specifications,
-      landForm,
-      features,
-      media,
-      discount,
-      paymentStructure,
-    } = formData;
+  // PropertyContext.tsx
+  const submitForm = async (displayStatus: "draft" | "publish") => {
+    try {
+      setIsSubmitting(true);
 
-    console.log("Submitting with displayStatus:", displayStatus); // Debug log
+      const {
+        basicDetails,
+        bulkDetails,
+        specifications,
+        landForm,
+        features,
+        media,
+        discount,
+        paymentStructure,
+      } = formData;
 
-    const formPayload = new FormData();
+      console.log("Submitting with displayStatus:", displayStatus); // Debug log
 
-    // Populate formPayload based on isBulk and isLandProperty
-    if (isBulk) {
-      formPayload.append("name", bulkDetails.propertyName);
-      formPayload.append("type", bulkDetails.propertyType);
-      formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
-      formPayload.append("price", bulkDetails.price);
-      formPayload.append("street_address", bulkDetails.address);
-      formPayload.append("city", bulkDetails.city || "");
-      formPayload.append("country", bulkDetails.country);
-      formPayload.append("state", bulkDetails.state);
-      formPayload.append("lga", bulkDetails.lga);
-      formPayload.append("category", "bulk");
-    
-      formPayload.append("initial_deposit", bulkDetails.initialDeposit || "0");
-    } else {
-      formPayload.append("name", basicDetails.propertyName);
-      formPayload.append("type", basicDetails.propertyType);
-      formPayload.append("price", basicDetails.price);
-      formPayload.append("initial_deposit", basicDetails.initialDeposit || "0");
-      formPayload.append("country", basicDetails.country);
-      formPayload.append("state", basicDetails.state);
-      formPayload.append("lga", basicDetails.lga);
-      formPayload.append("street_address", basicDetails.address);
-      formPayload.append("location_type", basicDetails.locationType || "");;
-    if (Array.isArray(basicDetails.propertyFiles)) {
-      basicDetails.propertyFiles.forEach((propertyFiles, index) => {
-        if (propertyFiles instanceof File) {
-          formPayload.append(`property_files[${index}]`, propertyFiles);
+      const formPayload = new FormData();
+
+      // Populate formPayload based on isBulk and isLandProperty
+      if (isBulk) {
+        if (bulkDetails.propertyName) {
+          formPayload.append("name", bulkDetails.propertyName);
         }
-      });
-    }
-      
-        formPayload.append(" category_id", basicDetails.category_id);
-      if (Array.isArray(basicDetails.purpose)) {
-        basicDetails.purpose.forEach((purpose, index) => {
-          formPayload.append(`purpose[${index}]`, purpose);
+        if (bulkDetails.propertyType) {
+          formPayload.append("type", bulkDetails.propertyType);
+        }
+        if (bulkDetails.propertyUnits) {
+          formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
+        }
+        if (bulkDetails.price) {
+          formPayload.append("price", bulkDetails.price);
+        }
+        if (bulkDetails.address) {
+          formPayload.append("street_address", bulkDetails.address);
+        }
+        if (bulkDetails.city) {
+          formPayload.append("city", bulkDetails.city || "");
+        }
+        if (bulkDetails.country) {
+          formPayload.append("country", bulkDetails.country);
+        }
+        if (bulkDetails.state) {
+          formPayload.append("state", bulkDetails.state);
+        }
+        if (bulkDetails.lga) {
+          formPayload.append("lga", bulkDetails.lga);
+        }
+        formPayload.append("category", "bulk");
+        if (bulkDetails.initialDeposit) {
+          formPayload.append("initial_deposit", bulkDetails.initialDeposit || "0");
+        }
+      } else {
+        if (basicDetails.propertyName) {
+          formPayload.append("name", basicDetails.propertyName);
+        }
+        if (basicDetails.propertyType) {
+          formPayload.append("type", basicDetails.propertyType);
+        }
+        if (basicDetails.price) {
+          formPayload.append("price", basicDetails.price);
+        }
+        if (basicDetails.initialDeposit) {
+          formPayload.append("initial_deposit", basicDetails.initialDeposit || "0");
+        }
+        if (basicDetails.country) {
+          formPayload.append("country", basicDetails.country);
+        }
+        if (basicDetails.state) {
+          formPayload.append("state", basicDetails.state);
+        }
+        if (basicDetails.lga) {
+          formPayload.append("lga", basicDetails.lga);
+        }
+        if (basicDetails.address) {
+          formPayload.append("street_address", basicDetails.address);
+        }
+        if (basicDetails.locationType) {
+          formPayload.append("location_type", basicDetails.locationType || "");
+        }
+        if (Array.isArray(basicDetails.propertyFiles)) {
+          basicDetails.propertyFiles.forEach((propertyFiles, index) => {
+            if (propertyFiles instanceof File) {
+              formPayload.append(`property_files[${index}]`, propertyFiles);
+            }
+          });
+        }
+        if (basicDetails.category_id) {
+          formPayload.append("category_id", basicDetails.category_id);
+        }
+        if (Array.isArray(basicDetails.purpose)) {
+          basicDetails.purpose.forEach((purpose, index) => {
+            formPayload.append(`purpose[${index}]`, purpose);
+          });
+        } else if (basicDetails.purpose) {
+          formPayload.append("purpose", basicDetails.purpose || "");
+        }
+        formPayload.append("category", "house");
+      }
+
+      if (isLandProperty) {
+        if (landForm.landSize) {
+          formPayload.append("size", landForm.landSize);
+        }
+        if (landForm.plotShape) {
+          formPayload.append("shape", landForm.plotShape || "");
+        }
+        if (landForm.topography) {
+          formPayload.append("topography", landForm.topography || "");
+        }
+        formPayload.append("category", "estate");
+        if (landForm.nearbyLandmarks && landForm.nearbyLandmarks.length > 0) {
+          formPayload.append(
+            "nearbyLandmarks",
+            Array.isArray(landForm.nearbyLandmarks)
+              ? landForm.nearbyLandmarks.join(", ")
+              : landForm.nearbyLandmarks || ""
+          );
+        }
+        if (landForm.roadAccess && landForm.roadAccess.length > 0) {
+          formPayload.append(
+            "road_access",
+            Array.isArray(landForm.roadAccess)
+              ? landForm.roadAccess.join(", ")
+              : landForm.roadAccess || ""
+          );
+        }
+        if (landForm.titleDocumentType && landForm.titleDocumentType.length > 0) {
+          formPayload.append(
+            "title_document_type",
+            Array.isArray(landForm.titleDocumentType)
+              ? landForm.titleDocumentType.join(", ")
+              : landForm.titleDocumentType || ""
+          );
+        }
+        if (landForm.description) {
+          formPayload.append("description", landForm.description);
+        }
+        if (landForm.unitsAvailable) {
+          const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
+          formPayload.append("number_of_unit", unitsAvailable.toString());
+        }
+        if (landForm.director_id) {
+          formPayload.append("director_id", landForm.director_id || "1");
+        }
+        if (landForm.fencing) {
+          formPayload.append("fencing", landForm.fencing || "");
+        }
+        if (landForm.gatedEstate) {
+          formPayload.append("gated_estate", landForm.gatedEstate || "");
+        }
+        if (landForm.contactNumber) {
+          formPayload.append("contact_number", landForm.contactNumber || "");
+        }
+        if (landForm.whatsAppLink) {
+          formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
+        }
+        if (landForm.documents) {
+          formPayload.append("property_agreement", landForm.documents);
+        }
+      } else {
+        if (specifications.bedrooms) {
+          formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
+        }
+        if (specifications.bathrooms) {
+          formPayload.append("number_of_bathroom", specifications.bathrooms || "0");
+        }
+        if (specifications.titleDocumentTypeProp && specifications.titleDocumentTypeProp.length > 0) {
+          formPayload.append(
+            "title_document_type",
+            Array.isArray(specifications.titleDocumentTypeProp)
+              ? specifications.titleDocumentTypeProp.join(", ")
+              : specifications.titleDocumentTypeProp || ""
+          );
+        }
+        if (specifications.toilets) {
+          formPayload.append("toilets", specifications.toilets || "0");
+        }
+        if (specifications.landSize) {
+          formPayload.append("size", specifications.landSize);
+        }
+        if (specifications.parkingSpaces) {
+          formPayload.append("parking_space", specifications.parkingSpaces || "0");
+        }
+        if (specifications.description) {
+          formPayload.append("description", specifications.description);
+        }
+        if (specifications.yearBuilt) {
+          formPayload.append("year_built", specifications.yearBuilt || "");
+        }
+        if (specifications.unitsAvailable) {
+          const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
+          formPayload.append("number_of_unit", unitsAvailable.toString());
+        }
+        if (specifications.director_id) {
+          formPayload.append("director_id", specifications.director_id || "1");
+        }
+        if (specifications.nearbyLandmarks && specifications.nearbyLandmarks.length > 0) {
+          formPayload.append(
+            "nearby_landmarks",
+            Array.isArray(specifications.nearbyLandmarks)
+              ? specifications.nearbyLandmarks.join(", ")
+              : specifications.nearbyLandmarks || ""
+          );
+        }
+        if (specifications.rentDuration) {
+          formPayload.append("rent_duration", specifications.rentDuration || "");
+        }
+        if (specifications.buildingCondition) {
+          formPayload.append("building_condition", specifications.buildingCondition || "");
+        }
+        if (specifications.whatsAppLink) {
+          formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
+        }
+        if (specifications.contactNumber) {
+          formPayload.append("contact_number", specifications.contactNumber || "");
+        }
+        if (specifications.documents) {
+          formPayload.append("property_agreement", specifications.documents);
+        }
+      }
+
+      if (Array.isArray(features.features) && features.features.length > 0) {
+        features.features.forEach((feature, index) => {
+          formPayload.append(`features[${index}]`, feature);
         });
-      } else {
-        formPayload.append("purpose", basicDetails.purpose || "");
       }
-      formPayload.append("category", "house");
-    }
 
-    if (isLandProperty) {
-      formPayload.append("size", landForm.landSize);
-      formPayload.append("shape", landForm.plotShape || "");
-      formPayload.append("topography", landForm.topography || "");
-      formPayload.append("category", "estate");
-      formPayload.append(
-        "nearbyLandmarks",
-        Array.isArray(landForm.nearbyLandmarks)
-          ? landForm.nearbyLandmarks.join(", ")
-          : landForm.nearbyLandmarks || ""
-      );
-      formPayload.append(
-        "road_access",
-        Array.isArray(landForm.roadAccess)
-          ? landForm.roadAccess.join(", ")
-          : landForm.roadAccess || ""
-      );
-      formPayload.append(
-        "title_document_type",
-        Array.isArray(landForm.titleDocumentType)
-          ? landForm.titleDocumentType.join(", ")
-          : landForm.titleDocumentType || ""
-      );
-      // formPayload.append("overview", landForm.overview);
-      formPayload.append("description", landForm.description);
-      const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
-      formPayload.append("number_of_unit", unitsAvailable.toString());
-      formPayload.append("director_id", landForm.director_id || "1");
-      formPayload.append("fencing", landForm.fencing || "");
-      formPayload.append("gated_estate", landForm.gatedEstate || "");
-      formPayload.append("contact_number", landForm.contactNumber || "");
-      formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
-      formPayload.append("property_agreement", landForm.documents);
-    } else {
-      formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
-      formPayload.append("number_of_bathroom", specifications.bathrooms || "0");
-      formPayload.append(
-        "title_document_type",
-        Array.isArray(specifications.titleDocumentTypeProp)
-          ? specifications.titleDocumentTypeProp.join(", ")
-          : specifications.titleDocumentTypeProp || ""
-      );
-      formPayload.append("toilets", specifications.toilets || "0");
-      formPayload.append("size", specifications.landSize);
-      formPayload.append("parking_space", specifications.parkingSpaces || "0");
-      // formPayload.append("overview", specifications.overview);
-      formPayload.append("description", specifications.description);
-      formPayload.append("year_built", specifications.yearBuilt || "");
-      const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
-      formPayload.append("number_of_unit", unitsAvailable.toString());
-      formPayload.append("director_id", specifications.director_id || "1");
-      formPayload.append(
-        "nearby_landmarks",
-        Array.isArray(specifications.nearbyLandmarks)
-          ? specifications.nearbyLandmarks.join(", ")
-          : specifications.nearbyLandmarks || ""
-      );
-      formPayload.append("rent_duration", specifications.rentDuration || "");
-      formPayload.append("building_condition", specifications.buildingCondition || "");
-      formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
-      formPayload.append("contact_number", specifications.contactNumber || "");
-      formPayload.append("property_agreement", specifications.documents);
-    }
-
-    if (Array.isArray(features.features)) {
-      features.features.forEach((feature, index) => {
-        formPayload.append(`features[${index}]`, feature);
-      });
-    }
-
-    if (Array.isArray(media.images)) {
-      media.images.forEach((image, index) => {
-        if (image instanceof File) {
-          formPayload.append(`photos[${index}]`, image);
-          if (index === 0) {
-            formPayload.append("display_image", image);
+      if (Array.isArray(media.images) && media.images.length > 0) {
+        media.images.forEach((image, index) => {
+          if (image instanceof File) {
+            formPayload.append(`photos[${index}]`, image);
+            if (index === 0) {
+              formPayload.append("display_image", image);
+            }
           }
-        }
-      });
-    }
-
-    if (media.tourLink) {
-      formPayload.append("virtual_tour", media.tourLink);
-    }
-
-    if (media.videoLink) {
-      formPayload.append("video_link", media.videoLink);
-    }
-      if (media.mapUrl) {
-      formPayload.append("map_link", media.mapUrl);
-    }
-
-    // if (Array.isArray(media.videoFile) && media.videoFile.length > 0) {
-    //   media.videoFile.forEach((video, index) => {
-    //     if (video instanceof File) {
-    //       formPayload.append(`video_file[${index}]`, video);
-    //     }
-    //   });
-    // }
-
-    formPayload.append("payment_type", paymentStructure.paymentType);
-    formPayload.append("property_duration_limit", paymentStructure.paymentDuration);
-    if (Array.isArray(paymentStructure.paymentSchedule)) {
-      paymentStructure.paymentSchedule.forEach((schedule, index) => {
-        formPayload.append(`payment_schedule[${index}]`, schedule);
-      });
-    }
-    formPayload.append("fees_charges", paymentStructure.feesCharges);
-
-    if (discount.discountName) {
-      formPayload.append("is_discount", "1");
-      formPayload.append("discount_name", discount.discountName);
-      formPayload.append("discount_percentage", discount.discountOff);
-      formPayload.append("discount_units", discount.unitsRequired);
-      formPayload.append("discount_start_date", discount.validFrom);
-      formPayload.append("discount_end_date", discount.validTo);
-    } else {
-      formPayload.append("is_discount", "0");
-    }
-
-    // Use the displayStatus parameter directly
-    formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
-
-    const result = await dispatch(
-      createProperty({ credentials: formPayload })
-    ).unwrap();
-
-    const createdPropertyId = result.data.property.id || 0;
-
-    if (createdPropertyId) {
-      const feePromises = fees
-        .filter((fee) => fee.checked)
-        .map((fee) => ({
-          property_id: createdPropertyId.toString(),
-          name: fee.name,
-          value: fee.amount.replace(/[^\d.]/g, ""),
-          type: fee.type,
-          purpose: fee.purpose,
-        }))
-        .map((feeDetail) =>
-          dispatch(add_property_detail({ credentials: feeDetail }))
-            .then((result) => {
-              console.log(`Successfully added fee: ${feeDetail.name}`);
-              return result;
-            })
-            .catch((error) => {
-              console.error(`Failed to add fee ${feeDetail.name}:`, error);
-              toast.error(`Failed to add fee ${feeDetail.name}`);
-              throw error;
-            })
-        );
-
-      const feeResults = await Promise.allSettled(feePromises);
-
-      const successfulFees = feeResults.filter(
-        (r) => r.status === "fulfilled"
-      ).length;
-      const failedFees = feeResults.filter(
-        (r) => r.status === "rejected"
-      ).length;
-
-      if (failedFees === 0) {
-        toast.success("All fees added successfully!");
-      } else {
-        toast.warning(
-          `Property created but ${failedFees} fee(s) failed to add`
-        );
+        });
       }
 
-      resetFormData();
-      dispatch(resetPropertyState());
-    } else {
-      toast.error(
-        "Property created but couldn't add fees - missing property ID"
-      );
+      if (media.tourLink) {
+        formPayload.append("virtual_tour", media.tourLink);
+      }
+
+      if (media.videoLink) {
+        formPayload.append("video_link", media.videoLink);
+      }
+      if (media.mapUrl) {
+        formPayload.append("map_link", media.mapUrl);
+      }
+
+      if (paymentStructure.paymentType) {
+        formPayload.append("payment_type", paymentStructure.paymentType);
+      }
+      if (paymentStructure.paymentDuration) {
+        formPayload.append("property_duration_limit", paymentStructure.paymentDuration);
+      }
+      if (Array.isArray(paymentStructure.paymentSchedule) && paymentStructure.paymentSchedule.length > 0) {
+        paymentStructure.paymentSchedule.forEach((schedule, index) => {
+          formPayload.append(`payment_schedule[${index}]`, schedule);
+        });
+      }
+      if (paymentStructure.feesCharges) {
+        formPayload.append("fees_charges", paymentStructure.feesCharges);
+      }
+
+      if (discount.discountName) {
+        formPayload.append("is_discount", "1");
+        formPayload.append("discount_name", discount.discountName);
+        formPayload.append("discount_percentage", discount.discountOff);
+        formPayload.append("discount_units", discount.unitsRequired);
+        formPayload.append("discount_start_date", discount.validFrom);
+        formPayload.append("discount_end_date", discount.validTo);
+      } else {
+        formPayload.append("is_discount", "0");
+      }
+
+      // Use the displayStatus parameter directly
+      formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
+
+      const result = await dispatch(
+        createProperty({ credentials: formPayload })
+      ).unwrap();
+
+      const createdPropertyId = result.data.property.id || 0;
+
+      if (createdPropertyId) {
+        const feePromises = fees
+          .filter((fee) => fee.checked)
+          .map((fee) => ({
+            property_id: createdPropertyId.toString(),
+            name: fee.name,
+            value: fee.amount.replace(/[^\d.]/g, ""),
+            type: fee.type,
+            purpose: fee.purpose,
+          }))
+          .map((feeDetail) =>
+            dispatch(add_property_detail({ credentials: feeDetail }))
+              .then((result) => {
+                console.log(`Successfully added fee: ${feeDetail.name}`);
+                return result;
+              })
+              .catch((error) => {
+                console.error(`Failed to add fee ${feeDetail.name}:`, error);
+                toast.error(`Failed to add fee ${feeDetail.name}`);
+                throw error;
+              })
+          );
+
+        const feeResults = await Promise.allSettled(feePromises);
+
+        const successfulFees = feeResults.filter(
+          (r) => r.status === "fulfilled"
+        ).length;
+        const failedFees = feeResults.filter(
+          (r) => r.status === "rejected"
+        ).length;
+
+        if (failedFees === 0) {
+          toast.success("All fees added successfully!");
+        } else {
+          toast.warning(
+            `Property created but ${failedFees} fee(s) failed to add`
+          );
+        }
+
+        resetFormData();
+        dispatch(resetPropertyState());
+      } else {
+        toast.error(
+          "Property created but couldn't add fees - missing property ID"
+        );
+      }
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      if (error.response) {
+        toast.error(
+          `Server error: ${
+            error.response.data.message || error.response.statusText
+          }`
+        );
+      } else if (error.request) {
+        toast.error(
+          "No response from server. Please check your network connection."
+        );
+      } else {
+        toast.error(`Request error: ${error.message}`);
+      }
+      throw error; // Re-throw to allow handleDraftPublishSelect to handle it
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error: any) {
-    console.error("Error submitting form:", error);
-    if (error.response) {
-      toast.error(
-        `Server error: ${
-          error.response.data.message || error.response.statusText
-        }`
-      );
-    } else if (error.request) {
-      toast.error(
-        "No response from server. Please check your network connection."
-      );
-    } else {
-      toast.error(`Request error: ${error.message}`);
-    }
-    throw error; // Re-throw to allow handleDraftPublishSelect to handle it
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <PropertyContext.Provider
       value={{
+        newFees, setNewFees,
         selectedPropertyId,
-         setSelectedPropertyId,
-         
+        setSelectedPropertyId,
         isInfrastructure,
         setIsCancelInfrastructure,
         fees,
@@ -718,12 +819,15 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
         setOption,
         role,
         setRole,
-
         setDisplayStatus,
         sales,
         setSales,
         imagePreview,
-         setImagePreview
+        setImagePreview,
+        director_name,
+        setDirectorName,
+        previousPropType,
+        setpreviousPropType
       }}
     >
       {children}

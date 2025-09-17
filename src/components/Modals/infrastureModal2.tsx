@@ -74,6 +74,7 @@ export default function InfrastructureFeesModalss({
     formData,
     setFees,
     fees,
+     setNewFees,newFees
   } = useContext(PropertyContext)!;
   
   const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -148,9 +149,10 @@ export default function InfrastructureFeesModalss({
         amount: newFeeAmount.startsWith("₦") ? newFeeAmount : `₦${newFeeAmount}`,
         checked: true,
         purpose: newFeePurpose,
-        isNew: true, // Mark as new fee
+        isNew: true,
       };
       setFees([...fees, newFee]);
+       setNewFees([newFee]);
       setNewFeeName("");
       setNewFeeAmount("");
       setNewFeetype("");

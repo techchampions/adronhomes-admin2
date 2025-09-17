@@ -48,7 +48,10 @@ interface DropdownOption {
 }
 
 const LandForm = forwardRef<LandFormHandles>((props, ref) => {
-  const { formData, setLandForm } = useContext(PropertyContext)!;
+  const { formData, setLandForm,  director_name,
+        setDirectorName,
+        previousPropType,
+        setpreviousPropType,selectedPropertyId } = useContext(PropertyContext)!;
   const [titleDocumentType, setTitleDocumentType] = React.useState<string[]>(
     formData.landForm.titleDocumentType || []
   );
@@ -182,6 +185,10 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
+  {selectedPropertyId&&<p className="text-base text-black">
+  <span className="text-lg font-bold">Previous director:</span> {director_name}
+</p>
+}
      <EnhancedOptionInputField
   label="Director"
   placeholder="Select director"
