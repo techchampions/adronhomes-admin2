@@ -9,6 +9,7 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProperties } from "../../components/Redux/Properties/properties_Thunk";
 import { setPropertiesSearch } from "../../components/Redux/Properties/propertiesTable_slice";
+import PropertyTableComponent2 from "./TAbles/Properties_Table_Sold";
 
 const tabs = ['Published', 'Sold', 'Drafted'];
 
@@ -144,9 +145,13 @@ export default function Properties() {
               </p>
               <NotFound />
             </div>
-          ) : (
+          ) :activeTab==='Drafted'?(<PropertyTableComponent2   data={filteredProperties as PropertyData[]} CurrentPage={currentState.pagination.currentPage} 
+                  
+                  />): (
             <PropertyTableComponent 
-                  data={filteredProperties as PropertyData[]} CurrentPage={currentState.pagination.currentPage}          
+                  data={filteredProperties as PropertyData[]} CurrentPage={currentState.pagination.currentPage} 
+                  
+                  
             />
           )}
         </ReusableTable>

@@ -68,6 +68,7 @@ import LegalContractInvoice from "./Legal/contractDetails";
 import Dashboard_It from "./components/ItAdmin/Dashboard_It";
 import InfoTechSidebar from "./components/ItAdmin/sideNav";
 import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
+import EditProperty from "./pages/Properties/GeneralEditing";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -156,6 +157,11 @@ const App = () => {
                   element={<PaymentById />}
                 />
                 <Route
+                  path="/properties/property-edith/:id"
+                  element={<EditProperty />}
+                  
+                />
+                  <Route
                   path="/properties/:id"
                   element={<PropertyDetailsPage />}
                 />

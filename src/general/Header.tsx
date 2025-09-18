@@ -211,11 +211,8 @@ export default function Header({
             <MassUploadModal
               isOpen={showPersonnelModal}
               onClose={() => setPersonnelModal(false)}
-              onSubmit={function (values: {
-                files: FileList | null;
-              }): Promise<void> {
-                throw new Error("Function not implemented.");
-              }}
+             
+              
               x={() => setPersonnelModal(false)}
             />
           ) : (

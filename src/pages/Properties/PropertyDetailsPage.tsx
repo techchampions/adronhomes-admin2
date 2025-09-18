@@ -219,7 +219,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
       errors.street_address = "Street address is required";
     if (!formData.state) errors.state = "State is required";
     if (!formData.country) errors.country = "Country is required";
-    if (!formData.lga) errors.lga = "LGA is required";
+    // if (!formData.lga) errors.lga = "LGA is required";
     if (!formData.status) errors.status = "Status is required";
     if (!formData.contact_number)
       errors.contact_number = "Contact number is required";
@@ -381,10 +381,21 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
             </div>
 
             <div className="flex space-x-4 justify-center md:justify-end">
-              <button
+              {/* <button
                 onClick={isEditing ? handleSubmit : handleToggleEdit}
                 className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
                 disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditing
+                  ? "Save Changes"
+                  : "Edit Property"}
+              </button> */}
+                <button
+                onClick={()=>navigate(`/properties/property-edith/${property.id}`)}
+                className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
+                // disabled={isSubmitting}
               >
                 {isSubmitting
                   ? "Saving..."
@@ -497,7 +508,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                     ) : (
                       <div className="w-full md:w-2/3 flex justify-start">
                         <p className="text-gray-900 break-words max-w-2xl text-left">
-                          ₦{property.price.toLocaleString()}
+                
+                                         ₦{property && property.price!= null ? property.price.toLocaleString() : '0'}
                         </p>
                       </div>
                     )}
@@ -965,7 +977,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                       />
                     ) : (
                       <p className="text-gray-900 w-full md:w-2/3">
-                        ₦{property.initial_deposit.toLocaleString()}
+                        {/* ₦{property.initial_deposit.toLocaleString() ?? '0'} */}
+                         ₦{property && property.initial_deposit!= null ? property.initial_deposit.toLocaleString() : '0'}
                       </p>
                     )}
                   </div>
@@ -984,7 +997,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                       />
                     ) : (
                       <p className="text-gray-900 w-full md:w-2/3">
-                        ₦{property.total_amount.toLocaleString()}
+                    
+                        ₦{property && property.total_amount!= null ? property.total_amount.toLocaleString() : '0'}
                       </p>
                     )}
                   </div>
@@ -1613,7 +1627,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           </label>
                           
                           <p className="text-gray-900 w-full md:w-2/3">
-                            ₦{detail.value.toLocaleString()}
+                        ₦{detail && detail.value != null ? detail.value.toLocaleString() : '0'}
                           </p>
 
                            <label className="text-gray-700 font-medium w-full md:w-1/3">
