@@ -153,6 +153,8 @@ interface PropertyContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   isLandProperty: boolean;
+  setIsLandProperty2: (isLand: boolean) => void;
+  isLandProperty2: boolean;
   setIsLandProperty: (isLand: boolean) => void;
   isBulk: boolean;
   setIsBulk: (isBulk: boolean) => void;
@@ -298,6 +300,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   );
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLandProperty, setIsLandProperty] = useState<boolean>(false);
+    const [isLandProperty2, setIsLandProperty2] = useState<boolean>(false);
   const [isBulk, setIsBulk] = useState<boolean>(false);
   const [showBulkModal, setShowBulkModal] = useState<boolean>(false);
   const [showPersonnelModal, setPersonnelModal] = useState<boolean>(false);
@@ -836,7 +839,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         director_name,
         setDirectorName,
         previousPropType,
-        setpreviousPropType
+        setpreviousPropType,
+        isLandProperty2, setIsLandProperty2
       }}
     >
       {children}

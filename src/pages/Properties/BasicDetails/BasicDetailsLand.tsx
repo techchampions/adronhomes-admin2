@@ -55,22 +55,22 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const { formData, setBasicDetails,director_name,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
 
-  const [purpose, setPurpose] = useState<string[]>(
-    formData.basicDetails.purpose || []
-  );
+  // const [purpose, setPurpose] = useState<string[]>(
+  //   formData.basicDetails.purpose || []
+  // );
 
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-      purpose: purpose,
+    purpose: formData.basicDetails.purpose || [],
        propertyFiles: formData.basicDetails.propertyFiles || [],
     },
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails({
         ...values,
-        purpose: purpose,
-  propertyFiles: formData.basicDetails.propertyFiles || [],
+      purpose: formData.basicDetails.purpose || [],
+       propertyFiles: formData.basicDetails.propertyFiles || [],
       });
     },
     enableReinitialize: true,
@@ -120,9 +120,9 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [lgas]
   );
 
-  useEffect(() => {
-    formik.setFieldValue("purpose", purpose);
-  }, [purpose]);
+  // useEffect(() => {
+  //   formik.setFieldValue("purpose", purpose);
+  // }, [purpose]);
 
   // useEffect(() => {
   //   formik.setFieldValue("propertyFiles", propertyFiles);
@@ -309,8 +309,9 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       <TagInputField
         label="Purpose"
         placeholder="Add purpose (e.g., Bungalow)"
-        values={purpose}
-        onChange={(newPurpose) => setPurpose(newPurpose)}
+        values={formik.values.purpose}
+    onChange={(newPurposes) => formik.setFieldValue("purpose", newPurposes)}
+
         error={formik.touched.purpose && formik.errors.purpose}
       />
       {errors.countries && (
@@ -323,11 +324,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
           Error loading states: {errors.states.message}
         </div>
       )}
-      {/* {errors.lgas && (
-        <div className="text-red-500 text-sm">
-          Error loading LGAs: {errors.lgas.message}
-        </div>
-      )} */}
+   
     </form>
   );
 });
