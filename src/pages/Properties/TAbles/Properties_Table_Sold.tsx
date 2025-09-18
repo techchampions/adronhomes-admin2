@@ -194,11 +194,12 @@ export default function PropertyTableComponent2({
   const getPropertyType = (type: number) => {
     switch (type) {
       case 1:
-        return "Residential";
-      case 2:
-        return "Commercial";
-      case 3:
         return "Land";
+      case 2:
+        return "Residential";
+      case 3:
+        return "industrial";
+
       default:
         return "Commercial";
     }

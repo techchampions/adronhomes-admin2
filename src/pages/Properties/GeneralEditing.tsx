@@ -61,8 +61,8 @@ export default function EditProperty() {
     setPaymentStructure,
     setFees,
     fees,
-    isLandProperty,
-    setIsLandProperty,
+
+    // setIsLandProperty,
     isBulk,
     setIsBulk,
     isSubmitting,
@@ -71,6 +71,11 @@ export default function EditProperty() {
       imagePreview, setImagePreview,
               selectedPropertyId,
                setSelectedPropertyId,
+               setNewFees,newFees,
+                 director_name,
+        setDirectorName,
+        previousPropType,
+        setpreviousPropType
   } = useContext(PropertyContext)!;
   
 
@@ -81,8 +86,21 @@ export default function EditProperty() {
   const [galleryPreviews, setGalleryPreviews] = useState<(string | null)[]>([]);
   const [newDisplayImage, setNewDisplayImage] = useState<File | null>(null);
   const [newGalleryImages, setNewGalleryImages] = useState<(File | string | null)[]>([]);
-
+ const [isLandProperty, setIsLandProperty] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null!);
+  const propertyTypeOptions = [
+  { value: "2", label: "Residential" },
+  { value: "3", label: "Industrial" },
+  { value: "4", label: "Commercial" },
+];
+
+function getPropertyTypeLabelById(id: number | string | undefined): string {
+  if (!id) return "Unknown";
+
+  const match = propertyTypeOptions.find(option => option.value === String(id));
+  return match ? match.label : "Unknown";
+}
+
 const resetFormData = () => {
     setBasicDetails({
         propertyName: "",
@@ -169,6 +187,7 @@ const resetFormData = () => {
     setNewDisplayImage(null);
     setNewGalleryImages([]);
     setCurrentStep(1);
+     setNewFees([])
 };
   const galleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const basicDetailsRef = useRef<any>(null);
@@ -212,10 +231,12 @@ const resetFormData = () => {
     if (data?.properties?.[0]) {
 
       const property = data.properties[0];
-     
+     getPropertyTypeLabelById(property.type?.id)
+     setpreviousPropType(property.type?.name)
       setBasicDetails({
         propertyName: property.name,
         propertyType: property.type?.id?.toString() || "",
+
         price: property.price?.toString() || "",
         initialDeposit: property.initial_deposit?.toString() || "",
         address: property.street_address || "",
@@ -226,7 +247,7 @@ const resetFormData = () => {
         lga: property.lga || "N/A",
         category: property.category || "estate",
         category_id: null,
-        propertyFiles: convertUrlsToMockFiles(property.property_files)
+        propertyFiles: property.property_files
       });
 
        if (property.category !== "estate") {  setBasicDetails({
@@ -242,10 +263,11 @@ const resetFormData = () => {
         lga: property.lga || "N/A",
         category: property.category || "estate",
         category_id: property.category_id?.toString() || "",
-         propertyFiles: convertUrlsToMockFiles(property.property_files)
+         propertyFiles: (property.property_files)
       });}
-
+setDirectorName(`${property.director.first_name} ${property.director.last_name}`)
     if (property.category !== "estate") {
+
       setSpecifications({
         bedrooms: property.no_of_bedroom?.toString() || "",
         bathrooms: property.number_of_bathroom?.toString() || "",
@@ -258,7 +280,8 @@ const resetFormData = () => {
         description: property.description || "",
         overview: property.overview || "",
         documents: property.property_agreement || "",
-        director_id: property.director_id?.toString() || "",
+        director_id:property.director_id|| "",
+        
         nearbyLandmarks: property.nearby_landmarks ? 
           property.nearby_landmarks.split(',').map(item => item.trim()) : [],
         rentDuration: property.rent_duration || "",
@@ -294,13 +317,11 @@ const resetFormData = () => {
           property.nearby_landmarks.split(',').map(item => item.trim()) : [],
       });
     }
-
-      setFeatures({
-        features: Array.isArray(property.features) && property.features.length > 0
-          ? property.features[0].split(',').map(f => f.trim())
-          : [],
-        //    setSelectedPropertyId()
-      });
+setFeatures({
+  features: Array.isArray(property.features) && property.features.length > 0
+    ? property.features
+    : [],
+});
 
       setMedia({
         mapUrl: property.property_map || "",
@@ -337,7 +358,7 @@ const resetFormData = () => {
       );
 
       setDisplayStatus(property.is_active ? "publish" : "draft");
-      setIsLandProperty(property.category === "estate");
+      setIsLandProperty(property.type.name === "Land");
       setIsBulk(property.category === "bulk");
       setImagePreview(property.display_image || null);
       setGalleryPreviews(property.photos || []);
@@ -460,7 +481,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       formPayload.append("lga", basicDetails.lga || "");
       formPayload.append("street_address", basicDetails.address);
       formPayload.append("location_type", basicDetails.locationType || "N/A");
-      formPayload.append("category", "single");
+           formPayload.append("category", isLandProperty ? "estate" : "house");
       basicDetails.purpose.forEach((purpose, index) => {
         formPayload.append(`purpose[${index}]`, purpose);
       });
@@ -550,7 +571,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
 
     
     if (propertyId) {
-      const feePromises = fees
+      const feePromises = newFees
         .filter((fee) => fee.checked)
         .map((fee) => ({
           property_id: propertyId.toString(),
@@ -845,14 +866,14 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
                   Add Discount
                 </p>
               )}
-              {isLandProperty&&<p
+              {/* {isLandProperty&&<p
                 className={`text-dark font-bold text-sm text-center cursor-pointer ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 onClick={() => !isSubmitting && setShowInfrastructureModal(true)}
               >
                 Manage Infrastructure Fees
-              </p>}
+              </p>} */}
             </div>
           )}
 
