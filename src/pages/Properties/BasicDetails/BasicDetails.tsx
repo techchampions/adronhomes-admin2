@@ -172,9 +172,9 @@ import MultipleFileUploadField from "../../../components/input/multiplefile";
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const { formData, setBasicDetails, setSales,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
-    const [propertyFiles, setPropertyFiles] = useState<any[]>(
-      formData.basicDetails.propertyFiles || []
-    );
+    // const [propertyFiles, setPropertyFiles] = useState<any[]>(
+    //   formData.basicDetails.propertyFiles || []
+    // );
   
   // Get data from Redux store
   const countries = useSelector(selectAllCountries);
@@ -227,7 +227,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       ...formData.basicDetails,
       category_id: formData.basicDetails.category_id || "",
       purpose: formData.basicDetails.purpose || [],
-      propertyFiles: propertyFiles,
+       propertyFiles: formData.basicDetails.propertyFiles || [],
     },
     validationSchema,
     onSubmit: (values) => {
@@ -266,24 +266,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [lgas]
   );
 
-  // No longer need these useEffects as Formik manages state directly
-  // useEffect(() => {
-  //   formik.setFieldValue("purpose", purpose);
-  // }, [purpose]);
-
-  // useEffect(() => {
-  //   formik.setFieldValue("propertyFiles", propertyFiles);
-  // }, [propertyFiles]);
-
-  // No longer need to manually set state from context
-  // useEffect(() => {
-  //   if (formData.basicDetails.purpose) {
-  //     setPurpose(formData.basicDetails.purpose);
-  //   }
-  //   if (formData.basicDetails.propertyFiles) {
-  //     setPropertyFiles(formData.basicDetails.propertyFiles);
-  //   }
-  // }, [formData.basicDetails.purpose, formData.basicDetails.propertyFiles]);
 
   const handlePurposeChange = (value: string) => {
     const normalized = value.toLowerCase();
@@ -482,19 +464,18 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isSearchable={false}
       />
 
-        <MultipleFileUploadField
+      <MultipleFileUploadField
         label="Upload Files"
         placeholder="Drag and drop or click to upload files"
         name="propertyFiles"
         multiple={true}
         onChange={(files) => {
+          // Update Formik state directly instead of using local state
           formik.setFieldValue("propertyFiles", files);
-          setPropertyFiles(files || []);
         }}
-        value={propertyFiles}
+        value={formik.values.propertyFiles || []} 
         error={formik.touched.propertyFiles && formik.errors.propertyFiles}
       />
-
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}

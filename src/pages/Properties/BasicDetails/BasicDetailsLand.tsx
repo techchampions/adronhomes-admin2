@@ -58,22 +58,19 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const [purpose, setPurpose] = useState<string[]>(
     formData.basicDetails.purpose || []
   );
-  const [propertyFiles, setPropertyFiles] = useState<any[]>(
-    formData.basicDetails.propertyFiles || []
-  );
 
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
       purpose: purpose,
-      propertyFiles: propertyFiles,
+       propertyFiles: formData.basicDetails.propertyFiles || [],
     },
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails({
         ...values,
         purpose: purpose,
-        propertyFiles: propertyFiles,
+  propertyFiles: formData.basicDetails.propertyFiles || [],
       });
     },
     enableReinitialize: true,
@@ -127,9 +124,9 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     formik.setFieldValue("purpose", purpose);
   }, [purpose]);
 
-  useEffect(() => {
-    formik.setFieldValue("propertyFiles", propertyFiles);
-  }, [propertyFiles]);
+  // useEffect(() => {
+  //   formik.setFieldValue("propertyFiles", propertyFiles);
+  // }, [propertyFiles]);
 
   useEffect(() => {
     dispatch(fetchAllCountries());
@@ -297,18 +294,18 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.lgas}
         isSearchable={true}
       /> */}
-    <MultipleFileUploadField
-  label="Upload Files"
-  placeholder="Drag and drop or click to upload files"
-  name="propertyFiles"
-  multiple={true}
-  value={formik.values.propertyFiles} // File[] type
-  onChange={(files) => {
-    formik.setFieldValue("propertyFiles", files);
-    setPropertyFiles(files || []); // This now works perfectly
-  }}
-  error={formik.errors.propertyFiles}
-/>
+  <MultipleFileUploadField
+        label="Upload Files"
+        placeholder="Drag and drop or click to upload files"
+        name="propertyFiles"
+        multiple={true}
+        onChange={(files) => {
+          // Update Formik state directly instead of using local state
+          formik.setFieldValue("propertyFiles", files);
+        }}
+        value={formik.values.propertyFiles || []} 
+        error={formik.touched.propertyFiles && formik.errors.propertyFiles}
+      />
       <TagInputField
         label="Purpose"
         placeholder="Add purpose (e.g., Bungalow)"
