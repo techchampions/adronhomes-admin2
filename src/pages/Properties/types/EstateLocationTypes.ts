@@ -24,6 +24,7 @@ export interface Location {
   id: number;
   country_name: string;
   total_property: number;
+  estate_total_property: number;
   state_name: string;
   photo: string;
   created_at: string | null;
