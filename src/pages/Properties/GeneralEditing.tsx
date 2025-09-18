@@ -481,7 +481,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       formPayload.append("lga", basicDetails.lga || "");
       formPayload.append("street_address", basicDetails.address);
       formPayload.append("location_type", basicDetails.locationType || "N/A");
-      formPayload.append("category", "single");
+           formPayload.append("category", isLandProperty ? "estate" : "house");
       basicDetails.purpose.forEach((purpose, index) => {
         formPayload.append(`purpose[${index}]`, purpose);
       });

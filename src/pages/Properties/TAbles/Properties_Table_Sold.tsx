@@ -196,7 +196,7 @@ export default function PropertyTableComponent2({
       case 1:
         return "Land";
       case 2:
-        return "Commercial";
+        return "Residential";
       case 3:
         return "industrial";
 

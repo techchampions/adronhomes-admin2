@@ -83,7 +83,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
 
-  const propertyTypeOptions = [{ value: "3", label: "Land" }];
+  const propertyTypeOptions = [{ value: "1", label: "Land" }];
 
   const states = useSelector((state: RootState) =>
     selectCountryStates(state, formik.values.country)

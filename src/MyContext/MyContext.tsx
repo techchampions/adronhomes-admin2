@@ -437,7 +437,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         paymentStructure,
       } = formData;
 
-      console.log("Submitting with displayStatus:", displayStatus); // Debug log
+      console.log("Submitting with displayStatus:", displayStatus);
 
       const formPayload = new FormData();
 
@@ -771,7 +771,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       } else {
         toast.error(`Request error: ${error.message}`);
       }
-      throw error; // Re-throw to allow handleDraftPublishSelect to handle it
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
