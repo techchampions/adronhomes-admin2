@@ -32,6 +32,7 @@ import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesM
 import MediaFORM from "./Media/MediaFORM2";
 import { add_property_detail } from "../../components/Redux/addProperty/addFees/addFees_thunk";
 import { convertUrlsToMockFiles } from "../../utils/coverturloffiles";
+import InfrastructureFeesModalss from "../../components/Modals/infrastureModal2";
 
 export default function EditProperty() {
   const { id } = useParams<{ id: string }>();
@@ -232,6 +233,7 @@ const resetFormData = () => {
 
       const property = data.properties[0];
      getPropertyTypeLabelById(property.type?.id)
+     setSelectedPropertyId(true)
      setpreviousPropType(property.type?.name)
       setBasicDetails({
         propertyName: property.name,
@@ -790,7 +792,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
             isSubmitting={isSubmitting}
           />
 
-          <InfrastructureFeesModal
+          <InfrastructureFeesModalss
             isOpen={showInfrastructureModal}
             onClose={() => setShowInfrastructureModal(false)}
           />
@@ -866,14 +868,14 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
                   Add Discount
                 </p>
               )}
-              {/* {isLandProperty&&<p
+            {isLandProperty&&<p
                 className={`text-dark font-bold text-sm text-center cursor-pointer ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 onClick={() => !isSubmitting && setShowInfrastructureModal(true)}
               >
                 Manage Infrastructure Fees
-              </p>} */}
+              </p>} 
             </div>
           )}
 
