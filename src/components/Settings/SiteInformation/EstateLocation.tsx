@@ -46,16 +46,13 @@ const EstateLocation = () => {
               </div>
               <div className="flex-1 min-w-0 text-left overflow-hidden">
                 {" "}
-                {/* Added min-w-0 and overflow-hidden */}
                 <p className="font-medium text-xs md:text-sm truncate">
                   {" "}
-                  {/* Removed w-full as it's not needed */}
                   {item.state_name} Estate
                 </p>
                 <p className="text-xs truncate hover:underline underline-offset-2">
-                  {item.total_property} Estates
+                  {item.estate_total_property} Estates
                 </p>{" "}
-                {/* Added truncate for category too */}
               </div>
               <div className="text-right h-full flex flex-col justify-between gap-1 text-xs">
                 <div
