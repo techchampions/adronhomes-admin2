@@ -534,7 +534,14 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         if (landForm.topography) {
           formPayload.append("topography", landForm.topography || "");
         }
-       
+        if (landForm.nearbyLandmarks && landForm.nearbyLandmarks.length > 0) {
+          formPayload.append(
+            "nearby_landmarks",
+            Array.isArray(landForm.nearbyLandmarks)
+              ? landForm.nearbyLandmarks.join(", ")
+              : landForm.nearbyLandmarks || ""
+          );
+        }
         if (landForm.nearbyLandmarks && landForm.nearbyLandmarks.length > 0) {
           formPayload.append(
             "nearbyLandmarks",

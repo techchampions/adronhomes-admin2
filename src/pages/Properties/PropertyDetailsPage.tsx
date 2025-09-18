@@ -508,7 +508,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                     ) : (
                       <div className="w-full md:w-2/3 flex justify-start">
                         <p className="text-gray-900 break-words max-w-2xl text-left">
-                          ₦{property.price.toLocaleString()}
+                
+                                         ₦{property && property.price!= null ? property.price.toLocaleString() : '0'}
                         </p>
                       </div>
                     )}
@@ -976,7 +977,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                       />
                     ) : (
                       <p className="text-gray-900 w-full md:w-2/3">
-                        ₦{property.initial_deposit.toLocaleString()}
+                        {/* ₦{property.initial_deposit.toLocaleString() ?? '0'} */}
+                         ₦{property && property.initial_deposit!= null ? property.initial_deposit.toLocaleString() : '0'}
                       </p>
                     )}
                   </div>
@@ -995,7 +997,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                       />
                     ) : (
                       <p className="text-gray-900 w-full md:w-2/3">
-                        ₦{property.total_amount.toLocaleString()}
+                    
+                        ₦{property && property.total_amount!= null ? property.total_amount.toLocaleString() : '0'}
                       </p>
                     )}
                   </div>
@@ -1624,7 +1627,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           </label>
                           
                           <p className="text-gray-900 w-full md:w-2/3">
-                            ₦{detail.value.toLocaleString()}
+                        ₦{detail && detail.value != null ? detail.value.toLocaleString() : '0'}
                           </p>
 
                            <label className="text-gray-700 font-medium w-full md:w-1/3">

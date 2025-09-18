@@ -35,7 +35,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles>((props, ref) => {
   ];
 
   const paymentScheduleOptions = [
-    { value: "monthly", label: "Monthly" },
+    { value: "monthly", label: "Monthly"},
     { value: "quarterly", label: "Quarterly" },
     { value: "yearly", label: "Yearly" },
   ];
