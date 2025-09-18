@@ -345,7 +345,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   const setBasicDetails = (data: BasicDetailsFormValues) => {
-   const isLand = formData.basicDetails.propertyType==='1';
+    const isLand = isLandProperty;
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -355,7 +355,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   };
 
   const setBulkDetails = (data: BulkDetailsFormValues) => {
-   const isLand = formData.basicDetails.propertyType==='1';
+    const isLand = isLandProperty;
     setIsLandProperty(isLand);
 
     setFormData((prev) => ({
@@ -366,7 +366,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
 
   useEffect(() => {
     formData.basicDetails.propertyType;
-    const isLand = formData.basicDetails.propertyType==='1';
+    const isLand = isLandProperty;
     if (isLandProperty !== isLand) {
       setIsLandProperty(isLand);
     }
@@ -519,7 +519,9 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         } else if (basicDetails.purpose) {
           formPayload.append("purpose", basicDetails.purpose || "");
         }
-        formPayload.append("category", "house");
+       formPayload.append("category", isLandProperty ? "estate" : "house");
+
+         
       }
 
       if (isLandProperty) {
@@ -532,7 +534,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         if (landForm.topography) {
           formPayload.append("topography", landForm.topography || "");
         }
-        formPayload.append("category", "estate");
+       
         if (landForm.nearbyLandmarks && landForm.nearbyLandmarks.length > 0) {
           formPayload.append(
             "nearbyLandmarks",

@@ -358,7 +358,7 @@ setFeatures({
       );
 
       setDisplayStatus(property.is_active ? "publish" : "draft");
-      setIsLandProperty(property.category === "estate");
+      setIsLandProperty(property.type.name === "Land");
       setIsBulk(property.category === "bulk");
       setImagePreview(property.display_image || null);
       setGalleryPreviews(property.photos || []);
