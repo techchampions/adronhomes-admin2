@@ -44,7 +44,7 @@ const Discount = forwardRef<DiscountHandles>((props, ref) => {
     validationSchema,
     onSubmit: (values) => {
       setDiscount(values);
-        alert(JSON.stringify(values, null, 2)); 
+        // alert(JSON.stringify(values, null, 2)); 
     },
   });
 

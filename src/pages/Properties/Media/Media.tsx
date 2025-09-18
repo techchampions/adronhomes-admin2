@@ -17,8 +17,7 @@ interface MediaFormValues {
   tourLink: string;
   videoLink: string;
   mapUrl: string;
-  images: File[];
-
+  images: (File | string)[]; // Allow both File objects and string URLs
 }
 
 const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
@@ -44,18 +43,16 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
   });
 
   const formikRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (formData.media) {
-      setInitialValues({
-        tourLink: formData.media.tourLink || '',
-        videoLink: formData.media.videoLink || '',
-        mapUrl: formData.media.mapUrl || '',
-        images: formData.media.images || [],
-      
-      });
-    }
-  }, [formData.media]);
+useEffect(() => {
+  if (formData.media) {
+    setInitialValues({
+      tourLink: formData.media.tourLink || '',
+      videoLink: formData.media.videoLink || '',
+      mapUrl: formData.media.mapUrl || '',
+      images: formData.media.images || [],
+    });
+  }
+}, [formData.media]);
 
   useImperativeHandle(ref, () => ({
     handleSubmit: () => {
@@ -108,7 +105,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
             name="images"
             label="Property Images"
             multiple={true}
-            maxSize={5}
+            maxSize={2}
             minResolution={{ width: 1500, height: 1000 }}
             recommendedRatio="3:2"
             supportedFormats={["JPG", "JPEG", "PNG"]}

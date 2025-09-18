@@ -3,6 +3,7 @@ import { PropertyContext } from "../../../MyContext/MyContext";
 import { FaCamera, FaCheck, FaPen, FaTag, FaTrash } from "react-icons/fa6";
 import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus } from "react-icons/fa";
 import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
+import InfrastructureFeesModalss from "../../../components/Modals/infrastureModal2";
 
 interface EditingState {
   title: boolean;
@@ -21,7 +22,7 @@ interface EditingState {
 
 export default function PropertyListing() {
    const [isModalOpen, setIsModalOpen] = useState(false);
-  const { formData, isBulk, isLandProperty, setMedia,isInfrastructure, setIsCancelInfrastructure
+  const { formData, isBulk, isLandProperty, setMedia,isInfrastructure, selectedPropertyId,setIsCancelInfrastructure
    } = useContext(PropertyContext)!;
   const [activeImage, setActiveImage] = useState<number>(0);
   const [editing, setEditing] = useState<EditingState>({
@@ -54,7 +55,7 @@ export default function PropertyListing() {
     price: isBulk ? 
       formData.bulkDetails.price ? `₦${Number(formData.bulkDetails.price).toLocaleString()}` : "" : 
       formData.basicDetails.price ? `₦${Number(formData.basicDetails.price).toLocaleString()}` : "",
-    overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
+    // overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
     description: isLandProperty ? formData.landForm.description : formData.specifications.description,
     features: formData.features.features,
     address: isBulk ? formData.bulkDetails.address : formData.basicDetails.address,
@@ -94,7 +95,7 @@ export default function PropertyListing() {
         : formData.basicDetails.price
           ? `₦${Number(formData.basicDetails.price).toLocaleString()}`
           : "",
-      overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
+      // overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
       description: isLandProperty ? formData.landForm.description : formData.specifications.description,
       features: formData.features.features,
       address: isBulk ? formData.bulkDetails.address : formData.basicDetails.address,
@@ -512,32 +513,7 @@ export default function PropertyListing() {
             onClick={() => handleEdit("overview")}
           />
         </div>
-        {editing.overview ? (
-          <div className="flex flex-col gap-2">
-            <textarea
-              value={tempData.overview}
-              onChange={(e) => handleChange("overview", e.target.value)}
-              className="text-sm text-gray-600 border border-gray-300 rounded-md p-2 focus:outline-none focus:border-blue-500 min-h-24"
-              autoFocus
-            />
-            <div className="flex gap-2 justify-end">
-              <button 
-                className="px-2 py-1 bg-green-500 text-white rounded-md text-sm flex items-center gap-1"
-                onClick={() => handleSave("overview")}
-              >
-                <FaCheck className="w-3 h-3" /> Save
-              </button>
-              <button 
-                className="px-2 py-1 bg-red-500 text-white rounded-md text-sm flex items-center gap-1"
-                onClick={() => handleCancel("overview")}
-              >
-                <FaTimes className="w-3 h-3" /> Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-600">{propertyData.overview || "No overview provided"}</p>
-        )}
+       
       </div>
 
       {/* Description */}
@@ -767,10 +743,14 @@ export default function PropertyListing() {
           </div>
         )}
       </div>
-      <InfrastructureFeesModal 
+   { selectedPropertyId?  <InfrastructureFeesModalss
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-      />
+      />:
+       <InfrastructureFeesModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />}
     </div>
   );
 }

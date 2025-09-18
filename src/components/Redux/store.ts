@@ -56,6 +56,7 @@ import legalDashboardSliceReducer  from './legalDashboard/legalDashboardSlice'
 import toggleLatestReducer from './Properties/toggleLatestslice'
 import exportContractsReducer from './export/exportContractSlice'
 import itDashboardSliceReducer from './info-tech/itDashboardSlice'
+import deletepropertyDetailReducer from './Properties/deleteSliceDetails'
 
 export const store = configureStore({
   reducer: {
@@ -114,7 +115,8 @@ export const store = configureStore({
   legalDashboard:legalDashboardSliceReducer,
    toggleLatest: toggleLatestReducer,
    exportContracts:exportContractsReducer,
-   itDashboard:itDashboardSliceReducer
+   itDashboard:itDashboardSliceReducer,
+     deletepropertyDetail: deletepropertyDetailReducer,
   },
 });
 

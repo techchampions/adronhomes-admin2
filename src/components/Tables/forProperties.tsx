@@ -24,7 +24,7 @@ interface EdithBackgroung {
 
 export function EdithBackgroung({ children }: EdithBackgroung) {
   return (
-    <div className="bg-white rounded-[30px] w-full pt-[20px] md:pb-[42px] pb-[20px] lg:pt-[34px]  lg:pl-[42px]  lg:pr-[42px]  pl-[15px] pr-[15px] ">
+    <div className="bg-white rounded-[30px] w-full pt-[20px] md:pb-[42px] pb-[20px] lg:pt-[34px]  lg:pl-[42px]  lg:pr-[42px]  pl-[15px] pr-[15px]  mb-64">
       <div className="w-full">{children}</div>
     </div>
   );

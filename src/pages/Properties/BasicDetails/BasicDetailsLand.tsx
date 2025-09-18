@@ -9,15 +9,12 @@ import React, {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../components/input/inputtext";
-// import EnhancedOptionInputField from "../../../components/input/enhanced_drop_down"; // Updated import
 import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { formatToNaira } from "../../../utils/formatcurrency";
 import TagInputField from "../../../components/input/TagInputField";
-
-// Import the Redux actions and selectors
 import {
   fetchAllCountries,
   fetchCountryStates,
@@ -32,11 +29,11 @@ import {
   selectErrorStates,
 } from "../../../components/Redux/country/countrythunkand slice";
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
+import MultipleFileUploadField from "../../../components/input/multiplefile";
 
 const validationSchema = Yup.object().shape({
   propertyName: Yup.string().required("Property name is required"),
   propertyType: Yup.string().required("Property type is required"),
-  // category: Yup.string().required("Category is required"),
   price: Yup.number()
     .typeError("Price must be a number")
     .positive("Price must be positive")
@@ -48,7 +45,6 @@ const validationSchema = Yup.object().shape({
   address: Yup.string().required("Address is required"),
   country: Yup.string().required("Country is required"),
   state: Yup.string().required("State is required"),
-  // lga: Yup.string().required("LGA is required"),
   purpose: Yup.array()
     .of(Yup.string())
     .min(1, "At least one purpose is required")
@@ -56,118 +52,119 @@ const validationSchema = Yup.object().shape({
 });
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails } = useContext(PropertyContext)!;
-  const [initialLoad, setInitialLoad] = useState(true);
-  const [purpose, setPurpose] = useState<string[]>(formData.basicDetails.purpose || []);
-
+  const { formData, setBasicDetails,director_name,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
-  
-  // Get data from Redux store
+
+  const [purpose, setPurpose] = useState<string[]>(
+    formData.basicDetails.purpose || []
+  );
+  const [propertyFiles, setPropertyFiles] = useState<any[]>(
+    formData.basicDetails.propertyFiles || []
+  );
+
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-      // category: formData.basicDetails.category || "",
       purpose: purpose,
+      propertyFiles: propertyFiles,
     },
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails({
         ...values,
         purpose: purpose,
+        propertyFiles: propertyFiles,
       });
     },
+    enableReinitialize: true,
   });
-  
-  
+
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
 
-  const propertyTypeOptions = [
-    { value: "3", label: "Land" },
-  ];
+  const propertyTypeOptions = [{ value: "1", label: "Land" }];
 
-  const categoryOptions = [
-    { value: "residential", label: "Residential" },
-    { value: "commercial", label: "Commercial" },
-    { value: "agricultural", label: "Agricultural" },
-    { value: "industrial", label: "Industrial" },
-  ];
+  const states = useSelector((state: RootState) =>
+    selectCountryStates(state, formik.values.country)
+  );
+  const lgas = useSelector((state: RootState) =>
+    selectStateLGAs(state, formik.values.country, formik.values.state)
+  );
 
-  const locationTypeOptions = [
-    { value: "urban", label: "Urban" },
-    { value: "suburban", label: "Suburban" },
-    { value: "rural", label: "Rural" },
-  ];
-
-  const purposeOptions = [
-    { value: "bungalow", label: "Bungalow" },
-    { value: "bungalow_duplex", label: "Bungalow Duplex" },
-    { value: "single_family", label: "Single-Family Home" },
-    { value: "duplex", label: "Duplex" },
-    { value: "triplex", label: "Triplex" },
-    { value: "fourplex", label: "Fourplex" },
-    { value: "townhouse", label: "Townhouse" },
-    { value: "apartment", label: "Apartment" },
-    { value: "condo", label: "Condominium (Condo)" },
-    { value: "cottage", label: "Cottage" },
-    { value: "villa", label: "Villa" },
-    { value: "semi_detached", label: "Semi-Detached House" },
-  ];
-
-  // Format countries for dropdown with proper null checks
-  const countriesOptions = useMemo(() => 
-    (countries || [])
-      .map((country: any) => ({ 
-        value: country.name || '', 
-        label: country.name || '' 
-      }))
-      .sort((a, b) => (a.label || '').localeCompare(b.label || '')),
+  const countriesOptions = useMemo(
+    () =>
+      (countries || [])
+        .map((country: any) => ({
+          value: country.name || "",
+          label: country.name || "",
+        }))
+        .sort((a, b) => (a.label || "").localeCompare(b.label || "")),
     [countries]
   );
 
-  // Get states and LGAs based on selected values with proper null checks
-  const states = useSelector((state: RootState) => 
-    selectCountryStates(state, formik.values.country)
-  );
-  
-  const statesOptions = useMemo(() => 
-    (states || [])
-      .map((state: any) => ({ 
-        value: state.name || '', 
-        label: state.name || '' 
-      }))
-      .sort((a, b) => (a.label || '').localeCompare(b.label || '')),
+  const statesOptions = useMemo(
+    () =>
+      (states || [])
+        .map((state: any) => ({
+          value: state.name || "",
+          label: state.name || "",
+        }))
+        .sort((a, b) => (a.label || "").localeCompare(b.label || "")),
     [states]
   );
 
-  const lgas = useSelector((state: RootState) => 
-    selectStateLGAs(state, formik.values.country, formik.values.state)
-  );
-  
-  const lgaOptions = useMemo(() => 
-    lgas
-      .filter((lga) => lga?.name?.trim())
-      .map((lga) => ({ value: lga.name, label: lga.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)),
+  const lgaOptions = useMemo(
+    () =>
+      (lgas || [])
+        .filter((lga) => lga?.name?.trim())
+        .map((lga) => ({ value: lga.name, label: lga.name }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [lgas]
   );
 
   useEffect(() => {
-    if (initialLoad && formData.basicDetails) {
-      formik.setValues({
-        ...formData.basicDetails,
-        // category: formData.basicDetails.category || "",
-        purpose: formData.basicDetails.purpose || [],
-      });
-      setPurpose(formData.basicDetails.purpose || []);
-      setInitialLoad(false);
-    }
-  }, [formData.basicDetails, initialLoad]);
-
-  useEffect(() => {
     formik.setFieldValue("purpose", purpose);
   }, [purpose]);
+
+  useEffect(() => {
+    formik.setFieldValue("propertyFiles", propertyFiles);
+  }, [propertyFiles]);
+
+  useEffect(() => {
+    dispatch(fetchAllCountries());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (formik.values.country) {
+      dispatch(fetchCountryStates(formik.values.country));
+      dispatch(setSelectedCountry(formik.values.country));
+    } else {
+      dispatch(setSelectedCountry(null));
+    }
+  }, [formik.values.country, dispatch]);
+
+  useEffect(() => {
+    if (formik.values.country && formik.values.state) {
+      dispatch(
+        fetchStateLGAs({
+          countryName: formik.values.country,
+          stateName: formik.values.state,
+        })
+      );
+      dispatch(setSelectedState(formik.values.state));
+    } else {
+      dispatch(setSelectedState(null));
+    }
+  }, [formik.values.country, formik.values.state, dispatch]);
+
+  useEffect(() => {
+    if (formik.values.lga) {
+      dispatch(setSelectedLGA(formik.values.lga));
+    } else {
+      dispatch(setSelectedLGA(null));
+    }
+  }, [formik.values.lga, dispatch]);
 
   useImperativeHandle(ref, () => ({
     handleSubmit: async () => {
@@ -177,9 +174,9 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       if (hasErrors) {
         formik.setTouched(
           Object.keys(errors).reduce((acc, key) => {
-            acc[key] = true;
+            (acc as any)[key] = true;
             return acc;
-          }, {} as { [field: string]: boolean }),
+          }, {}),
           true
         );
         return false;
@@ -190,43 +187,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     },
     isValid: formik.isValid,
   }));
-
-  // Fetch countries on component mount
-  useEffect(() => {
-    dispatch(fetchAllCountries());
-  }, [dispatch]);
-
-  // Fetch states when country changes
-  useEffect(() => {
-    if (formik.values.country) {
-      dispatch(fetchCountryStates(formik.values.country));
-      dispatch(setSelectedCountry(formik.values.country));
-    } else {
-      dispatch(setSelectedCountry(null));
-    }
-  }, [formik.values.country, dispatch]);
-
-  // Fetch LGAs when state changes
-  useEffect(() => {
-    if (formik.values.country && formik.values.state) {
-      dispatch(fetchStateLGAs({ 
-        countryName: formik.values.country, 
-        stateName: formik.values.state 
-      }));
-      dispatch(setSelectedState(formik.values.state));
-    } else {
-      dispatch(setSelectedState(null));
-    }
-  }, [formik.values.country, formik.values.state, dispatch]);
-
-  // Set LGA when it changes
-  useEffect(() => {
-    if (formik.values.lga) {
-      dispatch(setSelectedLGA(formik.values.lga));
-    } else {
-      dispatch(setSelectedLGA(null));
-    }
-  }, [formik.values.lga, dispatch]);
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
@@ -239,6 +199,10 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
 
+  {selectedPropertyId&&<p className="text-base text-black">
+  <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
+</p>
+}
       <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
@@ -251,19 +215,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isSearchable={false}
       />
 
-      {/* Uncomment if you want to use the category field */}
-      {/* <EnhancedOptionInputField
-        label="Category"
-        placeholder="Select category"
-        name="category"
-        value={formik.values.category}
-        onChange={(value) => formik.setFieldValue("category", value)}
-        options={categoryOptions}
-        dropdownTitle="Categories"
-        error={formik.touched.category && formik.errors.category}
-        isSearchable={true}
-      /> */}
-
+      
       <InputField
         label="Price"
         placeholder="Enter price per unit"
@@ -277,7 +229,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         }}
         error={formik.touched.price && formik.errors.price}
       />
-
       <InputField
         label="Initial Deposit"
         placeholder="Enter initial deposit"
@@ -291,7 +242,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         }}
         error={formik.touched.initialDeposit && formik.errors.initialDeposit}
       />
-
       <InputField
         label="Address"
         placeholder="Enter address"
@@ -300,10 +250,11 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={formik.handleChange}
         error={formik.touched.address && formik.errors.address}
       />
-
       <EnhancedOptionInputField
         label="Country"
-        placeholder={loading.countries ? "Loading countries..." : "Select country"}
+        placeholder={
+          loading.countries ? "Loading countries..." : "Select country"
+        }
         name="country"
         value={formik.values.country}
         onChange={(value) => {
@@ -317,7 +268,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.countries}
         isSearchable={true}
       />
-
       <EnhancedOptionInputField
         label="State"
         placeholder={loading.states ? "Loading states..." : "Select state"}
@@ -334,7 +284,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.states}
         isSearchable={true}
       />
-
       {/* <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
@@ -348,7 +297,18 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.lgas}
         isSearchable={true}
       /> */}
-
+    <MultipleFileUploadField
+  label="Upload Files"
+  placeholder="Drag and drop or click to upload files"
+  name="propertyFiles"
+  multiple={true}
+  value={formik.values.propertyFiles} // File[] type
+  onChange={(files) => {
+    formik.setFieldValue("propertyFiles", files);
+    setPropertyFiles(files || []); // This now works perfectly
+  }}
+  error={formik.errors.propertyFiles}
+/>
       <TagInputField
         label="Purpose"
         placeholder="Add purpose (e.g., Bungalow)"
@@ -356,8 +316,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={(newPurpose) => setPurpose(newPurpose)}
         error={formik.touched.purpose && formik.errors.purpose}
       />
-
-      {/* Display error messages if any */}
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}
@@ -368,11 +326,11 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
           Error loading states: {errors.states.message}
         </div>
       )}
-      {errors.lgas && (
+      {/* {errors.lgas && (
         <div className="text-red-500 text-sm">
           Error loading LGAs: {errors.lgas.message}
         </div>
-      )}
+      )} */}
     </form>
   );
 });
