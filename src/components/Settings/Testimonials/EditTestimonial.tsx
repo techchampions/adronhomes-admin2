@@ -121,7 +121,8 @@ export default function EditTestimonial({
                 <SoosarInputField
                   icon={<FaYoutube />}
                   name="video_link"
-                  placeholder="Enter country Flag link "
+                  placeholder="Enter YouTube video link "
+
                 />
               </div>
 

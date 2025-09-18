@@ -14,6 +14,7 @@ import CreateTestimony from "./CreateTestimony";
 import DeleteTestimonial from "./DeleteTestimony";
 import { FaYoutube } from "react-icons/fa";
 import { PiImageBrokenDuotone } from "react-icons/pi";
+import { toast } from "react-toastify";
 
 const tabs = ["All", "Approved", "Pending"] as const;
 type Tab = (typeof tabs)[number];
@@ -85,8 +86,12 @@ const TestimonialList: React.FC = () => {
                 <div
                   className="flex gap-1 items-center text-red-300"
                   onClick={() => {
-                    setclient(item);
-                    setshowDeleteModal(true);
+                    if (testimonials.length > 6) {
+                      setclient(item);
+                      setshowDeleteModal(true);
+                    } else {
+                      toast.info("Must be atleast 5 testimonials");
+                    }
                   }}
                 >
                   <BiTrash size={15} />
