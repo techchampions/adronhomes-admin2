@@ -57,6 +57,7 @@ interface PersonnelsState {
   error: string | null;
   success: boolean;
   pagination: Pagination;
+  search: string;
 }
 
 const initialState: PersonnelsState = {
@@ -70,6 +71,7 @@ const initialState: PersonnelsState = {
     totalItems: 0,
     totalPages: 1,
   },
+  search: '',
 };
 
 const personnelsSlice = createSlice({
@@ -77,11 +79,17 @@ const personnelsSlice = createSlice({
   initialState,
   reducers: {
     resetPersonnelsState: () => initialState,
+
     setCurrentPage: (state, action: PayloadAction<number>) => {
       if (state.data) {
         state.data.current_page = action.payload;
       }
       state.pagination.currentPage = action.payload;
+    },
+
+    setPersonnelSearch: (state, action: PayloadAction<string>) => {
+      state.search = action.payload;
+      // state.pagination.currentPage = 1; 
     },
   },
   extraReducers: (builder) => {
@@ -97,6 +105,7 @@ const personnelsSlice = createSlice({
           state.loading = false;
           state.success = action.payload.success;
           state.data = action.payload.data;
+
           state.pagination = {
             currentPage: action.payload.data.current_page,
             perPage: action.payload.data.per_page,
@@ -107,14 +116,22 @@ const personnelsSlice = createSlice({
       )
       .addCase(personnels.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch personnels";
+        state.error =
+          action.payload?.message || "Failed to fetch personnels";
         state.success = false;
       });
   },
 });
 
-export const { resetPersonnelsState, setCurrentPage } = personnelsSlice.actions;
+// Export actions and reducer
+export const {
+  resetPersonnelsState,
+  setCurrentPage,
+  setPersonnelSearch,
+} = personnelsSlice.actions;
+
 export default personnelsSlice.reducer;
 
-export const selectPersonnelPagination = (state: { getpersonnel: PersonnelsState }) => 
+// Selector
+export const selectPersonnelPagination = (state: { getpersonnel: PersonnelsState }) =>
   state.getpersonnel.pagination;

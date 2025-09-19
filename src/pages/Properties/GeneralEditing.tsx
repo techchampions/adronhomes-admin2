@@ -437,42 +437,42 @@ export default function EditProperty() {
     galleryInputRefs.current[index]?.click();
 
   // Validation
-  const validateFormData = () => {
-    const errors: Record<string, string> = {};
-    const { basicDetails, specifications, landForm } = formData;
+  // const validateFormData = () => {
+  //   const errors: Record<string, string> = {};
+  //   const { basicDetails, specifications, landForm } = formData;
 
-    if (!basicDetails.propertyName) errors.name = "Property name is required";
-    if (!basicDetails.price) errors.price = "Price is required";
-    if (isLandProperty2) {
-      if (!landForm.landSize) errors.size = "Size is required";
-      if (!landForm.unitsAvailable)
-        errors.unitsAvailable = "Units available is required";
-      if (!landForm.description) errors.description = "Description is required";
-    } else {
-      if (!specifications.landSize) errors.size = "Size is required";
-      if (!specifications.bedrooms) errors.bedrooms = "Bedrooms is required";
-      if (!specifications.bathrooms) errors.bathrooms = "Bathrooms is required";
-      if (!specifications.toilets) errors.toilets = "Toilets is required";
-      if (!specifications.buildingCondition)
-        errors.buildingCondition = "Building condition is required";
-      if (!specifications.yearBuilt)
-        errors.yearBuilt = "Year built is required";
-    }
-    // if (!basicDetails.street_address) errors.street_address = "Street address is required";
-    if (!basicDetails.state) errors.state = "State is required";
-    if (!basicDetails.country) errors.country = "Country is required";
-    if (!formData.paymentStructure.paymentType)
-      errors.paymentType = "Payment type is required";
+  //   if (!basicDetails.propertyName) errors.name = "Property name is required";
+  //   if (!basicDetails.price) errors.price = "Price is required";
+  //   if (isLandProperty2) {
+  //     if (!landForm.landSize) errors.size = "Size is required";
+  //     if (!landForm.unitsAvailable)
+  //       errors.unitsAvailable = "Units available is required";
+  //     if (!landForm.description) errors.description = "Description is required";
+  //   } else {
+  //     if (!specifications.landSize) errors.size = "Size is required";
+  //     if (!specifications.bedrooms) errors.bedrooms = "Bedrooms is required";
+  //     if (!specifications.bathrooms) errors.bathrooms = "Bathrooms is required";
+  //     if (!specifications.toilets) errors.toilets = "Toilets is required";
+  //     if (!specifications.buildingCondition)
+  //       errors.buildingCondition = "Building condition is required";
+  //     if (!specifications.yearBuilt)
+  //       errors.yearBuilt = "Year built is required";
+  //   }
+  //   // if (!basicDetails.street_address) errors.street_address = "Street address is required";
+  //   if (!basicDetails.state) errors.state = "State is required";
+  //   if (!basicDetails.country) errors.country = "Country is required";
+  //   if (!formData.paymentStructure.paymentType)
+  //     errors.paymentType = "Payment type is required";
 
-    if (Object.keys(errors).length > 0) {
-      Object.values(errors).forEach((error) => toast.error(error));
-      return false;
-    }
-    return true;
-  };
+  //   if (Object.keys(errors).length > 0) {
+  //     Object.values(errors).forEach((error) => toast.error(error));
+  //     return false;
+  //   }
+  //   return true;
+  // };
 
   const submitForm = async (displayStatus: "draft" | "publish") => {
-    if (!validateFormData()) return;
+    // if (!validateFormData()) return;
 
     try {
       setIsSubmitting(true);
@@ -680,7 +680,7 @@ export default function EditProperty() {
         );
       }
 
-      // Perform cleanup and navigation after the entire process is complete.
+     
       resetFormData();
       dispatch(resetPropertyState());
       navigate("/properties");

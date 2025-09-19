@@ -106,10 +106,10 @@ export const customer = createAsyncThunk<
             identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
             device_id: "1010l0010l1",
           },
-          params: {
-            page,
-            search
-          }
+      params: search
+  ? { search } 
+  : { page, search },
+
         }
       );
       return response.data;
