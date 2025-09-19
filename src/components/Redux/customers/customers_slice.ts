@@ -8,7 +8,7 @@ interface CustomerState {
   loading: boolean;
   error: string | null;
   pagination: {
-    currentPage: number;
+    currentPage: any;
     totalPages: number;
     totalItems: number;
     perPage: number;
@@ -43,7 +43,7 @@ const customerSlice = createSlice({
     },
     setCustomersSearch: (state, action: PayloadAction<string>) => {
       state.search = action.payload;
-      state.pagination.currentPage = 1;
+      state.pagination.currentPage = "";
     },
   },
   extraReducers: (builder) => {
