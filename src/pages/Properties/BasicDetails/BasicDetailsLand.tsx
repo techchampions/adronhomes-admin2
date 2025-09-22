@@ -52,25 +52,21 @@ const validationSchema = Yup.object().shape({
 });
 
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails,director_name,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
+  const { formData, setBasicDetails, director_name, selectedPropertyId, previousPropType } = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
-
-  // const [purpose, setPurpose] = useState<string[]>(
-  //   formData.basicDetails.purpose || []
-  // );
 
   const formik = useFormik({
     initialValues: {
       ...formData.basicDetails,
-    purpose: formData.basicDetails.purpose || [],
-       propertyFiles: formData.basicDetails.propertyFiles || [],
+      purpose: formData.basicDetails.purpose || [],
+      propertyFiles: formData.basicDetails.propertyFiles || [],
     },
     validationSchema,
     onSubmit: (values) => {
       setBasicDetails({
         ...values,
-      purpose: formData.basicDetails.purpose || [],
-       propertyFiles: formData.basicDetails.propertyFiles || [],
+        purpose: values.purpose || [],
+        propertyFiles: values.propertyFiles || [],
       });
     },
     enableReinitialize: true,
@@ -119,14 +115,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         .sort((a, b) => a.label.localeCompare(b.label)),
     [lgas]
   );
-
-  // useEffect(() => {
-  //   formik.setFieldValue("purpose", purpose);
-  // }, [purpose]);
-
-  // useEffect(() => {
-  //   formik.setFieldValue("propertyFiles", propertyFiles);
-  // }, [propertyFiles]);
 
   useEffect(() => {
     dispatch(fetchAllCountries());
@@ -196,10 +184,12 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
 
-  {selectedPropertyId&&<p className="text-base text-black">
-  <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
-</p>
-}
+      {selectedPropertyId && (
+        <p className="text-base text-black">
+          <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
+        </p>
+      )}
+
       <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
@@ -212,7 +202,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isSearchable={false}
       />
 
-      
       <InputField
         label="Price"
         placeholder="Enter price per unit"
@@ -226,6 +215,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         }}
         error={formik.touched.price && formik.errors.price}
       />
+      
       <InputField
         label="Initial Deposit"
         placeholder="Enter initial deposit"
@@ -239,6 +229,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         }}
         error={formik.touched.initialDeposit && formik.errors.initialDeposit}
       />
+      
       <InputField
         label="Address"
         placeholder="Enter address"
@@ -247,6 +238,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={formik.handleChange}
         error={formik.touched.address && formik.errors.address}
       />
+      
       <EnhancedOptionInputField
         label="Country"
         placeholder={
@@ -265,6 +257,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.countries}
         isSearchable={true}
       />
+      
       <EnhancedOptionInputField
         label="State"
         placeholder={loading.states ? "Loading states..." : "Select state"}
@@ -281,39 +274,27 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.states}
         isSearchable={true}
       />
-      {/* <EnhancedOptionInputField
-        label="LGA"
-        placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
-        name="lga"
-        value={formik.values.lga}
-        onChange={(value) => formik.setFieldValue("lga", value)}
-        options={lgaOptions}
-        dropdownTitle="LGAs"
-        error={formik.touched.lga && formik.errors.lga}
-        disabled={!formik.values.state}
-        isLoading={loading.lgas}
-        isSearchable={true}
-      /> */}
-  <MultipleFileUploadField
+
+      <MultipleFileUploadField
         label="Upload Files"
         placeholder="Drag and drop or click to upload files"
         name="propertyFiles"
         multiple={true}
         onChange={(files) => {
-          // Update Formik state directly instead of using local state
           formik.setFieldValue("propertyFiles", files);
         }}
-        value={formik.values.propertyFiles || []} 
+        value={formik.values.propertyFiles || []}
         error={formik.touched.propertyFiles && formik.errors.propertyFiles}
       />
+      
       <TagInputField
         label="Purpose"
         placeholder="Add purpose (e.g., Bungalow)"
-        values={formik.values.purpose}
-    onChange={(newPurposes) => formik.setFieldValue("purpose", newPurposes)}
-
+        values={formik.values.purpose || []}
+        onChange={(purpose) => formik.setFieldValue("purpose", purpose)}
         error={formik.touched.purpose && formik.errors.purpose}
       />
+      
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}
@@ -324,7 +305,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
           Error loading states: {errors.states.message}
         </div>
       )}
-   
     </form>
   );
 });
