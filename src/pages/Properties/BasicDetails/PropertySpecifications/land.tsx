@@ -351,7 +351,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
         value={formik.values.description}
         onChange={formik.handleChange}
         required
-        rows={6}
+        // rows={6}
         error={
           formik.touched.description && formik.errors.description
             ? formik.errors.description
@@ -380,7 +380,7 @@ const LandForm = forwardRef<LandFormHandles>((props, ref) => {
         name="documents"
         value={formik.values.documents as unknown as string}
         onChange={(e) => formik.setFieldValue("documents", e.target.value)}
-        rows={6}
+        // rows={6}
       />
     </form>
   );
