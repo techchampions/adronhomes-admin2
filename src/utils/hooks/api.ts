@@ -354,7 +354,7 @@ export const getPropertyRequest = async (
 export const getPropertyRequestByID = async (
   id: number
 ): Promise<PropertyByIdRequestsResponse> => {
-  const response = await adronApi.get(`/director/properties/${id}/requests`);
+  const response = await adronApi.get(`/admin/properties/${id}/requests`);
   return response.data;
 };
 
@@ -368,7 +368,7 @@ export const getPropertyByID = async (
 export const getEnquiryByID = async (
   id?: number | string
 ): Promise<GetPropertyByIdResponse> => {
-  const response = await adronApi.get(`/director/request/${id}`);
+  const response = await adronApi.get(`/admin/request/${id}`);
   return response.data;
 };
 export const getPartnershipByID = async (
