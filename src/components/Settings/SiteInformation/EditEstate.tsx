@@ -119,6 +119,7 @@ export default function EditEstate({
                 </label>
                 <SoosarInputField
                   name="country_name"
+                  isReadOnly={true}
                   placeholder="Enter Country name"
                 />
               </div>
@@ -129,6 +130,7 @@ export default function EditEstate({
                 </label>
                 <SoosarInputField
                   name="state_name"
+                  isReadOnly={true}
                   placeholder="Enter State name"
                 />
               </div>
