@@ -98,7 +98,7 @@ export default function Header({
 
   return (
     <>
-      <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between items-start gap-4 p-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
+      <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between it pt-16 pb-4 px-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
 
         <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0 ">
 
