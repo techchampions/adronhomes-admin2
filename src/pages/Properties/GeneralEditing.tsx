@@ -227,8 +227,8 @@ export default function EditProperty() {
   }, [propertyId, dispatch, navigate]);
 
   useEffect(() => {
-    if (data?.properties?.[0]) {
-      const property = data.properties[0];
+    if (data?.properties) {
+      const property = data?.properties;
 
       setImagePreview(property.display_image);
       setGalleryPreviews(property?.photos || []);
@@ -238,8 +238,8 @@ export default function EditProperty() {
 
   // Pre-populate form with fetched property data
   useEffect(() => {
-    if (data?.properties?.[0]) {
-      const property = data.properties[0];
+    if (data?.properties) {
+      const property = data?.properties;
       getPropertyTypeLabelById(property.type?.id);
       setSelectedPropertyId(true);
       setpreviousPropType(property.type?.name);
@@ -858,7 +858,7 @@ export default function EditProperty() {
       await dispatch(publishDraft(parseInt(propertyId))).unwrap();
       toast.success(
         `Property ${
-          data?.properties?.[0]?.is_active === 1 ? "drafted" : "published"
+          data?.properties?.is_active === 1 ? "drafted" : "published"
         } successfully!`
       );
       dispatch(fetchPropertyData({ id: parseInt(propertyId) }));
@@ -881,7 +881,7 @@ export default function EditProperty() {
     return <div className="p-4 text-red-500">{error}</div>;
   }
 
-  if (!data?.properties?.[0]) {
+  if (!data?.properties) {
     return (
       <div className="flex items-center justify-center w-full h-screen">
         <NotFound text="Property not found" />

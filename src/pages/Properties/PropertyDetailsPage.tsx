@@ -49,12 +49,12 @@ const PropertyDetailsPage = () => {
     (File | string | null)[]
   >([]);
   // const { isLandProperty } = useContext(PropertyContext)!;
-  const isLandProperty = data?.properties?.[0]?.category === "estate";
+  const isLandProperty = data?.properties?.category === "estate";
 
   // Initialize form data and gallery previews
   useEffect(() => {
-    if (data?.properties?.[0]) {
-      const property = data.properties[0];
+    if (data?.properties) {
+      const property = data.properties;
       setFormData(property);
       setImagePreview(property.display_image);
       setGalleryPreviews(property.photos || []);
@@ -345,7 +345,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
       </div>
     );
   if (error) return <div className="p-4 text-red-500">{error}</div>;
-  if (!data?.properties?.[0]) {
+  if (!data?.properties) {
     return (
       <div className="flex items-center justify-center w-full h-screen">
         <NotFound text="Property not found" />
@@ -353,7 +353,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
     );
   }
 
-  const property = data.properties[0];
+  const property = data.properties;
 
   const handleGoBack = () => {
     navigate(-1);

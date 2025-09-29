@@ -5,7 +5,7 @@ import { SimilarPropertyUser } from "./types";
 
 interface PropertyState {
   data: {
-    properties: Property[];
+    properties: Property;
     saved_property_user: SavedPropertyUser[];
     similar_property_user: SimilarPropertyUser[];
   } | null;
