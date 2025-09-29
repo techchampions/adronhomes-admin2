@@ -308,7 +308,6 @@ export default function EditProperty() {
         });
       }
 
-      // Set land form for land properties
       if (property.category === "estate") {
         setLandForm({
           plotShape: property.shape || "",
