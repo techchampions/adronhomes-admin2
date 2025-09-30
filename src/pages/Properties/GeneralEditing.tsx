@@ -260,7 +260,7 @@ export default function EditProperty() {
         propertyFiles: property.property_files,
       });
 
-      if (property.category !== "estate") {
+      if (property.category !=="estate") {
         setBasicDetails({
           propertyName: property.name,
           propertyType: property.type?.id?.toString() || "",
@@ -273,7 +273,7 @@ export default function EditProperty() {
           state: property.state || "",
           lga: property.lga || "N/A",
           category: property.category || "estate",
-          category_id: property.category_id?.toString() || "",
+          category_id: property.category_id || "",
           propertyFiles: property.property_files,
         });
       }
@@ -525,6 +525,9 @@ export default function EditProperty() {
 
         formPayload.append("location_type", basicDetails.locationType);
         formPayload.append("category", isLandProperty2 ? "estate" : "house");
+        if(!isLandProperty2)
+        { formPayload.append("category_id", basicDetails.category_id);}
+
         {
           basicDetails.purpose.forEach((purpose, index) => {
             formPayload.append(`purpose[${index}]`, purpose);
