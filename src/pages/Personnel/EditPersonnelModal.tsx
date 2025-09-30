@@ -166,6 +166,7 @@ export default function EditPersonnelModal({
                 <InputField
                   label="Phone Number"
                   placeholder="Phone number"
+                  name="phoneNumber"
                   value={values.phoneNumber}
                   onChange={handleChange}
                   type="tel"

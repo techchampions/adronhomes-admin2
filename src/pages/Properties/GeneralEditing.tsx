@@ -487,47 +487,45 @@ export default function EditProperty() {
 
       // Handle Bulk or Regular Basic Details
       if (isBulk) {
-        if (bulkDetails.propertyName)
-          formPayload.append("name", bulkDetails.propertyName);
-        if (bulkDetails.propertyType)
-          formPayload.append("type", bulkDetails.propertyType);
-        if (bulkDetails.propertyUnits)
-          formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
-        if (bulkDetails.price) formPayload.append("price", bulkDetails.price);
-        if (bulkDetails.address)
-          formPayload.append("street_address", bulkDetails.address);
-        if (bulkDetails.city) formPayload.append("city", bulkDetails.city);
-        if (basicDetails.country)
-          formPayload.append("country", basicDetails.country);
-        if (basicDetails.state) formPayload.append("state", basicDetails.state);
-        if (basicDetails.lga) formPayload.append("lga", basicDetails.lga);
+        formPayload.append("name", bulkDetails.propertyName);
+
+        formPayload.append("type", bulkDetails.propertyType);
+
+        formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
+        formPayload.append("price", bulkDetails.price);
+
+        formPayload.append("street_address", bulkDetails.address);
+        formPayload.append("city", bulkDetails.city);
+
+        formPayload.append("country", basicDetails.country);
+        formPayload.append("state", basicDetails.state);
+        formPayload.append("lga", basicDetails.lga);
         formPayload.append("category", "bulk");
-        if (basicDetails.initialDeposit)
-          formPayload.append(
-            "initial_deposit",
-            basicDetails.initialDeposit || "0"
-          );
+
+        formPayload.append(
+          "initial_deposit",
+          basicDetails.initialDeposit || "0"
+        );
       } else {
-        if (basicDetails.propertyName)
-          formPayload.append("name", basicDetails.propertyName);
-        if (basicDetails.propertyType)
-          formPayload.append("type", basicDetails.propertyType);
-        if (basicDetails.price) formPayload.append("price", basicDetails.price);
-        if (basicDetails.initialDeposit)
-          formPayload.append(
-            "initial_deposit",
-            basicDetails.initialDeposit || "0"
-          );
-        if (basicDetails.country)
-          formPayload.append("country", basicDetails.country);
-        if (basicDetails.state) formPayload.append("state", basicDetails.state);
-        if (basicDetails.lga) formPayload.append("lga", basicDetails.lga);
-        if (basicDetails.address)
-          formPayload.append("street_address", basicDetails.address);
-        if (basicDetails.locationType)
-          formPayload.append("location_type", basicDetails.locationType);
+        formPayload.append("name", basicDetails.propertyName);
+
+        formPayload.append("type", basicDetails.propertyType);
+        formPayload.append("price", basicDetails.price);
+
+        formPayload.append(
+          "initial_deposit",
+          basicDetails.initialDeposit || "0"
+        );
+
+        formPayload.append("country", basicDetails.country);
+        formPayload.append("state", basicDetails.state);
+        formPayload.append("lga", basicDetails.lga);
+
+        formPayload.append("street_address", basicDetails.address);
+
+        formPayload.append("location_type", basicDetails.locationType);
         formPayload.append("category", isLandProperty2 ? "estate" : "house");
-        if (basicDetails.purpose && basicDetails.purpose.length > 0) {
+        {
           basicDetails.purpose.forEach((purpose, index) => {
             formPayload.append(`purpose[${index}]`, purpose);
           });
@@ -536,155 +534,142 @@ export default function EditProperty() {
 
       // Handle Land or House Specifications
       if (isLandProperty2) {
-        if (landForm.landSize) formPayload.append("size", landForm.landSize);
-        if (landForm.plotShape) formPayload.append("shape", landForm.plotShape);
-        if (landForm.topography)
-          formPayload.append("topography", landForm.topography);
+        formPayload.append("size", landForm.landSize);
+        formPayload.append("shape", landForm.plotShape);
+
+        formPayload.append("topography", landForm.topography);
         formPayload.append("category", "estate");
-        if (landForm.nearbyLandmarks && landForm.nearbyLandmarks.length > 0) {
-          formPayload.append(
-            "nearby_landmarks",
-            landForm.nearbyLandmarks.join(", ")
-          );
-        }
-        if (landForm.roadAccess && landForm.roadAccess.length > 0) {
-          formPayload.append("road_access", landForm.roadAccess.join(", "));
-        }
-        if (
-          landForm.titleDocumentType &&
-          landForm.titleDocumentType.length > 0
-        ) {
-          formPayload.append(
-            "title_document_type",
-            landForm.titleDocumentType.join(", ")
-          );
-        }
-        if (landForm.description)
-          formPayload.append("description", landForm.description);
-        if (landForm.unitsAvailable)
-          formPayload.append("number_of_unit", landForm.unitsAvailable);
-        if (landForm.director_id)
-          formPayload.append("director_id", landForm.director_id);
-        if (landForm.fencing) formPayload.append("fencing", landForm.fencing);
-        if (landForm.gatedEstate)
-          formPayload.append("gated_estate", landForm.gatedEstate);
-        if (landForm.contactNumber)
-          formPayload.append("contact_number", landForm.contactNumber);
-        if (landForm.whatsAppLink)
-          formPayload.append("whatsapp_link", landForm.whatsAppLink);
-        if (landForm.documents)
-          formPayload.append("property_agreement", landForm.documents);
+
+        formPayload.append(
+          "nearby_landmarks",
+          landForm.nearbyLandmarks.join(", ")
+        );
+
+        formPayload.append("road_access", landForm.roadAccess.join(", "));
+
+        formPayload.append(
+          "title_document_type",
+          landForm.titleDocumentType.join(", ")
+        );
+
+        formPayload.append("description", landForm.description);
+
+        formPayload.append("number_of_unit", landForm.unitsAvailable);
+
+        formPayload.append("director_id", landForm.director_id);
+        formPayload.append("fencing", landForm.fencing);
+
+        formPayload.append("gated_estate", landForm.gatedEstate);
+
+        formPayload.append("contact_number", landForm.contactNumber);
+
+        formPayload.append("whatsapp_link", landForm.whatsAppLink);
+
+        formPayload.append("property_agreement", landForm.documents);
       } else {
-        if (specifications.bedrooms)
-          formPayload.append("no_of_bedroom", specifications.bedrooms);
-        if (specifications.bathrooms)
-          formPayload.append("number_of_bathroom", specifications.bathrooms);
-        if (specifications.toilets)
-          formPayload.append("toilets", specifications.toilets);
-        if (specifications.landSize)
-          formPayload.append("size", specifications.landSize);
-        if (specifications.parkingSpaces)
-          formPayload.append("parking_space", specifications.parkingSpaces);
-        if (specifications.description)
-          formPayload.append("description", specifications.description);
-        if (specifications.yearBuilt)
-          formPayload.append("year_built", specifications.yearBuilt);
-        if (specifications.unitsAvailable)
-          formPayload.append("number_of_unit", specifications.unitsAvailable);
-        if (specifications.director_id)
-          formPayload.append("director_id", specifications.director_id);
-        if (
-          specifications.nearbyLandmarks &&
-          specifications.nearbyLandmarks.length > 0
-        ) {
-          formPayload.append(
-            "nearby_landmarks",
-            specifications.nearbyLandmarks.join(", ")
-          );
-        }
-        if (specifications.rentDuration)
-          formPayload.append("rent_duration", specifications.rentDuration);
-        if (specifications.buildingCondition)
-          formPayload.append(
-            "building_condition",
-            specifications.buildingCondition
-          );
-        if (specifications.whatsAppLink)
-          formPayload.append("whatsapp_link", specifications.whatsAppLink);
-        if (specifications.contactNumber)
-          formPayload.append("contact_number", specifications.contactNumber);
-        if (specifications.documents)
-          formPayload.append("property_agreement", specifications.documents);
-        if (
-          specifications.titleDocumentTypeProp &&
-          specifications.titleDocumentTypeProp.length > 0
-        ) {
-          formPayload.append(
-            "title_document_type",
-            specifications.titleDocumentTypeProp.join(", ")
-          );
-        }
+        formPayload.append("no_of_bedroom", specifications.bedrooms);
+
+        formPayload.append("number_of_bathroom", specifications.bathrooms);
+
+        formPayload.append("toilets", specifications.toilets);
+
+        formPayload.append("size", specifications.landSize);
+
+        formPayload.append("parking_space", specifications.parkingSpaces);
+
+        formPayload.append("description", specifications.description);
+
+        formPayload.append("year_built", specifications.yearBuilt);
+
+        formPayload.append("number_of_unit", specifications.unitsAvailable);
+
+        formPayload.append("director_id", specifications.director_id);
+
+        formPayload.append(
+          "nearby_landmarks",
+          specifications.nearbyLandmarks.join(", ")
+        );
+
+        // if (specifications.rentDuration)
+        formPayload.append("rent_duration", specifications.rentDuration);
+        // if (specifications.buildingCondition)
+        formPayload.append(
+          "building_condition",
+          specifications.buildingCondition
+        );
+        // if (specifications.whatsAppLink)
+        formPayload.append("whatsapp_link", specifications.whatsAppLink);
+        // if (specifications.contactNumber)
+        formPayload.append("contact_number", specifications.contactNumber);
+        // if (specifications.documents)
+        formPayload.append("property_agreement", specifications.documents);
+
+        formPayload.append(
+          "title_document_type",
+          specifications.titleDocumentTypeProp.join(", ")
+        );
       }
 
       // Append Features
-      if (features.features && features.features.length > 0) {
-        features.features.forEach((feature, index) => {
-          formPayload.append(`features[${index}]`, feature);
-        });
-      }
+
+      features.features.forEach((feature, index) => {
+        formPayload.append(`features[${index}]`, feature);
+      });
 
       // Append Media
-      if (media.images && media.images.length > 0) {
-        const displayImage = media.images[0];
-        if (displayImage instanceof File) {
-          formPayload.append("display_image", displayImage);
-        }
-        media.images.slice(1).forEach((image, index) => {
-          if (image instanceof File) {
-            formPayload.append(`photos[${index}]`, image);
-          }
-        });
+      // if (media.images && media.images.length > 0) {
+      const displayImage = media.images[0];
+      if (displayImage instanceof File) {
+        formPayload.append("display_image", displayImage);
       }
-      if (media.tourLink) formPayload.append("virtual_tour", media.tourLink);
-      if (media.videoLink) formPayload.append("video_link", media.videoLink);
-      if (media.mapUrl) formPayload.append("map_link", media.mapUrl);
+      media.images.slice(1).forEach((image, index) => {
+        if (image instanceof File) {
+          formPayload.append(`photos[${index}]`, image);
+        }
+      });
+      // }
+      formPayload.append("virtual_tour", media.tourLink);
+
+      formPayload.append("video_link", media.videoLink);
+      formPayload.append("map_link", media.mapUrl);
 
       // Append Payment and Discount Details
-      if (paymentStructure.paymentType)
-        formPayload.append("payment_type", paymentStructure.paymentType);
-      if (paymentStructure.paymentDuration)
-        formPayload.append(
-          "property_duration_limit",
-          paymentStructure.paymentDuration
-        );
-      if (
-        paymentStructure.paymentSchedule &&
-        paymentStructure.paymentSchedule.length > 0
-      ) {
+      // if (paymentStructure.paymentType)
+      formPayload.append("payment_type", paymentStructure.paymentType);
+      // if (paymentStructure.paymentDuration)
+      formPayload.append(
+        "property_duration_limit",
+        paymentStructure.paymentDuration
+      );
+      // if (
+      //   paymentStructure.paymentSchedule &&
+      //   paymentStructure.paymentSchedule.length > 0
+      // )
+      {
         paymentStructure.paymentSchedule.forEach((schedule, index) => {
           formPayload.append(`payment_schedule[${index}]`, schedule);
         });
       }
-      if (paymentStructure.feesCharges) {
-        const feesCharges = parseFloat(paymentStructure.feesCharges);
-        if (!isNaN(feesCharges)) {
-          formPayload.append("fees_charges", feesCharges.toString());
-        } else {
-          formPayload.append("fees_charges", "0");
-        }
+      // if (paymentStructure.feesCharges) {
+      const feesCharges = parseFloat(paymentStructure.feesCharges);
+      if (!isNaN(feesCharges)) {
+        formPayload.append("fees_charges", feesCharges.toString());
+      } else {
+        formPayload.append("fees_charges", "0");
       }
+      // }
 
       if (discount.discountName) {
         formPayload.append("is_discount", "1");
         formPayload.append("discount_name", discount.discountName);
-        if (discount.discountOff)
-          formPayload.append("discount_percentage", discount.discountOff);
-        if (discount.unitsRequired)
-          formPayload.append("discount_units", discount.unitsRequired);
-        if (discount.validFrom)
-          formPayload.append("discount_start_date", discount.validFrom);
-        if (discount.validTo)
-          formPayload.append("discount_end_date", discount.validTo);
+
+        formPayload.append("discount_percentage", discount.discountOff);
+
+        formPayload.append("discount_units", discount.unitsRequired);
+
+        formPayload.append("discount_start_date", discount.validFrom);
+
+        formPayload.append("discount_end_date", discount.validTo);
       } else {
         formPayload.append("is_discount", "0");
       }
