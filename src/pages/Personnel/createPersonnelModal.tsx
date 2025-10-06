@@ -10,6 +10,7 @@ import {
   personnels,
 } from "../../components/Redux/personnel/personnel_thunk";
 import { toast } from "react-toastify";
+import EnhancedOptionInputField from "../../components/input/enhancedSelecet";
 
 interface PersonnelModalProps {
   isOpen?: boolean;
@@ -32,9 +33,9 @@ const roleOptions = [
   { value: "3", label: "Director" },
   { value: "4", label: "Accountant" },
   { value: "5", label: "Hr" },
-  { value: '6', label: "Legal", },
-    { value: '7', label: "Info Tech", },
-    { value: '8', label: "Customers", }
+  { value: "6", label: "Legal" },
+  { value: "7", label: "Info Tech" },
+  { value: "8", label: "Client service" },
 ];
 
 const validationSchema = Yup.object().shape({
@@ -173,7 +174,7 @@ export default function PersonnelModal({
               </div>
 
               <div className="mb-2 sm:mb-3 md:mb-4">
-                <OptionInputField
+                <EnhancedOptionInputField
                   label="Role"
                   placeholder="Select role"
                   value={values.role}

@@ -634,7 +634,7 @@ export default function EditProperty() {
       formPayload.append("virtual_tour", media.tourLink);
 
       formPayload.append("video_link", media.videoLink);
-      formPayload.append("map_link", media.mapUrl);
+      formPayload.append("property_map", media.mapUrl);
 
       // Append Payment and Discount Details
       // if (paymentStructure.paymentType)

@@ -573,7 +573,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           formPayload.append("description", landForm.description);
         }
         if (landForm.unitsAvailable) {
-          const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
+          const unitsAvailable = parseInt(landForm.unitsAvailable) || 0;
           formPayload.append("number_of_unit", unitsAvailable.toString());
         }
         if (landForm.director_id) {
@@ -625,7 +625,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           formPayload.append("year_built", specifications.yearBuilt || "");
         }
         if (specifications.unitsAvailable) {
-          const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
+          const unitsAvailable = parseInt(specifications.unitsAvailable) || 0;
           formPayload.append("number_of_unit", unitsAvailable.toString());
         }
         if (specifications.director_id) {
@@ -681,7 +681,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("video_link", media.videoLink);
       }
       if (media.mapUrl) {
-        formPayload.append("map_link", media.mapUrl);
+        formPayload.append("property_map", media.mapUrl);
       }
 
       if (paymentStructure.paymentType) {

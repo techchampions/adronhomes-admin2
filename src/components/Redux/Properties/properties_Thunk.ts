@@ -167,7 +167,7 @@ export const fetchProperties = createAsyncThunk<
         },
         params: {
           page,
-          ...(search && { search }) // Only include search if it has value
+          ...(search && { search }) 
         }
       }
     );

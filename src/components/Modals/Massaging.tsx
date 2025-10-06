@@ -42,7 +42,7 @@ export default function MessageModal({ isOpen, setIsOpen ,handleSend,message, lo
         {/* User info */}
         <div className="px-5 pb-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden">
-            <img src={userImage?userImage:"/profile.svg"} alt="User avatar" className="w-full h-full object-cover" />
+            <img src={userImage?userImage:"/unknown.png"} alt="User avatar" className="w-full h-full object-cover" />
           </div>
           <span className="font-[350] text-dark text-lg max-w-xs truncate">{userNmae}</span>
         </div>
@@ -76,9 +76,9 @@ export default function MessageModal({ isOpen, setIsOpen ,handleSend,message, lo
   Send Message
 </button>
 
-            <button className="p-3 rounded-full bg-gray-100 hover:bg-gray-200">
+            {/* <button className="p-3 rounded-full bg-gray-100 hover:bg-gray-200">
               <GiPaperClip className="w-5 h-5 text-gray-600" />
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
