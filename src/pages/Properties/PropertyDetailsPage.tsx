@@ -21,6 +21,9 @@ import { resetPublishDraftState } from "../../components/Redux/Properties/publis
 import { EdithBackgroung } from "../../components/Tables/forProperties";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { string } from "yup";
+import { SafeDescriptionSection } from "./cleanup";
+import { formatDate } from "../../utils/formatdate";
+
 
 const PropertyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -677,53 +680,11 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                 </div>
               </div>
 
-              {/* Description Section */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                <div className="space-y-4">
-                  {/* Overview */}
-                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                    <label className="text-gray-700 font-medium w-full md:w-1/3">
-                      Overview:
-                    </label>
-                    {isEditing ? (
-                      <textarea
-                        name="overview"
-                        value={formData.overview || ""}
-                        onChange={handleInputChange}
-                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-32"
-                      />
-                    ) : (
-                      <div className="w-full md:w-2/3 flex justify-start">
-                        <div className="text-gray-900 break-words max-w-2xl text-left">
-                          {property.overview || "N/A"}
-                        </div>
-                      </div>
-                    )}
-                  </div> */}
+            
+<div className="space-y-4">
+  <SafeDescriptionSection htmlContent={property.description || ''} />
+</div>
 
-                  {/* Description */}
-                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                    <label className="text-gray-700 font-medium w-full md:w-1/3">
-                      Description:
-                    </label>
-                    {isEditing ? (
-                      <textarea
-                        name="description"
-                        value={formData.description || ""}
-                        onChange={handleInputChange}
-                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-32"
-                      />
-                    ) : (
-                      <div className="w-full md:w-2/3 flex justify-start">
-                        <div className="text-gray-900 break-words max-w-2xl text-left">
-                          {property.description || "N/A"}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
 
               {/* Address Section */}
               <div className="mb-8">
@@ -1159,7 +1120,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           />
                         ) : (
                           <p className="text-gray-900 w-full md:w-2/3">
-                            {property.discount_start_date || "N/A"}
+                            {formatDate(property.discount_start_date) || "N/A"}
                           </p>
                         )}
                       </div>
@@ -1177,7 +1138,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           />
                         ) : (
                           <p className="text-gray-900 w-full md:w-2/3">
-                            {property.discount_end_date || "N/A"}
+                            {formatDate(property.discount_end_date )|| "N/A"}
                           </p>
                         )}
                       </div>
