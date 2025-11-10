@@ -1,4 +1,4 @@
- import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useContext } from "react";
 import { Formik, Form } from "formik";
@@ -28,7 +28,7 @@ const roleRoutes: Record<number, string> = {
   8: "/client/customers",
 };
 
-export default function Login() {
+export default function LoginMarketers() {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, token, success, message, error } = useSelector(
     (state: RootState) => state.auth
@@ -45,7 +45,7 @@ export default function Login() {
   const initialValues = {
     email: "",
     password: "",
-    isAdmin: true,
+    isAdmin:false
   };
 
   const validationSchema = Yup.object({
@@ -59,7 +59,7 @@ export default function Login() {
 
   const onSubmit = async (values: typeof initialValues) => {
     try {
-      await dispatch(loginUser(values)).unwrap();
+      await dispatch(loginUser(values))
     } catch (err) {}
   };
 
@@ -96,10 +96,6 @@ export default function Login() {
     }
   }, [userError, userSuccess, user?.role, navigate]);
 
-  const handleMarketerLogin = () => {
-    navigate("/login-marketer");
-  };
-
   return (
     <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6">
       <div className="bg-white w-full max-w-[841px] flex flex-col items-center rounded-[20px] md:rounded-[50px] px-6 sm:px-12 md:px-[233px] py-8 sm:py-12 md:py-[54px] relative">
@@ -111,7 +107,7 @@ export default function Login() {
           />
         </div>
         <p className="text-dark font-bold text-2xl sm:text-3xl md:text-[36px] xl:text-[36px] lg:text-[36px] mt-4 sm:mt-[22px] mb-8 sm:mb-[56px] font-cormorant">
-          Admin Login
+          Marketer Login
         </p>
 
         <Formik
@@ -140,7 +136,6 @@ export default function Login() {
                     Forgot password?
                   </p>
                 </div>
-
                 <div className="w-full">
                   <button
                     type="submit"
@@ -151,19 +146,6 @@ export default function Login() {
                   >
                     {loading ? "Logging in..." : "Log In"}
                   </button>
-
-                  {/* Marketer Login Link */}
-                  <div className="text-center mt-4">
-                    <p className="text-sm text-gray-600">
-                      Are you a marketer?{" "}
-                      <span
-                        className="text-[#79B833] font-medium cursor-pointer hover:underline"
-                        onClick={handleMarketerLogin}
-                      >
-                        Login here
-                      </span>
-                    </p>
-                  </div>
                 </div>
               </Form>
             </div>

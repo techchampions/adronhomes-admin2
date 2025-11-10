@@ -58,6 +58,10 @@ export default function Personnel() {
     dispatch(setPersonnelSearch(term)); // Resets page to 1 inside reducer
     dispatch(personnels({ role: option.value, search: term }));
   };
+  useEffect(()=>{
+ dispatch(setPersonnelSearch(''))
+   dispatch(personnels({ role: option.value, search: "" }));
+  },[dispatch])
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
