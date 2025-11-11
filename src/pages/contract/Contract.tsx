@@ -82,6 +82,9 @@ export default function Contract() {
     }));
   };
 
+  useEffect (()=>{
+     dispatch(setSearchFilter(""));
+  },[dispatch])
   const handleSearch = useCallback(
     (query: string) => {
       setSearchQuery(query);

@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export interface LoginCredentials {
   email: string;
   password: string;
-}
+  isAdmin: boolean; }
 
 export interface User {
   id: string;
@@ -37,8 +37,12 @@ export const loginUser = createAsyncThunk<
   "auth/login",
   async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
+      // Determine the URL based on the isAdmin boolean
+      const loginType = credentials.isAdmin ? "admin" : "marketer";
+      const url = `${BASE_URL}/api/login?type=${loginType}`;
+
       const response = await api.post<LoginSuccessResponse>(
-        `${BASE_URL}/api/login`,
+        url,
         credentials,
         {
           headers: {
