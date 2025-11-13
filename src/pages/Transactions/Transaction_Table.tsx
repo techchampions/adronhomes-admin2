@@ -4,10 +4,11 @@ import Pagination from "../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 // import { selectUserPaymentsPagination, setCurrentPage } from "../../components/Redux/UserPayments/userPaymentsSlice";
 import { AppDispatch } from "../../components/Redux/store";
-import { selectUserPaymentsPagination, setCurrentPage } from "../../components/Redux/Payment/userPayment/ userPaymentsSlice";
-import { fetchUserPayments } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
+
 import PaymentModal from "../../components/Modals/Transaction";
 import { formatDate } from "../../utils/formatdate";
+import { selectUserTransactionsPagination, setCurrentPage } from "../../components/Redux/Payment/userPayment/ userPaymentsSlice";
+import { fetchUserTransactions } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
 // import PaymentModal from "../../components/Modals/PaymentModal";
 
 export interface PaymentData {
@@ -36,13 +37,13 @@ interface PaymentDatas {
 export default function PaymentTableComponent({ data,userId }: {data:any,userId:any}) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const pagination = useSelector(selectUserPaymentsPagination);
+  const pagination = useSelector(selectUserTransactionsPagination);
   const [selectedPayment, setSelectedPayment] = useState<PaymentData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchUserPayments({ userId: userId,page })); 
+    await dispatch(fetchUserTransactions({ userId: userId,page })); 
   };
 
   const handleRowClick = (payment: PaymentData) => {
@@ -83,7 +84,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                   <div className="truncate">Payment ID</div>
                 </th>
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[200px] max-w-[200px]">
-                  <div className="truncate">Payer Name</div>
+                  <div className="truncate">Description</div>
                 </th>
              
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[150px] max-w-[150px]">
@@ -108,7 +109,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                     <div className="truncate">{payment.id}</div>
                   </td>
                   <td className="py-4 pr-6 font-medium text-dark text-sm w-[200px] max-w-[200px]">
-                    <div className="truncate">{payment.customerName}</div>
+                    <div className="truncate">{payment.description}</div>
                   </td>
                  
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">

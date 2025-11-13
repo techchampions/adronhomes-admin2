@@ -1,4 +1,3 @@
-// types.ts
 export interface ErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
@@ -79,29 +78,24 @@ export interface Person {
   last_name: string;
 }
 
-export interface Payment {
+export interface Transaction {
   id: number;
   property_id: number | null;
   user_id: number;
-  property_plan_id: number | null;
-  order_id: number | null;
-  amount_paid: number;
-  purpose: string;
-  payment_type: string;
-  status: number;
-  reference: string;
-  is_coupon: number;
+  plan_id: number | null;
+  amount: number;
+  transaction_type: string;
   created_at: string;
   updated_at: string;
-  proof_of_payment: string | null;
-  bank_name: string | null;
+  status: number;
   description: string;
   marketer_id: number | null;
-  director_id: number | null;
-  property: Property | null;
-  plan: Plan | null;
-  marketer: Person | null;
-  director: Person | null;
+  transaction_method: string;
+  is_payment: number;
+  reference: string;
+  property?: Property | null;
+  plan?: Plan | null;
+  marketer?: Person | null;
 }
 
 export interface PaginationLink {
@@ -110,9 +104,9 @@ export interface PaginationLink {
   active: boolean;
 }
 
-export interface PaymentListData {
+export interface TransactionListData {
   current_page: number;
-  data: Payment[];
+  data: Transaction[];
   first_page_url: string;
   from: number | null;
   last_page: number;
@@ -126,8 +120,8 @@ export interface PaymentListData {
   total: number;
 }
 
-export interface PaymentsResponse {
-  status: string;
+export interface TransactionsResponse {
+  success: boolean;
   message: string;
-  data: PaymentListData;
+  data: TransactionListData;
 }
