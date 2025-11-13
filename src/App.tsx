@@ -70,6 +70,7 @@ import InfoTechSidebar from "./components/ItAdmin/sideNav";
 import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 import EditProperty from "./pages/Properties/GeneralEditing";
 import LoginMarketers from "./components/Login/loginForMarketers";
+import UserWallet from "./pages/UserWallet/UserWallet";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -342,7 +343,9 @@ const App = () => {
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
-
+     {/* user wallet */}
+   <Route path="wallet-Transactions" element={<UserWallet />} />
+     
               {/* Client Routes (Unprotected) */}
               <Route path="/client" element={<AuthGuard />}>
                 <Route
