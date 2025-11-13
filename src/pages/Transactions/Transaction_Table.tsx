@@ -9,7 +9,7 @@ import PaymentModal from "../../components/Modals/Transaction";
 import { formatDate } from "../../utils/formatdate";
 import { selectUserTransactionsPagination, setCurrentPage } from "../../components/Redux/Payment/userPayment/ userPaymentsSlice";
 import { fetchUserTransactions } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
-// import PaymentModal from "../../components/Modals/PaymentModal";
+
 
 export interface PaymentData {
   id: number;
