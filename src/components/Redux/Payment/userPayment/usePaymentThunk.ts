@@ -1,17 +1,16 @@
-// userPaymentsThunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 
 import { toast } from "react-toastify";
-import { ErrorResponse, PaymentsResponse } from "./type";
+import { ErrorResponse, TransactionsResponse } from "./type";
 import { RootState } from "../../store";
 import api from "../../middleware";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
 
-export const fetchUserPayments = createAsyncThunk<
-  PaymentsResponse,
+export const fetchUserTransactions = createAsyncThunk<
+  TransactionsResponse,
   { 
     userId: any;
     page?: number;
@@ -24,7 +23,7 @@ export const fetchUserPayments = createAsyncThunk<
     rejectValue: ErrorResponse;
   }
 >(
-  "userPaymentsbyid",
+  "userTransactionsbyid",
   async ({ userId, page = 1, per_page = 10, status = null, search = null }, { rejectWithValue }) => {
     const token = Cookies.get("token");
 
@@ -49,8 +48,8 @@ export const fetchUserPayments = createAsyncThunk<
         params.search = search;
       }
 
-      const response = await api.get<PaymentsResponse>(
-        `${BASE_URL}/api/admin/user-wallet-payment/${userId}`,
+      const response = await api.get<TransactionsResponse>(
+        `${BASE_URL}/api/admin/user-wallet-transaction/${userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -73,7 +72,7 @@ export const fetchUserPayments = createAsyncThunk<
       if (axiosError.response) {
         const errorMessage =
           axiosError.response.data.message ||
-          "Failed to fetch user payments";
+          "Failed to fetch user transactions";
         toast.error(errorMessage);
         return rejectWithValue(axiosError.response.data);
       }

@@ -1,27 +1,25 @@
-// userPaymentsSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PaymentListData, PaymentsResponse } from "./type";
-import { fetchUserPayments } from "./usePaymentThunk";
+import { TransactionListData, TransactionsResponse } from "./type";
+import { fetchUserTransactions } from "./usePaymentThunk";
 
-
-interface PaymentPaginationState {
+interface TransactionPaginationState {
   currentPage: number;
   perPage: number;
   totalItems: number;
   totalPages: number;
-  statusFilter: number | null;
+  statusFilter: number | null
   searchFilter: string | null;
 }
 
-interface UserPaymentsState {
-  data: PaymentListData | null;
+interface UserTransactionsState {
+  data: TransactionListData | null;
   loading: boolean;
   error: string | null;
   success: boolean;
-  pagination: PaymentPaginationState;
+  pagination: TransactionPaginationState;
 }
 
-const initialState: UserPaymentsState = {
+const initialState: UserTransactionsState = {
   data: null,
   loading: false,
   error: null,
@@ -36,11 +34,11 @@ const initialState: UserPaymentsState = {
   },
 };
 
-const userPaymentsSlice = createSlice({
-  name: "userPaymentsbyid",
+const userTransactionsSlice = createSlice({
+  name: "userTransactionsbyid",
   initialState,
   reducers: {
-    resetUserPaymentsState: () => initialState,
+    resetUserTransactionsState: () => initialState,
     setCurrentPage: (state, action: PayloadAction<number>) => {
       if (state.data) {
         state.data.current_page = action.payload;
@@ -62,16 +60,16 @@ const userPaymentsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserPayments.pending, (state) => {
+      .addCase(fetchUserTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
       .addCase(
-        fetchUserPayments.fulfilled,
-        (state, action: PayloadAction<PaymentsResponse>) => {
+        fetchUserTransactions.fulfilled,
+        (state, action: PayloadAction<TransactionsResponse>) => {
           state.loading = false;
-          state.success = action.payload.status === "success";
+          state.success = action.payload.success;
           state.data = action.payload.data;
           
           state.pagination = {
@@ -83,36 +81,36 @@ const userPaymentsSlice = createSlice({
           };
         }
       )
-      .addCase(fetchUserPayments.rejected, (state, action) => {
+      .addCase(fetchUserTransactions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch user payments";
+        state.error = action.payload?.message || "Failed to fetch user transactions";
         state.success = false;
       });
   },
 });
 
 export const { 
-  resetUserPaymentsState, 
+  resetUserTransactionsState, 
   setCurrentPage, 
   setStatusFilter, 
   setSearchFilter,
   setPerPage
-} = userPaymentsSlice.actions;
+} = userTransactionsSlice.actions;
 
-export default userPaymentsSlice.reducer;
+export default userTransactionsSlice.reducer;
 
 // Selectors
-export const selectUserPaymentsPagination = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsPagination = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.pagination;
 
-export const selectUserPaymentsList = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsList = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.data?.data;
 
-export const selectUserPaymentsLoading = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsLoading = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.loading;
 
-export const selectUserPaymentsError = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsError = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.error;
 
-export const selectUserPaymentsSuccess = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsSuccess = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.success;
