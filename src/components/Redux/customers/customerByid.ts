@@ -129,6 +129,7 @@ export interface CustomerByIdResponse {
   completed_property: PaginatedPlans; // Now includes pagination
   unique_customer_id:any
 }
+const savedUsername = localStorage.getItem("username") || "";
 
 // Error Response Interface
 export interface ErrorResponse {
@@ -154,6 +155,7 @@ interface CustomerByIdState {
     totalItems: number;
     totalPages: number;
   };
+  username:string
 }
 
 const initialState: CustomerByIdState = {
@@ -172,6 +174,7 @@ const initialState: CustomerByIdState = {
     totalItems: 0,
     totalPages: 1,
   },
+  username: savedUsername
 };
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -249,6 +252,17 @@ const customerByIdSlice = createSlice({
       state.activePlanPagination = initialState.activePlanPagination;
       state.completedPropertyPagination = initialState.completedPropertyPagination;
     },
+  setUsername: (state, action: PayloadAction<string>) => {
+  // Clear previous username
+  localStorage.removeItem("username");
+
+  // Save new username
+  localStorage.setItem("username", action.payload);
+
+  // Update redux state
+  state.username = action.payload;
+},
+
     setActivePlanCurrentPage: (state, action: PayloadAction<number>) => {
       state.activePlanPagination.currentPage = action.payload;
     },
@@ -291,6 +305,7 @@ export const {
   resetCustomerByIdState,
   setActivePlanCurrentPage,
   setCompletedPropertyCurrentPage,
+  setUsername
 } = customerByIdSlice.actions;
 
 export default customerByIdSlice.reducer;
@@ -303,3 +318,4 @@ export const selectActivePlanPagination = (state: RootState) => state.customerBy
 export const selectCompletedPropertyPagination = (state: RootState) => state.customerById.completedPropertyPagination;
 export const selectCustomerActivePlans = (state: RootState) => state.customerById.data?.active_plan.data || [];
 export const selectCustomerCompletedProperties = (state: RootState) => state.customerById.data?.completed_property.data || [];
+export const selectCustomerUsername=(state:RootState)=>state.customerById.username
