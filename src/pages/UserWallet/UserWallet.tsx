@@ -1,5 +1,5 @@
 // UserWallet.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import { AppDispatch, RootState } from "../../components/Redux/store";
@@ -13,7 +13,9 @@ import {
   selectWalletError,
   setCurrentPage,
   setSearchFilter,
-  setTransactionTypeFilter 
+  selectActiveTab,
+  setActiveTab
+//   setTransactionTypeFilter 
 } from "../../components/Redux/wallet/walllet_slice";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
@@ -25,34 +27,33 @@ export default function UserWallet() {
   const tabs = ["All Transactions", "Credit", "Debit"];
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState("All Transactions");
-
+//   const [activeTab, setActiveTab] = useState("All Transactions");
+const activeTab = useSelector(selectActiveTab);
   // Select data from wallet slice
   const transactions = useSelector(selectWalletTransactionsList);
   const summary = useSelector(selectWalletSummary);
   const pagination = useSelector(selectWalletPagination);
   const loading = useSelector(selectWalletLoading);
   const error = useSelector(selectWalletError);
-
+  const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     dispatch(fetchWalletTransactions({
       page: pagination.currentPage,
     //   per_page: pagination.perPage,
-    //   search: pagination.searchFilter,
+      search: searchQuery,
       type: activeTab === "All Transactions" ? null : activeTab.toLowerCase()
     }));
-  }, [dispatch, pagination.currentPage, pagination.perPage, pagination.searchFilter, activeTab]);
+  }, [dispatch, pagination.currentPage, pagination.perPage,searchQuery, activeTab]);
 
   const handleSearch = (searchTerm: string) => {
-    dispatch(setSearchFilter(searchTerm || null));
+    // dispatch(setSearchFilter(searchTerm ));
+    setSearchQuery(searchTerm)
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    dispatch(setTransactionTypeFilter(
-      tab === "All Transactions" ? null : tab.toLowerCase()
-    ));
-  };
+const handleTabChange = useCallback((tab:any) => {
+    dispatch(setActiveTab(tab)); // This resets page to 1 automatically
+  }, [dispatch]);
+
 const cardConfigs = useMemo(
   () => ({
     totalAmount: {
@@ -131,7 +132,7 @@ const cardConfigs = useMemo(
     currency={true}
     title={cardConfigs.active.title}
     value={cardConfigs.active.value}
-    change={cardConfigs.active.change}
+    change={`${cardConfigs.active.change}`}
   />
 </div>
 

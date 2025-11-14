@@ -138,7 +138,7 @@ const App = () => {
   useAxiosInterceptor();
 
   return (
-    <Provider store={store}>
+    <Provider store={store} >
       <QueryProvider>
         <PropertyProvider>
           <AppLayout>

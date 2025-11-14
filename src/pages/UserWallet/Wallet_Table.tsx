@@ -48,7 +48,7 @@ export default function WalletTableComponent({ data, pagination }: WalletTablePr
 
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchWalletTransactions({ page }));
+    // await dispatch(fetchWalletTransactions({ page }));
   };
 
   const handleRowClick = (transaction: WalletTransactionData) => {

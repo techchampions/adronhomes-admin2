@@ -1,10 +1,9 @@
 // Wallet_slice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {  WalletSuccessResponse } from './types';
 import { fetchWalletTransactions } from './wallet_thunk';
 // import { fetchWalletTransactions,  } from './Wallet_thunk';
 
-// Pagination state interface
 interface WalletPaginationState {
   currentPage: number;
   perPage: number;
@@ -36,10 +35,13 @@ interface WalletState {
       total: number;
     };
   } | null;
+     search: string;
   loading: boolean;
   error: string | null;
   success: boolean;
   pagination: WalletPaginationState;
+
+   activeTab: "All Transactions" | "Credit" | "Debit";
 }
 
 const initialState: WalletState = {
@@ -55,6 +57,8 @@ const initialState: WalletState = {
     searchFilter: null,
     transactionTypeFilter: null,
   },
+  activeTab: "All Transactions",
+   search: '',
 };
 
 const walletSlice = createSlice({
@@ -68,12 +72,18 @@ const walletSlice = createSlice({
       }
       state.pagination.currentPage = action.payload;
     },
+
+ 
+setActiveTab: (state, action: PayloadAction<"All Transactions" | "Credit" | "Debit">) => {
+  state.activeTab = action.payload;
+  state.pagination.currentPage = 1;
+ },
     setTransactionTypeFilter: (state, action: PayloadAction<string | null>) => {
       state.pagination.transactionTypeFilter = action.payload;
       state.pagination.currentPage = 1;
     },
-    setSearchFilter: (state, action: PayloadAction<string | null>) => {
-      state.pagination.searchFilter = action.payload;
+    setSearchFilter: (state, action: PayloadAction<string>) => {
+    state.search = action.payload;
       state.pagination.currentPage = 1;
     },
     setPerPage: (state, action: PayloadAction<number>) => {
@@ -121,7 +131,8 @@ export const {
   setTransactionTypeFilter, 
   setSearchFilter,
   setPerPage,
-  clearWalletError
+  clearWalletError,
+  setActiveTab
 } = walletSlice.actions;
 
 export default walletSlice.reducer;
@@ -133,11 +144,22 @@ export const selectWalletPagination = (state: { wallet: WalletState }) =>
 export const selectWalletTransactionsList = (state: { wallet: WalletState }) =>
   state.wallet.data?.list.data;
 
-export const selectWalletSummary = (state: { wallet: WalletState }) => ({
-  total_wallet_amount: state.wallet.data?.total_wallet_amount,
-  total_creditted: state.wallet.data?.total_creditted,
-  total_debitted: state.wallet.data?.total_debitted,
-});
+// export const selectWalletSummary = (state: { wallet: WalletState }) => ({
+//   total_wallet_amount: state.wallet.data?.total_wallet_amount,
+//   total_creditted: state.wallet.data?.total_creditted,
+//   total_debitted: state.wallet.data?.total_debitted,
+// });
+
+export const selectWalletSummary = createSelector(
+  (state: { wallet: WalletState }) => state.wallet.data?.total_wallet_amount,
+  (state: { wallet: WalletState }) => state.wallet.data?.total_creditted,
+  (state: { wallet: WalletState }) => state.wallet.data?.total_debitted,
+  (total_wallet_amount, total_creditted, total_debitted) => ({
+    total_wallet_amount,
+    total_creditted,
+    total_debitted,
+  })
+);
 
 export const selectWalletLoading = (state: { wallet: WalletState }) =>
   state.wallet.loading;
@@ -150,3 +172,5 @@ export const selectWalletSuccess = (state: { wallet: WalletState }) =>
 
 export const selectWalletData = (state: { wallet: WalletState }) =>
   state.wallet.data;
+export const selectActiveTab = (state: { wallet: WalletState }) => 
+  state.wallet.activeTab;

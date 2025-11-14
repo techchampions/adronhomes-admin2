@@ -10,6 +10,7 @@ import LoadingAnimations from "../../components/LoadingAnimations";
 import { fetchUserTransactions } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
 import TransactionTableComponent from "./Transaction_Table";
 import { useParams } from "react-router-dom";
+import { selectCustomerUsername } from "../../components/Redux/customers/customerByid";
 
 export default function UserTransactions() {
   const tabs = ["All Transactions"];
@@ -32,7 +33,7 @@ export default function UserTransactions() {
       }));
     }
   }, [dispatch, userId, activeTab]);
-
+  const userNmae = useSelector(selectCustomerUsername);
   const transformTransactionData = () => {
     if (!data?.data) return [];
 
@@ -64,8 +65,8 @@ export default function UserTransactions() {
   return (
     <div className="mb-[52px] relative">
       <Header 
-        title="User Transactions" 
-        subtitle="Manage user transaction history"
+        title={userNmae}
+        subtitle=" transaction history"
         showSearchAndButton={false}
         history={true}
       />

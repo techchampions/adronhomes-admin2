@@ -7,11 +7,12 @@ import { ErrorResponse, TransactionsResponse } from "./type";
 import { RootState } from "../../store";
 import api from "../../middleware";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
 
 export const fetchUserTransactions = createAsyncThunk<
   TransactionsResponse,
-  { 
+  {
     userId: any;
     page?: number;
     per_page?: number;
@@ -24,7 +25,10 @@ export const fetchUserTransactions = createAsyncThunk<
   }
 >(
   "userTransactionsbyid",
-  async ({ userId, page = 1, per_page = 10, status = null, search = null }, { rejectWithValue }) => {
+  async (
+    { userId, page = 1, per_page = 10, status = null, search = null },
+    { rejectWithValue }
+  ) => {
     const token = Cookies.get("token");
 
     if (!token) {
@@ -80,7 +84,7 @@ export const fetchUserTransactions = createAsyncThunk<
       const errorMessage = axiosError.request
         ? "No response from server. Please check your network connection."
         : "An unexpected error occurred. Please try again.";
-      
+
       toast.error(errorMessage);
       return rejectWithValue({
         message: errorMessage,
