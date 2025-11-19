@@ -328,10 +328,10 @@ export default function CustomerSinglePage() {
             onClick={() => {
               const path = location.pathname;
               const basePath = path.startsWith("/payments/customers")
-                ? "/payments/customers/transactions"
+                ? "/payments/customers/payment/"
                 : path.startsWith("/client/customers")
-                ? "/client/customers/transactions"
-                : "/customers/transactions";
+                ? "/client/customers/payment"
+                : "/customers/payment";
 
               navigate(`${basePath}/${id}`);
               if (data?.customer) {
@@ -341,7 +341,8 @@ export default function CustomerSinglePage() {
               }
             }}
           >
-            view Transactions
+           
+            View property payments
           </button>
           <MatrixCardGreen
             title="Total Amount Paid"
@@ -352,7 +353,7 @@ export default function CustomerSinglePage() {
 
         <div className=" w-full relative ">
           <button
-            className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1 px-2 rounded-full border"
+            className="absolute z-50 right-5 top-5 text-xs font-semibold  bg- py-1 px-2 rounded-full border"
             onClick={() => {
               const path = location.pathname;
               const basePath = path.startsWith("/payments/customers")
@@ -360,11 +361,15 @@ export default function CustomerSinglePage() {
                 : path.startsWith("/client/customers")
                 ? "/client/customers/transactions"
                 : "/customers/transactions";
-
+              if (data?.customer) {
+                const fullName =
+                  `${data.customer.first_name} ${data.customer.last_name}`.trim();
+                dispatch(setUsername(fullName || "Unknown Customer"));
+              }
               navigate(`${basePath}/${id}`);
             }}
           >
-            view Wallet Trnx
+         view Wallet Trnx
           </button>
           <MatrixCard
             title="Total Wallet Balance"

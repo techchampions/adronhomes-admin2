@@ -12,6 +12,8 @@ interface TransactionPaginationState {
 }
 
 interface UserTransactionsState {
+  stats: { total: number; approved: number; pending: number; amount_total: number; amount_approved: number; amount_pending: number; };
+  items: never[];
   data: TransactionListData | null;
   loading: boolean;
   error: string | null;

@@ -66,7 +66,7 @@ export default function UserTransactions() {
     <div className="mb-[52px] relative">
       <Header 
         title={userNmae}
-        subtitle=" transaction history"
+        subtitle=" wallet transaction history"
         showSearchAndButton={false}
         history={true}
       />

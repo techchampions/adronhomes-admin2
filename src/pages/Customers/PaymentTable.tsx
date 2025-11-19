@@ -1,7 +1,27 @@
 import React, { useState } from 'react';
-import TransactionModal from '../../components/Modals/Transaction';
+import PaymentModal from '../../components/Modals/PaymentModal';
 
 type PaymentStatus = 'Completed' | 'Pending' | 'Failed' | 'Missed';
+
+interface PropertyData {
+  name: string;
+  price: number;
+  size: string;
+  image: string;
+  address: string;
+}
+
+interface TransactionData {
+  from: string;
+  description: string;
+  type: string;
+  method: string;
+  fees: string;
+  reference: string;
+  status: string;
+  bankIcon: string;
+  property: PropertyData;
+}
 
 interface PaymentCardProps {
   title: string;
@@ -9,6 +29,7 @@ interface PaymentCardProps {
   amount: string;
   status: PaymentStatus;
   index: number;
+  transactionData: TransactionData;
 }
 
 const statusStyles: Record<PaymentStatus, { text: string; bg: string; border: string }> = {
@@ -33,25 +54,6 @@ const statusStyles: Record<PaymentStatus, { text: string; bg: string; border: st
     border: 'border-[#272727]',
   },
 };
-interface TransactionData {
-  from: string;
-  description: string;
-  type: string;
-  method: string;
-  fees: string;
-  reference: string;
-  status: string;
-  bankIcon: string;
-}
-
-interface PaymentCardProps {
-  title: string;
-  date: string;
-  amount: string;
-  status: PaymentStatus;
-  index: number;
-  transactionData: TransactionData;
-}
 
 export const PaymentCard: React.FC<PaymentCardProps> = ({
   title,
@@ -87,17 +89,11 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({
         <p className="text-dark font-bold text-base text-right truncate">{amount}</p>
       </div>
 
-      <TransactionModal
+      <PaymentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        // transactionData={transactionData}
+        paymentData={transactionData}
       />
     </>
   );
 };
-
-
-
-
-
-

@@ -17,7 +17,7 @@ export interface PaymentData {
   marketerInCharge: string;
   amount: string;
   status: "Approved" | "Pending" | "Rejected";
-  paymentDate: string;
+  transactionDate: string;
   description: string;
   payment_type: string;
   reference: string;
@@ -67,7 +67,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
       amount: payment.amount,
       reference: payment.reference,
       status: payment.status === "Rejected" ? "Failed" : payment.status,
-      paymentDate: payment.paymentDate,
+      transactionDate: payment.transactionDate,
       director: payment.director ? 
         `${payment.director.first_name} ${payment.director.last_name}` : 'N/A'
     };
@@ -130,7 +130,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                   </td>
                   <td className="py-4 pl-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">
                     <div className="truncate">
-                      {formatDate(payment.paymentDate)}
+                      {formatDate(payment.transactionDate)}
                     </div>
                   </td>
                 </tr>
