@@ -71,6 +71,7 @@ import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 import EditProperty from "./pages/Properties/GeneralEditing";
 import LoginMarketers from "./components/Login/loginForMarketers";
 import UserWallet from "./pages/UserWallet/UserWallet";
+import UserPaymentsPage from "./pages/Transactions/UserPaymentsPage";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -234,6 +235,11 @@ const App = () => {
                   path="/customers/transactions/:id"
                   element={<UserPayments />}
                 />
+   <Route
+               path="/customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
+                
                 <Route
                   path="/customers/wallet-transactions/:id"
                   element={<WalletTransactionsPage />}
@@ -296,6 +302,10 @@ const App = () => {
                     path="customers/transactions/:id"
                     element={<UserPayments />}
                   />
+                     <Route
+               path="customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
                   <Route
                     path="customers/wallet-transactions/:id"
                     element={<WalletTransactionsPage />}
@@ -357,6 +367,10 @@ const App = () => {
                 <Route
                   path="customers/transactions/:id"
                   element={<UserPayments />}
+                />
+                   <Route
+               path="customers/payment/:id"
+                  element={<UserPaymentsPage />}
                 />
                 <Route
                   path="customers/wallet-transactions/:id"
