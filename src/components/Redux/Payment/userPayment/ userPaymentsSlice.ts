@@ -7,8 +7,7 @@ interface TransactionPaginationState {
   perPage: number;
   totalItems: number;
   totalPages: number;
-  statusFilter: number | null
-  searchFilter: string | null;
+  
 }
 
 interface UserTransactionsState {
@@ -31,9 +30,16 @@ const initialState: UserTransactionsState = {
     perPage: 10,
     totalItems: 0,
     totalPages: 1,
-    statusFilter: null,
-    searchFilter: null,
   },
+  stats: {
+    total: 0,
+    approved: 0,
+    pending: 0,
+    amount_total: 0,
+    amount_approved: 0,
+    amount_pending: 0
+  },
+  items: []
 };
 
 const userTransactionsSlice = createSlice({
@@ -47,14 +53,7 @@ const userTransactionsSlice = createSlice({
       }
       state.pagination.currentPage = action.payload;
     },
-    setStatusFilter: (state, action: PayloadAction<number | null>) => {
-      state.pagination.statusFilter = action.payload;
-      state.pagination.currentPage = 1;
-    },
-    setSearchFilter: (state, action: PayloadAction<string | null>) => {
-      state.pagination.searchFilter = action.payload;
-      state.pagination.currentPage = 1;
-    },
+  
     setPerPage: (state, action: PayloadAction<number>) => {
       state.pagination.perPage = action.payload;
       state.pagination.currentPage = 1;
@@ -94,8 +93,6 @@ const userTransactionsSlice = createSlice({
 export const { 
   resetUserTransactionsState, 
   setCurrentPage, 
-  setStatusFilter, 
-  setSearchFilter,
   setPerPage
 } = userTransactionsSlice.actions;
 

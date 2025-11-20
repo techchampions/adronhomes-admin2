@@ -15,8 +15,9 @@ interface PaymentData {
   amount: string;
   reference: string;
   status: string;
-  transactionDate: string;
+  transactionDate: any;
   director: string;
+  
 }
 
 interface PaymentModalProps {
