@@ -38,7 +38,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
 
   const handlePageChange = async (page: any) => {
     await dispatch(setCustomersPage(page));
-    await dispatch(customer(page));
+    // await dispatch(customer(page));
   };
   const navigate = useNavigate();
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import { AppDispatch, RootState } from "../../components/Redux/store";
@@ -18,6 +18,7 @@ export default function UserTransactions() {
   const [activeTab, setActiveTab] = useState("All Transactions");
   const { id } = useParams<{ id: string }>();
   const [userId, setUserId] = useState(id); 
+  const [searching, setSearching] =useState("")
 
   const { data, loading, error, pagination } = useSelector(
     (state: RootState) => state.userPayments
@@ -26,13 +27,17 @@ export default function UserTransactions() {
   useEffect(() => {
     if (userId) {
       dispatch(fetchUserTransactions({ 
+        search:searching,
         userId,
         status: activeTab === "Approved" ? 1 : 
                 activeTab === "Rejected" ? 2 : 
                 activeTab === "Pending" ? 0 : null
       }));
     }
-  }, [dispatch, userId, activeTab]);
+  }, [dispatch, userId, activeTab,searching]);
+  const handleSearch=useCallback((value:any)=>{
+setSearching(value)
+  },[])
   const userNmae = useSelector(selectCustomerUsername);
   const transformTransactionData = () => {
     if (!data?.data) return [];
@@ -76,6 +81,7 @@ export default function UserTransactions() {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={(tab) => setActiveTab(tab)}
+          onSearch={handleSearch}
         >
           {loading ? (
             <div className="absolute top-96 left-96 right-96">
