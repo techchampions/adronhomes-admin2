@@ -21,6 +21,12 @@ export default function Customers() {
   useEffect(() => {
     dispatch(customer({ page: pagination.currentPage, search }));
   }, [dispatch, pagination.currentPage, search]);
+  useEffect(() => {
+    return () => {
+      dispatch(setCustomersSearch(""));
+    };
+  }, [dispatch]);
+
  const customersModalRef = useRef<ExportModalRef>(null);
    const openCustomersModal = () => {
     if (customersModalRef.current) {

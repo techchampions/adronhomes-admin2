@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -25,7 +25,7 @@ export default function UserPaymentsPage({
   const paymentStats = useSelector(selectPaymentStats);
   const loading = useSelector(selectUserPaymentsLoading);
   const error = useSelector(selectUserPaymentsError);
-
+const [searching, setSearching] =useState("")
   const tabs = ["Payment History"];
   const [activeTab] = React.useState(tabs[0]);
 const userId=(id)
@@ -35,13 +35,19 @@ const userId=(id)
         fetchUserPayments({
           userId: userId,
           page: 1,
+          Search:searching
         })
       );
     }
-  }, [dispatch, userId]);
+  }, [dispatch, userId,searching]);
 
   // const formattedUserName = userName || `User ${userId}`;
-
+ const handleSearch = useCallback(
+    (value: string) => {
+     setSearching(value)
+    },
+    [dispatch]
+  );
   const stats = paymentStats || {
     total: 0,
     approved: 0,
@@ -80,7 +86,7 @@ const userId=(id)
 
       {/* Table */}
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        <ReusableTable searchPlaceholder="Search payments..." tabs={tabs} activeTab={activeTab} showTabs={false}>
+        <ReusableTable searchPlaceholder="Search payments..." tabs={tabs} activeTab={activeTab} showTabs={false}     onSearch={handleSearch}>
           {loading && !paymentStats ? (
             <div className="flex justify-center items-center py-16">
               <LoadingAnimations loading={loading} />

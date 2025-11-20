@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import api from "../../middleware";
 import { RootState } from "../../store";
+// import { Search } from "lucide-react";
 
 export interface NameData {
   id: number;
@@ -84,6 +85,7 @@ export interface ErrorResponse {
 export interface FetchPaymentsArgs {
     userId: any;
     page?: number;
+    Search?:any
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -94,7 +96,7 @@ export const fetchUserPayments = createAsyncThunk<
   { rejectValue: ErrorResponse; state: RootState }
 >(
   "paymentsid/fetchUserPayments",
-  async ({ userId, page = 1 }, { rejectWithValue }) => {
+  async ({ userId, page = 1,Search=null }, { rejectWithValue }) => {
     const token = Cookies.get("token");
 
     if (!token) {
@@ -110,6 +112,7 @@ export const fetchUserPayments = createAsyncThunk<
           params: {
             user_id: userId,
             page: page,
+            Search:Search
           },
           headers: {
             Authorization: `Bearer ${token}`,

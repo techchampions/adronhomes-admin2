@@ -12,10 +12,12 @@ interface PaginationState {
 interface UserPaymentsState {
   summary: Omit<PaymentSummary, 'list'> | null;
   payments: PaymentItem[];
+  filteredPayments: PaymentItem[]; // New state for search results
   pagination: PaginationState;
   loading: boolean;
   error: string | null;
   success: boolean;
+  searchQuery: string; // New state for search term
 }
 
 const initialPagination: PaginationState = {
@@ -28,17 +30,37 @@ const initialPagination: PaginationState = {
 const initialState: UserPaymentsState = {
   summary: null,
   payments: [],
+  filteredPayments: [],
   pagination: initialPagination,
   loading: false,
   error: null,
   success: false,
+  searchQuery: "",
 };
 
 const userPaymentsSlice = createSlice({
-  name: "user_paymentsss",
+  name: "user_payments",
   initialState,
   reducers: {
     resetUserPaymentsState: () => initialState,
+    
+    // New reducer for search
+setSearchQuery: (state, action: PayloadAction<string>) => {
+  state.searchQuery = action.payload;
+  if (!action.payload) {
+    state.filteredPayments = state.payments;
+  } else {
+    const query = action.payload.toLowerCase();
+    state.filteredPayments = state.payments.filter(payment => {
+      return Object.values(payment).some(value => 
+        value !== null &&
+        value !== undefined &&
+        value.toString().toLowerCase().includes(query)
+      );
+    });
+  }
+},
+
   },
   extraReducers: (builder) => {
     builder
@@ -54,31 +76,18 @@ const userPaymentsSlice = createSlice({
           state.success = action.payload.success;
           state.error = null;
 
-          console.log('🔄 Slice - Full API Response:', action.payload);
-          
           const { payments } = action.payload.data;
-          
-          // Extract summary data (excluding list)
           const { list, ...summary } = payments;
-          
-          console.log('📊 Slice - Summary:', summary);
-          console.log('📋 Slice - List data:', list.data);
-          console.log('🔢 Slice - Number of items:', list.data.length);
 
           state.summary = summary;
           state.payments = list.data || [];
+          state.filteredPayments = list.data || []; // Initialize filteredPayments
           state.pagination = {
               currentPage: list.current_page || 1,
               lastPage: list.last_page || 1,
               total: list.total || 0,
               perPage: list.per_page || 50,
           };
-
-          console.log('✅ Slice - Final state:', {
-            paymentsCount: state.payments.length,
-            summary: state.summary,
-            pagination: state.pagination
-          });
         }
       )
       .addCase(fetchUserPayments.rejected, (state, action) => {
@@ -87,19 +96,18 @@ const userPaymentsSlice = createSlice({
         state.error = action.payload?.message || "Failed to fetch user payments.";
         state.summary = null;
         state.payments = [];
+        state.filteredPayments = [];
         state.pagination = initialPagination;
-        
-        console.log('❌ Slice - Error:', action.payload);
       });
   },
 });
 
-export const { resetUserPaymentsState } = userPaymentsSlice.actions;
+export const { resetUserPaymentsState, setSearchQuery } = userPaymentsSlice.actions;
 export default userPaymentsSlice.reducer;
 
-// Updated selectors with proper typing
+// Selectors
 export const selectUserPayments = (state: RootState) => 
-  (state as any).user_payments?.payments || [];
+  (state as any).user_payments?.filteredPayments || [];
 
 export const selectPaymentStats = (state: RootState) =>
   (state as any).user_payments?.summary || null;
@@ -112,3 +120,6 @@ export const selectUserPaymentsError = (state: RootState) =>
 
 export const selectUserPaymentsPagination = (state: RootState) =>
   (state as any).user_payments?.pagination || initialPagination;
+
+export const selectUserPaymentsSearchQuery = (state: RootState) =>
+  (state as any).user_payments?.searchQuery || "";
