@@ -13,8 +13,9 @@ export interface WalletTransactionData {
   customerName: string;
   amount: string;
   status: any
-  transactionDate: string;
+  transactionDate: any;
   description: string;
+  // transactionDate:any
   transactionType: "credit" | "debit";
   reference: string;
   transactionMethod: string;
@@ -73,6 +74,7 @@ export default function WalletTableComponent({ data, pagination }: WalletTablePr
       reference: transaction.reference,
       status: transaction.status,
       paymentDate: transaction.transactionDate,
+      transactionDate:transaction.transactionDate,
       director: 'N/A',
       user: transaction.user ? {
         name: transaction.customerName,
