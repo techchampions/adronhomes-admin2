@@ -28,8 +28,11 @@ const DigitsInfo = () => {
   };
 
   const validationSchema = Yup.object().shape({
-    phoneNumber: Yup.string().required("Phone No. is required"),
-    email: Yup.string().required("Email is required"),
+    properties: Yup.string().required("required"),
+    nomOfClients: Yup.string().required("required"),
+    team: Yup.string().required("required"),
+    location: Yup.string().required("required"),
+    exp: Yup.string().required("required"),
   });
   if (isLoading) {
     return (
