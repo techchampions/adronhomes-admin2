@@ -34,7 +34,7 @@ export interface GetPropertyByIdResponse {
   status: string;
   message: string;
   data: {
-    properties: Property[];
+    properties: Property;
   };
 }
 

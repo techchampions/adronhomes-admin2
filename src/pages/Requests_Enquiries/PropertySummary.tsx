@@ -1,16 +1,21 @@
 import React from "react";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaDumbbell, FaMapMarkerAlt } from "react-icons/fa";
 import { GiStreetLight } from "react-icons/gi";
 import { useGetPropertyByID } from "../../utils/hooks/query";
 import SmallLoader from "../../components/SmallLoader";
 import { formatToNaira } from "../../utils/formatcurrency";
 import { TfiRulerAlt2 } from "react-icons/tfi";
+import { Cctv } from "lucide-react";
 type Prop = {
   id?: number | string;
 };
 const PropertySummary: React.FC<Prop> = ({ id }) => {
   const { data, isError, isLoading } = useGetPropertyByID(id);
-  const property = data?.data.properties[0];
+  const property = data?.data.properties;
+  const desiredFeatures = ["Gym", "CCTV", "Street Light"];
+  const features = data?.data.properties.features.filter((feature) =>
+    desiredFeatures.includes(feature)
+  );
   if (isLoading) return <SmallLoader />;
   return (
     <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -30,19 +35,20 @@ const PropertySummary: React.FC<Prop> = ({ id }) => {
           </p>
           <div className="flex items-center text-sm md:text-xs mt-2 justify-between font-bold text-gray-500 gap-4">
             <span className="flex items-center gap-1 truncate">
-              <TfiRulerAlt2 />{" "}
-              {/* <img src="/ruler.svg" width={14} height={14} alt="dumbbell" /> */}
-              {property?.size}
+              <TfiRulerAlt2 /> {property?.size}
             </span>
-            <span className="flex items-center gap-1 truncate">
-              <GiStreetLight />
-              Str Light
-            </span>
-            <span className="flex items-center gap-1 truncate">
-              {/* <FaDumbbell /> */}
-              <img src="/dumbbell.svg" width={18} height={18} alt="dumbbell" />
-              Gym
-            </span>
+            {features?.map((feature, i) => (
+              <span className="flex items-center gap-1 truncate">
+                {feature === "Gym" ? (
+                  <FaDumbbell size={17} />
+                ) : feature === "Street Light" ? (
+                  <GiStreetLight size={17} />
+                ) : (
+                  <Cctv size={17} />
+                )}
+                {feature}
+              </span>
+            ))}
             <div className="flex items-center gap-1 text-xs ">
               {/* {property?.type} */}
             </div>
