@@ -59,6 +59,7 @@ import itDashboardSliceReducer from './info-tech/itDashboardSlice'
 import deletepropertyDetailReducer from './Properties/deleteSliceDetails'
 import  walletslice from "./wallet/walllet_slice"
 import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
+import passwordResetReducer from "./passwordRese/passwordReset_slice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -120,7 +121,7 @@ export const store = configureStore({
      deletepropertyDetail: deletepropertyDetailReducer,
      wallet:walletslice,
 user_payments: userPaymentsReducers,
-  },
+    passwordReset: passwordResetReducer,  },
 });
 
 export type AppDispatch = typeof store.dispatch;
