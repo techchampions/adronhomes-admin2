@@ -64,17 +64,16 @@ export interface PersonnelsResponse {
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export const personnels = createAsyncThunk<
   PersonnelsResponse, 
-  { role: number },  
+  { role: number; search?: string },  // <-- include search
   {
     state: RootState;
     rejectValue: ErrorResponse;
   }
 >(
   "personnels/fetch",
-  async ({ role }, { rejectWithValue, getState }) => { // Destructure role from the first argument
+  async ({ role, search }, { rejectWithValue, getState }) => {
     const token = Cookies.get("token");
     const state = getState();
     const currentPage = state.getpersonnel?.data?.current_page || 1;
@@ -83,6 +82,14 @@ export const personnels = createAsyncThunk<
       return rejectWithValue({
         message: "No authentication token found. Please login again.",
       });
+    }
+
+    // Build query parameters
+    const params: Record<string, any> = { role };
+    if (search) {
+      params.search = search;
+    } else {
+      params.page = currentPage;
     }
 
     try {
@@ -95,10 +102,7 @@ export const personnels = createAsyncThunk<
             identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
             device_id: "1010l0010l1",
           },
-          params: {
-            page: currentPage,
-            role: role, // Pass the role from the parameters
-          },
+          params, // use the built params object
         }
       );
       return response.data;
@@ -127,6 +131,7 @@ export const personnels = createAsyncThunk<
     }
   }
 );
+
 
 // Rename your interface to avoid conflict with built-in FormData
 interface PersonnelFormData {

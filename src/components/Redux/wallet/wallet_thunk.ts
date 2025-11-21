@@ -1,34 +1,38 @@
+// wallet_thunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
-
 import { toast } from "react-toastify";
-import { ErrorResponse, TransactionsResponse } from "./type";
-import { RootState } from "../../store";
-import api from "../../middleware";
+// import { RootState } from "../../store";
+// import api from "../../middleware";
+// import { WalletSuccessResponse, ErrorResponse } from "./wallet_types";
+import { RootState } from "../store";
+import { ErrorResponse } from "../SavedPropertyUser_thunk";
+import { WalletSuccessResponse } from "./types";
+import api from "../middleware";
 
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://adron.microf10.sg-host.com";
 
-export const fetchUserTransactions = createAsyncThunk<
-  TransactionsResponse,
-  {
-    userId: any;
+export const fetchWalletTransactions = createAsyncThunk<
+  WalletSuccessResponse,
+  { 
     page?: number;
     per_page?: number;
-    status?: number | null;
     search?: string | null;
+    type?: string | null;
   },
   {
     state: RootState;
     rejectValue: ErrorResponse;
   }
 >(
-  "userTransactionsbyid",
-  async (
-    { userId, page = 1, per_page = 10, status = null, search = null },
-    { rejectWithValue }
-  ) => {
+  "wallet/fetchTransactions",
+  async ({ 
+    page = 1, 
+    per_page = 20, 
+    search = null, 
+    type = null 
+  }, { rejectWithValue }) => {
     const token = Cookies.get("token");
 
     if (!token) {
@@ -44,16 +48,16 @@ export const fetchUserTransactions = createAsyncThunk<
         per_page,
       };
 
-      if (status !== null) {
-        params.status = status;
-      }
-
       if (search) {
         params.search = search;
       }
 
-      const response = await api.get<TransactionsResponse>(
-        `${BASE_URL}/api/admin/user-wallet-transaction/${userId}`,
+      if (type) {
+        params.type = type;
+      }
+
+      const response = await api.get<WalletSuccessResponse>(
+        `${BASE_URL}/api/admin/transactions`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +80,7 @@ export const fetchUserTransactions = createAsyncThunk<
       if (axiosError.response) {
         const errorMessage =
           axiosError.response.data.message ||
-          "Failed to fetch user transactions";
+          "Failed to fetch wallet transactions";
         toast.error(errorMessage);
         return rejectWithValue(axiosError.response.data);
       }
@@ -84,7 +88,7 @@ export const fetchUserTransactions = createAsyncThunk<
       const errorMessage = axiosError.request
         ? "No response from server. Please check your network connection."
         : "An unexpected error occurred. Please try again.";
-
+      
       toast.error(errorMessage);
       return rejectWithValue({
         message: errorMessage,

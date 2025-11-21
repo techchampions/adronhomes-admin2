@@ -3,9 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../components/Redux/hook";
 import { TbXboxX } from "react-icons/tb";
-import {
-  fetchPropertyData,
-} from "../../components/Redux/Properties/propertiesDetails/propertiesDetails_thunk";
+import { fetchPropertyData } from "../../components/Redux/Properties/propertiesDetails/propertiesDetails_thunk";
 import { clearPropertyData } from "../../components/Redux/Properties/propertiesDetails/propetiesDetailsSlice";
 import { UpdateProperty } from "../../components/Redux/addProperty/UpdateProperties/updateThunk";
 import { edit_property_detail } from "../../components/Redux/addProperty/addFees/edithFees";
@@ -38,7 +36,9 @@ export default function EditProperty() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data, loading, error } = useAppSelector((state) => state.propertyDetails);
+  const { data, loading, error } = useAppSelector(
+    (state) => state.propertyDetails
+  );
   const {
     loading: publishLoading,
     success: publishSuccess,
@@ -69,127 +69,136 @@ export default function EditProperty() {
     isSubmitting,
     setIsSubmitting,
     setDisplayStatus,
-      imagePreview, setImagePreview,
-              selectedPropertyId,
-               setSelectedPropertyId,
-               setNewFees,newFees,
-                 director_name,
-        setDirectorName,
-        previousPropType,
-        setpreviousPropType
+    imagePreview,
+    setImagePreview,
+    selectedPropertyId,
+    setSelectedPropertyId,
+    setNewFees,
+    newFees,
+    director_name,
+    setDirectorName,
+    previousPropType,
+    setpreviousPropType,
+    isLandProperty2,
+    setIsLandProperty2,
   } = useContext(PropertyContext)!;
-  
 
-  const [discount, setDiscounted] = useState(formData.discount.discountName !== "");
+  const [discount, setDiscounted] = useState(
+    formData.discount.discountName !== ""
+  );
   const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
   const [showInfrastructureModal, setShowInfrastructureModal] = useState(false);
 
   const [galleryPreviews, setGalleryPreviews] = useState<(string | null)[]>([]);
   const [newDisplayImage, setNewDisplayImage] = useState<File | null>(null);
-  const [newGalleryImages, setNewGalleryImages] = useState<(File | string | null)[]>([]);
- const [isLandProperty, setIsLandProperty] = useState<boolean>(false);
+  const [newGalleryImages, setNewGalleryImages] = useState<
+    (File | string | null)[]
+  >([]);
+  //  const [isLandProperty2, setIsLandProperty2] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null!);
   const propertyTypeOptions = [
-  { value: "2", label: "Residential" },
-  { value: "3", label: "Industrial" },
-  { value: "4", label: "Commercial" },
-];
+    { value: "2", label: "Residential" },
+    { value: "3", label: "Industrial" },
+    { value: "4", label: "Commercial" },
+  ];
 
-function getPropertyTypeLabelById(id: number | string | undefined): string {
-  if (!id) return "Unknown";
+  function getPropertyTypeLabelById(id: number | string | undefined): string {
+    if (!id) return "Unknown";
 
-  const match = propertyTypeOptions.find(option => option.value === String(id));
-  return match ? match.label : "Unknown";
-}
+    const match = propertyTypeOptions.find(
+      (option) => option.value === String(id)
+    );
+    return match ? match.label : "Unknown";
+  }
 
-const resetFormData = () => {
+  const resetFormData = () => {
     setBasicDetails({
-        propertyName: "",
-        propertyType: "",
-        price: "",
-        initialDeposit: "",
-        address: "",
-        locationType: "",
-        purpose: [],
-        country: "",
-        state: "",
-        lga: "",
-        category: "estate",
-        category_id: null,
-        propertyFiles:[]
+      propertyName: "",
+      propertyType: "",
+      price: "",
+      initialDeposit: "",
+      address: "",
+      locationType: "",
+      purpose: [],
+      country: "",
+      state: "",
+      lga: "",
+      category: "estate",
+      category_id: null,
+      propertyFiles: [],
     });
-   
+
     setSpecifications({
-        bedrooms: "",
-        bathrooms: "",
-        toilets: "",
-        propertySize: "",
-        landSize: "",
-        parkingSpaces: "",
-        yearBuilt: "",
-        unitsAvailable: "",
-        description: "",
-        overview: "",
-        documents: "",
-        director_id: "",
-        nearbyLandmarks: [],
-        rentDuration: "",
-        buildingCondition: "",
-        titleDocumentTypeProp: [],
-        whatsAppLink: "",
-        contactNumber: "",
+      bedrooms: "",
+      bathrooms: "",
+      toilets: "",
+      propertySize: "",
+      landSize: "",
+      parkingSpaces: "",
+      yearBuilt: "",
+      unitsAvailable: "",
+      description: "",
+      overview: "",
+      documents: "",
+      director_id: "",
+      nearbyLandmarks: [],
+      rentDuration: "",
+      buildingCondition: "",
+      titleDocumentTypeProp: [],
+      whatsAppLink: "",
+      contactNumber: "",
     });
     setLandForm({
-        plotShape: "",
-        topography: "",
-        propertySize: "",
-        landSize: "",
-        roadAccess: [],
-        unitsAvailable: "",
-        description: "",
-        overview: "",
-        documents: "",
-        director_id: "",
-        titleDocumentType: [],
-        fencing: "",
-        gatedEstate: "",
-        contactNumber: "",
-        whatsAppLink: "",
-        nearbyLandmarks: [],
+      plotShape: "",
+      topography: "",
+      propertySize: "",
+      landSize: "",
+      roadAccess: [],
+      unitsAvailable: "",
+      description: "",
+      overview: "",
+      documents: "",
+      director_id: "",
+      titleDocumentType: [],
+      fencing: "",
+      gatedEstate: "",
+      contactNumber: "",
+      whatsAppLink: "",
+      nearbyLandmarks: [],
     });
     setFeatures({
-        features: [],
+      features: [],
     });
     setMedia({
-        mapUrl: "",
-        tourLink: "",
-        videoLink: "",
-        images: [],
+      mapUrl: "",
+      tourLink: "",
+      videoLink: "",
+      images: [],
     });
     setDiscount({
-        discountName: "",
-        discountType: "",
-        discountOff: "",
-        unitsRequired: "",
-        validFrom: "",
-        validTo: "",
+      discountName: "",
+      discountType: "",
+      discountOff: "",
+      unitsRequired: "",
+      validFrom: "",
+      validTo: "",
     });
     setPaymentStructure({
-        paymentType: "",
-        paymentDuration: "",
-        paymentSchedule: [],
-        feesCharges: "",
+      paymentType: "",
+      paymentDuration: "",
+      paymentSchedule: [],
+      feesCharges: "",
     });
     setFees([]);
-    setIsLandProperty(false);
+    setIsLandProperty2(false);
     setIsBulk(false);
     setImagePreview(null);
     setGalleryPreviews([]);
     setNewDisplayImage(null);
     setNewGalleryImages([]);
     setCurrentStep(1);
-     setNewFees([])
-};
+    setNewFees([]);
+  };
   const galleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const basicDetailsRef = useRef<any>(null);
   const bulkBasicDetailsRef = useRef<any>(null);
@@ -218,9 +227,9 @@ const resetFormData = () => {
   }, [propertyId, dispatch, navigate]);
 
   useEffect(() => {
-    if (data?.properties?.[0]) {
-      const property = data.properties[0];
-    
+    if (data?.properties) {
+      const property = data?.properties;
+
       setImagePreview(property.display_image);
       setGalleryPreviews(property?.photos || []);
       setNewGalleryImages(property?.photos || []);
@@ -229,12 +238,11 @@ const resetFormData = () => {
 
   // Pre-populate form with fetched property data
   useEffect(() => {
-    if (data?.properties?.[0]) {
-
-      const property = data.properties[0];
-     getPropertyTypeLabelById(property.type?.id)
-     setSelectedPropertyId(true)
-     setpreviousPropType(property.type?.name)
+    if (data?.properties) {
+      const property = data?.properties;
+      getPropertyTypeLabelById(property.type?.id);
+      setSelectedPropertyId(true);
+      setpreviousPropType(property.type?.name);
       setBasicDetails({
         propertyName: property.name,
         propertyType: property.type?.id?.toString() || "",
@@ -249,81 +257,89 @@ const resetFormData = () => {
         lga: property.lga || "N/A",
         category: property.category || "estate",
         category_id: null,
-        propertyFiles: property.property_files
+        propertyFiles: property.property_files,
       });
 
-       if (property.category !== "estate") {  setBasicDetails({
-        propertyName: property.name,
-        propertyType: property.type?.id?.toString() || "",
-        price: property.price?.toString() || "",
-        initialDeposit: property.initial_deposit?.toString() || "",
-        address: property.street_address || "",
-        locationType: property.location_type || "",
-        purpose: property.purpose || [],
-        country: property.country || "",
-        state: property.state || "",
-        lga: property.lga || "N/A",
-        category: property.category || "estate",
-        category_id: property.category_id?.toString() || "",
-         propertyFiles: (property.property_files)
-      });}
-setDirectorName(`${property.director.first_name} ${property.director.last_name}`)
-    if (property.category !== "estate") {
+      if (property.category !=="estate") {
+        setBasicDetails({
+          propertyName: property.name,
+          propertyType: property.type?.id?.toString() || "",
+          price: property.price?.toString() || "",
+          initialDeposit: property.initial_deposit?.toString() || "",
+          address: property.street_address || "",
+          locationType: property.location_type || "",
+          purpose: property.purpose || [],
+          country: property.country || "",
+          state: property.state || "",
+          lga: property.lga || "N/A",
+          category: property.category || "estate",
+          category_id: property.category_id || "",
+          propertyFiles: property.property_files,
+        });
+      }
+      setDirectorName(
+        `${property.director.first_name} ${property.director.last_name}`
+      );
+      if (property.category !== "estate") {
+        setSpecifications({
+          bedrooms: property.no_of_bedroom?.toString() || "",
+          bathrooms: property.number_of_bathroom?.toString() || "",
+          toilets: property.toilets?.toString() || "",
+          propertySize: property.size?.toString() || "",
+          landSize: property.size?.toString() || "",
+          parkingSpaces: property.parking_space?.toString() || "",
+          yearBuilt: property.year_built?.toString() || "",
+          unitsAvailable: property.number_of_unit?.toString() || "",
+          description: property.description || "",
+          overview: property.overview || "",
+          documents: property.property_agreement || "",
+          director_id: property.director_id || "",
 
-      setSpecifications({
-        bedrooms: property.no_of_bedroom?.toString() || "",
-        bathrooms: property.number_of_bathroom?.toString() || "",
-        toilets: property.toilets?.toString() || "",
-        propertySize: property.size?.toString() || "",
-        landSize: property.size?.toString() || "",
-        parkingSpaces: property.parking_space?.toString() || "",
-        yearBuilt: property.year_built?.toString() || "",
-        unitsAvailable: property.number_of_unit?.toString() || "",
-        description: property.description || "",
-        overview: property.overview || "",
-        documents: property.property_agreement || "",
-        director_id:property.director_id|| "",
-        
-        nearbyLandmarks: property.nearby_landmarks ? 
-          property.nearby_landmarks.split(',').map(item => item.trim()) : [],
-        rentDuration: property.rent_duration || "",
-        buildingCondition: property.building_condition || "",
-        titleDocumentTypeProp: property.title_document_type ? 
-          property.title_document_type.split(',').map(item => item.trim()) : [],
-        whatsAppLink: property.whatsapp_link || "",
-        contactNumber: property.contact_number || "",
-      });
-    }
+          nearbyLandmarks: property.nearby_landmarks
+            ? property.nearby_landmarks.split(",").map((item) => item.trim())
+            : [],
+          rentDuration: property.rent_duration || "",
+          buildingCondition: property.building_condition || "",
+          titleDocumentTypeProp: property.title_document_type
+            ? property.title_document_type.split(",").map((item) => item.trim())
+            : [],
+          whatsAppLink: property.whatsapp_link || "",
+          contactNumber: property.contact_number || "",
+        });
+      }
 
-    // Set land form for land properties
-    if (property.category === "estate") {
-      setLandForm({
-        plotShape: property.shape || "",
-        topography: property.topography || "",
-        propertySize: property.size?.toString() || "",
-        landSize: property.size?.toString() || "",
-        roadAccess: property.road_access ? 
-          property.road_access.split(',').map(item => item.trim()) : [],
-        unitsAvailable: property.number_of_unit?.toString() || "",
-        description: property.description || "",
-        overview: property.overview || "",
-        documents: property.property_agreement || "",
-        director_id: property.director_id?.toString() || "",
-        titleDocumentType: property.title_document_type ? 
-          property.title_document_type.split(',').map(item => item.trim()) : [],
-        fencing: property.fencing || "",
-        gatedEstate: property.gated_estate || "",
-        contactNumber: property.contact_number || "",
-        whatsAppLink: property.whatsapp_link || "",
-        nearbyLandmarks: property.nearby_landmarks ? 
-          property.nearby_landmarks.split(',').map(item => item.trim()) : [],
+      if (property.category === "estate") {
+        setLandForm({
+          plotShape: property.shape || "",
+          topography: property.topography || "",
+          propertySize: property.size?.toString() || "",
+          landSize: property.size?.toString() || "",
+          roadAccess: property.road_access
+            ? property.road_access.split(",").map((item) => item.trim())
+            : [],
+          unitsAvailable: property.number_of_unit?.toString() || "",
+          description: property.description || "",
+          overview: property.overview || "",
+          documents: property.property_agreement || "",
+          director_id: property.director_id?.toString() || "",
+          titleDocumentType: property.title_document_type
+            ? property.title_document_type.split(",").map((item) => item.trim())
+            : [],
+          fencing: property.fencing || "",
+          gatedEstate: property.gated_estate || "",
+          contactNumber: property.contact_number || "",
+          whatsAppLink: property.whatsapp_link || "",
+          nearbyLandmarks: property.nearby_landmarks
+            ? property.nearby_landmarks.split(",").map((item) => item.trim())
+            : [],
+        });
+      }
+      setFeatures({
+        features:
+          Array.isArray(property.features) && property.features.length > 0
+            ? property.features
+            : [],
       });
-    }
-setFeatures({
-  features: Array.isArray(property.features) && property.features.length > 0
-    ? property.features
-    : [],
-});
 
       setMedia({
         mapUrl: property.property_map || "",
@@ -335,9 +351,15 @@ setFeatures({
       setDiscount({
         discountName: property.is_discount ? property.discount_name || "" : "",
         discountType: property.is_discount ? "percentage" : "",
-        discountOff: property.is_discount ? property.discount_percentage?.toString() || "" : "",
-        unitsRequired: property.is_discount ? property.discount_units?.toString() || "" : "",
-        validFrom: property.is_discount ? property.discount_start_date || "" : "",
+        discountOff: property.is_discount
+          ? property.discount_percentage?.toString() || ""
+          : "",
+        unitsRequired: property.is_discount
+          ? property.discount_units?.toString() || ""
+          : "",
+        validFrom: property.is_discount
+          ? property.discount_start_date || ""
+          : "",
         validTo: property.is_discount ? property.discount_end_date || "" : "",
       });
 
@@ -360,13 +382,12 @@ setFeatures({
       );
 
       setDisplayStatus(property.is_active ? "publish" : "draft");
-      setIsLandProperty(property.type.name === "Land");
+      setIsLandProperty2(property.type.name === "Land");
       setIsBulk(property.category === "bulk");
       setImagePreview(property.display_image || null);
       setGalleryPreviews(property.photos || []);
       setNewGalleryImages(property.photos || []);
     }
-    
   }, [data]);
 
   // Reset states after success/error
@@ -392,25 +413,27 @@ setFeatures({
     }
   };
 
-  const handleGalleryImageChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const newPreviews = [...galleryPreviews];
-        newPreviews[index] = reader.result as string;
-        setGalleryPreviews(newPreviews);
+  const handleGalleryImageChange =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const newPreviews = [...galleryPreviews];
+          newPreviews[index] = reader.result as string;
+          setGalleryPreviews(newPreviews);
 
-        const newImages = [...newGalleryImages];
-        newImages[index] = file;
-        setNewGalleryImages(newImages);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+          const newImages = [...newGalleryImages];
+          newImages[index] = file;
+          setNewGalleryImages(newImages);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
   const triggerFileInput = () => fileInputRef.current?.click();
-  const triggerGalleryFileInput = (index: number) => galleryInputRefs.current[index]?.click();
+  const triggerGalleryFileInput = (index: number) =>
+    galleryInputRefs.current[index]?.click();
 
   // Validation
   const validateFormData = () => {
@@ -419,22 +442,26 @@ setFeatures({
 
     if (!basicDetails.propertyName) errors.name = "Property name is required";
     if (!basicDetails.price) errors.price = "Price is required";
-    if (isLandProperty) {
+    if (isLandProperty2) {
       if (!landForm.landSize) errors.size = "Size is required";
-      if (!landForm.unitsAvailable) errors.unitsAvailable = "Units available is required";
+      if (!landForm.unitsAvailable)
+        errors.unitsAvailable = "Units available is required";
       if (!landForm.description) errors.description = "Description is required";
     } else {
       if (!specifications.landSize) errors.size = "Size is required";
       if (!specifications.bedrooms) errors.bedrooms = "Bedrooms is required";
       if (!specifications.bathrooms) errors.bathrooms = "Bathrooms is required";
       if (!specifications.toilets) errors.toilets = "Toilets is required";
-      if (!specifications.buildingCondition) errors.buildingCondition = "Building condition is required";
-      if (!specifications.yearBuilt) errors.yearBuilt = "Year built is required";
+      if (!specifications.buildingCondition)
+        errors.buildingCondition = "Building condition is required";
+      if (!specifications.yearBuilt)
+        errors.yearBuilt = "Year built is required";
     }
     // if (!basicDetails.street_address) errors.street_address = "Street address is required";
     if (!basicDetails.state) errors.state = "State is required";
     if (!basicDetails.country) errors.country = "Country is required";
-    if (!formData.paymentStructure.paymentType) errors.paymentType = "Payment type is required";
+    if (!formData.paymentStructure.paymentType)
+      errors.paymentType = "Payment type is required";
 
     if (Object.keys(errors).length > 0) {
       Object.values(errors).forEach((error) => toast.error(error));
@@ -443,184 +470,280 @@ setFeatures({
     return true;
   };
 
-const submitForm = async (displayStatus: "draft" | "publish") => {
-  if (!validateFormData()) return;
+  const submitForm = async (displayStatus: "draft" | "publish") => {
+    try {
+      setIsSubmitting(true);
+      const formPayload = new FormData();
+      const {
+        basicDetails,
+        bulkDetails,
+        specifications,
+        landForm,
+        features,
+        media,
+        discount,
+        paymentStructure,
+      } = formData;
 
-  try {
-    setIsSubmitting(true);
-    const formPayload = new FormData();
-    const {
-      basicDetails,
-      bulkDetails,
-      specifications,
-      landForm,
-      features,
-      media,
-      discount,
-      paymentStructure,
-    } = formData;
+      // Handle Bulk or Regular Basic Details
+      if (isBulk) {
+        formPayload.append("name", bulkDetails.propertyName);
 
-    // Populate formPayload based on isBulk
-    if (isBulk) {
-      formPayload.append("name", bulkDetails.propertyName);
-      formPayload.append("type", bulkDetails.propertyType);
-      formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
-      formPayload.append("price", bulkDetails.price);
-      formPayload.append("street_address", bulkDetails.address);
-      formPayload.append("city", bulkDetails.city || "");
-      formPayload.append("country", basicDetails.country);
-      formPayload.append("state", basicDetails.state);
-      formPayload.append("lga", basicDetails.lga || "");
-      formPayload.append("category", "bulk");
-      formPayload.append("initial_deposit", basicDetails.initialDeposit || "0");
-    } else {
-      formPayload.append("name", basicDetails.propertyName);
-      formPayload.append("type", basicDetails.propertyType);
-      formPayload.append("price", basicDetails.price);
-      formPayload.append("initial_deposit", basicDetails.initialDeposit || "0");
-      formPayload.append("country", basicDetails.country);
-      formPayload.append("state", basicDetails.state);
-      formPayload.append("lga", basicDetails.lga || "");
-      formPayload.append("street_address", basicDetails.address);
-      formPayload.append("location_type", basicDetails.locationType || "N/A");
-           formPayload.append("category", isLandProperty ? "estate" : "house");
-      basicDetails.purpose.forEach((purpose, index) => {
-        formPayload.append(`purpose[${index}]`, purpose);
-      });
-    }
+        formPayload.append("type", bulkDetails.propertyType);
 
-    // Populate formPayload based on isLandProperty
-    if (isLandProperty) {
-      formPayload.append("size", landForm.landSize);
-      formPayload.append("shape", landForm.plotShape || "N/A");
-      formPayload.append("topography", landForm.topography || "N/A");
-      formPayload.append("category", "estate");
-      formPayload.append("nearby_landmarks", landForm.nearbyLandmarks.join(", "));
-      formPayload.append("road_access", landForm.roadAccess.join(", "));
-      formPayload.append("title_document_type", landForm.titleDocumentType.join(", "));
-      formPayload.append("description", landForm.description);
-      formPayload.append("number_of_unit", landForm.unitsAvailable);
-      formPayload.append("director_id", landForm.director_id || "1");
-      formPayload.append("fencing", landForm.fencing || "");
-      formPayload.append("gated_estate", landForm.gatedEstate || "");
-      formPayload.append("contact_number", landForm.contactNumber || "");
-      formPayload.append("whatsapp_link", landForm.whatsAppLink || "");
-      formPayload.append("property_agreement", landForm.documents);
-    } else {
-      formPayload.append("no_of_bedroom", specifications.bedrooms || "0");
-      formPayload.append("number_of_bathroom", specifications.bathrooms || "0");
-      formPayload.append("title_document_type", specifications.titleDocumentTypeProp.join(", "));
-      formPayload.append("toilets", specifications.toilets || "0");
-      formPayload.append("size", specifications.landSize);
-      formPayload.append("parking_space", specifications.parkingSpaces || "0");
-      formPayload.append("description", specifications.description);
-      formPayload.append("year_built", specifications.yearBuilt || "");
-      formPayload.append("number_of_unit", specifications.unitsAvailable);
-      formPayload.append("director_id", specifications.director_id || "1");
-      formPayload.append("nearby_landmarks", specifications.nearbyLandmarks.join(", "));
-      formPayload.append("rent_duration", specifications.rentDuration || "");
-      formPayload.append("building_condition", specifications.buildingCondition || "");
-      formPayload.append("whatsapp_link", specifications.whatsAppLink || "");
-      formPayload.append("contact_number", specifications.contactNumber || "");
-      formPayload.append("property_agreement", specifications.documents);
-    }
+        formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
+        formPayload.append("price", bulkDetails.price);
 
-    // Append shared features and media
-    features.features.forEach((feature, index) => {
-      formPayload.append(`features[${index}]`, feature);
-    });
-    const displayImage = media.images[0];
-    if (displayImage instanceof File) {
-      formPayload.append("display_image", displayImage);
-    }
-    media.images.slice(1).forEach((image, index) => {
-      if (image instanceof File) {
-        formPayload.append(`photos[${index}]`, image);
-      }
-    });
-    if (media.tourLink) formPayload.append("virtual_tour", media.tourLink);
-    if (media.videoLink) formPayload.append("video_link", media.videoLink);
-    if (media.mapUrl) formPayload.append("map_link", media.mapUrl);
+        formPayload.append("street_address", bulkDetails.address);
+        formPayload.append("city", bulkDetails.city);
 
-    // Append payment and discount details
-    formPayload.append("payment_type", paymentStructure.paymentType);
-    formPayload.append("property_duration_limit", paymentStructure.paymentDuration);
-    paymentStructure.paymentSchedule.forEach((schedule, index) => {
-      formPayload.append(`payment_schedule[${index}]`, schedule);
-    });
-    const feesCharges = parseFloat(paymentStructure.feesCharges);
-    if (!isNaN(feesCharges)) {
-      formPayload.append("fees_charges", feesCharges.toString());
-    } else {
-      formPayload.append("fees_charges", "0");
-    }
+        formPayload.append("country", basicDetails.country);
+        formPayload.append("state", basicDetails.state);
+        formPayload.append("lga", basicDetails.lga);
+        formPayload.append("category", "bulk");
 
-    formPayload.append("is_discount", discount.discountName ? "1" : "0");
-    if (discount.discountName) {
-      formPayload.append("discount_name", discount.discountName);
-      formPayload.append("discount_percentage", discount.discountOff);
-      formPayload.append("discount_units", discount.unitsRequired);
-      formPayload.append("discount_start_date", discount.validFrom);
-      formPayload.append("discount_end_date", discount.validTo);
-    }
+        formPayload.append(
+          "initial_deposit",
+          basicDetails.initialDeposit || "0"
+        );
+      } else {
+        formPayload.append("name", basicDetails.propertyName);
 
-    formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
+        formPayload.append("type", basicDetails.propertyType);
+        formPayload.append("price", basicDetails.price);
 
-    // Start the update process. This is the correct pattern.
-    await dispatch(
-      UpdateProperty({ UpdateId: parseInt(propertyId!), credentials: formPayload })
-    ).unwrap();
-
-    
-    if (propertyId) {
-      const feePromises = newFees
-        .filter((fee) => fee.checked)
-        .map((fee) => ({
-          property_id: propertyId.toString(),
-          name: fee.name,
-          value: fee.amount.replace(/[^\d.]/g, ""),
-          type: fee.type,
-          purpose: fee.purpose,
-        }))
-        .map((feeDetail) =>
-          dispatch(add_property_detail({ credentials: feeDetail }))
-            .then((result) => {
-              console.log(`Successfully added fee: ${feeDetail.name}`);
-              return result;
-            })
-            .catch((error) => {
-              console.error(`Failed to add fee ${feeDetail.name}:`, error);
-              toast.error(`Failed to add fee ${feeDetail.name}`);
-              throw error; 
-            })
+        formPayload.append(
+          "initial_deposit",
+          basicDetails.initialDeposit || "0"
         );
 
-      const feeResults = await Promise.allSettled(feePromises);
+        formPayload.append("country", basicDetails.country);
+        formPayload.append("state", basicDetails.state);
+        formPayload.append("lga", basicDetails.lga);
 
-      const successfulFees = feeResults.filter((r) => r.status === "fulfilled").length;
-      const failedFees = feeResults.filter((r) => r.status === "rejected").length;
+        formPayload.append("street_address", basicDetails.address);
 
-      if (failedFees === 0) {
-        toast.success("Property and all fees updated successfully!");
-      } else {
-        toast.warning(`Property updated, but ${failedFees} fee(s) failed to add.`);
+        formPayload.append("location_type", basicDetails.locationType);
+        formPayload.append("category", isLandProperty2 ? "estate" : "house");
+        if(!isLandProperty2)
+        { formPayload.append("category_id", basicDetails.category_id);}
+
+        {
+          basicDetails.purpose.forEach((purpose, index) => {
+            formPayload.append(`purpose[${index}]`, purpose);
+          });
+        }
       }
-    } else {
-      toast.error("Property updated but couldn't add fees - missing property ID.");
+
+      // Handle Land or House Specifications
+      if (isLandProperty2) {
+        formPayload.append("size", landForm.landSize);
+        formPayload.append("shape", landForm.plotShape);
+
+        formPayload.append("topography", landForm.topography);
+        formPayload.append("category", "estate");
+
+        formPayload.append(
+          "nearby_landmarks",
+          landForm.nearbyLandmarks.join(", ")
+        );
+
+        formPayload.append("road_access", landForm.roadAccess.join(", "));
+
+        formPayload.append(
+          "title_document_type",
+          landForm.titleDocumentType.join(", ")
+        );
+
+        formPayload.append("description", landForm.description);
+
+        formPayload.append("number_of_unit", landForm.unitsAvailable);
+
+        formPayload.append("director_id", landForm.director_id);
+        formPayload.append("fencing", landForm.fencing);
+
+        formPayload.append("gated_estate", landForm.gatedEstate);
+
+        formPayload.append("contact_number", landForm.contactNumber);
+
+        formPayload.append("whatsapp_link", landForm.whatsAppLink);
+
+        formPayload.append("property_agreement", landForm.documents);
+      } else {
+        formPayload.append("no_of_bedroom", specifications.bedrooms);
+
+        formPayload.append("number_of_bathroom", specifications.bathrooms);
+
+        formPayload.append("toilets", specifications.toilets);
+
+        formPayload.append("size", specifications.landSize);
+
+        formPayload.append("parking_space", specifications.parkingSpaces);
+
+        formPayload.append("description", specifications.description);
+
+        formPayload.append("year_built", specifications.yearBuilt);
+
+        formPayload.append("number_of_unit", specifications.unitsAvailable);
+
+        formPayload.append("director_id", specifications.director_id);
+
+        formPayload.append(
+          "nearby_landmarks",
+          specifications.nearbyLandmarks.join(", ")
+        );
+
+        // if (specifications.rentDuration)
+        formPayload.append("rent_duration", specifications.rentDuration);
+        // if (specifications.buildingCondition)
+        formPayload.append(
+          "building_condition",
+          specifications.buildingCondition
+        );
+        // if (specifications.whatsAppLink)
+        formPayload.append("whatsapp_link", specifications.whatsAppLink);
+        // if (specifications.contactNumber)
+        formPayload.append("contact_number", specifications.contactNumber);
+        // if (specifications.documents)
+        formPayload.append("property_agreement", specifications.documents);
+
+        formPayload.append(
+          "title_document_type",
+          specifications.titleDocumentTypeProp.join(", ")
+        );
+      }
+
+      // Append Features
+
+      features.features.forEach((feature, index) => {
+        formPayload.append(`features[${index}]`, feature);
+      });
+
+      // Append Media
+      // if (media.images && media.images.length > 0) {
+      const displayImage = media.images[0];
+      if (displayImage instanceof File) {
+        formPayload.append("display_image", displayImage);
+      }
+      media.images.slice(1).forEach((image, index) => {
+        if (image instanceof File) {
+          formPayload.append(`photos[${index}]`, image);
+        }
+      });
+      // }
+      formPayload.append("virtual_tour", media.tourLink);
+
+      formPayload.append("video_link", media.videoLink);
+      formPayload.append("property_map", media.mapUrl);
+
+      // Append Payment and Discount Details
+      // if (paymentStructure.paymentType)
+      formPayload.append("payment_type", paymentStructure.paymentType);
+      // if (paymentStructure.paymentDuration)
+      formPayload.append(
+        "property_duration_limit",
+        paymentStructure.paymentDuration
+      );
+      // if (
+      //   paymentStructure.paymentSchedule &&
+      //   paymentStructure.paymentSchedule.length > 0
+      // )
+      {
+        paymentStructure.paymentSchedule.forEach((schedule, index) => {
+          formPayload.append(`payment_schedule[${index}]`, schedule);
+        });
+      }
+      // if (paymentStructure.feesCharges) {
+      const feesCharges = parseFloat(paymentStructure.feesCharges);
+      if (!isNaN(feesCharges)) {
+        formPayload.append("fees_charges", feesCharges.toString());
+      } else {
+        formPayload.append("fees_charges", "0");
+      }
+      // }
+
+      if (discount.discountName) {
+        formPayload.append("is_discount", "1");
+        formPayload.append("discount_name", discount.discountName);
+
+        formPayload.append("discount_percentage", discount.discountOff);
+
+        formPayload.append("discount_units", discount.unitsRequired);
+
+        formPayload.append("discount_start_date", discount.validFrom);
+
+        formPayload.append("discount_end_date", discount.validTo);
+      } else {
+        formPayload.append("is_discount", "0");
+      }
+
+      formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
+
+      // Start the update process
+      await dispatch(
+        UpdateProperty({
+          UpdateId: parseInt(propertyId!),
+          credentials: formPayload,
+        })
+      ).unwrap();
+
+      // Handle Fees
+      if (propertyId) {
+        const feePromises = newFees
+          .filter((fee) => fee.checked)
+          .map((fee) => ({
+            property_id: propertyId.toString(),
+            name: fee.name,
+            value: fee.amount.replace(/[^\d.]/g, ""),
+            type: fee.type,
+            purpose: fee.purpose,
+          }))
+          .map((feeDetail) =>
+            dispatch(add_property_detail({ credentials: feeDetail }))
+              .then((result) => {
+                console.log(`Successfully added fee: ${feeDetail.name}`);
+                return result;
+              })
+              .catch((error) => {
+                console.error(`Failed to add fee ${feeDetail.name}:`, error);
+                toast.error(`Failed to add fee ${feeDetail.name}`);
+                throw error;
+              })
+          );
+
+        const feeResults = await Promise.allSettled(feePromises);
+
+        const successfulFees = feeResults.filter(
+          (r) => r.status === "fulfilled"
+        ).length;
+        const failedFees = feeResults.filter(
+          (r) => r.status === "rejected"
+        ).length;
+
+        if (failedFees === 0) {
+          toast.success("Property and all fees updated successfully!");
+        } else {
+          toast.warning(
+            `Property updated, but ${failedFees} fee(s) failed to add.`
+          );
+        }
+      } else {
+        toast.error(
+          "Property updated but couldn't add fees - missing property ID."
+        );
+      }
+
+      // Reset form and navigate
+      resetFormData();
+      dispatch(resetPropertyState());
+      navigate("/properties");
+    } catch (error: any) {
+      console.error("Update failed:", error);
+      toast.error(error.message || "Failed to update property or its fees.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Perform cleanup and navigation after the entire process is complete.
-    resetFormData();
-    dispatch(resetPropertyState());
-    navigate("/properties");
-  } catch (error: any) {
-    console.error("Update failed:", error);
-    toast.error(error.message || "Failed to update property or its fees.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+  };
   const handleNext = async () => {
     if (isSubmitting) return;
 
@@ -641,7 +764,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
         }
         break;
       case 2:
-        if (isLandProperty) {
+        if (isLandProperty2) {
           if (landRef.current) {
             landRef.current.handleSubmit();
             canProceed = landRef.current.isValid;
@@ -662,7 +785,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
       case 4:
         if (featuresRef.current) {
           featuresRef.current.handleSubmit();
-            canProceed = featuresRef.current.isValid;
+          canProceed = featuresRef.current.isValid;
         }
         break;
       case 5:
@@ -721,7 +844,9 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
     try {
       await dispatch(publishDraft(parseInt(propertyId))).unwrap();
       toast.success(
-        `Property ${data?.properties?.[0]?.is_active === 1 ? "drafted" : "published"} successfully!`
+        `Property ${
+          data?.properties?.is_active === 1 ? "drafted" : "published"
+        } successfully!`
       );
       dispatch(fetchPropertyData({ id: parseInt(propertyId) }));
     } catch (error: any) {
@@ -743,7 +868,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
     return <div className="p-4 text-red-500">{error}</div>;
   }
 
-  if (!data?.properties?.[0]) {
+  if (!data?.properties) {
     return (
       <div className="flex items-center justify-center w-full h-screen">
         <NotFound text="Property not found" />
@@ -768,21 +893,24 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
               </h1>
             </div>
             <div className="flex space-x-4 justify-center md:justify-end">
-             <button
+              <button
                 className={`bg-red-500 text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-red-600 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 `}
                 onClick={() => {
-                    resetFormData();
-                    navigate("/properties"); // Navigate back to the properties list
+                  resetFormData();
+                  navigate("/properties"); // Navigate back to the properties list
                 }}
                 disabled={isSubmitting}
-            >
+              >
                 Cancel
-            </button>
+              </button>
             </div>
           </div>
 
           <div className="w-full lg:flex justify-center hidden">
-            <StepIndicator setCurrentStep={setCurrentStep} currentStep={currentStep} />
+            <StepIndicator
+              setCurrentStep={setCurrentStep}
+              currentStep={currentStep}
+            />
           </div>
 
           <DraftPublishModal
@@ -801,7 +929,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
             <div className="bg-white rounded-lg p-6">
               {isBulk ? (
                 <BulkBasicDetails ref={bulkBasicDetailsRef} />
-              ) : isLandProperty ? (
+              ) : isLandProperty2 ? (
                 <BasicDetailsLand ref={basicDetailsRef} />
               ) : (
                 <BasicDetails ref={basicDetailsRef} />
@@ -811,7 +939,7 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
 
           {currentStep === 2 && (
             <div className="bg-white rounded-lg p-6">
-              {isLandProperty ? (
+              {isLandProperty2 ? (
                 <LandForm ref={landRef} />
               ) : (
                 <PropertySpecifications ref={specificationsRef} />
@@ -822,19 +950,19 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
           {currentStep === 3 && (
             <div className="bg-white rounded-lg p-6">
               <MediaFORM
-                  ref={mediaRef}
-                  imagePreview={imagePreview}
-                  setImagePreview={setImagePreview}
-                  newDisplayImage={newDisplayImage}
-                  setNewDisplayImage={setNewDisplayImage}
-                  galleryPreviews={galleryPreviews}
-                  setGalleryPreviews={setGalleryPreviews}
-                  newGalleryImages={newGalleryImages}
-                  setNewGalleryImages={setNewGalleryImages}
-                  galleryInputRefs={galleryInputRefs}
-                  triggerFileInput={triggerFileInput}
-                  triggerGalleryFileInput={triggerGalleryFileInput}
-                  fileInputRef={fileInputRef}
+                ref={mediaRef}
+                imagePreview={imagePreview}
+                setImagePreview={setImagePreview}
+                newDisplayImage={newDisplayImage}
+                setNewDisplayImage={setNewDisplayImage}
+                galleryPreviews={galleryPreviews}
+                setGalleryPreviews={setGalleryPreviews}
+                newGalleryImages={newGalleryImages}
+                setNewGalleryImages={setNewGalleryImages}
+                galleryInputRefs={galleryInputRefs}
+                triggerFileInput={triggerFileInput}
+                triggerGalleryFileInput={triggerGalleryFileInput}
+                fileInputRef={fileInputRef}
               />
             </div>
           )}
@@ -854,9 +982,12 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
                     className="absolute right-1/2 -top-16 cursor-pointer"
                     onClick={() => !isSubmitting && setDiscounted(false)}
                   >
-                  <TbXboxX className="w-10 h-10 text-red-500" />
+                    <TbXboxX className="w-10 h-10 text-red-500" />
                   </p>
-                  <div className="mt-24"> <Discount ref={discountRef} /></div>
+                  <div className="mt-24">
+                    {" "}
+                    <Discount ref={discountRef} />
+                  </div>
                 </div>
               ) : (
                 <p
@@ -868,14 +999,18 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
                   Add Discount
                 </p>
               )}
-            {isLandProperty&&<p
-                className={`text-dark font-bold text-sm text-center cursor-pointer ${
-                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                onClick={() => !isSubmitting && setShowInfrastructureModal(true)}
-              >
-                Manage Infrastructure Fees
-              </p>} 
+              {isLandProperty2 && (
+                <p
+                  className={`text-dark font-bold text-sm text-center cursor-pointer ${
+                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() =>
+                    !isSubmitting && setShowInfrastructureModal(true)
+                  }
+                >
+                  Manage Infrastructure Fees
+                </p>
+              )}
             </div>
           )}
 
@@ -891,48 +1026,64 @@ const submitForm = async (displayStatus: "draft" | "publish") => {
             </div>
           )}
 
-            <div className="grid grid-cols-2  w-full mt-20">
-          <div className="w-full justify-start flex">
-            <div>
-              {currentStep > 1 && currentStep < 7 && (
-                <button
-                  className={`bg-[#272727] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#272727] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 ${
-                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  onClick={handleBack}
-                  disabled={isSubmitting}
-                >
-                  Back
-                </button>
-              )}
+          <div className="grid grid-cols-2  w-full mt-20">
+            <div className="w-full justify-start flex">
+              <div>
+                {currentStep > 1 && currentStep < 7 && (
+                  <button
+                    className={`bg-[#272727] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#272727] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 ${
+                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={handleBack}
+                    disabled={isSubmitting}
+                  >
+                    Back
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="w-full justify-end flex">
+              <div>
+                {currentStep < 7 && (
+                  <button
+                    className={`bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap ${
+                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    onClick={handleNext}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Processing...
+                      </div>
+                    ) : (
+                      nextButtonText
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-          <div className="w-full justify-end flex">
-            <div>
-              {currentStep < 7 && (
-                <button
-                  className={`bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap ${
-                    isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  onClick={handleNext}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </div>
-                  ) : (
-                    nextButtonText
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
         </div>
       </EdithBackgroung>
     </section>

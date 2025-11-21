@@ -36,145 +36,15 @@ import {
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 import MultipleFileUploadField from "../../../components/input/multiplefile";
 
-// Modified FileUploadField component (kept as-is since it's a separate concern)
-// interface FileUploadFieldProps {
-//   label: string;
-//   placeholder: string;
-//   onChange: (files: File[] | null) => void;
-//   required?: boolean;
-//   error?: any;
-//   disabled?: boolean;
-//   accept?: string;
-//   multiple?: boolean;
-//   value?: File[];
-// }
 
-// const FileUploadField: React.FC<FileUploadFieldProps> = ({
-//   label,
-//   placeholder,
-//   onChange,
-//   required = false,
-//   error,
-//   disabled = false,
-//   accept,
-//   multiple = false,
-//   value = []
-// }) => {
-//   const fileInputRef = useRef<HTMLInputElement>(null);
-//   const [duplicateError, setDuplicateError] = useState<string | null>(null);
-
-//   const handleClick = () => {
-//     if (!disabled && fileInputRef.current) {
-//       fileInputRef.current.value = "";
-//       fileInputRef.current.click();
-//     }
-//   };
-
-//   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-//     const files = e.target.files;
-//     if (!files) {
-//       onChange(null);
-//       return;
-//     }
-
-//     const newFiles = Array.from(files);
-//     let hasDuplicate = false;
-//     let newFileArray: File[] = [...value];
-
-//     for (const newFile of newFiles) {
-//       if (value.some(existingFile => existingFile.name === newFile.name)) {
-//         setDuplicateError(`File already exists: ${newFile.name}`);
-//         hasDuplicate = true;
-//         break;
-//       }
-//       newFileArray.push(newFile);
-//     }
-
-//     if (!hasDuplicate) {
-//       onChange(newFileArray);
-//       setDuplicateError(null);
-//     }
-//   };
-
-//   const handleRemoveFile = (fileToRemove: File) => {
-//     const filteredFiles = value.filter(file => file.name !== fileToRemove.name);
-//     onChange(filteredFiles);
-//     setDuplicateError(null);
-//   };
-
-//   return (
-//     <div className="w-full">
-//       <label className="block text-[#4F4F4F] font-[325] text-[14px] mb-2">
-//         {label} {required && <span className="text-red-500">*</span>}
-//       </label>
-
-//       <div className="relative">
-//         <div
-//           className={`w-full bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px] ${
-//             (error || duplicateError) ? "border border-red-500" : ""
-//           } ${disabled ? "bg-gray-100 cursor-not-allowed" : "cursor-pointer"}`}
-//           onClick={handleClick}
-//         >
-//           {value.length > 0 ? (
-//             <div className="flex flex-wrap gap-2 pr-10">
-//               {value.map((file, index) => (
-//                 <div
-//                   key={index}
-//                   className="flex items-center bg-gray-200 rounded-full px-3 py-1 text-sm"
-//                 >
-//                   <span className="truncate">{file.name}</span>
-//                   <button
-//                     type="button"
-//                     onClick={(e) => {
-//                       e.stopPropagation();
-//                       handleRemoveFile(file);
-//                     }}
-//                     className="ml-2 text-gray-500 hover:text-gray-800 focus:outline-none"
-//                   >
-//                     <MdClose size={16} />
-//                   </button>
-//                 </div>
-//               ))}
-//             </div>
-//           ) : (
-//             <span className="truncate">{placeholder}</span>
-//           )}
-
-//           <AiOutlineUpload
-//             className={`absolute top-3 right-3 ${
-//               disabled ? "text-gray-400" : "text-[#4F4F4F]"
-//             }`}
-//             size={20}
-//           />
-//         </div>
-
-//         <input
-//           type="file"
-//           ref={fileInputRef}
-//           onChange={handleFileChange}
-//           disabled={disabled}
-//           accept={accept}
-//           multiple={multiple}
-//           className="hidden"
-//         />
-//       </div>
-
-//       {(error || duplicateError) && (
-//         <p className="text-red-500 text-sm mt-1">
-//           {duplicateError || (Array.isArray(error) ? error[0] : error)}
-//         </p>
-//       )}
-//     </div>
-//   );
-// };
 
 // Main BasicDetails component
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   const { formData, setBasicDetails, setSales,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
-    const [propertyFiles, setPropertyFiles] = useState<any[]>(
-      formData.basicDetails.propertyFiles || []
-    );
+    // const [propertyFiles, setPropertyFiles] = useState<any[]>(
+    //   formData.basicDetails.propertyFiles || []
+    // );
   
   // Get data from Redux store
   const countries = useSelector(selectAllCountries);
@@ -198,28 +68,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   ];
 
   const validationSchema = Yup.object().shape({
-    // propertyName: Yup.string().required("Property name is required"),
-    // propertyType: Yup.string().required("Property type is required"),
-    // price: Yup.number()
-    //   .typeError("Price must be a number")
-    //   .positive("Price must be positive")
-    //   .required("Price is required"),
-    // initialDeposit: Yup.number()
-    //   .typeError("Initial deposit must be a number")
-    //   .positive("Initial deposit must be positive")
-    //   .required("Initial deposit is required"),
-    // address: Yup.string().required("Address is required"),
-    // country: Yup.string().required("Country is required"),
-    // state: Yup.string().required("State is required"),
-    // // lga: Yup.string().required("LGA is required"),
-    // purpose: Yup.array()
-    //   .of(Yup.string())
-    //   .min(1, "At least one purpose is required")
-    //   .required("Purpose is required"),
-    // propertyFiles: Yup.array()
-    //   .of(Yup.mixed<File>())
-    //   .min(1, "At least one file is required")
-    //   .required("Property files are required"),
+
   });
 
   const formik = useFormik({
@@ -227,7 +76,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       ...formData.basicDetails,
       category_id: formData.basicDetails.category_id || "",
       purpose: formData.basicDetails.purpose || [],
-      propertyFiles: propertyFiles,
+       propertyFiles: formData.basicDetails.propertyFiles || [],
     },
     validationSchema,
     onSubmit: (values) => {
@@ -266,24 +115,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [lgas]
   );
 
-  // No longer need these useEffects as Formik manages state directly
-  // useEffect(() => {
-  //   formik.setFieldValue("purpose", purpose);
-  // }, [purpose]);
-
-  // useEffect(() => {
-  //   formik.setFieldValue("propertyFiles", propertyFiles);
-  // }, [propertyFiles]);
-
-  // No longer need to manually set state from context
-  // useEffect(() => {
-  //   if (formData.basicDetails.purpose) {
-  //     setPurpose(formData.basicDetails.purpose);
-  //   }
-  //   if (formData.basicDetails.propertyFiles) {
-  //     setPropertyFiles(formData.basicDetails.propertyFiles);
-  //   }
-  // }, [formData.basicDetails.purpose, formData.basicDetails.propertyFiles]);
 
   const handlePurposeChange = (value: string) => {
     const normalized = value.toLowerCase();
@@ -482,19 +313,18 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isSearchable={false}
       />
 
-        <MultipleFileUploadField
+      <MultipleFileUploadField
         label="Upload Files"
         placeholder="Drag and drop or click to upload files"
         name="propertyFiles"
         multiple={true}
         onChange={(files) => {
+          // Update Formik state directly instead of using local state
           formik.setFieldValue("propertyFiles", files);
-          setPropertyFiles(files || []);
         }}
-        value={propertyFiles}
+        value={formik.values.propertyFiles || []} 
         error={formik.touched.propertyFiles && formik.errors.propertyFiles}
       />
-
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}

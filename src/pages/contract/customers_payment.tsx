@@ -98,12 +98,12 @@ export default function ContractInvoice() {
 
   const [isChecked, setIsChecked] = useState(false);
 
-// Set initial state once planProperties is available
-useEffect(() => {
-  if (planProperties?.is_allocated !== undefined) {
-    setIsChecked(planProperties.is_allocated === 1);
-  }
-}, [planProperties]);
+  // Set initial state once planProperties is available
+  useEffect(() => {
+    if (planProperties?.is_allocated !== undefined) {
+      setIsChecked(planProperties.is_allocated === 1);
+    }
+  }, [planProperties]);
 
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
 
@@ -309,13 +309,14 @@ useEffect(() => {
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
-       { hasContractDocuments&& <div className="flex items-center  mb-6">
-          {/* Custom Checkbox */}
-          <input
-            type="checkbox"
-            id="confirmCheckbox"
-            // value={isChecked}
-            className="
+        {hasContractDocuments && (
+          <div className="flex items-center  mb-6">
+            {/* Custom Checkbox */}
+            <input
+              type="checkbox"
+              id="confirmCheckbox"
+              // value={isChecked}
+              className="
                             mr-3
                             appearance-none inline-block w-6 h-6 border-2 border-gray-300 rounded-md
                             relative cursor-pointer outline-none transition-colors duration-200 ease-in-out
@@ -324,24 +325,24 @@ useEffect(() => {
                             after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2
                             after:block
                         "
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-          />
-          <div className="flex flex-col">
-            <label
-              htmlFor="confirmCheckbox"
-              className="text-lg text-gray-700 select-none cursor-pointer"
-            >
-              I confirm that i have uploaded all required documents
-            </label>
-            <p className="text-xs italic">
-              This confirms that all the required documents have been uploaded
-              and that the property will be allocated to the customer. Please
-              ensure the documents have been properly reviewed.
-            </p>
+              checked={isChecked}
+              onChange={handleCheckboxChange}
+            />
+            <div className="flex flex-col">
+              <label
+                htmlFor="confirmCheckbox"
+                className="text-lg text-gray-700 select-none cursor-pointer"
+              >
+                I confirm that i have uploaded all required documents
+              </label>
+              <p className="text-xs italic">
+                This confirms that all the required documents have been uploaded
+                and that the property will be allocated to the customer. Please
+                ensure the documents have been properly reviewed.
+              </p>
+            </div>
           </div>
-        </div>
-}
+        )}
         <UserProfileCard
           name={contract?.contract_subscriber_name_1}
           joinDate={formatDate(contract?.created_at)}
@@ -352,7 +353,9 @@ useEffect(() => {
           name2={contract?.contract_subscriber_name_2}
           marketer={contract?.contract_main_marketer ?? "N/A"}
           businestype={contract?.contract_business_type ?? "N/A"}
-          jointType={contract?.contract_business_type === "Joint"} unique_contract_id={contract?.unique_contract_id  ?? "N/A"}        />
+          jointType={contract?.contract_business_type === "Joint"}
+          unique_contract_id={contract?.unique_contract_id ?? "N/A"}
+        />
         {/* {hasContractDocuments && ( */}
         {/* <div className="relative">
             <div
@@ -463,83 +466,100 @@ useEffect(() => {
           </div>
         </ReusableTable>
 
-        {isModalOpen && data && (
-          <div className="fixed inset-0 bg-[#00000066] bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-            <div className="rounded-lg sm:rounded-[30px] bg-white p-3 sm:p-6 w-full max-w-full min-w-0 md:min-w-[800px] max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-3 sm:mb-4">
-                <h2 className="text-lg sm:text-xl font-bold">
-                  Payment Schedule
-                </h2>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-[#767676] hover:text-dark text-sm sm:text-base"
-                >
-                  Close
-                </button>
-              </div>
+       {isModalOpen && (
+  <div className="fixed inset-0 bg-[#00000066] bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+    <div className="rounded-lg sm:rounded-[30px] bg-white p-3 sm:p-6 w-full max-w-full min-w-0 md:min-w-[800px] max-h-[90vh] overflow-y-auto">
+      <div className="flex justify-between items-center mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-bold">
+          Payment Schedule
+        </h2>
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="text-[#767676] hover:text-dark text-sm sm:text-base"
+        >
+          Close
+        </button>
+      </div>
 
-              <div className="space-y-2 sm:space-y-4">
-                {data?.map((item, index) => {
-                  const status = statusMap[item.status];
-                  const style = statusStyles[status];
-                  const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F5F5F5]";
-
-                  return (
-                    <div
-                      key={item.id}
-                      className={`rounded-lg sm:rounded-[30px] ${bgColor} p-3 sm:p-6`}
-                    >
-                      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 w-full items-center">
-                        <div className="min-w-0 col-span-1 xs:col-span-2 sm:col-span-1">
-                          <p className="text-sm sm:text-base font-[325] text-dark truncate">
-                            Payment {item.property?.name || "Property"}
-                          </p>
-                          <p className="font-[400] text-xs sm:text-sm text-[#767676] truncate">
-                            Payment #{item.id}
-                          </p>
-                        </div>
-
-                        <div className="flex justify-start sm:justify-center col-span-1">
-                          <button
-                            className={`text-xs sm:text-sm font-[400] ${style.text} ${style.bg} border ${style.border} py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap`}
-                          >
-                            {status}
-                          </button>
-                        </div>
-
-                        <p className="text-dark font-bold text-sm sm:text-base text-left sm:text-right col-span-1 truncate">
-                          ₦{item.amount.toLocaleString()}
-                        </p>
-
-                        <div className="flex justify-start sm:justify-end col-span-1">
-                          {status === "Rejected" ? (
-                            <button className="text-xs sm:text-sm font-[400] text-white bg-[#272727] py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap">
-                              Mark Paid
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => {}}
-                              className="text-xs sm:text-sm font-[400] text-[#767676] bg-transparent py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap hover:bg-[#EAEAEA]"
-                            >
-                              {new Date(item.due_date).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                }
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+      {/* Empty state handling */}
+      {!data || data.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
+          <div className="text-[#767676] mb-4">
+            <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
           </div>
-        )}
+          <h3 className="text-lg sm:text-xl font-semibold text-dark mb-2">
+            No Payment Schedule
+          </h3>
+          <p className="text-sm sm:text-base text-[#767676] max-w-md">
+            There are no payments scheduled at the moment. Payments will appear here once they are available.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2 sm:space-y-4">
+          {data.map((item, index) => {
+            const status = statusMap[item.status];
+            const style = statusStyles[status];
+            const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F5F5F5]";
+
+            return (
+              <div
+                key={item.id}
+                className={`rounded-lg sm:rounded-[30px] ${bgColor} p-3 sm:p-6`}
+              >
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 w-full items-center">
+                  <div className="min-w-0 col-span-1 xs:col-span-2 sm:col-span-1">
+                    <p className="text-sm sm:text-base font-[325] text-dark truncate">
+                      Payment {item.property?.name || "Property"}
+                    </p>
+                    <p className="font-[400] text-xs sm:text-sm text-[#767676] truncate">
+                      Payment #{item.id}
+                    </p>
+                  </div>
+
+                  <div className="flex justify-start sm:justify-center col-span-1">
+                    <button
+                      className={`text-xs sm:text-sm font-[400] ${style.text} ${style.bg} border ${style.border} py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap`}
+                    >
+                      {status}
+                    </button>
+                  </div>
+
+                  <p className="text-dark font-bold text-sm sm:text-base text-left sm:text-right col-span-1 truncate">
+                    ₦{item.amount.toLocaleString()}
+                  </p>
+
+                  <div className="flex justify-start sm:justify-end col-span-1">
+                    {status === "Rejected" ? (
+                      <button className="text-xs sm:text-sm font-[400] text-white bg-[#272727] py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap">
+                        Mark Paid
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {}}
+                        className="text-xs sm:text-sm font-[400] text-[#767676] bg-transparent py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap hover:bg-[#EAEAEA]"
+                      >
+                        {new Date(item.due_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  </div>
+)}
       </div>
       <>
         {isAllocationModalOpen && (

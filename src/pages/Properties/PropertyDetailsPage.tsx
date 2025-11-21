@@ -21,6 +21,8 @@ import { resetPublishDraftState } from "../../components/Redux/Properties/publis
 import { EdithBackgroung } from "../../components/Tables/forProperties";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { string } from "yup";
+import { SafeDescriptionSection } from "./cleanup";
+import { formatDate } from "../../utils/formatdate";
 
 const PropertyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,12 +51,12 @@ const PropertyDetailsPage = () => {
     (File | string | null)[]
   >([]);
   // const { isLandProperty } = useContext(PropertyContext)!;
-  const isLandProperty = data?.properties?.[0]?.category === "estate";
+  const isLandProperty = data?.properties?.category === "estate";
 
   // Initialize form data and gallery previews
   useEffect(() => {
-    if (data?.properties?.[0]) {
-      const property = data.properties[0];
+    if (data?.properties) {
+      const property = data.properties;
       setFormData(property);
       setImagePreview(property.display_image);
       setGalleryPreviews(property.photos || []);
@@ -115,12 +117,12 @@ const PropertyDetailsPage = () => {
     }
   };
 
-const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
-  setFormData((prev) => ({
-    ...prev,
-    [field]: value,
-  }));
-};
+  const handleArrayInputChange = (field: keyof Property, value: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -345,7 +347,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
       </div>
     );
   if (error) return <div className="p-4 text-red-500">{error}</div>;
-  if (!data?.properties?.[0]) {
+  if (!data?.properties) {
     return (
       <div className="flex items-center justify-center w-full h-screen">
         <NotFound text="Property not found" />
@@ -353,15 +355,19 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
     );
   }
 
-  const property = data.properties[0];
+  const property = data.properties;
 
   const handleGoBack = () => {
     navigate(-1);
   };
 
-
-  const uniquePurposes = [...new Set(formData.details?.map(d => d.purpose).filter(p => p !== undefined && p !== null) || [])];
-
+  const uniquePurposes = [
+    ...new Set(
+      formData.details
+        ?.map((d) => d.purpose)
+        .filter((p) => p !== undefined && p !== null) || []
+    ),
+  ];
 
   return (
     <section className="w-full lg:pl-[38px] lg:pr-[64px] pr-[15px] pl-[15px] pt-8">
@@ -392,8 +398,10 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                   ? "Save Changes"
                   : "Edit Property"}
               </button> */}
-                <button
-                onClick={()=>navigate(`/properties/property-edith/${property.id}`)}
+              <button
+                onClick={() =>
+                  navigate(`/properties/property-edith/${property.id}`)
+                }
                 className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
                 // disabled={isSubmitting}
               >
@@ -508,8 +516,10 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                     ) : (
                       <div className="w-full md:w-2/3 flex justify-start">
                         <p className="text-gray-900 break-words max-w-2xl text-left">
-                
-                                         ₦{property && property.price!= null ? property.price.toLocaleString() : '0'}
+                          ₦
+                          {property && property.price != null
+                            ? property.price.toLocaleString()
+                            : "0"}
                         </p>
                       </div>
                     )}
@@ -677,52 +687,10 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                 </div>
               </div>
 
-              {/* Description Section */}
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                <div className="space-y-4">
-                  {/* Overview */}
-                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                    <label className="text-gray-700 font-medium w-full md:w-1/3">
-                      Overview:
-                    </label>
-                    {isEditing ? (
-                      <textarea
-                        name="overview"
-                        value={formData.overview || ""}
-                        onChange={handleInputChange}
-                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-32"
-                      />
-                    ) : (
-                      <div className="w-full md:w-2/3 flex justify-start">
-                        <div className="text-gray-900 break-words max-w-2xl text-left">
-                          {property.overview || "N/A"}
-                        </div>
-                      </div>
-                    )}
-                  </div> */}
-
-                  {/* Description */}
-                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
-                    <label className="text-gray-700 font-medium w-full md:w-1/3">
-                      Description:
-                    </label>
-                    {isEditing ? (
-                      <textarea
-                        name="description"
-                        value={formData.description || ""}
-                        onChange={handleInputChange}
-                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-32"
-                      />
-                    ) : (
-                      <div className="w-full md:w-2/3 flex justify-start">
-                        <div className="text-gray-900 break-words max-w-2xl text-left">
-                          {property.description || "N/A"}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+              <div className="space-y-4">
+                <SafeDescriptionSection
+                  htmlContent={property.description || ""}
+                />
               </div>
 
               {/* Address Section */}
@@ -884,7 +852,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                       </div>
                     )}
                   </div> */}
-{/* 
+                  {/* 
                   <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
                     <label className="text-gray-700 font-medium w-full md:w-1/3">
                       Nearby Landmarks:
@@ -919,15 +887,15 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                     <div className="w-full md:w-2/3">
                       <textarea
                         value={formData.features?.join(", ") || ""}
-//                         onChange={(e) => {
-//   const input = e.target.value;
-//   const array = input
-//     .split(",")
-//     .map((item) => item.trim())
-//     .filter((item) => item.length > 0); // removes empty entries
-//   handleArrayInputChange("features", array);
-// }}
-  onChange={(e) =>
+                        //                         onChange={(e) => {
+                        //   const input = e.target.value;
+                        //   const array = input
+                        //     .split(",")
+                        //     .map((item) => item.trim())
+                        //     .filter((item) => item.length > 0); // removes empty entries
+                        //   handleArrayInputChange("features", array);
+                        // }}
+                        onChange={(e) =>
                           handleArrayInputChange(
                             "features",
                             e.target.value.split("\n")
@@ -978,7 +946,10 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                     ) : (
                       <p className="text-gray-900 w-full md:w-2/3">
                         {/* ₦{property.initial_deposit.toLocaleString() ?? '0'} */}
-                         ₦{property && property.initial_deposit!= null ? property.initial_deposit.toLocaleString() : '0'}
+                        ₦
+                        {property && property.initial_deposit != null
+                          ? property.initial_deposit.toLocaleString()
+                          : "0"}
                       </p>
                     )}
                   </div>
@@ -997,8 +968,10 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                       />
                     ) : (
                       <p className="text-gray-900 w-full md:w-2/3">
-                    
-                        ₦{property && property.total_amount!= null ? property.total_amount.toLocaleString() : '0'}
+                        ₦
+                        {property && property.total_amount != null
+                          ? property.total_amount.toLocaleString()
+                          : "0"}
                       </p>
                     )}
                   </div>
@@ -1159,7 +1132,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           />
                         ) : (
                           <p className="text-gray-900 w-full md:w-2/3">
-                            {property.discount_start_date || "N/A"}
+                            {formatDate(property.discount_start_date) || "N/A"}
                           </p>
                         )}
                       </div>
@@ -1177,7 +1150,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           />
                         ) : (
                           <p className="text-gray-900 w-full md:w-2/3">
-                            {property.discount_end_date || "N/A"}
+                            {formatDate(property.discount_end_date) || "N/A"}
                           </p>
                         )}
                       </div>
@@ -1528,63 +1501,61 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                 <div className="space-y-4">
                   {isEditing ? (
                     (formData.details || []).map((detail, index) => (
-
-                      <><div
-
-                        key={detail.id || index}
-                        className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
-                      >
-                        <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-1/3">
-                          <label className="text-gray-700 font-medium">
-                            Detail {index + 1} Name:
-                          </label>
-                          <input
-                            type="text"
-                            value={detail.name}
-                            onChange={(e) => {
-                              const updatedDetails = [
-                                ...(formData.details || []),
-                              ];
-                              updatedDetails[index] = {
-                                ...updatedDetails[index],
-                                name: e.target.value,
-                              };
-                              setFormData((prev) => ({
-                                ...prev,
-                                details: updatedDetails,
-                              }));
-
-                            } }
-                            className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
-                            placeholder="Detail Name" />
-
+                      <>
+                        <div
+                          key={detail.id || index}
+                          className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
+                        >
+                          <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-1/3">
+                            <label className="text-gray-700 font-medium">
+                              Detail {index + 1} Name:
+                            </label>
+                            <input
+                              type="text"
+                              value={detail.name}
+                              onChange={(e) => {
+                                const updatedDetails = [
+                                  ...(formData.details || []),
+                                ];
+                                updatedDetails[index] = {
+                                  ...updatedDetails[index],
+                                  name: e.target.value,
+                                };
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  details: updatedDetails,
+                                }));
+                              }}
+                              className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                              placeholder="Detail Name"
+                            />
+                          </div>
+                          <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-2/3">
+                            <label className="text-gray-700 font-medium">
+                              Value:
+                            </label>
+                            <input
+                              type="number"
+                              value={detail.value}
+                              onChange={(e) => {
+                                const updatedDetails = [
+                                  ...(formData.details || []),
+                                ];
+                                updatedDetails[index] = {
+                                  ...updatedDetails[index],
+                                  value: Number(e.target.value),
+                                };
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  details: updatedDetails,
+                                }));
+                              }}
+                              className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                              placeholder="Value"
+                            />
+                          </div>
                         </div>
                         <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-2/3">
-                          <label className="text-gray-700 font-medium">
-                            Value:
-                          </label>
-                          <input
-                            type="number"
-                            value={detail.value}
-                            onChange={(e) => {
-                              const updatedDetails = [
-                                ...(formData.details || []),
-                              ];
-                              updatedDetails[index] = {
-                                ...updatedDetails[index],
-                                value: Number(e.target.value),
-                              };
-                              setFormData((prev) => ({
-                                ...prev,
-                                details: updatedDetails,
-                              }));
-
-                            } }
-                            className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
-                            placeholder="Value" />
-                        </div>
-
-                      </div><div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-2/3">
                           <label className="text-gray-700 font-medium">
                             Purpose:
                           </label>
@@ -1602,7 +1573,7 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                                 ...prev,
                                 details: updatedDetails,
                               }));
-                            } }
+                            }}
                             className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
                           >
                             {uniquePurposes.map((p) => (
@@ -1611,8 +1582,8 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                               </option>
                             ))}
                           </select>
-                        </div></>
-
+                        </div>
+                      </>
                     ))
                   ) : (
                     <div className="space-y-4">
@@ -1622,23 +1593,21 @@ const handleArrayInputChange =  (field: keyof Property, value: string[]) => {
                           className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2"
                         >
                           <label className="text-gray-700 font-medium w-full md:w-1/3">
-
                             {detail.name} :
                           </label>
-                          
+
                           <p className="text-gray-900 w-full md:w-2/3">
-                        ₦{detail && detail.value != null ? detail.value.toLocaleString() : '0'}
+                            ₦
+                            {detail && detail.value != null
+                              ? detail.value.toLocaleString()
+                              : "0"}
                           </p>
 
-                           <label className="text-gray-700 font-medium w-full md:w-1/3">
+                          <label className="text-gray-700 font-medium w-full md:w-1/3">
                             purpose : {detail.purpose}
                           </label>
                         </div>
-                        
                       ))}
-
-                      
-
                     </div>
                   )}
                 </div>

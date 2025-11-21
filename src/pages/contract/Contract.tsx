@@ -22,9 +22,9 @@ import {
 import { fetchContracts } from "../../components/Redux/Contract/contracts_thunk";
 import NotFound from "../../components/NotFound";
 import ContractsTableComponenTwo from "./contractTableTwo";
-import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
+// import { getContract } from "../../components/Redux/UpdateContract/viewcontractFormDetails";
 import NewContractsTable from "./activeContractTable";
-import { useAppSelector } from "../../components/Redux/hook";
+// import { useAppSelector } from "../../components/Redux/hook";
 import AllocationTable from "./AllocationTable";
 import ExportContractModal from "../../components/exportModal/contractExport";
 import { ExportModalRef } from "../../components/exportModal/modalexport";
@@ -43,19 +43,18 @@ export default function Contract() {
   const loading = useSelector((state: RootState) => state.getcontracts.loading);
   const error = useSelector((state: RootState) => state.getcontracts.error);
 
-
   const getContractFilters = useCallback((tab: string) => {
     switch (tab) {
       case "New":
-        return { contract: 0, status: 5 }; 
+        return { contract: 0, status: 5 };
       case "Active":
-        return { contract: 1, status: 1 }; 
+        return { contract: 1, status: 1 };
       case "Completed":
-        return { contract: 1, status: 2 }; 
+        return { contract: 1, status: 2 };
       case "Allocated":
-        return { contract: 1, status: 3 }; 
+        return { contract: 1, status: 3 };
       default:
-        return { contract: 1, status: 1 }; 
+        return { contract: 1, status: 1 };
     }
   }, []);
 
@@ -63,36 +62,45 @@ export default function Contract() {
     const filters = getContractFilters(activeTab);
     dispatch(setContractFilter(filters.contract));
     dispatch(setStatusFilter(filters.status));
-    dispatch(fetchContracts({ 
-      page: 1, 
-      contract: filters.contract, 
-      status: filters.status, 
-      search: searchQuery 
-    }));
+    dispatch(
+      fetchContracts({
+        page: 1,
+        contract: filters.contract,
+        status: filters.status,
+        search: searchQuery,
+      })
+    );
   }, [dispatch, activeTab, getContractFilters, searchQuery]);
 
   const handlePageChange = async (page: number) => {
     const filters = getContractFilters(activeTab);
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchContracts({ 
-      page, 
-      contract: filters.contract, 
-      status: filters.status, 
-      search: searchQuery 
-    }));
+    await dispatch(
+      fetchContracts({
+        page,
+        contract: filters.contract,
+        status: filters.status,
+        search: searchQuery,
+      })
+    );
   };
 
+  useEffect(() => {
+    dispatch(setSearchFilter(""));
+  }, [dispatch]);
   const handleSearch = useCallback(
     (query: string) => {
       setSearchQuery(query);
       const filters = getContractFilters(activeTab);
       dispatch(setSearchFilter(query));
-      dispatch(fetchContracts({ 
-        page: 1, 
-        contract: filters.contract, 
-        status: filters.status, 
-        search: query 
-      }));
+      dispatch(
+        fetchContracts({
+          page: 1,
+          contract: filters.contract,
+          status: filters.status,
+          search: query,
+        })
+      );
     },
     [dispatch, activeTab, getContractFilters]
   );
@@ -117,7 +125,7 @@ export default function Contract() {
       </div>
     );
   }
- const contractModalRef = useRef<ExportModalRef>(null);
+  const contractModalRef = useRef<ExportModalRef>(null);
   const openPaymentsModal = () => {
     if (contractModalRef.current) {
       contractModalRef.current.openModal();
@@ -129,7 +137,7 @@ export default function Contract() {
         title="Contracts"
         subtitle="Manage the list of contracts for each property bought by user"
         // showSearchAndButton={false}
-         buttonText="export"
+        buttonText="export"
         onButtonClick={openPaymentsModal}
       />
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
@@ -167,64 +175,68 @@ export default function Contract() {
       </div>
 
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-      <ReusableTable
-  activeTab={activeTab}
-  onTabChange={setActiveTab}
-  tabs={["New", "Active", "Completed", "Allocated"]}
-  searchPlaceholder={"Search by contract ID or email"}
-  showTabs={true}
-  onSearch={handleSearch}
->
-  {loading ? (
-    <div className="w-full flex items-center justify-center">
-      <LoadingAnimations loading={loading} />
-    </div>
-  ) : !loading && (!contractList || contractList.length === 0) ? (
-    <div className="max-h-screen">
-      <p className="text-center font-normal text-[#767676]">No data found</p>
-      <NotFound />
-    </div>
-  ) : activeTab === "New" ? (
-    // 1
-    <ContractsTableComponent
-                  data={contractList || []}
-                  pagination={contractPagination}
-                  onPageChange={handlePageChange}
-                  getStatusText={getStatusText} page={1} statuss={5} contract={0}    />
-  ) : activeTab === "Active" ? (
-    <NewContractsTable
-      data={contractList || []}
-      pagination={contractPagination}
-      onPageChange={handlePageChange}
-      getStatusText={getStatusText}
-    />
-  ) :  activeTab === "Completed" ? (
-    <NewContractsTable
-      data={contractList || []}
-      pagination={contractPagination}
-      onPageChange={handlePageChange}
-      getStatusText={getStatusText}
-    />
-  ):  activeTab === "Allocated" ? (
-    <AllocationTable
-      data={contractList || []}
-      pagination={contractPagination}
-      onPageChange={handlePageChange}
-      getStatusText={getStatusText}
-    />
-  ) : (
-    <ContractsTableComponenTwo
-      data={contractList || []}
-      pagination={contractPagination}
-      onPageChange={handlePageChange}
-      getStatusText={getStatusText}
-    />
-    
-  )}
-</ReusableTable>
-
+        <ReusableTable
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabs={["New", "Active", "Completed", "Allocated"]}
+          searchPlaceholder={"Search by contract ID or email"}
+          showTabs={true}
+          onSearch={handleSearch}
+        >
+          {loading ? (
+            <div className="w-full flex items-center justify-center">
+              <LoadingAnimations loading={loading} />
+            </div>
+          ) : !loading && (!contractList || contractList.length === 0) ? (
+            <div className="max-h-screen">
+              <p className="text-center font-normal text-[#767676]">
+                No data found
+              </p>
+              <NotFound />
+            </div>
+          ) : activeTab === "New" ? (
+            // 1
+            <ContractsTableComponent
+              data={contractList || []}
+              pagination={contractPagination}
+              onPageChange={handlePageChange}
+              getStatusText={getStatusText}
+              page={1}
+              statuss={5}
+              contract={0}
+            />
+          ) : activeTab === "Active" ? (
+            <NewContractsTable
+              data={contractList || []}
+              pagination={contractPagination}
+              onPageChange={handlePageChange}
+              getStatusText={getStatusText}
+            />
+          ) : activeTab === "Completed" ? (
+            <NewContractsTable
+              data={contractList || []}
+              pagination={contractPagination}
+              onPageChange={handlePageChange}
+              getStatusText={getStatusText}
+            />
+          ) : activeTab === "Allocated" ? (
+            <AllocationTable
+              data={contractList || []}
+              pagination={contractPagination}
+              onPageChange={handlePageChange}
+              getStatusText={getStatusText}
+            />
+          ) : (
+            <ContractsTableComponenTwo
+              data={contractList || []}
+              pagination={contractPagination}
+              onPageChange={handlePageChange}
+              getStatusText={getStatusText}
+            />
+          )}
+        </ReusableTable>
       </div>
-     <ExportContractModal ref={contractModalRef} />
+      <ExportContractModal ref={contractModalRef} />
     </div>
   );
 }

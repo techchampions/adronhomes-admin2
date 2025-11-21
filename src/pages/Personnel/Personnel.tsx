@@ -5,20 +5,13 @@ import UsersTableComponent from "./Personnel_Table";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { personnels } from "../../components/Redux/personnel/personnel_thunk";
-import { User } from "../../components/Redux/personnel/edithPersonelle";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
 import { PropertyContext } from "../../MyContext/MyContext";
-
-interface UsersTable {
-  id: number;
-  User: string;
-  Email: string;
-  Role: string;
-  Created: string;
-  user: User;
-  referral_code: any;
-}
+import {
+  setPersonnelSearch,
+  setCurrentPage,
+} from "../../components/Redux/personnel/personnel_slice";
 
 const getRoleName = (roleId: number): string => {
   switch (roleId) {
@@ -39,47 +32,36 @@ const getRoleName = (roleId: number): string => {
     case 7:
       return "Info Tech";
     case 8:
-
       return "Client service";
-
     default:
       return "Unknown";
   }
 };
 
-
 export default function Personnel() {
-  const sortOptions = [
-    { value: 0, name: "All" },
-    { value: 1, name: "Admin" },
-    { value: 2, name: "Marketer" },
-    { value: 3, name: "Sales Director" },
-    { value: 4, name: "Accountant" },
-    { value: 5, name: "Human Resources" },
-    { value: 6, name: "Legal", },
-    { value: 7, name: "Info Tech", },
-    { value: 8, name: "Client service", }
-
-
-  ];
-
-
-
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
-  const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch<AppDispatch>();
-  const { data, error, loading } = useSelector(
+  const { data, error, loading, search, pagination } = useSelector(
     (state: RootState) => state.getpersonnel
   );
 
-  const { option, setOption } = useContext(PropertyContext)!;
+  const { option } = useContext(PropertyContext)!;
 
+  // Fetch data on mount, and when search or role changes
   useEffect(() => {
-    // const roleValues = sortOptions.map(option => option.value);
-    dispatch(personnels({ role: option.value }));
-  }, [dispatch, option]);
+    dispatch(personnels({ role: option.value, search }));
+  }, [dispatch, option.value, search, pagination.currentPage]);
+
+  const handleSearch = (term: string) => {
+    dispatch(setPersonnelSearch(term)); // Resets page to 1 inside reducer
+    dispatch(personnels({ role: option.value, search: term }));
+  };
+  useEffect(()=>{
+ dispatch(setPersonnelSearch(''))
+   dispatch(personnels({ role: option.value, search: "" }));
+  },[dispatch])
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
@@ -99,22 +81,7 @@ export default function Personnel() {
   };
 
   const allData = personnelData();
-
-  // Filter data based on search term
-  const filteredData = allData.filter((item) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      item.User.toLowerCase().includes(searchLower) ||
-      item.Email.toLowerCase().includes(searchLower) ||
-      item.Role.toLowerCase().includes(searchLower)
-    );
-  });
-
-  const isEmpty = filteredData.length === 0;
-
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-  };
+  const isEmpty = allData.length === 0;
 
   return (
     <div className="mb-[52px]">
@@ -128,15 +95,11 @@ export default function Personnel() {
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          searchPlaceholder="search for personnel"
+          searchPlaceholder="Search for personnel"
           onSearch={handleSearch}
-          sortOptions={sortOptions}
-          onSortChange={setOption}
-          defaultSort={0}
         >
           {loading ? (
-            <div className=" w-full flex items-center justify-center">
-              {" "}
+            <div className="w-full flex items-center justify-center">
               <LoadingAnimations loading={loading} />
             </div>
           ) : isEmpty ? (
@@ -147,7 +110,7 @@ export default function Personnel() {
               <NotFound />
             </div>
           ) : (
-            <UsersTableComponent userData={filteredData} />
+            <UsersTableComponent userData={allData} />
           )}
         </ReusableTable>
       </div>

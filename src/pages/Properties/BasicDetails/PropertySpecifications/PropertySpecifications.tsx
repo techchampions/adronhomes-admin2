@@ -359,7 +359,7 @@ useEffect(() => {
           value={formik.values.description}
           onChange={formik.handleChange}
           required
-          rows={6}
+          // rows={6}
           error={
             formik.touched.description && formik.errors.description
               ? formik.errors.description
@@ -438,7 +438,7 @@ useEffect(() => {
           name="documents"
           value={formik.values.documents}
           onChange={(e) => formik.setFieldValue("documents", e.target.value)}
-          rows={6}
+          // rows={6}
           error={
             formik.touched.documents && formik.errors.documents
               ? formik.errors.documents

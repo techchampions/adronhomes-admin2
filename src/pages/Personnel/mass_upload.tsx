@@ -191,7 +191,7 @@ const MassUploadModal: React.FC<MassUploadModalProps> = ({
             )}
             <div className="mt-4 text-xs text-gray-500">
               <p>Supported formats: .xlsx, .xls</p>
-              <p className="mt-1">
+              {/* <p className="mt-1">
                 Download template:
                 <a
                   href="/path-to-template/employee-template.xlsx"
@@ -200,7 +200,7 @@ const MassUploadModal: React.FC<MassUploadModalProps> = ({
                 >
                   Employee Template
                 </a>
-              </p>
+              </p> */}
             </div>
           </div>
           <div className="flex justify-between items-center gap-2 mt-8">

@@ -66,13 +66,18 @@ export default function Properties() {
     return () => clearTimeout(debounceTimer);
   }, [dispatch, currentState.pagination.currentPage, currentState.search, activeTab]);
 
-  const handleSearch = (value: string) => {
+
+useEffect(()=>{
+      const type = activeTab.toLowerCase() as "drafted" | "published" | "sold";
+   dispatch(setPropertiesSearch({ type, search: "" }));
+},[dispatch])
+  const handleSearch = useCallback( (value: string) => {
     const type = activeTab.toLowerCase() as "drafted" | "published" | "sold";
     dispatch(setPropertiesSearch({ type, search: value }));
-    setIsSearching(true);
+    // setIsSearching(true);
     
-    setTimeout(() => setIsSearching(false), 1000);
-  };
+    // setTimeout(() => setIsSearching(false), 1000);
+  },[]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

@@ -153,6 +153,8 @@ interface PropertyContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   isLandProperty: boolean;
+  setIsLandProperty2: (isLand: boolean) => void;
+  isLandProperty2: boolean;
   setIsLandProperty: (isLand: boolean) => void;
   isBulk: boolean;
   setIsBulk: (isBulk: boolean) => void;
@@ -298,6 +300,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
   );
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLandProperty, setIsLandProperty] = useState<boolean>(false);
+    const [isLandProperty2, setIsLandProperty2] = useState<boolean>(false);
   const [isBulk, setIsBulk] = useState<boolean>(false);
   const [showBulkModal, setShowBulkModal] = useState<boolean>(false);
   const [showPersonnelModal, setPersonnelModal] = useState<boolean>(false);
@@ -570,7 +573,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           formPayload.append("description", landForm.description);
         }
         if (landForm.unitsAvailable) {
-          const unitsAvailable = parseInt(landForm.unitsAvailable) || 1;
+          const unitsAvailable = parseInt(landForm.unitsAvailable) || 0;
           formPayload.append("number_of_unit", unitsAvailable.toString());
         }
         if (landForm.director_id) {
@@ -622,7 +625,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           formPayload.append("year_built", specifications.yearBuilt || "");
         }
         if (specifications.unitsAvailable) {
-          const unitsAvailable = parseInt(specifications.unitsAvailable) || 1;
+          const unitsAvailable = parseInt(specifications.unitsAvailable) || 0;
           formPayload.append("number_of_unit", unitsAvailable.toString());
         }
         if (specifications.director_id) {
@@ -678,7 +681,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         formPayload.append("video_link", media.videoLink);
       }
       if (media.mapUrl) {
-        formPayload.append("map_link", media.mapUrl);
+        formPayload.append("property_map", media.mapUrl);
       }
 
       if (paymentStructure.paymentType) {
@@ -836,7 +839,8 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         director_name,
         setDirectorName,
         previousPropType,
-        setpreviousPropType
+        setpreviousPropType,
+        isLandProperty2, setIsLandProperty2
       }}
     >
       {children}

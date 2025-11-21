@@ -14,6 +14,7 @@ import {
   selectCompletedPropertyPagination,
   selectCustomerActivePlans,
   selectCustomerCompletedProperties,
+  setUsername,
 } from "../../components/Redux/customers/customerByid";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import { formatDate } from "../../utils/formatdate";
@@ -44,7 +45,7 @@ export default function CustomerSinglePage() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-    const location = useLocation();
+  const location = useLocation();
 
   const { data, loading, error } = useSelector(
     (state: RootState) => state.customerById
@@ -177,7 +178,7 @@ export default function CustomerSinglePage() {
         StartDate: item.start_date ? formatDate(item.start_date) : "N/A",
         FinalPayment: item.end_date ? formatDate(item.end_date) : "N/A",
         property: item.property,
-           user_id: item.user_id,
+        user_id: item.user_id,
         plan_id: item.id,
       };
     }) || [];
@@ -322,20 +323,26 @@ export default function CustomerSinglePage() {
 
       <div className="grid md:grid-cols-2 gap-[20px]">
         <div className=" w-full relative ">
-     <button
-  className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1 px-2 rounded-full border"
-  onClick={() => {
-    const path = location.pathname;
-    const basePath = path.startsWith("/payments/customers")
-      ? "/payments/customers/transactions"
-      : path.startsWith("/client/customers")
-      ? "/client/customers/transactions"
-      : "/customers/transactions";
+          <button
+            className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1 px-2 rounded-full border"
+            onClick={() => {
+              const path = location.pathname;
+              const basePath = path.startsWith("/payments/customers")
+                ? "/payments/customers/payment/"
+                : path.startsWith("/client/customers")
+                ? "/client/customers/payment"
+                : "/customers/payment";
 
-    navigate(`${basePath}/${id}`);
-  }}
->
-            view Transactions
+              navigate(`${basePath}/${id}`);
+              if (data?.customer) {
+                const fullName =
+                  `${data.customer.first_name} ${data.customer.last_name}`.trim();
+                dispatch(setUsername(fullName || "Unknown Customer"));
+              }
+            }}
+          >
+           
+            View property payments
           </button>
           <MatrixCardGreen
             title="Total Amount Paid"
@@ -344,27 +351,31 @@ export default function CustomerSinglePage() {
           />
         </div>
 
-          <div className=" w-full relative ">
-   <button
-  className="absolute z-50 right-5 top-5 text-xs font-semibold text-white bg- py-1 px-2 rounded-full border"
-  onClick={() => {
-    const path = location.pathname;
-    const basePath = path.startsWith("/payments/customers")
-      ? "/payments/customers/transactions"
-      : path.startsWith("/client/customers")
-      ? "/client/customers/transactions"
-      : "/customers/transactions";
-
-    navigate(`${basePath}/${id}`);
-  }}
->
-            view Wallet Trnx
+        <div className=" w-full relative ">
+          <button
+            className="absolute z-50 right-5 top-5 text-xs font-semibold  bg- py-1 px-2 rounded-full border"
+            onClick={() => {
+              const path = location.pathname;
+              const basePath = path.startsWith("/payments/customers")
+                ? "/payments/customers/transactions"
+                : path.startsWith("/client/customers")
+                ? "/client/customers/transactions"
+                : "/customers/transactions";
+              if (data?.customer) {
+                const fullName =
+                  `${data.customer.first_name} ${data.customer.last_name}`.trim();
+                dispatch(setUsername(fullName || "Unknown Customer"));
+              }
+              navigate(`${basePath}/${id}`);
+            }}
+          >
+         view Wallet Trnx
           </button>
-      <MatrixCard
-          title="Total Wallet Balance"
-        value={formatAsNaira(data.wallet_amount)}
-          change="Includes total  wallet balance of this customer"
-        />
+          <MatrixCard
+            title="Total Wallet Balance"
+            value={formatAsNaira(data.wallet_amount)}
+            change="Includes total  wallet balance of this customer"
+          />
         </div>
         <MatrixCard
           title="Total Pending Payments"
@@ -376,7 +387,6 @@ export default function CustomerSinglePage() {
           value={data.active_property.toString()}
           change="Includes all active property plans of this customer"
         />
-           
       </div>
 
       <ProfileCard

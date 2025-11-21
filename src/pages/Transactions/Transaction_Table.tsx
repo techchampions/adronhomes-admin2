@@ -4,11 +4,12 @@ import Pagination from "../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 // import { selectUserPaymentsPagination, setCurrentPage } from "../../components/Redux/UserPayments/userPaymentsSlice";
 import { AppDispatch } from "../../components/Redux/store";
-import { selectUserPaymentsPagination, setCurrentPage } from "../../components/Redux/Payment/userPayment/ userPaymentsSlice";
-import { fetchUserPayments } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
+
 import PaymentModal from "../../components/Modals/Transaction";
 import { formatDate } from "../../utils/formatdate";
-// import PaymentModal from "../../components/Modals/PaymentModal";
+import { selectUserTransactionsPagination, setCurrentPage } from "../../components/Redux/Payment/userPayment/ userPaymentsSlice";
+import { fetchUserTransactions } from "../../components/Redux/Payment/userPayment/usePaymentThunk";
+
 
 export interface PaymentData {
   id: number;
@@ -16,7 +17,7 @@ export interface PaymentData {
   marketerInCharge: string;
   amount: string;
   status: "Approved" | "Pending" | "Rejected";
-  paymentDate: string;
+  transactionDate: string;
   description: string;
   payment_type: string;
   reference: string;
@@ -36,13 +37,13 @@ interface PaymentDatas {
 export default function PaymentTableComponent({ data,userId }: {data:any,userId:any}) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const pagination = useSelector(selectUserPaymentsPagination);
+  const pagination = useSelector(selectUserTransactionsPagination);
   const [selectedPayment, setSelectedPayment] = useState<PaymentData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePageChange = async (page: number) => {
     await dispatch(setCurrentPage(page));
-    await dispatch(fetchUserPayments({ userId: userId,page })); 
+    await dispatch(fetchUserTransactions({ userId: userId,page })); 
   };
 
   const handleRowClick = (payment: PaymentData) => {
@@ -66,7 +67,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
       amount: payment.amount,
       reference: payment.reference,
       status: payment.status === "Rejected" ? "Failed" : payment.status,
-      paymentDate: payment.paymentDate,
+      transactionDate: payment.transactionDate,
       director: payment.director ? 
         `${payment.director.first_name} ${payment.director.last_name}` : 'N/A'
     };
@@ -83,7 +84,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                   <div className="truncate">Payment ID</div>
                 </th>
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[200px] max-w-[200px]">
-                  <div className="truncate">Payer Name</div>
+                  <div className="truncate">Description</div>
                 </th>
              
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs w-[150px] max-w-[150px]">
@@ -108,7 +109,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                     <div className="truncate">{payment.id}</div>
                   </td>
                   <td className="py-4 pr-6 font-medium text-dark text-sm w-[200px] max-w-[200px]">
-                    <div className="truncate">{payment.customerName}</div>
+                    <div className="truncate">{payment.description}</div>
                   </td>
                  
                   <td className="py-4 pr-6 font-[325] text-dark text-sm w-[150px] max-w-[150px]">
@@ -129,7 +130,7 @@ export default function PaymentTableComponent({ data,userId }: {data:any,userId:
                   </td>
                   <td className="py-4 pl-6 font-[325] text-dark text-sm w-[120px] max-w-[120px]">
                     <div className="truncate">
-                      {formatDate(payment.paymentDate)}
+                      {formatDate(payment.transactionDate)}
                     </div>
                   </td>
                 </tr>

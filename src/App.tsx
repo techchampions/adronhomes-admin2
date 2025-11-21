@@ -69,10 +69,13 @@ import Dashboard_It from "./components/ItAdmin/Dashboard_It";
 import InfoTechSidebar from "./components/ItAdmin/sideNav";
 import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
 import EditProperty from "./pages/Properties/GeneralEditing";
+import LoginMarketers from "./components/Login/loginForMarketers";
+import UserWallet from "./pages/UserWallet/UserWallet";
+import UserPaymentsPage from "./pages/Transactions/UserPaymentsPage";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
-  const token = Cookies.get('token');
+  const token = Cookies.get("token");
   if (!token) {
     return <Navigate to="/" replace />;
   }
@@ -91,9 +94,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isPayments = location.pathname.startsWith("/payments/");
   const isLegal = location.pathname.startsWith("/legal");
   const client = location.pathname.startsWith("/client/");
-  const shouldShowSidebar = location.pathname !== "/";
-  const isinfotech=location.pathname.startsWith("/info-tech")
+  const shouldShowSidebar =
+    location.pathname !== "/" && location.pathname !== "/login-marketer";
 
+  const isinfotech = location.pathname.startsWith("/info-tech");
+  // const marketer_login=
   return (
     <div className="flex">
       {shouldShowSidebar && (
@@ -110,9 +115,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <ClientSidebar />
           ) : isLegal ? (
             <LegalSideBar />
-          ): isinfotech ? (
+          ) : isinfotech ? (
             <InfoTechSidebar />
-          )  : (
+          ) : (
             <AdminSidebar />
           )}
         </div>
@@ -134,18 +139,19 @@ const App = () => {
   useAxiosInterceptor();
 
   return (
-    <Provider store={store}>
+    <Provider store={store} >
       <QueryProvider>
         <PropertyProvider>
           <AppLayout>
             <Routes>
               {/* Public Route */}
               <Route path="/" element={<Login />} />
+              <Route path="/login-marketer" element={<LoginMarketers />} />
 
               {/* Protected Routes */}
               <Route element={<AuthGuard />}>
                 {/* Admin Routes */}
-                  <Route
+                <Route
                   path="/partnership-requests"
                   element={<ClientsPartnership />}
                 />
@@ -159,9 +165,8 @@ const App = () => {
                 <Route
                   path="/properties/property-edith/:id"
                   element={<EditProperty />}
-                  
                 />
-                  <Route
+                <Route
                   path="/properties/:id"
                   element={<PropertyDetailsPage />}
                 />
@@ -180,7 +185,7 @@ const App = () => {
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
                 />
-             
+
                 <Route
                   path="/director/requests-enquiries/:id"
                   element={<PropertyEnquiries />}
@@ -230,6 +235,11 @@ const App = () => {
                   path="/customers/transactions/:id"
                   element={<UserPayments />}
                 />
+   <Route
+               path="/customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
+                
                 <Route
                   path="/customers/wallet-transactions/:id"
                   element={<WalletTransactionsPage />}
@@ -244,7 +254,7 @@ const App = () => {
                   element={<Customers_payment />}
                 />
                 <Route path="/properties/form" element={<General />} />
-               
+
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
 
@@ -292,6 +302,10 @@ const App = () => {
                     path="customers/transactions/:id"
                     element={<UserPayments />}
                   />
+                     <Route
+               path="customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
                   <Route
                     path="customers/wallet-transactions/:id"
                     element={<WalletTransactionsPage />}
@@ -339,10 +353,12 @@ const App = () => {
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
-
+     {/* user wallet */}
+   <Route path="wallet-Transactions" element={<UserWallet />} />
+     
               {/* Client Routes (Unprotected) */}
               <Route path="/client" element={<AuthGuard />}>
-                 <Route
+                <Route
                   path="partnership-requests"
                   element={<ClientsPartnership />}
                 />
@@ -351,6 +367,10 @@ const App = () => {
                 <Route
                   path="customers/transactions/:id"
                   element={<UserPayments />}
+                />
+                   <Route
+               path="customers/payment/:id"
+                  element={<UserPaymentsPage />}
                 />
                 <Route
                   path="customers/wallet-transactions/:id"
@@ -375,7 +395,7 @@ const App = () => {
 
               {/* Info-Tech Route Group */}
               <Route path="/info-tech" element={<AuthGuard />}>
-               <Route index element={<Dashboard_It />} />
+                <Route index element={<Dashboard_It />} />
                 {/* Requests & Enquiries Routes */}
                 <Route
                   path="requests-enquiries"
@@ -421,18 +441,15 @@ const App = () => {
                 <Route
                   path="settings/add-account"
                   element={<AccountDetails />}
-                
                 />
 
-                  <Route path="error-500" element={<Error500 />} />
-                  <Route path="*" element={<Error404 />} />
+                <Route path="error-500" element={<Error500 />} />
+                <Route path="*" element={<Error404 />} />
               </Route>
 
               {/* Top-Level Catch-All for Unmatched Routes */}
               <Route path="*" element={<Error404 />} />
             </Routes>
-
-         
           </AppLayout>
           {isInfrastructure && (
             <InfrastructureFeesModal

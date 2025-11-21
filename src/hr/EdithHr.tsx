@@ -103,7 +103,7 @@ const EditJobModal: React.FC<EditJobModalProps> = ({
                 value={formik.values.description}
                 onChange={formik.handleChange}
                 required
-                rows={4}
+                // rows={4}
               />
 
               <InputField
@@ -140,7 +140,7 @@ const EditJobModal: React.FC<EditJobModalProps> = ({
                 name="key_responsibility"
                 value={formik.values.key_responsibility}
                 onChange={formik.handleChange}
-                rows={3}
+                // rows={3}
               />
 
               <InputAreaField
@@ -149,7 +149,7 @@ const EditJobModal: React.FC<EditJobModalProps> = ({
                 name="requirements"
                 value={formik.values.requirements}
                 onChange={formik.handleChange}
-                rows={3}
+                // rows={3}
               />
 
               <InputAreaField
@@ -158,7 +158,7 @@ const EditJobModal: React.FC<EditJobModalProps> = ({
                 name="qualifications"
                 value={formik.values.qualifications}
                 onChange={formik.handleChange}
-                rows={3}
+                // rows={3}
               />
 
               <InputField

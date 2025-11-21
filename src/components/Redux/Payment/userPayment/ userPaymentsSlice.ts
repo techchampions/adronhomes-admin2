@@ -1,27 +1,26 @@
-// userPaymentsSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PaymentListData, PaymentsResponse } from "./type";
-import { fetchUserPayments } from "./usePaymentThunk";
+import { TransactionListData, TransactionsResponse } from "./type";
+import { fetchUserTransactions } from "./usePaymentThunk";
 
-
-interface PaymentPaginationState {
+interface TransactionPaginationState {
   currentPage: number;
   perPage: number;
   totalItems: number;
   totalPages: number;
-  statusFilter: number | null;
-  searchFilter: string | null;
+  
 }
 
-interface UserPaymentsState {
-  data: PaymentListData | null;
+interface UserTransactionsState {
+  stats: { total: number; approved: number; pending: number; amount_total: number; amount_approved: number; amount_pending: number; };
+  items: never[];
+  data: TransactionListData | null;
   loading: boolean;
   error: string | null;
   success: boolean;
-  pagination: PaymentPaginationState;
+  pagination: TransactionPaginationState;
 }
 
-const initialState: UserPaymentsState = {
+const initialState: UserTransactionsState = {
   data: null,
   loading: false,
   error: null,
@@ -31,30 +30,30 @@ const initialState: UserPaymentsState = {
     perPage: 10,
     totalItems: 0,
     totalPages: 1,
-    statusFilter: null,
-    searchFilter: null,
   },
+  stats: {
+    total: 0,
+    approved: 0,
+    pending: 0,
+    amount_total: 0,
+    amount_approved: 0,
+    amount_pending: 0
+  },
+  items: []
 };
 
-const userPaymentsSlice = createSlice({
-  name: "userPaymentsbyid",
+const userTransactionsSlice = createSlice({
+  name: "userTransactionsbyid",
   initialState,
   reducers: {
-    resetUserPaymentsState: () => initialState,
+    resetUserTransactionsState: () => initialState,
     setCurrentPage: (state, action: PayloadAction<number>) => {
       if (state.data) {
         state.data.current_page = action.payload;
       }
       state.pagination.currentPage = action.payload;
     },
-    setStatusFilter: (state, action: PayloadAction<number | null>) => {
-      state.pagination.statusFilter = action.payload;
-      state.pagination.currentPage = 1;
-    },
-    setSearchFilter: (state, action: PayloadAction<string | null>) => {
-      state.pagination.searchFilter = action.payload;
-      state.pagination.currentPage = 1;
-    },
+  
     setPerPage: (state, action: PayloadAction<number>) => {
       state.pagination.perPage = action.payload;
       state.pagination.currentPage = 1;
@@ -62,16 +61,16 @@ const userPaymentsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserPayments.pending, (state) => {
+      .addCase(fetchUserTransactions.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
       .addCase(
-        fetchUserPayments.fulfilled,
-        (state, action: PayloadAction<PaymentsResponse>) => {
+        fetchUserTransactions.fulfilled,
+        (state, action: PayloadAction<TransactionsResponse>) => {
           state.loading = false;
-          state.success = action.payload.status === "success";
+          state.success = action.payload.success;
           state.data = action.payload.data;
           
           state.pagination = {
@@ -83,36 +82,34 @@ const userPaymentsSlice = createSlice({
           };
         }
       )
-      .addCase(fetchUserPayments.rejected, (state, action) => {
+      .addCase(fetchUserTransactions.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch user payments";
+        state.error = action.payload?.message || "Failed to fetch user transactions";
         state.success = false;
       });
   },
 });
 
 export const { 
-  resetUserPaymentsState, 
+  resetUserTransactionsState, 
   setCurrentPage, 
-  setStatusFilter, 
-  setSearchFilter,
   setPerPage
-} = userPaymentsSlice.actions;
+} = userTransactionsSlice.actions;
 
-export default userPaymentsSlice.reducer;
+export default userTransactionsSlice.reducer;
 
 // Selectors
-export const selectUserPaymentsPagination = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsPagination = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.pagination;
 
-export const selectUserPaymentsList = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsList = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.data?.data;
 
-export const selectUserPaymentsLoading = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsLoading = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.loading;
 
-export const selectUserPaymentsError = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsError = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.error;
 
-export const selectUserPaymentsSuccess = (state: { userPayments: UserPaymentsState }) =>
+export const selectUserTransactionsSuccess = (state: { userPayments: UserTransactionsState }) =>
   state.userPayments.success;
