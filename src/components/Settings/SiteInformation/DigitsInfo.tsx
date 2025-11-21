@@ -29,7 +29,7 @@ const DigitsInfo = () => {
 
   const validationSchema = Yup.object().shape({
     properties: Yup.string().required("required"),
-    nomOfClients: Yup.string().required("required"),
+    numOfClients: Yup.string().required("required"),
     team: Yup.string().required("required"),
     location: Yup.string().required("required"),
     exp: Yup.string().required("required"),
