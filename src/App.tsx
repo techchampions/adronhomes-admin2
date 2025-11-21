@@ -160,7 +160,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
-                <Route path="reset-password" element={<ResetCard />} />
+             
 
                 <Route
                   path="/payment/status/:paymentId"
@@ -201,6 +201,7 @@ const App = () => {
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/settings/sliders" element={<SliderSettings />} />
+                   <Route path="/settings/reset-password" element={<ResetCard />} />
                 <Route
                   path="/settings/page-headers"
                   element={<HeaderSettings />}
