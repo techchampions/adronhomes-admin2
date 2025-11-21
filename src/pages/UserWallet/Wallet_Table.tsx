@@ -15,7 +15,6 @@ export interface WalletTransactionData {
   status: any
   transactionDate: any;
   description: string;
-  // transactionDate:any
   transactionType: "credit" | "debit";
   reference: string;
   transactionMethod: string;

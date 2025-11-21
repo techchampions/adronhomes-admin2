@@ -72,6 +72,8 @@ import EditProperty from "./pages/Properties/GeneralEditing";
 import LoginMarketers from "./components/Login/loginForMarketers";
 import UserWallet from "./pages/UserWallet/UserWallet";
 import UserPaymentsPage from "./pages/Transactions/UserPaymentsPage";
+import SettingsCard from "./marketer/SettingsCard";
+import ResetCard from "./components/Modals/settings/changepassword";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -158,6 +160,8 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
+                <Route path="reset-password" element={<ResetCard />} />
+
                 <Route
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
