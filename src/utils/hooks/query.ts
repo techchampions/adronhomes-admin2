@@ -180,7 +180,7 @@ export const useGetSocials = () => {
 export const useGetDigits = () => {
   return useQuery<SettingsResponse>({
     queryKey: ["settings", "digits"],
-    queryFn: () => getSettings("digits"),
+    queryFn: () => getSettings("digit"),
   });
 };
 export const useGetEquiryInfo = () => {

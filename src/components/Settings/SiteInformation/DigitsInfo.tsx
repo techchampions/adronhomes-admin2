@@ -15,7 +15,7 @@ const DigitsInfo = () => {
   const info = data?.data.data || [];
   const properties = info.find((item) => item.name === "Properties");
   const numOfClients = info.find((item) => item.name === "Number of Clients");
-  const team = info.find((item) => item.name === "Teams Members");
+  const team = info.find((item) => item.name === "Team Members");
   const location = info.find((item) => item.name === "Location");
   const exp = info.find((item) => item.name === "Years of Exp.");
 
