@@ -43,6 +43,7 @@ export interface Customer {
   saved_property_total: number;
   // Updated marketer type
   marketer: Marketer;
+  virtual_account:VirtualAccount
 }
 
 export interface CustomersList {
@@ -64,6 +65,20 @@ export interface CustomersList {
   to: number;
   total: number;
 }
+
+export interface VirtualAccount {
+  id: number;
+  account_name: string;
+  account_number: string;
+  account_bank: string;
+  account_balance: number;
+  user_id: number;
+  is_deactivated: number;  
+  created_at: string;      
+  updated_at: string;       
+  is_generated: number;    
+}
+
 
 export interface CustomersData {
   total: number;

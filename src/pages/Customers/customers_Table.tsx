@@ -1,6 +1,6 @@
 // CustomersTableComponent.tsx
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IoCaretBack, IoCaretForward } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../components/Redux/store";
@@ -9,18 +9,23 @@ import {
   selectCustomersPagination,
   setCustomersPage,
 } from "../../components/Redux/customers/customers_slice";
-import {
-  customer,
-  Marketer,
-} from "../../components/Redux/customers/customers_thunk"; // Import Marketer interface
+import { customer, Marketer } from "../../components/Redux/customers/customers_thunk";
 import { formatDate } from "../../utils/formatdate";
-import { useLocation, useNavigate, useNavigation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+ 
+// import ConfirmationModal from "../../components/Modals/ConfirmationModal";
+import { RootState } from "../../components/Redux/store";
+import ConfirmationModal from "../../components/Modals/delete";
+import { deleteCustomer } from "../../components/Redux/customers/deletecut";
+import { MdDelete } from "react-icons/md";
+// import { deleteCustomer } from "../Redux/customers/deletecut";
 
 interface CustomersTable {
+  virtual_account: any;
   id: any;
   first_name: any;
   last_name: any;
-  marketer: Marketer; // Change 'any' to 'Marketer'
+  marketer: Marketer;
   created_at: any;
   property_plan_total: any;
   saved_property_total: any;
@@ -33,20 +38,63 @@ interface CustomersTableprop {
 
 export default function CustomersTableComponent({ data }: CustomersTableprop) {
   const dispatch = useDispatch<AppDispatch>();
-  const pagination = useSelector(selectCustomersPagination);
+  const navigate = useNavigate();
   const location = useLocation();
+
+  const pagination = useSelector(selectCustomersPagination);
+  const deleteState = useSelector((state: RootState) => state.deleteCustomer);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomersTable | null>(null);
+
+  // Open modal
+  const openDeleteModal = (customer: CustomersTable) => {
+    setSelectedCustomer(customer);
+    setModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedCustomer) return;
+
+    const result = await dispatch(deleteCustomer(selectedCustomer.id));
+
+   
+    if (deleteCustomer.fulfilled.match(result)) {
+      setModalOpen(false);
+    
+       dispatch(customer({ page: pagination.currentPage }));
+    
+    }
+  };
 
   const handlePageChange = async (page: any) => {
     await dispatch(setCustomersPage(page));
-    // await dispatch(customer(page));
   };
-  const navigate = useNavigate();
+
   return (
     <>
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={modalOpen}
+        title="Delete Customer"
+        description="Are you sure you want to delete this customer?"
+        subjectName={
+          selectedCustomer
+            ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
+            : ""
+        }
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        loading={deleteState.loading}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+      />
+
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[800px] md:min-w-0">
+        <div className="min-w-[900px] md:min-w-0">
           <table className="w-full">
-            <thead>
+           <thead>
               <tr className="text-left">
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
                   Customer's Name
@@ -61,106 +109,86 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   Property Plans
                 </th>
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
-                  Saved Properties
+                  Wallet Balance
                 </th>
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] whitespace-nowrap">
                   Phone Number
                 </th>
               </tr>
             </thead>
+
             <tbody>
               {data.map((row) => (
-                <tr
-                  key={row.id}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    let basePath = "/customers"; // default fallback
+                <tr key={row.id} className="cursor-pointer">
 
-                    if (location.pathname.startsWith("/payments/customers")) {
-                      basePath = "/payments/customers";
-                    } else if (
-                      location.pathname.startsWith("/client/customers")
-                    ) {
-                      basePath = "/client/customers";
-                    }
-
-                    navigate(`${basePath}/${row.id}`);
-                  }}
-                >
+                  {/* NAME */}
                   <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[72px] truncate whitespace-nowrap pr-4"
-                    title={
-                      typeof `${row.first_name || ""} ${
-                        row.last_name || ""
-                      }` === "string"
-                        ? `${row.first_name || ""} ${
-                            row.last_name || ""
-                          }`.trim()
-                        : undefined
-                    }
+                    className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
+                    onClick={() => navigate(`/customers/${row.id}`)}
                   >
                     {row.first_name || row.last_name
-                      ? `${row.first_name || ""} ${row.last_name || ""}`.trim()
+                      ? `${row.first_name || ""} ${row.last_name || ""}`
                       : "N/A"}
                   </td>
 
+                  {/* MARKETER */}
                   <td
-                    className="pb-[31px] font-gotham font-[350] text-dark text-sm max-w-[85px] truncate whitespace-nowrap pr-4"
-                    title={
-                      row.marketer
-                        ? `${row.marketer.first_name || ""} ${
-                            row.marketer.last_name || ""
-                          }`.trim()
-                        : undefined
-                    }
+                    className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
+                    onClick={() => navigate(`/customers/${row.id}`)}
                   >
-                    {/* Access marketer's first_name and last_name */}
                     {row.marketer
                       ? `${row.marketer.first_name || ""} ${
                           row.marketer.last_name || ""
-                        }`.trim()
+                        }`
                       : "N/A"}
                   </td>
+
+                  {/* DATE */}
                   <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[73px] truncate whitespace-nowrap pr-4"
-                    title={
-                      typeof formatDate(row.created_at) === "string"
-                        ? formatDate(row.created_at)
-                        : undefined
-                    }
+                    className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
+                    onClick={() => navigate(`/customers/${row.id}`)}
                   >
-                    {row.created_at ? formatDate(row.created_at) : "N/A"}
+                    {formatDate(row.created_at)}
                   </td>
+
+                  {/* PROPERTY PLANS */}
                   <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm whitespace-nowra pr-4"
-                    title={
-                      typeof row.property_plan_total === "string"
-                        ? row.property_plan_total
-                        : undefined
-                    }
+                    className="pb-[31px] text-dark text-sm whitespace-nowrap pr-4"
+                    onClick={() => navigate(`/customers/${row.id}`)}
                   >
                     {row.property_plan_total ?? "N/A"}
                   </td>
+
+                  {/* SAVED PROPERTIES */}
                   <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm whitespace-nowrap pr-4"
-                    title={
-                      typeof row.saved_property_total === "string"
-                        ? row.saved_property_total
-                        : undefined
-                    }
+                    className="pb-[31px] text-dark text-sm whitespace-nowrap pr-4"
+                    onClick={() => navigate(`/customers/${row.id}`)}
                   >
-                    {row.saved_property_total ?? "N/A"}
+             {row.virtual_account?.account_balance ?? "N/A"}
+
                   </td>
+
+                  {/* PHONE */}
                   <td
-                    className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[100px] truncate whitespace-nowrap"
-                    title={
-                      typeof row.phone_number === "string"
-                        ? row.phone_number
-                        : undefined
-                    }
+                    className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
+                    onClick={() => navigate(`/customers/${row.id}`)}
                   >
                     {row.phone_number ?? "N/A"}
                   </td>
+
+                  {/* DELETE BUTTON */}
+                  <td className="pb-[31px]">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openDeleteModal(row);
+                      }}
+                      
+                    >
+                    <MdDelete className="text-red-500 hover:text-red-600 " />
+                    </button>
+                  </td>
+
                 </tr>
               ))}
             </tbody>
