@@ -2,9 +2,9 @@ import React, { useState, useRef } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { GoDotFill } from "react-icons/go";
 import { IoCopyOutline } from "react-icons/io5";
-import { FiShare2 } from "react-icons/fi";
-import { FiDownload } from "react-icons/fi";
-import { useParams } from "react-router-dom";
+import { FiShare2, FiDownload } from "react-icons/fi";
+import jsPDF from "jspdf";
+import domtoimage from "dom-to-image";
 
 interface PaymentData {
   from: string;
@@ -17,7 +17,6 @@ interface PaymentData {
   status: string;
   transactionDate: any;
   director: string;
-  
 }
 
 interface PaymentModalProps {
@@ -39,70 +38,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     reference: "",
     status: "Pending",
     transactionDate: "",
-    director: ""
+    director: "",
   },
 }) => {
-  const [copied, setCopied] = useState<boolean>(false);
-  const modalRef = useRef<HTMLDivElement>(null);
-  
+  const [copied, setCopied] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
-      });
-  };
-
-  const handleDownload = () => {
-    const receiptText = `
-      Payment Details
-      ------------------
-      From: ${paymentData.from}
-      Property: ${paymentData.property}
-      Description: ${paymentData.description}
-      Type: ${paymentData.type}
-      Method: ${paymentData.method}
-      Amount: ${paymentData.amount}
-      Director: ${paymentData.director}
-      Reference: ${paymentData.reference}
-      Status: ${paymentData.status}
-      Date: ${paymentData.transactionDate}
-    `;
-
-    const blob = new Blob([receiptText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `payment_${paymentData.reference}.txt`;
-    link.href = url;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Payment Details',
-          text: `Payment Reference: ${paymentData.reference}`,
-          url: window.location.href,
-        });
-      } else {
-        handleCopy(window.location.href);
-        alert('Link copied to clipboard!');
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
-  };
+  // ONLY the content to be included in PDF
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
 
-  const getStatusColor = (status: string): string => {
+  const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "approved":
       case "completed":
@@ -117,15 +64,88 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     }
   };
 
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const generatePdf = async () => {
+    if (!pdfRef.current) return null;
+    setIsGenerating(true);
+
+    try {
+      const imgData = await domtoimage.toPng(pdfRef.current, {
+        quality: 1,
+        bgcolor: "#ffffff",
+        cacheBust: true,
+        width: pdfRef.current.offsetWidth * 2,
+        height: pdfRef.current.offsetHeight * 2,
+        style: {
+          transform: "scale(2)",
+          transformOrigin: "top left",
+          width: `${pdfRef.current.offsetWidth}px`,
+          height: `${pdfRef.current.offsetHeight}px`,
+        },
+      });
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const img = new Image();
+      img.src = imgData;
+      await new Promise((resolve) => (img.onload = resolve));
+
+      const aspectRatio = img.naturalWidth / img.naturalHeight;
+      let finalWidth = pdfWidth - 40;
+      let finalHeight = finalWidth / aspectRatio;
+      if (finalHeight > pdfHeight - 40) {
+        finalHeight = pdfHeight - 40;
+        finalWidth = finalHeight * aspectRatio;
+      }
+
+      pdf.addImage(imgData, "PNG", (pdfWidth - finalWidth) / 2, 20, finalWidth, finalHeight);
+      pdf.save("transaction-receipt.pdf");
+
+      return pdf;
+    } catch (err) {
+      console.error("PDF generation error:", err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    await generatePdf();
+  };
+
+  const handleShare = async () => {
+    const pdf = await generatePdf();
+    if (!pdf) return;
+
+    const pdfBlob = pdf.output("blob");
+    const file = new File([pdfBlob], "transaction-receipt.pdf", {
+      type: "application/pdf",
+    });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ title: "Transaction Receipt", files: [file] });
+      } catch (err) {
+        console.error("Share failed:", err);
+      }
+    } else {
+      alert("Sharing not supported on this device. PDF downloaded instead.");
+    }
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-[rgba(102,102,102,0.2)] p-2 sm:p-4">
-      <div 
-        ref={modalRef}
-        // Removed overflow-y-auto and max-h-[95vh] from this div
-        className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-[95vw] sm:max-w-lg px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 relative animate-fadeIn flex flex-col h-[95vh]" // Added flex flex-col and h-[95vh]
-      >
-        {/* Fixed Top Section (Header) */}
-        <div className="w-full items-center justify-between flex mb-4 sm:mb-6 flex-shrink-0"> {/* Added flex-shrink-0 */}
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-[rgba(102,102,102,0.2)] p-2 sm:p-4 scrollbar-hide">
+      <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-[95vw] sm:max-w-lg px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 relative animate-fadeIn flex flex-col h-[95vh] scrollbar-hide">
+        
+        {/* Cancel button (NOT part of PDF) */}
+        <div className="flex justify-between items-center mb-4 scrollbar-hide">
           <p className="font-medium text-lg sm:text-xl md:text-2xl">Payment Details</p>
           <button
             onClick={onClose}
@@ -135,137 +155,52 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           </button>
         </div>
 
-        {/* Scrollable Middle Section (Data) */}
-        <div className="flex-grow overflow-y-auto pr-2 custom-scrollbar"> {/* Added flex-grow, overflow-y-auto, and custom-scrollbar for styling */}
-          {/* From */}
-          <div className="grid grid-cols-3 border-b border-b-gray-200 pb-3 sm:pb-4 w-full items-center">
-            <div className="col-span-2">
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">From</p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base line-clamp-2">
-                {paymentData.from}
-              </h1>
-            </div>
+        {/* PDF content */}
+        <div ref={pdfRef} className="flex-grow overflow-y-auto pr-2 custom-scrollbar scrollbar-hide">
+          {/* Logo */}
+          <div className="w-full flex justify-center mb-4">
+            <img src="/logo.png" alt="Company Logo" className="h-10 md:h-12 object-contain" />
           </div>
 
-          {/* Property */}
-          <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
-            <div>
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
-                Property
-              </p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
-                {paymentData.property}
-              </h1>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
-            <div>
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
-                Description
-              </p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
-                {paymentData.description}
-              </h1>
-            </div>
-          </div>
-
-          {/* Payment Method */}
-          <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">
-            <div>
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
-                Payment Method
-              </p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
-                {paymentData.method}
-              </h1>
-            </div>
-            <div className="w-full flex justify-end">
-              <div>
-                <p className="mb-1 sm:mb-2 text-xs font-normal text-gray-600">Amount</p>
-                <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
-                  ₦{Number(paymentData.amount).toLocaleString()}
-                </h1>
-              </div>
-            </div>
-          </div>
-
-          {/* Director */}
-          <div className="grid grid-cols-1 border-b border-b-gray-200 py-3 sm:py-4 w-full">
-            <div>
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
-                Director
-              </p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
-                {paymentData.director}
-              </h1>
-            </div>
-          </div>
-
-          {/* Payment Reference */}
-          <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">
-            <div>
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">
-                Payment Reference
-              </p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base truncate pr-1 sm:pr-2">
-                {paymentData.reference}
-              </h1>
-            </div>
-            <div className="w-full flex justify-end">
-              <button
-                onClick={() => handleCopy(paymentData.reference)}
-                className="flex items-center hover:bg-gray-100 p-1 sm:px-2 rounded transition-colors text-xs sm:text-sm"
-              >
-                <IoCopyOutline className="mr-1" size={14} />
-                <span>{copied ? "Copied!" : "Copy"}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="grid grid-cols-2 border-b border-b-gray-200 py-3 sm:py-4 w-full items-center">
-            <div>
-              <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-normal text-gray-600">Status</p>
-              <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base flex items-center">
-                <GoDotFill
-                  color={getStatusColor(paymentData.status)}
-                  className="mr-1"
-                  size={14}
-                />
-                {paymentData.status}
-              </h1>
-            </div>
-            <div className="w-full flex justify-end">
-              <div>
-                <p className="mb-1 sm:mb-2 text-xs font-normal text-gray-600">Date</p>
-                <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
-                  {new Date(paymentData.transactionDate).toLocaleDateString()}
-                </h1>
-              </div>
-            </div>
+          {/* Receipt details */}
+          <div className="space-y-3">
+            <DetailRow label="From" value={paymentData.from} />
+            <DetailRow label="Property" value={paymentData.property} />
+            <DetailRow label="Description" value={paymentData.description} />
+            <DetailRow label="Payment Method" value={paymentData.method} />
+            <DetailRow label="Amount" value={`₦${Number(paymentData.amount).toLocaleString()}`} />
+            <DetailRow label="Director" value={paymentData.director} />
+            <DetailRow label="Payment Reference" value={paymentData.reference} copyable onCopy={() => handleCopy(paymentData.reference)} copied={copied} />
+            <DetailRow
+              label="Status"
+              value={paymentData.status}
+              colorDot={getStatusColor(paymentData.status)}
+            />
+            <DetailRow
+              label="Date"
+              value={new Date(paymentData.transactionDate).toLocaleDateString()}
+            />
           </div>
         </div>
 
-        {/* Fixed Bottom Section (Actions) */}
-        <div className="grid grid-cols-3 mt-2 gap-2 w-full items-center flex-shrink-0 pt-4"> {/* Added flex-shrink-0 and pt-4 for spacing */}
+        {/* Buttons (NOT part of PDF) */}
+        <div className="grid grid-cols-3 mt-2 gap-2 w-full items-center flex-shrink-0 pt-4">
           <div className="col-span-1 flex items-center w-full justify-end">
-            <button 
+            <button
               onClick={handleShare}
               className="flex items-center text-xs sm:text-base font-medium text-gray-900 hover:underline"
             >
               <FiShare2 className="mr-1" size={14} />
-              Share
+              {isGenerating ? "Generating..." : "Share"}
             </button>
           </div>
           <div className="col-span-2 flex justify-end">
-            <button 
+            <button
               onClick={handleDownload}
               className="flex items-center bg-gray-900 text-white font-medium text-xs sm:text-sm md:text-base py-2 sm:py-3 px-4 sm:px-6 md:px-10 rounded-full hover:bg-gray-800 transition-colors"
             >
               <FiDownload className="mr-1" size={14} />
-              Download
+              {isGenerating ? "Generating..." : "Download"}
             </button>
           </div>
         </div>
@@ -273,5 +208,37 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     </div>
   );
 };
+
+interface DetailRowProps {
+  label: string;
+  value: string;
+  copyable?: boolean;
+  onCopy?: () => void;
+  copied?: boolean;
+  colorDot?: string;
+}
+
+const DetailRow: React.FC<DetailRowProps> = ({ label, value, copyable, onCopy, copied, colorDot }) => (
+  <div className="grid grid-cols-2 border-b border-b-gray-200 py-2">
+    <div>
+      <p className="mb-1 text-xs sm:text-sm font-normal text-gray-600">{label}</p>
+      <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base flex items-center">
+        {colorDot && <GoDotFill color={colorDot} className="mr-1" size={14} />}
+        {value}
+      </h1>
+    </div>
+    {copyable && onCopy && (
+      <div className="flex justify-end items-center">
+        <button
+          onClick={onCopy}
+          className="flex items-center hover:bg-gray-100 p-1 sm:px-2 rounded transition-colors text-xs sm:text-sm"
+        >
+          <IoCopyOutline className="mr-1" size={14} />
+          <span>{copied ? "Copied!" : "Copy"}</span>
+        </button>
+      </div>
+    )}
+  </div>
+);
 
 export default PaymentModal;
