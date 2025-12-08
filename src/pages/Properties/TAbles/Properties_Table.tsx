@@ -8,7 +8,9 @@ import {
   selectPropertiesPagination,
   selectPublishedPropertiesPagination,
   selectSoldPropertiesPagination,
-  setPropertiesPage,
+  setDraftedPropertiesPage,
+  setPublishedPropertiesPage,
+  setSoldPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
 import InputField from "../../../components/input/inputtext";
 import { toast } from "react-toastify";
@@ -171,16 +173,32 @@ export default function PropertyTableComponent({
     }
   };
 
-  const handlePageChange = async (page: any) => {
-    await dispatch(setPropertiesPage(page));
-    await dispatch(fetchProperties(page));
-  };
-  const pagination = activeTab === "Sold" 
-    ? useSelector(selectSoldPropertiesPagination)
-    : useSelector(selectPublishedPropertiesPagination);
 
+const handlePageChange = async (page: any) => {
+  // First, dispatch the correct page change based on activeTab
+  if (activeTab === "Published") {
+    await dispatch(setPublishedPropertiesPage({ type: "published", page }));
+  } else if (activeTab === "Sold") {
+    await dispatch(setSoldPropertiesPage({ type: "sold", page }));
+  } else if (activeTab === "Drafted") {
+    await dispatch(setDraftedPropertiesPage({ type: "drafted", page }));
+  }
+};
 
-  // Handle success and error states
+// Correct the pagination selector logic
+const pagination = useSelector((state: RootState) => {
+  switch (activeTab) {
+    case "Published":
+      return selectPublishedPropertiesPagination(state);
+    case "Sold":
+      return selectSoldPropertiesPagination(state);
+    case "Drafted":
+      return selectPropertiesPagination(state); 
+    default:
+      return selectPublishedPropertiesPagination(state);
+  }
+});
+
   useEffect(() => {
     if (success) {
       toast.success("Property updated successfully!");
