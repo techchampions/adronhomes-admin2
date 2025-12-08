@@ -154,3 +154,10 @@ export default propertiesSlice.reducer;
 export const selectPropertiesPagination = (state: {
   properties: PropertiesState;
 }) => state.properties.drafted.pagination;
+
+export const selectPublishedPropertiesPagination = (state: {
+  properties: PropertiesState;
+}) => state.properties.published.pagination;
+export const selectSoldPropertiesPagination = (state: {
+  properties: PropertiesState;
+}) => state.properties.sold.pagination;
