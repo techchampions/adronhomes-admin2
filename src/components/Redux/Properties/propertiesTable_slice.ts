@@ -56,10 +56,30 @@ const propertiesSlice = createSlice({
   name: "properties",
   initialState,
   reducers: {
-    setPropertiesPage: (
+    setSoldPropertiesPage: (
       state,
       action: PayloadAction<{
-        type: "drafted" | "published" | "sold";
+        type: "sold";
+        page: number;
+      }>
+    ) => {
+      const { type, page } = action.payload;
+      state[type].pagination.currentPage = page;
+    },
+    setDraftedPropertiesPage: (
+      state,
+      action: PayloadAction<{
+        type: "drafted";
+        page: number;
+      }>
+    ) => {
+      const { type, page } = action.payload;
+      state[type].pagination.currentPage = page;
+    },
+    setPublishedPropertiesPage: (
+      state,
+      action: PayloadAction<{
+        type: "published";
         page: number;
       }>
     ) => {
@@ -102,7 +122,7 @@ const propertiesSlice = createSlice({
           state.drafted.loading = false;
           state.published.loading = false;
           state.sold.loading = false;
-          
+
           state.drafted.data = action.payload.drafted_properties.data;
           state.published.data = action.payload.published_properties.data;
           state.sold.data = action.payload.sold_properties.data;
@@ -148,7 +168,13 @@ const propertiesSlice = createSlice({
   },
 });
 
-export const { setPropertiesPage, setPropertiesSearch, clearPropertiesSearch } = propertiesSlice.actions;
+export const {
+  setDraftedPropertiesPage,
+  setPublishedPropertiesPage,
+  setSoldPropertiesPage,
+  setPropertiesSearch,
+  clearPropertiesSearch,
+} = propertiesSlice.actions;
 export default propertiesSlice.reducer;
 
 export const selectPropertiesPagination = (state: {

@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "../Redux/store";
 import { fetchITDashboard } from "../Redux/info-tech/itDashboardSlice";
 import { useNavigate, useNavigation } from "react-router-dom";
 import LoadingAnimations from "../LoadingAnimations";
+import { getUser } from "../Redux/User/user_Thunk";
 
 // A simple capitalize function
 const capitalize = (str: any) => {
@@ -29,14 +30,20 @@ export default function Dashboard_It() {
     loading,
     error,
   } = useSelector((state: RootState) => state.itDashboard);
-
+const {
+    loading: userLoading,
+    success: userSuccess,
+    error: userError,
+    user:infoUser,
+  } = useSelector((state: RootState) => state.user);
   useEffect(() => {
+       dispatch(getUser());
     dispatch(fetchITDashboard());
   }, [dispatch]);
 
   const user = {
-    first_name: "Mike",
-    last_name: "Wellington",
+    first_name:infoUser?.first_name,
+    last_name: infoUser?.last_name,
   };
 
   // Use safe defaults for all values to prevent undefined errors
