@@ -6,6 +6,7 @@ import { PropertyContext } from "../MyContext/MyContext";
 import PersonnelModal from "../pages/Personnel/createPersonnelModal";
 import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
+import SyncCitaModal from "./SyncCitaModal";
 
 
 interface HeaderProps {
@@ -20,6 +21,7 @@ interface HeaderProps {
   handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
   viewForm?: boolean;
+  cita?: boolean; // Add this prop
 }
 
 export default function Header({
@@ -32,6 +34,7 @@ export default function Header({
   showSearchAndButton = true,
   viewForm = false,
   handleViewPurchaseFormClick,
+  cita = false, // Default to false
 }: HeaderProps) {
   const {
     showBulkModal,
@@ -51,6 +54,7 @@ export default function Header({
   } = useContext(PropertyContext)!;
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
+  const [showSyncCitaModal, setShowSyncCitaModal] = useState(false); // State for Sync Cita modal
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -86,6 +90,13 @@ export default function Header({
         setShowBulkModal(true);
       }
     }
+  };
+
+  // Handle Sync Cita button click
+  const handleButtonClickcita = () => {
+    setShowSyncCitaModal(true);
+    // You might want to start the sync process here
+    // For example: startSyncProcess();
   };
 
   // Determine button text based on page and state
@@ -126,7 +137,6 @@ export default function Header({
           {showSearchAndButton && (
             <>
               {/* <div
-
                 className={`relative h-[45px] lg:h-[51px] w-full sm:w-64 lg:w-[410px] rounded-full border transition-all font-[400] ${isSearchFocused
                   ? "border-[#79B833] shadow-sm"
                   : "border-[#D8D8D8]"} bg-white overflow-hidden`}
@@ -134,12 +144,21 @@ export default function Header({
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
-                  className="w-full h-full px-4 lg:px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
+                  className="w-full h-full px-4 lg:px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"}
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setIsSearchFocused(false)}
                 />
-
               </div> */}
+
+              {/* Sync Cita Button - Only shows when cita prop is true */}
+              {cita && (
+                <button
+                  className="text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap bg-[#79B833] hover:bg-[#6aa22c]"
+                  onClick={handleButtonClickcita}
+                >
+                  Sync With Cita
+                </button>
+              )}
 
               <button
                 className={`text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap ${
@@ -165,6 +184,14 @@ export default function Header({
           )}
         </div>
       </div>
+
+      {/* Sync Cita Modal */}
+      {showSyncCitaModal && (
+        <SyncCitaModal
+          isOpen={showSyncCitaModal}
+          onClose={() => setShowSyncCitaModal(false)}
+        />
+      )}
 
       {/* Modals */}
       {!isPersonnelPage && showBulkModal && (

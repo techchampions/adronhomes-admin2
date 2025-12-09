@@ -6,7 +6,7 @@ import { fetchProperties } from "../../../components/Redux/Properties/properties
 import {
   // selectPropertiesagination,
   selectPropertiesPagination,
-  setPropertiesPage,
+  setDraftedPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
 import InputField from "../../../components/input/inputtext";
 import { toast } from "react-toastify";
@@ -168,7 +168,7 @@ export default function PropertyTableComponent2({
   };
 
   const handlePageChange = async (page: any) => {
-    await dispatch(setPropertiesPage(page));
+    await dispatch(setDraftedPropertiesPage(page));
     await dispatch(fetchProperties(page));
   };
 

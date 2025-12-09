@@ -12,6 +12,7 @@ import {
 import { add_property_detail } from "../components/Redux/addProperty/addFees/addFees_thunk";
 import { resetPropertyDetailState } from "../components/Redux/addProperty/addFees/add_property_detail_slice";
 import { useLocation, useNavigate } from "react-router-dom";
+import { LandSizeSection } from "../pages/Properties/addPropplan/planForm";
 
 interface Fee {
   [x: string]: any;
@@ -131,6 +132,7 @@ interface PropertyFormData {
   display: {
     status: "draft" | "publish";
   };
+  LandSizeSection:LandSizeSection[]
 }
 
 interface PropertyContextType {
@@ -145,6 +147,7 @@ interface PropertyContextType {
   setBulkDetails: (data: BulkDetailsFormValues) => void;
   setSpecifications: (data: PropertySpecificationsFormValues) => void;
   setLandForm: (data: LandFormValues) => void;
+  setLandSizeSections:(data:LandSizeSection[])=>void
   setFeatures: (data: FeaturesFormValues) => void;
   setMedia: (data: MediaFormValues) => void;
   setDiscount: (data: DiscountFormValues) => void;
@@ -199,6 +202,7 @@ interface PropertyProviderProps {
 }
 
 const initialFormData: PropertyFormData = {
+LandSizeSection: [], 
   basicDetails: {
     propertyName: "",
     propertyType: "",
@@ -395,7 +399,12 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       landForm: data,
     }));
   };
-
+const setLandSizeSections=(data:LandSizeSection[])=>{
+    setFormData((prev) => ({
+      ...prev,
+      LandSizeSection: data, 
+    }));
+}
   const setFeatures = (data: FeaturesFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -438,6 +447,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         media,
         discount,
         paymentStructure,
+        LandSizeSection
       } = formData;
 
       console.log("Submitting with displayStatus:", displayStatus);
@@ -661,6 +671,17 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
           formPayload.append(`features[${index}]`, feature);
         });
       }
+formData.LandSizeSection.forEach((ls, i) => {
+  formPayload.append(`land_sizes[${i}][id]`, String(ls.id));
+  formPayload.append(`land_sizes[${i}][size]`, String(ls.size));
+
+  ls.durations.forEach((d, j) => {
+    formPayload.append(`land_sizes[${i}][durations][${j}][id]`, (d.id));
+    formPayload.append(`land_sizes[${i}][durations][${j}][duration]`, (d.duration));
+    formPayload.append(`land_sizes[${i}][durations][${j}][price]`, (d.price));
+    formPayload.append(`land_sizes[${i}][durations][${j}][cittaLink]`, (d.cittaLink));
+  });
+});
 
       if (Array.isArray(media.images) && media.images.length > 0) {
         media.images.forEach((image, index) => {
@@ -804,6 +825,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setBulkDetails,
         setSpecifications,
         setLandForm,
+        setLandSizeSections,
         setFeatures,
         setMedia,
         setDiscount,

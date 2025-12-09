@@ -18,6 +18,7 @@ import DraftPublishModal from "./DraftPublishModal";
 import BasicDetails from "./BasicDetails/BasicDetails";
 import BasicDetailsLand from "./BasicDetails/BasicDetailsLand";
 import { toast } from "react-toastify";
+import PropertyListingPage from "./addPropplan/planForm";
 
 
 
@@ -50,7 +51,7 @@ const { loading, error, success, propertyId } = useSelector(
   const paymentStructureRef = useRef<any>(null);
   const discountRef = useRef<any>(null);
   const land = useRef<any>(null);
-
+  const LandPlan = useRef<any>(null);
   const handleNext = async () => {
     if (isSubmitting) return;
     
@@ -84,19 +85,26 @@ const { loading, error, success, propertyId } = useSelector(
           }
         }
         break;
-      case 3:
+          case 3:
+        if (LandPlan.current) {
+          LandPlan.current.handleSubmit();
+          canProceed = LandPlan.current.isValid;
+        }
+        break;
+   
+      case 4:
         if (mediaRef.current) {
           mediaRef.current.handleSubmit();
           canProceed = mediaRef.current.isValid;
         }
         break;
-      case 4:
+      case 5:
         if (featuresRef.current) {
           featuresRef.current.handleSubmit();
           canProceed = featuresRef.current.isValid;
         }
         break;
-      case 5:
+      case 6:
         if (discount) {
           if (discountRef.current) {
             discountRef.current.handleSubmit();
@@ -108,7 +116,7 @@ const { loading, error, success, propertyId } = useSelector(
           canProceed = paymentStructureRef.current.isValid && canProceed;
         }
         break;
-      case 6:
+      case 7:
         if (canProceed) {
           setShowDraftPublishModal(true);
           return;
@@ -151,6 +159,7 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
   const stepTitles = [
     "Basic Details",
     "Property Specifications",
+    "Land Sizes & Pricing",
     "Media",
     "Features",
     discount ? "Discount" : "Set Payment Structure",
@@ -178,15 +187,15 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
           isSubmitting={isSubmitting}
         />
 
-        {currentStep === 6 || currentStep === 7 ? (
+        {currentStep === 7 || currentStep === 8 ? (
           <>
             <p className="text-dark text-2xl font-[350] mb-[8px]">
-              {currentStep === 6
+              {currentStep === 7
                 ? "Confirm Property Details"
                 : "Submission Complete"}
             </p>
             <h1 className="text-[#767676] font-[325] text-base mb-[30px]">
-              {currentStep === 6
+              {currentStep === 7
                 ? "Confirm everything is in order before proceeding"
                 : "Your property has been successfully submitted"}
             </h1>
@@ -201,8 +210,10 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
             </div>
           </>
         )}
-
+  {/* < /> */}
         {currentStep === 1 && (
+          // <PropertyListingPage ref={LandPlan}
+          // />
           <ForProperties
             tab={stepTitles[0]}
             children={
@@ -228,21 +239,27 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
           />
         )}
 
-        {currentStep === 3 && (
+    {currentStep === 3 && (
+          <ForProperties
+            tab={stepTitles[2]}
+            children={<PropertyListingPage ref={LandPlan} />}
+          />
+        )}
+        {currentStep === 4 && (
           <ForProperties
             tab={stepTitles[2]}
             children={<MediaFORM ref={mediaRef} />}
           />
         )}
 
-        {currentStep === 4 && (
+        {currentStep === 5 && (
           <ForProperties
             tab={stepTitles[3]}
             children={<FeaturesInput ref={featuresRef} />}
           />
         )}
 
-        {currentStep === 5 && (
+        {currentStep === 6 && (
           <div className="space-y-[30px]">
             <ForProperties
               tab={stepTitles[4]}
@@ -272,13 +289,13 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
           </div>
         )}
 
-        {currentStep === 6 && <PropertyListing />}
+        {currentStep === 7 && <PropertyListing />}
         {/* {currentStep === 7 && <FinalSubmission />} */}
 
         <div className="grid grid-cols-2 mb-[69px] w-full mt-20">
           <div className="w-full justify-start flex">
             <div>
-              {currentStep > 1 && currentStep < 7 && (
+              {currentStep > 1 && currentStep < 8 && (
                 <button
                   className={`bg-[#272727] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#272727] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 ${
                     isSubmitting ? "opacity-50 cursor-not-allowed" : ""
@@ -293,7 +310,7 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
           </div>
           <div className="w-full justify-end flex">
             <div>
-              {currentStep < 7 && (
+              {currentStep < 8 && (
                 <button
                   className={`bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap ${
                     isSubmitting ? "opacity-50 cursor-not-allowed" : ""

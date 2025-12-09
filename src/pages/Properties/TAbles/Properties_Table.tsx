@@ -6,7 +6,11 @@ import { fetchProperties } from "../../../components/Redux/Properties/properties
 import {
   // selectPropertiesagination,
   selectPropertiesPagination,
-  setPropertiesPage,
+  selectPublishedPropertiesPagination,
+  selectSoldPropertiesPagination,
+  setDraftedPropertiesPage,
+  setPublishedPropertiesPage,
+  setSoldPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
 import InputField from "../../../components/input/inputtext";
 import { toast } from "react-toastify";
@@ -27,7 +31,7 @@ import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatest
 
 export interface PropertyData {
   is_featured: any;
-  is_offer:any
+  is_offer: any;
   id: number;
   name: string;
   display_image: string;
@@ -83,11 +87,13 @@ export interface PropertyData {
 interface PropertyTableProps {
   data: PropertyData[];
   CurrentPage: any;
+  activeTab: any;
 }
 
 export default function PropertyTableComponent({
   data,
   CurrentPage,
+  activeTab,
 }: PropertyTableProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -167,14 +173,32 @@ export default function PropertyTableComponent({
     }
   };
 
-  const handlePageChange = async (page: any) => {
-    await dispatch(setPropertiesPage(page));
-    await dispatch(fetchProperties(page));
-  };
 
-  const pagination = useSelector(selectPropertiesPagination);
+const handlePageChange = async (page: any) => {
+  // First, dispatch the correct page change based on activeTab
+  if (activeTab === "Published") {
+    await dispatch(setPublishedPropertiesPage({ type: "published", page }));
+  } else if (activeTab === "Sold") {
+    await dispatch(setSoldPropertiesPage({ type: "sold", page }));
+  } else if (activeTab === "Drafted") {
+    await dispatch(setDraftedPropertiesPage({ type: "drafted", page }));
+  }
+};
 
-  // Handle success and error states
+// Correct the pagination selector logic
+const pagination = useSelector((state: RootState) => {
+  switch (activeTab) {
+    case "Published":
+      return selectPublishedPropertiesPagination(state);
+    case "Sold":
+      return selectSoldPropertiesPagination(state);
+    case "Drafted":
+      return selectPropertiesPagination(state); 
+    default:
+      return selectPublishedPropertiesPagination(state);
+  }
+});
+
   useEffect(() => {
     if (success) {
       toast.success("Property updated successfully!");
@@ -191,7 +215,7 @@ export default function PropertyTableComponent({
     }
   }, [success, error, dispatch]);
 
- const getPropertyType = (type: number) => {
+  const getPropertyType = (type: number) => {
     switch (type) {
       case 1:
         return "land";
@@ -389,10 +413,10 @@ export default function PropertyTableComponent({
     success: toggleLatestSuccess,
     error: toggleLatestError,
   } = useSelector((state: RootState) => state.toggleLatest);
-   const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<number | null>(
-    null
-  );
-useEffect(() => {
+  const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<
+    number | null
+  >(null);
+  useEffect(() => {
     if (toggleLatestSuccess) {
       dispatch(
         fetchProperties({
@@ -406,14 +430,15 @@ useEffect(() => {
       dispatch(resetToggleLatestState());
     }
   }, [toggleLatestSuccess, toggleLatestError, dispatch]);
-   const handleToggleLatest = async (propertyId: number) => {
+  const handleToggleLatest = async (propertyId: number) => {
     setLoadingLatestPropertyId(propertyId);
     await dispatch(toggleLatest({ id: propertyId }));
     setLoadingLatestPropertyId(null);
-  }
+  };
+
   return (
     <>
-        <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto">
         <div className="min-w-[800px] md:min-w-0">
           <table className="w-full">
             <thead>
@@ -428,8 +453,6 @@ useEffect(() => {
                   Property Type
                 </th>
 
-         
-
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
@@ -442,8 +465,7 @@ useEffect(() => {
 
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Latest
-                </th> 
-
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -452,7 +474,6 @@ useEffect(() => {
                   <tr
                     key={`property-${property.id}`}
                     className="hover:bg-gray-50 cursor-pointer"
-
                   >
                     <td
                       className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]"
@@ -525,7 +546,7 @@ useEffect(() => {
                         </div>
                       </div>
                     </td>
-               
+
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -549,7 +570,6 @@ useEffect(() => {
                     </td>
                     <td className="w-1/6 py-4 pl-4 text-sm">
                       <div className="flex space-x-2">
-                     
                         <button
                           aria-label="Delete property"
                           onClick={() => handleDeleteClick(property)}
@@ -596,7 +616,9 @@ useEffect(() => {
                         </span>
                       </label>
                     </td>
-                    <td className="w-1/6 py-4 px-6 text-sm"> {/* Add this new cell */}
+                    <td className="w-1/6 py-4 px-6 text-sm">
+                      {" "}
+                      {/* Add this new cell */}
                       <label className="inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -604,12 +626,14 @@ useEffect(() => {
                           checked={property.is_offer === 1}
                           onChange={() => handleToggleLatest(property.id)}
                           disabled={
-                            toggleLatestLoading && loadingLatestPropertyId === property.id
+                            toggleLatestLoading &&
+                            loadingLatestPropertyId === property.id
                           }
                         />
                         <div
                           className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
-                            toggleLatestLoading && loadingLatestPropertyId === property.id
+                            toggleLatestLoading &&
+                            loadingLatestPropertyId === property.id
                               ? "bg-gray-300"
                               : property.is_offer === 1
                               ? "bg-[#79B833]"
@@ -623,7 +647,8 @@ useEffect(() => {
                           ></div>
                         </div>
                         <span className="ml-3 text-sm font-medium text-gray-700">
-                          {toggleLatestLoading && loadingLatestPropertyId === property.id
+                          {toggleLatestLoading &&
+                          loadingLatestPropertyId === property.id
                             ? "Updating..."
                             : property.is_offer === 1
                             ? "On"
@@ -658,7 +683,7 @@ useEffect(() => {
           cancelButtonText="Cancel"
         />
       )}
-      
+
       <div className="w-full">
         <Pagination
           pagination={pagination}
