@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
 import {
@@ -111,6 +111,9 @@ export default function Sidebar() {
             Logout
           </div>
         </div>
+        <div className="text-[#79B833] hover:underline text-sm">
+          <Link to={"/marketer-customer"}>Access Marketer Dashboard</Link>
+        </div>
       </div>
     </div>
   );
@@ -200,6 +203,9 @@ export default function Sidebar() {
                   <div className="font-[325] text-[16px] leading-[1] tracking-[0] w-full text-[#767676]">
                     Logout
                   </div>
+                </div>
+                <div className="text-[#79B833] hover:underline mt4">
+                  <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
                 </div>
               </div>
             </div>

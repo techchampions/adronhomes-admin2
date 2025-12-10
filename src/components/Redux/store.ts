@@ -61,6 +61,7 @@ import  walletslice from "./wallet/walllet_slice"
 import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
 import passwordResetReducer from "./passwordRese/passwordReset_slice"
 import deleteCustomerredux from "./customers/deletecut"
+import propertyCodesReducer from "./citta/propertyCodesSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -123,7 +124,8 @@ export const store = configureStore({
      wallet:walletslice,
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
-  deleteCustomer:deleteCustomerredux },
+  deleteCustomer:deleteCustomerredux,
+propertyCodes:propertyCodesReducer},
 });
 
 export type AppDispatch = typeof store.dispatch;

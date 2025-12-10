@@ -3,12 +3,22 @@ import React, {
   useState,
   forwardRef,
   useContext,
+  useEffect,
 } from "react";
 import InputField from "../../../components/input/inputtext";
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 import { CITTA_LINKS, formatToNaira, validationSchema } from "./types";
 import { useFormik } from "formik";
 import { PropertyContext } from "../../../MyContext/MyContext";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchPropertyCodes,
+  selectPropertyCodesForDropdown,
+  selectPropertyCodesLoading,
+  selectPropertyCodesSuccess,
+} from "../../../components/Redux/citta/propertyCodesSlice";
+import { useAppDispatch } from "../../../components/Redux/hook";
+import { resetSuccess } from "../../../components/Redux/Login/login_slice";
 
 interface Duration {
   id: any;
@@ -42,12 +52,24 @@ const PropertyListingPage = forwardRef<
   PropertyListingPageRef,
   PropertyListingPageProps
 >((props, ref) => {
+  const dispatch = useAppDispatch();
   const { formData, setLandSizeSections } = useContext(PropertyContext)!;
   const [propertyName, setPropertyName] = useState("");
   const [propertyDescription, setPropertyDescription] = useState("");
   const [landPlan, setLandPlan] = useState<any>(null);
+  const dropdownOptions = useSelector(selectPropertyCodesForDropdown);
+  const dropdownOptionsLoading = useSelector(selectPropertyCodesLoading);
+  const success = useSelector(selectPropertyCodesSuccess);
 
-  // Add a new land size section
+  useEffect(() => {
+    dispatch(fetchPropertyCodes());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (success) {
+      dispatch(resetSuccess());
+    }
+  }, [success]);
   const addLandSizeSection = () => {
     const newSection: LandSizeSection = {
       id: Date.now(),
@@ -154,7 +176,7 @@ const PropertyListingPage = forwardRef<
     onSubmit: (values) => {
       // Handle form submission
       setLandSizeSections(values.landSizeSections);
-      alert(values.landSizeSections)
+      alert(values.landSizeSections);
       // You can also set the form data or trigger any other actions here
     },
   });
@@ -257,7 +279,6 @@ const PropertyListingPage = forwardRef<
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-gray-800">
                 {/* Land Sizes & Pricing */}
-                
               </h2>
               <button
                 type="button"
@@ -392,7 +413,6 @@ const PropertyListingPage = forwardRef<
                                 `${sectionIndex}.durations[${durationIndex}].duration`
                               )
                             }
-                            //   onBlur={() => formik.setFieldTouched(`landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`, true)}
                             required
                           />
                         </div>
@@ -425,7 +445,6 @@ const PropertyListingPage = forwardRef<
                                 `${sectionIndex}.durations[${durationIndex}].price`
                               )
                             }
-                            //   onBlur={() => formik.setFieldTouched(`landSizeSections[${sectionIndex}].durations[${durationIndex}].price`, true)}
                             required
                           />
                         </div>
@@ -447,9 +466,9 @@ const PropertyListingPage = forwardRef<
                                     value
                                   )
                                 }
-                                //   onBlur={() => formik.setFieldTouched(`landSizeSections[${sectionIndex}].durations[${durationIndex}].cittaLink`, true)}
-                                options={CITTA_LINKS}
+                                options={dropdownOptions}
                                 isSearchable
+                                isLoading={dropdownOptionsLoading}
                                 error={
                                   isFieldTouched(
                                     `${sectionIndex}.durations[${durationIndex}].cittaLink`

@@ -43,7 +43,7 @@ export default function Customers() {
         subtitle="Manage the list of registered customers"
          buttonText="Export"
          onButtonClick={openCustomersModal}
-         cita={true}
+        //  cita={true}
       />
 
              

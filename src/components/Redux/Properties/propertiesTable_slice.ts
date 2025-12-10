@@ -174,6 +174,7 @@ export const {
   setSoldPropertiesPage,
   setPropertiesSearch,
   clearPropertiesSearch,
+  // selectPropertiesPagination
 } = propertiesSlice.actions;
 export default propertiesSlice.reducer;
 

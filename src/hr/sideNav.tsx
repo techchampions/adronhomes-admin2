@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 
 import { useDispatch } from "react-redux";
@@ -84,6 +84,11 @@ export default function CarrerSideBar() {
             Logout
           </div>
         </div>
+         <div className="text-[#79B833] hover:underline text-sm">
+                  <Link to={'/marketer-customer'}>
+              Access Marketer Dashboard</Link>
+                </div>
+     
       </div>
     </div>
   );
@@ -149,8 +154,16 @@ export default function CarrerSideBar() {
                     </div>
                   );
                 })}
+                
               </div>
+                  <div className="text-[#79B833] hover:underline mt-4">
+                  <Link to={'/marketer-customer'}>
+                  Marketer Dashboard</Link>
+                </div>
+     
+  
             </div>
+            
           </div>
         </>
       )}

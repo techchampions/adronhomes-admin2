@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../components/Redux/Login/login_slice";
 import { Icon2, Icon3, Icon5, Icon6, Icon7, Icon8 } from "../general/icon";
@@ -82,7 +82,12 @@ export default function ClientSidebar() {
           </svg>
           <div className="text-sm md:text-[16px] text-[#767676]">Logout</div>
         </div>
-      </div>
+        <div className="text-[#79B833] hover:underline text-sm">
+                      <Link to={'/marketer-customer'}>
+                   Access   Marketer Dashboard</Link>
+                    </div>
+         
+          </div>
     </div>
   );
 
@@ -167,7 +172,12 @@ export default function ClientSidebar() {
                   <div className="text-[16px] text-[#767676]">Logout</div>
                 </div>
               </div>
-            </div>
+               <div className="text-[#79B833] hover:underline mt-4">
+                  <Link to={'/marketer-customer'}>
+                  Marketer Dashboard</Link>
+                </div>
+     
+      </div>
           </div>
         </>
       )}

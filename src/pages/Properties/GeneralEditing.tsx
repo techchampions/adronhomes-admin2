@@ -31,6 +31,8 @@ import MediaFORM from "./Media/MediaFORM2";
 import { add_property_detail } from "../../components/Redux/addProperty/addFees/addFees_thunk";
 import { convertUrlsToMockFiles } from "../../utils/coverturloffiles";
 import InfrastructureFeesModalss from "../../components/Modals/infrastureModal2";
+import PropertyListingPage from "./addPropplan/planForm"; // Add this import
+import ForProperties from "../../components/Tables/forProperties"; // Add this import
 
 export default function EditProperty() {
   const { id } = useParams<{ id: string }>();
@@ -62,8 +64,6 @@ export default function EditProperty() {
     setPaymentStructure,
     setFees,
     fees,
-
-    // setIsLandProperty,
     isBulk,
     setIsBulk,
     isSubmitting,
@@ -81,6 +81,7 @@ export default function EditProperty() {
     setpreviousPropType,
     isLandProperty2,
     setIsLandProperty2,
+    setLandSizeSections,
   } = useContext(PropertyContext)!;
 
   const [discount, setDiscounted] = useState(
@@ -94,7 +95,7 @@ export default function EditProperty() {
   const [newGalleryImages, setNewGalleryImages] = useState<
     (File | string | null)[]
   >([]);
-  //  const [isLandProperty2, setIsLandProperty2] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null!);
   const propertyTypeOptions = [
     { value: "2", label: "Residential" },
@@ -199,16 +200,40 @@ export default function EditProperty() {
     setCurrentStep(1);
     setNewFees([]);
   };
+
   const galleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const basicDetailsRef = useRef<any>(null);
   const bulkBasicDetailsRef = useRef<any>(null);
   const specificationsRef = useRef<any>(null);
   const landRef = useRef<any>(null);
+  const LandPlan = useRef<any>(null); // Changed from landPlanRef to LandPlan
   const mediaRef = useRef<any>(null);
   const featuresRef = useRef<any>(null);
   const paymentStructureRef = useRef<any>(null);
   const discountRef = useRef<any>(null);
   const propertyId = id;
+
+  // Dynamic step titles based on property type
+  const stepTitles = isLandProperty2
+    ? [
+        "Basic Details",
+        "Property Specifications",
+        "Land Sizes & Pricing",
+        "Media",
+        "Features",
+        discount ? "Discount" : "Payment Structure",
+        "Preview",
+      ]
+    : [
+        "Basic Details",
+        "Property Specifications",
+        "Media",
+        "Features",
+        discount ? "Discount" : "Payment Structure",
+        "Preview",
+      ];
+
+  const totalSteps = isLandProperty2 ? 7 : 6;
 
   // Fetch property data
   useEffect(() => {
@@ -246,7 +271,6 @@ export default function EditProperty() {
       setBasicDetails({
         propertyName: property.name,
         propertyType: property.type?.id?.toString() || "",
-
         price: property.price?.toString() || "",
         initialDeposit: property.initial_deposit?.toString() || "",
         address: property.street_address || "",
@@ -259,8 +283,25 @@ export default function EditProperty() {
         category_id: null,
         propertyFiles: property.property_files,
       });
-
-      if (property.category !=="estate") {
+       if (property?.land_sizes) {
+      const formattedLandSizes = property.land_sizes.map(
+        (ls: any) => ({
+          id: ls.id?.toString() || "",
+          size: ls.size?.toString() || "",
+          // measurement_unit: ls.measurement_unit || "sqm",
+          durations: ls.durations?.map((d: any) => ({
+            id: d.id?.toString() || "",
+            duration: d.duration?.toString() || "",
+            price: d.price?.toString() || "",
+            cittaLink: d.citta_id || "",
+            is_active: d.is_active || true,
+          })) || [],
+        })
+      );
+      
+      setLandSizeSections(formattedLandSizes);
+    }
+      if (property.category !== "estate") {
         setBasicDetails({
           propertyName: property.name,
           propertyType: property.type?.id?.toString() || "",
@@ -278,7 +319,7 @@ export default function EditProperty() {
         });
       }
       setDirectorName(
-        `${property.director.first_name} ${property.director.last_name}`
+        `${property?.director?.first_name} ${property?.director?.last_name}`
       );
       if (property.category !== "estate") {
         setSpecifications({
@@ -294,7 +335,6 @@ export default function EditProperty() {
           overview: property.overview || "",
           documents: property.property_agreement || "",
           director_id: property.director_id || "",
-
           nearbyLandmarks: property.nearby_landmarks
             ? property.nearby_landmarks.split(",").map((item) => item.trim())
             : [],
@@ -382,7 +422,7 @@ export default function EditProperty() {
       );
 
       setDisplayStatus(property.is_active ? "publish" : "draft");
-      setIsLandProperty2(property.type.name === "Land");
+      setIsLandProperty2(property?.type?.name === "Land");
       setIsBulk(property.category === "bulk");
       setImagePreview(property.display_image || null);
       setGalleryPreviews(property.photos || []);
@@ -457,7 +497,6 @@ export default function EditProperty() {
       if (!specifications.yearBuilt)
         errors.yearBuilt = "Year built is required";
     }
-    // if (!basicDetails.street_address) errors.street_address = "Street address is required";
     if (!basicDetails.state) errors.state = "State is required";
     if (!basicDetails.country) errors.country = "Country is required";
     if (!formData.paymentStructure.paymentType)
@@ -483,130 +522,119 @@ export default function EditProperty() {
         media,
         discount,
         paymentStructure,
+        LandSizeSection,
       } = formData;
 
       // Handle Bulk or Regular Basic Details
       if (isBulk) {
         formPayload.append("name", bulkDetails.propertyName);
-
         formPayload.append("type", bulkDetails.propertyType);
-
         formPayload.append("no_of_unit", bulkDetails.propertyUnits || "1");
         formPayload.append("price", bulkDetails.price);
-
         formPayload.append("street_address", bulkDetails.address);
         formPayload.append("city", bulkDetails.city);
-
         formPayload.append("country", basicDetails.country);
         formPayload.append("state", basicDetails.state);
         formPayload.append("lga", basicDetails.lga);
         formPayload.append("category", "bulk");
-
         formPayload.append(
           "initial_deposit",
           basicDetails.initialDeposit || "0"
         );
       } else {
         formPayload.append("name", basicDetails.propertyName);
-
         formPayload.append("type", basicDetails.propertyType);
         formPayload.append("price", basicDetails.price);
-
         formPayload.append(
           "initial_deposit",
           basicDetails.initialDeposit || "0"
         );
-
         formPayload.append("country", basicDetails.country);
         formPayload.append("state", basicDetails.state);
         formPayload.append("lga", basicDetails.lga);
-
         formPayload.append("street_address", basicDetails.address);
-
         formPayload.append("location_type", basicDetails.locationType);
         formPayload.append("category", isLandProperty2 ? "estate" : "house");
-        if(!isLandProperty2)
-        { formPayload.append("category_id", basicDetails.category_id);}
-
-        {
-          basicDetails.purpose.forEach((purpose, index) => {
-            formPayload.append(`purpose[${index}]`, purpose);
-          });
+        if (!isLandProperty2) {
+          formPayload.append("category_id", basicDetails.category_id);
         }
+        basicDetails.purpose.forEach((purpose, index) => {
+          formPayload.append(`purpose[${index}]`, purpose);
+        });
       }
 
       // Handle Land or House Specifications
+      if (isLandProperty2 && LandSizeSection && LandSizeSection.length > 0) {
+        LandSizeSection.forEach((ls, i) => {
+          formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
+          formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+
+          if (ls.durations && ls.durations.length > 0) {
+            ls.durations.forEach((d, j) => {
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][id]`,
+                String(d.id || "")
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][duration]`,
+                String(d.duration || "")
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][price]`,
+                String(d.price || "")
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][citta_id]`,
+                String(d.cittaLink || "")
+              );
+            });
+          }
+        });
+      }
       if (isLandProperty2) {
         formPayload.append("size", landForm.landSize);
         formPayload.append("shape", landForm.plotShape);
-
         formPayload.append("topography", landForm.topography);
         formPayload.append("category", "estate");
-
         formPayload.append(
           "nearby_landmarks",
           landForm.nearbyLandmarks.join(", ")
         );
-
         formPayload.append("road_access", landForm.roadAccess.join(", "));
-
         formPayload.append(
           "title_document_type",
           landForm.titleDocumentType.join(", ")
         );
-
         formPayload.append("description", landForm.description);
-
         formPayload.append("number_of_unit", landForm.unitsAvailable);
-
         formPayload.append("director_id", landForm.director_id);
         formPayload.append("fencing", landForm.fencing);
-
         formPayload.append("gated_estate", landForm.gatedEstate);
-
         formPayload.append("contact_number", landForm.contactNumber);
-
         formPayload.append("whatsapp_link", landForm.whatsAppLink);
-
         formPayload.append("property_agreement", landForm.documents);
       } else {
         formPayload.append("no_of_bedroom", specifications.bedrooms);
-
         formPayload.append("number_of_bathroom", specifications.bathrooms);
-
         formPayload.append("toilets", specifications.toilets);
-
         formPayload.append("size", specifications.landSize);
-
         formPayload.append("parking_space", specifications.parkingSpaces);
-
         formPayload.append("description", specifications.description);
-
         formPayload.append("year_built", specifications.yearBuilt);
-
         formPayload.append("number_of_unit", specifications.unitsAvailable);
-
         formPayload.append("director_id", specifications.director_id);
-
         formPayload.append(
           "nearby_landmarks",
           specifications.nearbyLandmarks.join(", ")
         );
-
-        // if (specifications.rentDuration)
         formPayload.append("rent_duration", specifications.rentDuration);
-        // if (specifications.buildingCondition)
         formPayload.append(
           "building_condition",
           specifications.buildingCondition
         );
-        // if (specifications.whatsAppLink)
         formPayload.append("whatsapp_link", specifications.whatsAppLink);
-        // if (specifications.contactNumber)
         formPayload.append("contact_number", specifications.contactNumber);
-        // if (specifications.documents)
         formPayload.append("property_agreement", specifications.documents);
-
         formPayload.append(
           "title_document_type",
           specifications.titleDocumentTypeProp.join(", ")
@@ -614,13 +642,11 @@ export default function EditProperty() {
       }
 
       // Append Features
-
       features.features.forEach((feature, index) => {
         formPayload.append(`features[${index}]`, feature);
       });
 
       // Append Media
-      // if (media.images && media.images.length > 0) {
       const displayImage = media.images[0];
       if (displayImage instanceof File) {
         formPayload.append("display_image", displayImage);
@@ -630,48 +656,34 @@ export default function EditProperty() {
           formPayload.append(`photos[${index}]`, image);
         }
       });
-      // }
-      formPayload.append("virtual_tour", media.tourLink);
 
+      formPayload.append("virtual_tour", media.tourLink);
       formPayload.append("video_link", media.videoLink);
       formPayload.append("property_map", media.mapUrl);
 
       // Append Payment and Discount Details
-      // if (paymentStructure.paymentType)
       formPayload.append("payment_type", paymentStructure.paymentType);
-      // if (paymentStructure.paymentDuration)
       formPayload.append(
         "property_duration_limit",
         paymentStructure.paymentDuration
       );
-      // if (
-      //   paymentStructure.paymentSchedule &&
-      //   paymentStructure.paymentSchedule.length > 0
-      // )
-      {
-        paymentStructure.paymentSchedule.forEach((schedule, index) => {
-          formPayload.append(`payment_schedule[${index}]`, schedule);
-        });
-      }
-      // if (paymentStructure.feesCharges) {
+      paymentStructure.paymentSchedule.forEach((schedule, index) => {
+        formPayload.append(`payment_schedule[${index}]`, schedule);
+      });
+
       const feesCharges = parseFloat(paymentStructure.feesCharges);
       if (!isNaN(feesCharges)) {
         formPayload.append("fees_charges", feesCharges.toString());
       } else {
         formPayload.append("fees_charges", "0");
       }
-      // }
 
       if (discount.discountName) {
         formPayload.append("is_discount", "1");
         formPayload.append("discount_name", discount.discountName);
-
         formPayload.append("discount_percentage", discount.discountOff);
-
         formPayload.append("discount_units", discount.unitsRequired);
-
         formPayload.append("discount_start_date", discount.validFrom);
-
         formPayload.append("discount_end_date", discount.validTo);
       } else {
         formPayload.append("is_discount", "0");
@@ -744,6 +756,7 @@ export default function EditProperty() {
       setIsSubmitting(false);
     }
   };
+
   const handleNext = async () => {
     if (isSubmitting) return;
 
@@ -777,38 +790,87 @@ export default function EditProperty() {
         }
         break;
       case 3:
-        if (mediaRef.current) {
-          mediaRef.current.handleSubmit();
-          canProceed = mediaRef.current.isValid;
+        if (isLandProperty2) {
+          // Land Sizes & Pricing step
+          if (LandPlan.current) {
+            LandPlan.current.handleSubmit();
+            canProceed = LandPlan.current.isValid;
+          }
+        } else {
+          // Media step for non-land properties
+          if (mediaRef.current) {
+            mediaRef.current.handleSubmit();
+            canProceed = mediaRef.current.isValid;
+          }
         }
         break;
       case 4:
-        if (featuresRef.current) {
-          featuresRef.current.handleSubmit();
-          canProceed = featuresRef.current.isValid;
+        if (isLandProperty2) {
+          // Media step for land properties
+          if (mediaRef.current) {
+            mediaRef.current.handleSubmit();
+            canProceed = mediaRef.current.isValid;
+          }
+        } else {
+          // Features step for non-land properties
+          if (featuresRef.current) {
+            featuresRef.current.handleSubmit();
+            canProceed = featuresRef.current.isValid;
+          }
         }
         break;
       case 5:
-        if (discount) {
-          if (discountRef.current) {
-            discountRef.current.handleSubmit();
-            canProceed = discountRef.current.isValid;
+        if (isLandProperty2) {
+          // Features step for land properties
+          if (featuresRef.current) {
+            featuresRef.current.handleSubmit();
+            canProceed = featuresRef.current.isValid;
           }
-        }
-        if (paymentStructureRef.current) {
-          paymentStructureRef.current.handleSubmit();
-          canProceed = paymentStructureRef.current.isValid && canProceed;
+        } else {
+          // Payment/Discount step for non-land properties
+          if (discount) {
+            if (discountRef.current) {
+              discountRef.current.handleSubmit();
+              canProceed = discountRef.current.isValid;
+            }
+          }
+          if (paymentStructureRef.current) {
+            paymentStructureRef.current.handleSubmit();
+            canProceed = paymentStructureRef.current.isValid && canProceed;
+          }
         }
         break;
       case 6:
-        if (canProceed) {
+        if (isLandProperty2) {
+          // Payment/Discount step for land properties
+          if (discount) {
+            if (discountRef.current) {
+              discountRef.current.handleSubmit();
+              canProceed = discountRef.current.isValid;
+            }
+          }
+          if (paymentStructureRef.current) {
+            paymentStructureRef.current.handleSubmit();
+            canProceed = paymentStructureRef.current.isValid && canProceed;
+          }
+        } else {
+          // Preview step for non-land properties
+          if (canProceed) {
+            setShowDraftPublishModal(true);
+            return;
+          }
+        }
+        break;
+      case 7:
+        // Preview step for land properties
+        if (isLandProperty2 && canProceed) {
           setShowDraftPublishModal(true);
           return;
         }
         break;
     }
 
-    if (canProceed) {
+    if (canProceed && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -854,7 +916,8 @@ export default function EditProperty() {
     }
   };
 
-  const nextButtonText = currentStep === 6 ? "Confirm & Update" : "Next";
+  const nextButtonText =
+    currentStep === totalSteps ? "Confirm & Update" : "Next";
 
   if (loading) {
     return (
@@ -897,7 +960,7 @@ export default function EditProperty() {
                 className={`bg-red-500 text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-red-600 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 `}
                 onClick={() => {
                   resetFormData();
-                  navigate("/properties"); // Navigate back to the properties list
+                  navigate("/properties");
                 }}
                 disabled={isSubmitting}
               >
@@ -947,7 +1010,17 @@ export default function EditProperty() {
             </div>
           )}
 
-          {currentStep === 3 && (
+          {/* Step 3: Land Sizes & Pricing (only for land properties) */}
+          {currentStep === 3 && isLandProperty2 && (
+            <ForProperties
+              tab={stepTitles[2]}
+              children={<PropertyListingPage ref={LandPlan} />}
+            />
+          )}
+
+          {/* Step 3 for non-land OR Step 4 for land: Media */}
+          {((!isLandProperty2 && currentStep === 3) ||
+            (isLandProperty2 && currentStep === 4)) && (
             <div className="bg-white rounded-lg p-6">
               <MediaFORM
                 ref={mediaRef}
@@ -967,13 +1040,17 @@ export default function EditProperty() {
             </div>
           )}
 
-          {currentStep === 4 && (
+          {/* Step 4 for non-land OR Step 5 for land: Features */}
+          {((!isLandProperty2 && currentStep === 4) ||
+            (isLandProperty2 && currentStep === 5)) && (
             <div className="bg-white rounded-lg p-6">
               <FeaturesInput ref={featuresRef} />
             </div>
           )}
 
-          {currentStep === 5 && (
+          {/* Step 5 for non-land OR Step 6 for land: Payment Structure & Discount */}
+          {((!isLandProperty2 && currentStep === 5) ||
+            (isLandProperty2 && currentStep === 6)) && (
             <div className="bg-white rounded-lg p-6 space-y-[30px]">
               <Payment_Structure ref={paymentStructureRef} />
               {discount ? (
@@ -985,7 +1062,6 @@ export default function EditProperty() {
                     <TbXboxX className="w-10 h-10 text-red-500" />
                   </p>
                   <div className="mt-24">
-                    {" "}
                     <Discount ref={discountRef} />
                   </div>
                 </div>
@@ -1014,7 +1090,9 @@ export default function EditProperty() {
             </div>
           )}
 
-          {currentStep === 6 && (
+          {/* Step 6 for non-land OR Step 7 for land: Preview */}
+          {((!isLandProperty2 && currentStep === 6) ||
+            (isLandProperty2 && currentStep === 7)) && (
             <div className="bg-white rounded-lg p-6">
               <p className="text-dark text-2xl font-[350] mb-[8px]">
                 Confirm Property Details
@@ -1026,10 +1104,10 @@ export default function EditProperty() {
             </div>
           )}
 
-          <div className="grid grid-cols-2  w-full mt-20">
+          <div className="grid grid-cols-2 w-full mt-20">
             <div className="w-full justify-start flex">
               <div>
-                {currentStep > 1 && currentStep < 7 && (
+                {currentStep > 1 && currentStep < totalSteps + 1 && (
                   <button
                     className={`bg-[#272727] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#272727] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 ${
                       isSubmitting ? "opacity-50 cursor-not-allowed" : ""
@@ -1044,7 +1122,7 @@ export default function EditProperty() {
             </div>
             <div className="w-full justify-end flex">
               <div>
-                {currentStep < 7 && (
+                {currentStep < totalSteps + 1 && (
                   <button
                     className={`bg-[#79B833] text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-[#6aa22c] transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 whitespace-nowrap ${
                       isSubmitting ? "opacity-50 cursor-not-allowed" : ""

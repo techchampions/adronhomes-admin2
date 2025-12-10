@@ -538,6 +538,18 @@ const setLandSizeSections=(data:LandSizeSection[])=>{
       }
 
       if (isLandProperty) {
+        formData.LandSizeSection.forEach((ls, i) => {
+  formPayload.append(`land_sizes[${i}][id]`, String(ls.id));
+  formPayload.append(`land_sizes[${i}][size]`, String(ls.size));
+
+  ls.durations.forEach((d, j) => {
+    formPayload.append(`land_sizes[${i}][durations][${j}][id]`, (d.id));
+    formPayload.append(`land_sizes[${i}][durations][${j}][duration]`, (d.duration));
+    formPayload.append(`land_sizes[${i}][durations][${j}][price]`, (d.price));
+    formPayload.append(`land_sizes[${i}][durations][${j}][cittaLink]`, (d.cittaLink));
+  });
+});
+
         if (landForm.landSize) {
           formPayload.append("size", landForm.landSize);
         }
@@ -671,17 +683,6 @@ const setLandSizeSections=(data:LandSizeSection[])=>{
           formPayload.append(`features[${index}]`, feature);
         });
       }
-formData.LandSizeSection.forEach((ls, i) => {
-  formPayload.append(`land_sizes[${i}][id]`, String(ls.id));
-  formPayload.append(`land_sizes[${i}][size]`, String(ls.size));
-
-  ls.durations.forEach((d, j) => {
-    formPayload.append(`land_sizes[${i}][durations][${j}][id]`, (d.id));
-    formPayload.append(`land_sizes[${i}][durations][${j}][duration]`, (d.duration));
-    formPayload.append(`land_sizes[${i}][durations][${j}][price]`, (d.price));
-    formPayload.append(`land_sizes[${i}][durations][${j}][cittaLink]`, (d.cittaLink));
-  });
-});
 
       if (Array.isArray(media.images) && media.images.length > 0) {
         media.images.forEach((image, index) => {
