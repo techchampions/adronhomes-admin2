@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Icon1,
   Icon2,
@@ -103,6 +103,9 @@ export default function InfoTechSidebar() {
             Logout
           </div>
         </div>
+         <div className="text-[#79B833] hover:underline mt4">
+                  <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
+                </div>
       </div>
     </div>
   );
@@ -194,6 +197,9 @@ export default function InfoTechSidebar() {
                   </div>
                 </div>
               </div>
+               <div className="text-[#79B833] hover:underline mt4">
+                                <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
+                              </div>
             </div>
           </div>
         </>
