@@ -1,12 +1,22 @@
 import React from "react";
 import { useGetUser } from "../../utils/hooks/query";
 import SmallLoader from "../SmallLoader";
-import { useNavigate, useNavigation } from "react-router-dom";
-// import { useRouter } from "next/navigation";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Cardone() {
   const { data, isLoading } = useGetUser();
-  const router = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleRedirect = () => {
+    const path = location.pathname.toLowerCase();
+
+    if (path.startsWith("/info-tech")) {
+      navigate("/info-tech/settings/reset-password");
+    } else {
+      navigate("/settings/reset-password");
+    }
+  };
 
   return (
     <div className="bg-white rounded-[30px] px-6 sm:px-[41px] pt-5 sm:pt-[25px] pb-6 sm:pb-[33px]">
@@ -20,10 +30,10 @@ export default function Cardone() {
             </p>
 
             <button
-              onClick={() => router("/settings/reset-password")}
+              onClick={handleRedirect}
               className="font-bold text-xs sm:text-sm text-primary hover:underline"
             >
-             Reset password
+              Reset password
             </button>
           </div>
 
