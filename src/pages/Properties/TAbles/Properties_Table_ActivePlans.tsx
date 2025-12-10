@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../components/Redux/store";
 // import { selectPropertiesagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
-import { selectPropertiesPagination, setPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
+import { selectPropertiesPagination, setDraftedPropertiesPage } from "../../../components/Redux/Properties/propertiesTable_slice";
 
 export interface PropertyDataActivePlan {
   name: string;
@@ -26,7 +26,7 @@ export default function PropertyTableComponentActivePlan({
 }: PropertyTableProps) {
    const dispatch = useDispatch<AppDispatch>();
   const handlePageChange = async (page: any) => {
-    await dispatch(setPropertiesPage(page));
+    await dispatch(setDraftedPropertiesPage(page));
     await dispatch(fetchProperties({}));
   };
   const pagination = useSelector(selectPropertiesPagination);
