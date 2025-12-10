@@ -141,7 +141,7 @@ const App = () => {
   useAxiosInterceptor();
 
   return (
-    <Provider store={store} >
+    <Provider store={store}>
       <QueryProvider>
         <PropertyProvider>
           <AppLayout>
@@ -160,7 +160,6 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
-             
 
                 <Route
                   path="/payment/status/:paymentId"
@@ -201,7 +200,10 @@ const App = () => {
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/settings/sliders" element={<SliderSettings />} />
-                   <Route path="/settings/reset-password" element={<ResetCard />} />
+                <Route
+                  path="/settings/reset-password"
+                  element={<ResetCard />}
+                />
                 <Route
                   path="/settings/page-headers"
                   element={<HeaderSettings />}
@@ -240,11 +242,11 @@ const App = () => {
                   path="/customers/transactions/:id"
                   element={<UserPayments />}
                 />
-   <Route
-               path="/customers/payment/:id"
+                <Route
+                  path="/customers/payment/:id"
                   element={<UserPaymentsPage />}
                 />
-                
+
                 <Route
                   path="/customers/wallet-transactions/:id"
                   element={<WalletTransactionsPage />}
@@ -307,10 +309,10 @@ const App = () => {
                     path="customers/transactions/:id"
                     element={<UserPayments />}
                   />
-                     <Route
-               path="customers/payment/:id"
-                  element={<UserPaymentsPage />}
-                />
+                  <Route
+                    path="customers/payment/:id"
+                    element={<UserPaymentsPage />}
+                  />
                   <Route
                     path="customers/wallet-transactions/:id"
                     element={<WalletTransactionsPage />}
@@ -358,9 +360,9 @@ const App = () => {
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
-     {/* user wallet */}
-   <Route path="wallet-Transactions" element={<UserWallet />} />
-     
+              {/* user wallet */}
+              <Route path="wallet-Transactions" element={<UserWallet />} />
+
               {/* Client Routes (Unprotected) */}
               <Route path="/client" element={<AuthGuard />}>
                 <Route
@@ -373,8 +375,8 @@ const App = () => {
                   path="customers/transactions/:id"
                   element={<UserPayments />}
                 />
-                   <Route
-               path="customers/payment/:id"
+                <Route
+                  path="customers/payment/:id"
                   element={<UserPaymentsPage />}
                 />
                 <Route
@@ -410,9 +412,10 @@ const App = () => {
                   path="requests-enquiries/:id"
                   element={<PropertyEnquiries />}
                 />
-
+                <Route path="settings/reset-password" element={<ResetCard />} />
                 {/* Settings Routes */}
                 <Route path="settings" element={<Settings />} />
+
                 <Route path="settings/sliders" element={<SliderSettings />} />
                 <Route
                   path="settings/page-headers"
