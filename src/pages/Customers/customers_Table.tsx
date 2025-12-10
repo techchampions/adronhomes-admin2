@@ -126,21 +126,24 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                     className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
                     onClick={() => navigate(`/customers/${row.id}`)}
                   >
-                    {row.first_name || row.last_name
+                      <div className="truncate max-w-48">
+                        {row.first_name || row.last_name
                       ? `${row.first_name || ""} ${row.last_name || ""}`
                       : "N/A"}
+                      </div>
+                    
                   </td>
 
                   {/* MARKETER */}
                   <td
-                    className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
+                    className="pb-[31px] text-dark text-sm  whitespace-nowrap pr-4"
                     onClick={() => navigate(`/customers/${row.id}`)}
                   >
-                    {row.marketer
+                  <div className="truncate max-w-28"> {row.marketer
                       ? `${row.marketer.first_name || ""} ${
                           row.marketer.last_name || ""
                         }`
-                      : "N/A"}
+                      : "N/A"}</div> 
                   </td>
 
                   {/* DATE */}
