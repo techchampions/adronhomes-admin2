@@ -1,9 +1,18 @@
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { FaCamera, FaCheck, FaPen, FaTag, FaTrash } from "react-icons/fa6";
-import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus, FaBullseye } from "react-icons/fa";
+import {
+  FaHome,
+  FaMapMarkerAlt,
+  FaTimes,
+  FaPlus,
+  FaBullseye,
+} from "react-icons/fa";
 import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
 import InfrastructureFeesModalss from "../../../components/Modals/infrastureModal2";
-import { useEditPropertyForm } from "../../../components/Redux/hooks/usePropertyForms";
+import {
+  useCreatePropertyForm,
+  useEditPropertyForm,
+} from "../../../components/Redux/hooks/usePropertyForms";
 
 interface EditingState {
   title: boolean;
@@ -32,22 +41,19 @@ export default function PropertyListing() {
     discount: reduxDiscount,
     metadata,
     LandSizeSection,
-    
-    // Redux setters
-    setEditMedia,
-    setEditBasicDetails,
-    setEditBulkDetails,
-    setEditSpecifications,
-    setEditLandForm,
-    setEditLandSizeSections,
-    setEditFeatures,
-    setEditDiscount,
-  } = useEditPropertyForm();
 
-  const {
-    isLandProperty2,
-    isBulk
-  } = metadata;
+    // Redux setters
+    setCreateMedia,
+    setCreateBasicDetails,
+    setCreateBulkDetails,
+    setCreateSpecifications,
+    setCreateLandForm,
+    setCreateLandSizeSections,
+    setCreateFeatures,
+    setCreateDiscount,
+  } = useCreatePropertyForm();
+
+  const { isLandProperty, isBulk } = metadata;
 
   // Extract values from metadata
   const { propertyId: editPropertyId } = metadata;
@@ -67,7 +73,7 @@ export default function PropertyListing() {
     address: false,
     discount: false,
     propertyUnits: false,
-    landSizeSection: false
+    landSizeSection: false,
   });
 
   // Local editing states
@@ -90,7 +96,7 @@ export default function PropertyListing() {
   const [editingPropertyUnits, setEditingPropertyUnits] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Local state for editing land size sections
   const [localLandSizeSections, setLocalLandSizeSections] = useState(
     LandSizeSection || []
@@ -106,15 +112,11 @@ export default function PropertyListing() {
 
   // Use Redux data directly
   const getDisplayData = () => {
-    const isLandProperty = isLandProperty2;
+    // const isLandProperty = isLandProperty;
 
     return {
-      title: isBulk
-        ? bulkDetails.propertyName
-        : basicDetails.propertyName,
-      location: isBulk
-        ? bulkDetails.address
-        : basicDetails.address,
+      title: isBulk ? bulkDetails.propertyName : basicDetails.propertyName,
+      location: isBulk ? bulkDetails.address : basicDetails.address,
       virtualTour: media.tourLink,
       squareMeters: isLandProperty
         ? landForm.propertySize
@@ -138,9 +140,7 @@ export default function PropertyListing() {
         ? landForm.description
         : specifications.description,
       features: reduxFeatures.features || [],
-      address: isBulk
-        ? bulkDetails.address
-        : basicDetails.address,
+      address: isBulk ? bulkDetails.address : basicDetails.address,
       discount: {
         name: reduxDiscount.discountName,
         off: reduxDiscount.discountOff,
@@ -163,44 +163,46 @@ export default function PropertyListing() {
   const handleEdit = (field: keyof EditingState) => {
     // Initialize editing state with current data
     switch (field) {
-      case 'title':
-        setEditingTitle(isBulk ? bulkDetails.propertyName : basicDetails.propertyName);
+      case "title":
+        setEditingTitle(
+          isBulk ? bulkDetails.propertyName : basicDetails.propertyName
+        );
         break;
-      case 'location':
+      case "location":
         setEditingLocation(isBulk ? bulkDetails.address : basicDetails.address);
         break;
-      case 'virtualTour':
+      case "virtualTour":
         setEditingVirtualTour(media.tourLink);
         break;
-      case 'squareMeters':
-        const isLandProperty = isLandProperty2;
-        const size = isLandProperty 
-          ? landForm.propertySize 
+      case "squareMeters":
+        // const isLandProperty = isLandProperty;
+        const size = isLandProperty
+          ? landForm.propertySize
           : specifications.propertySize;
         setEditingSquareMeters(size ? `${size} Sq M` : "");
         break;
-      case 'propertyType':
-        setEditingPropertyType(isBulk ? bulkDetails.propertyType : basicDetails.propertyType);
+      case "propertyType":
+        setEditingPropertyType(
+          isBulk ? bulkDetails.propertyType : basicDetails.propertyType
+        );
         break;
-      case 'price':
-        const price = isBulk 
-          ? bulkDetails.price 
-          : basicDetails.price;
+      case "price":
+        const price = isBulk ? bulkDetails.price : basicDetails.price;
         setEditingPrice(price ? `₦${Number(price).toLocaleString()}` : "");
         break;
-      case 'description':
-        const description = isLandProperty2 
-          ? landForm.description 
+      case "description":
+        const description = isLandProperty
+          ? landForm.description
           : specifications.description;
         setEditingDescription(description || "");
         break;
-      case 'features':
+      case "features":
         setEditingFeatures([...reduxFeatures.features]);
         break;
-      case 'address':
+      case "address":
         setEditingAddress(isBulk ? bulkDetails.address : basicDetails.address);
         break;
-      case 'discount':
+      case "discount":
         setEditingDiscount({
           name: reduxDiscount.discountName,
           off: reduxDiscount.discountOff,
@@ -209,14 +211,14 @@ export default function PropertyListing() {
           to: reduxDiscount.validTo,
         });
         break;
-      case 'propertyUnits':
+      case "propertyUnits":
         setEditingPropertyUnits(isBulk ? bulkDetails.propertyUnits : "1");
         break;
-      case 'landSizeSection':
+      case "landSizeSection":
         // Already handled by localLandSizeSections
         break;
     }
-    
+
     setEditing({ ...editing, [field]: true });
   };
 
@@ -226,95 +228,95 @@ export default function PropertyListing() {
 
   const handleSave = (field: keyof EditingState) => {
     switch (field) {
-      case 'title':
+      case "title":
         if (isBulk) {
-          setEditBulkDetails({
+          setCreateBulkDetails({
             ...bulkDetails,
-            propertyName: editingTitle
+            propertyName: editingTitle,
           });
         } else {
-          setEditBasicDetails({
+          setCreateBasicDetails({
             ...basicDetails,
-            propertyName: editingTitle
+            propertyName: editingTitle,
           });
         }
         break;
-      
-      case 'location':
-      case 'address':
+
+      case "location":
+      case "address":
         if (isBulk) {
-          setEditBulkDetails({
+          setCreateBulkDetails({
             ...bulkDetails,
-            address: editingAddress
+            address: editingAddress,
           });
         } else {
-          setEditBasicDetails({
+          setCreateBasicDetails({
             ...basicDetails,
-            address: editingAddress
+            address: editingAddress,
           });
         }
         break;
-      
-      case 'virtualTour':
-        setEditMedia({
+
+      case "virtualTour":
+        setCreateMedia({
           ...media,
-          tourLink: editingVirtualTour
+          tourLink: editingVirtualTour,
         });
         break;
-      
-      case 'propertyType':
+
+      case "propertyType":
         if (isBulk) {
-          setEditBulkDetails({
+          setCreateBulkDetails({
             ...bulkDetails,
-            propertyType: editingPropertyType
+            propertyType: editingPropertyType,
           });
         } else {
-          setEditBasicDetails({
+          setCreateBasicDetails({
             ...basicDetails,
-            propertyType: editingPropertyType
+            propertyType: editingPropertyType,
           });
         }
         break;
-      
-      case 'price':
+
+      case "price":
         // Extract numeric value from formatted string
-        const priceValue = editingPrice.replace(/[^\d.]/g, '');
+        const priceValue = editingPrice.replace(/[^\d.]/g, "");
         if (isBulk) {
-          setEditBulkDetails({
+          setCreateBulkDetails({
             ...bulkDetails,
-            price: priceValue
+            price: priceValue,
           });
         } else {
-          setEditBasicDetails({
+          setCreateBasicDetails({
             ...basicDetails,
-            price: priceValue
+            price: priceValue,
           });
         }
         break;
-      
-      case 'description':
-        if (isLandProperty2) {
-          setEditLandForm({
+
+      case "description":
+        if (isLandProperty) {
+          setCreateLandForm({
             ...landForm,
-            description: editingDescription
+            description: editingDescription,
           });
         } else {
-          setEditSpecifications({
+          setCreateSpecifications({
             ...specifications,
-            description: editingDescription
+            description: editingDescription,
           });
         }
         break;
-      
-      case 'features':
-        setEditFeatures({
+
+      case "features":
+        setCreateFeatures({
           ...reduxFeatures,
-          features: editingFeatures
+          features: editingFeatures,
         });
         break;
-      
-      case 'discount':
-        setEditDiscount({
+
+      case "discount":
+        setCreateDiscount({
           ...reduxDiscount,
           discountName: editingDiscount.name,
           discountOff: editingDiscount.off,
@@ -323,37 +325,37 @@ export default function PropertyListing() {
           validTo: editingDiscount.to,
         });
         break;
-      
-      case 'propertyUnits':
+
+      case "propertyUnits":
         if (isBulk) {
-          setEditBulkDetails({
+          setCreateBulkDetails({
             ...bulkDetails,
-            propertyUnits: editingPropertyUnits
+            propertyUnits: editingPropertyUnits,
           });
         }
         break;
-      
-      case 'squareMeters':
+
+      case "squareMeters":
         // Extract numeric value from string
-        const sizeValue = editingSquareMeters.replace(/[^\d.]/g, '');
-        if (isLandProperty2) {
-          setEditLandForm({
+        const sizeValue = editingSquareMeters.replace(/[^\d.]/g, "");
+        if (isLandProperty) {
+          setCreateLandForm({
             ...landForm,
-            propertySize: sizeValue
+            propertySize: sizeValue,
           });
         } else {
-          setEditSpecifications({
+          setCreateSpecifications({
             ...specifications,
-            propertySize: sizeValue
+            propertySize: sizeValue,
           });
         }
         break;
-      
-      case 'landSizeSection':
+
+      case "landSizeSection":
         // Already handled by save button in land size section
         break;
     }
-    
+
     setEditing({ ...editing, [field]: false });
   };
 
@@ -366,11 +368,8 @@ export default function PropertyListing() {
   // Handle image upload - update Redux state
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newImages = [
-        ...media.images,
-        ...Array.from(e.target.files),
-      ];
-      setEditMedia({
+      const newImages = [...media.images, ...Array.from(e.target.files)];
+      setCreateMedia({
         ...media,
         images: newImages,
       });
@@ -380,7 +379,7 @@ export default function PropertyListing() {
   // Handle image removal
   const handleRemoveImage = (index: number) => {
     const newImages = media.images.filter((_, i) => i !== index);
-    setEditMedia({
+    setCreateMedia({
       ...media,
       images: newImages,
     });
@@ -674,9 +673,9 @@ export default function PropertyListing() {
           )}
         </div>
       </div>
-      
+
       {/* Infrastructure Fees */}
-      {(isLandProperty2) && (
+      {isLandProperty && (
         <div className="mb-6">
           <div className="flex flex-col justify-between mb-2">
             <h2 className="text-lg font-semibold">Infrastructure Fees</h2>
@@ -935,257 +934,282 @@ export default function PropertyListing() {
       </div>
 
       {/* Land Size Section */}
-     {
-      isLandProperty2 &&( <div className="mt-8">
-        <div className="flex items-center mb-3">
-          <h2 className="text-lg font-semibold">Land Size Sections</h2>
-          <FaPen
-            className="w-4 h-4 ml-2 text-[#272727] cursor-pointer"
-            onClick={() => handleEdit("landSizeSection")}
-          />
-        </div>
+      {isLandProperty && (
+        <div className="mt-8">
+          <div className="flex items-center mb-3">
+            <h2 className="text-lg font-semibold">Land Size Sections</h2>
+            <FaPen
+              className="w-4 h-4 ml-2 text-[#272727] cursor-pointer"
+              onClick={() => handleEdit("landSizeSection")}
+            />
+          </div>
 
-        {editing.landSizeSection ? (
-          <>
-            {localLandSizeSections.map((section: any, secIndex: number) => (
-              <div
-                key={section.id}
-                className="border rounded-lg p-4 mb-4 bg-gray-50"
-              >
-                {/* --- Size --- */}
-                <div className="flex items-center gap-2 mb-3">
-                  <label className="text-sm font-medium w-24">Size (sqm)</label>
-                  <input
-                    type="text"
-                    value={section.size}
-                    onChange={(e) => {
-                      const updated = [...localLandSizeSections];
-                      updated[secIndex].size = e.target.value;
-                      setLocalLandSizeSections(updated);
-                    }}
-                    className="border rounded px-2 py-1 text-sm w-32 focus:outline-none focus:border-[#79B833]"
-                  />
-
-                  <button
-                    type="button"
-                    className="ml-auto text-red-500 text-sm hover:text-red-700"
-                    onClick={() => {
-                      const updated = localLandSizeSections.filter(
-                        (_: any, i: number) => i !== secIndex
-                      );
-                      setLocalLandSizeSections(updated);
-                    }}
-                  >
-                    Remove Section
-                  </button>
-                </div>
-
-                {/* ---- Durations ---- */}
-                <h3 className="text-sm font-semibold mb-2">Durations</h3>
-
-                {section.durations.map((d: any, dIndex: number) => (
-                  <div
-                    key={d.id}
-                    className="grid grid-cols-4 gap-2 mb-2 items-center"
-                  >
-                    {/* Duration */}
+          {editing.landSizeSection ? (
+            <>
+              {localLandSizeSections.map((section: any, secIndex: number) => (
+                <div
+                  key={section.id}
+                  className="border rounded-lg p-4 mb-4 bg-gray-50"
+                >
+                  {/* --- Size --- */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <label className="text-sm font-medium w-24">
+                      Size (sqm)
+                    </label>
                     <input
                       type="text"
-                      value={d.duration}
-                      placeholder="Duration (months)"
+                      value={section.size}
                       onChange={(e) => {
                         const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].duration = e.target.value;
+                        updated[secIndex].size = e.target.value;
                         setLocalLandSizeSections(updated);
                       }}
-                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
+                      className="border rounded px-2 py-1 text-sm w-32 focus:outline-none focus:border-[#79B833]"
                     />
 
-                    {/* Price */}
-                    <input
-                      type="text"
-                      value={d.price}
-                      placeholder="Price"
-                      onChange={(e) => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].price = e.target.value;
-                        setLocalLandSizeSections(updated);
-                      }}
-                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
-                    />
-
-                    {/* Citta Link */}
-                    <input
-                      type="text"
-                      value={d.cittaLink}
-                      placeholder="Citta Link"
-                      onChange={(e) => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].cittaLink = e.target.value;
-                        setLocalLandSizeSections(updated);
-                      }}
-                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
-                    />
-
-                    {/* Remove Duration */}
                     <button
                       type="button"
-                      className="text-red-500 hover:text-red-700"
+                      className="ml-auto text-red-500 text-sm hover:text-red-700"
                       onClick={() => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations = updated[secIndex].durations.filter(
-                          (_: any, i: number) => i !== dIndex
+                        const updated = localLandSizeSections.filter(
+                          (_: any, i: number) => i !== secIndex
                         );
                         setLocalLandSizeSections(updated);
                       }}
                     >
-                      Remove
+                      Remove Section
                     </button>
                   </div>
-                ))}
 
-                {/* Add Duration Button */}
+                  {/* ---- Durations ---- */}
+                  <h3 className="text-sm font-semibold mb-2">Durations</h3>
+
+                  {section.durations.map((d: any, dIndex: number) => (
+                    <div
+                      key={d.id}
+                      className="grid grid-cols-4 gap-2 mb-2 items-center"
+                    >
+                      {/* Duration */}
+                      <input
+                        type="text"
+                        value={d.duration}
+                        placeholder="Duration (months)"
+                        onChange={(e) => {
+                          const updated = [...localLandSizeSections];
+                          updated[secIndex].durations[dIndex].duration =
+                            e.target.value;
+                          setLocalLandSizeSections(updated);
+                        }}
+                        className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
+                      />
+
+                      {/* Price */}
+                      <input
+                        type="text"
+                        value={d.price}
+                        placeholder="Price"
+                        onChange={(e) => {
+                          const updated = [...localLandSizeSections];
+                          updated[secIndex].durations[dIndex].price =
+                            e.target.value;
+                          setLocalLandSizeSections(updated);
+                        }}
+                        className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
+                      />
+
+                      {/* Citta Link */}
+                      <input
+                        type="text"
+                        value={d.cittaLink}
+                        placeholder="Citta Link"
+                        onChange={(e) => {
+                          const updated = [...localLandSizeSections];
+                          updated[secIndex].durations[dIndex].cittaLink =
+                            e.target.value;
+                          setLocalLandSizeSections(updated);
+                        }}
+                        className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
+                      />
+
+                      {/* Remove Duration */}
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => {
+                          const updated = [...localLandSizeSections];
+                          updated[secIndex].durations = updated[
+                            secIndex
+                          ].durations.filter(
+                            (_: any, i: number) => i !== dIndex
+                          );
+                          setLocalLandSizeSections(updated);
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add Duration Button */}
+                  <button
+                    type="button"
+                    className="text-sm text-[#79B833] hover:text-[#6ba32c] mt-2 flex items-center gap-1"
+                    onClick={() => {
+                      const updated = [...localLandSizeSections];
+                      updated[secIndex].durations.push({
+                        id: Date.now(),
+                        duration: "",
+                        price: "",
+                        cittaLink: "",
+                      });
+                      setLocalLandSizeSections(updated);
+                    }}
+                  >
+                    <FaPlus className="w-3 h-3" />
+                    Add Duration
+                  </button>
+                </div>
+              ))}
+
+              {/* Add New Land Size Section Button */}
+              <div className="flex items-center gap-3 mt-4">
                 <button
                   type="button"
-                  className="text-sm text-[#79B833] hover:text-[#6ba32c] mt-2 flex items-center gap-1"
+                  className="px-4 py-2 bg-[#79B833] text-white rounded-md text-sm hover:bg-[#6ba32c] flex items-center gap-2"
                   onClick={() => {
-                    const updated = [...localLandSizeSections];
-                    updated[secIndex].durations.push({
-                      id: Date.now(),
-                      duration: "",
-                      price: "",
-                      cittaLink: "",
-                    });
-                    setLocalLandSizeSections(updated);
+                    setLocalLandSizeSections([
+                      ...localLandSizeSections,
+                      {
+                        id: Date.now(),
+                        size: "",
+                        durations: [],
+                      },
+                    ]);
                   }}
                 >
                   <FaPlus className="w-3 h-3" />
-                  Add Duration
+                  Add Land Size Section
                 </button>
-              </div>
-            ))}
 
-            {/* Add New Land Size Section Button */}
-            <div className="flex items-center gap-3 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 bg-[#79B833] text-white rounded-md text-sm hover:bg-[#6ba32c] flex items-center gap-2"
-                onClick={() => {
-                  setLocalLandSizeSections([
-                    ...localLandSizeSections,
-                    {
-                      id: Date.now(),
-                      size: "",
-                      durations: [],
-                    },
-                  ]);
-                }}
-              >
-                <FaPlus className="w-3 h-3" />
-                Add Land Size Section
-              </button>
-
-              {/* Save and Cancel buttons for the entire section */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 flex items-center gap-2"
-                  onClick={() => {
-                    // Save to Redux
-                    setEditLandSizeSections(localLandSizeSections);
-                    setEditing({ ...editing, landSizeSection: false });
-                  }}
-                >
-                  <FaCheck className="w-3 h-3" />
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 flex items-center gap-2"
-                  onClick={() => {
-                    // Reset to original Redux data
-                    setLocalLandSizeSections(LandSizeSection || []);
-                    setEditing({ ...editing, landSizeSection: false });
-                  }}
-                >
-                  <FaTimes className="w-3 h-3" />
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          /* Display view mode when NOT editing */
-          <div className="space-y-4">
-            {LandSizeSection?.length > 0 ? (
-              LandSizeSection.map((section: any, secIndex: number) => (
-                <div
-                  key={section.id}
-                  className="border rounded-lg p-4 bg-gray-50"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-medium">
-                      <span className="text-gray-600">Size:</span>{" "}
-                      {section.size ? `${section.size} sqm` : "Not specified"}
-                    </h3>
-                  </div>
-
-                  {/* Display durations */}
-                  {section.durations.length > 0 ? (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-600 mb-2">Durations:</h4>
-                      {section.durations.map((duration: any, dIndex: number) => (
-                        <div key={duration.id} className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-500">Duration:</span>{" "}
-                            {duration.duration || "N/A"}
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Price:</span>{" "}
-                            {duration.price || "N/A"}
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Citta Link:</span>{" "}
-                            {duration.cittaLink ? (
-                              <a
-                                href={duration.cittaLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline"
-                              >
-                                View Link
-                              </a>
-                            ) : (
-                              "N/A"
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">No durations added</p>
-                  )}
+                {/* Save and Cancel buttons for the entire section */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 flex items-center gap-2"
+                    onClick={() => {
+                      // Save to Redux
+                      setCreateLandSizeSections(localLandSizeSections);
+                      setEditing({ ...editing, landSizeSection: false });
+                    }}
+                  >
+                    <FaCheck className="w-3 h-3" />
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 flex items-center gap-2"
+                    onClick={() => {
+                      // Reset to original Redux data
+                      setLocalLandSizeSections(LandSizeSection || []);
+                      setEditing({ ...editing, landSizeSection: false });
+                    }}
+                  >
+                    <FaTimes className="w-3 h-3" />
+                    Cancel
+                  </button>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-6 bg-gray-50 rounded-lg border">
-                <p className="text-gray-500">No land size sections added yet</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Click the edit icon to add land size sections
-                </p>
               </div>
-            )}
-          </div>
-        )}
-      </div>)
-     }
-{isLandProperty2 &&
-     (
-   <InfrastructureFeesModal
+            </>
+          ) : (
+            /* Display view mode when NOT editing */
+            <div className="space-y-4">
+              {LandSizeSection?.length > 0 ? (
+                LandSizeSection.map((section: any, secIndex: number) => (
+                  <div
+                    key={section.id}
+                    className="border rounded-lg p-4 bg-gray-50"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="font-medium">
+                        <span className="text-gray-600">Size:</span>{" "}
+                        {section.size ? `${section.size} sqm` : "Not specified"}
+                      </h3>
+                    </div>
+
+                    {/* Display durations */}
+                    {section.durations.length > 0 ? (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-gray-600 mb-2">
+                          Durations:
+                        </h4>
+                        {section.durations.map(
+                          (duration: any, dIndex: number) => (
+                            <div
+                              key={duration.id}
+                              className="grid grid-cols-3 gap-4 text-sm"
+                            >
+                              <div>
+                                <span className="text-gray-500">Duration:</span>{" "}
+                                {duration.duration || "N/A"}
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Price:</span>{" "}
+                                {duration.price || "N/A"}
+                              </div>
+                              <div>
+                                <span className="text-gray-500">
+                                  Citta Link:
+                                </span>{" "}
+                                {duration.cittaLink ? (
+                                  <a
+                                    href={duration.cittaLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline"
+                                  >
+                                    View Link
+                                  </a>
+                                ) : (
+                                  "N/A"
+                                )}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">
+                        No durations added
+                      </p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 bg-gray-50 rounded-lg border">
+                  <p className="text-gray-500">
+                    No land size sections added yet
+                  </p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Click the edit icon to add land size sections
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+{/* 
+      {isEditMode ? (
+        <InfrastructureFeesModalss
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />
-      ) }
+      ) : ( */}
+  {isLandProperty &&    (  <InfrastructureFeesModalss
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />)}
+      {/* )} */}
     </div>
   );
 }

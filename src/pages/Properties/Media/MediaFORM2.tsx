@@ -1,8 +1,8 @@
-import React, { forwardRef, useImperativeHandle, useContext, useRef, useEffect, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
 import InputField from "../../../components/input/inputtext";
-import { PropertyContext } from "../../../MyContext/MyContext";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
@@ -19,35 +19,67 @@ interface MediaFormValues {
 }
 
 interface MediaFORMProps {
-  imagePreview: string | null;
-  setImagePreview: (preview: string | null) => void;
-  galleryPreviews: (string | null)[];
-  setGalleryPreviews: (previews: (string | null)[]) => void;
-
-  newDisplayImage: File | null;
-  setNewDisplayImage: (file: File | null) => void;
-
-  newGalleryImages: (File | string | null)[];
-  setNewGalleryImages: (images: (File | string | null)[]) => void;
-
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  galleryInputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
-  triggerFileInput: () => void;
-  triggerGalleryFileInput: (index: number) => void;
+  // Common props
+  setMedia: (data: MediaFormValues) => void;
+  initialData?: MediaFormValues;
+  isEditMode?: boolean;
+  
+  // Edit mode props (optional for create mode)
+  imagePreview?: string | null;
+  setImagePreview?: (preview: string | null) => void;
+  newDisplayImage?: File | null;
+  setNewDisplayImage?: (file: File | null) => void;
+  galleryPreviews?: (string | null)[];
+  setGalleryPreviews?: (previews: (string | null)[]) => void;
+  newGalleryImages?: (File | string | null)[];
+  setNewGalleryImages?: (images: (File | string | null)[]) => void;
+  galleryInputRefs?: React.MutableRefObject<(HTMLInputElement | null)[]>;
+  triggerFileInput?: () => void;
+  triggerGalleryFileInput?: (index: number) => void;
+  fileInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-
 const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
-  const { formData, setMedia, imagePreview, setImagePreview } = useContext(PropertyContext)!;
   const {
-    galleryPreviews,
-    setGalleryPreviews,
-    fileInputRef,
-    galleryInputRefs,
-    triggerFileInput,
-    triggerGalleryFileInput
+    setMedia,
+    initialData,
+    isEditMode = false,
+    
+    // Edit mode specific props
+    imagePreview: externalImagePreview,
+    setImagePreview: externalSetImagePreview,
+    newDisplayImage,
+    setNewDisplayImage,
+    galleryPreviews: externalGalleryPreviews,
+    setGalleryPreviews: externalSetGalleryPreviews,
+    newGalleryImages,
+    setNewGalleryImages,
+    galleryInputRefs: externalGalleryInputRefs,
+    triggerFileInput: externalTriggerFileInput,
+    triggerGalleryFileInput: externalTriggerGalleryFileInput,
+    fileInputRef: externalFileInputRef,
   } = props;
 
+  // Create refs for create mode
+  const createFileInputRef = useRef<HTMLInputElement>(null);
+  const createGalleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  
+  // Use external refs if provided, otherwise use create mode refs
+  const fileInputRef = externalFileInputRef || createFileInputRef;
+  const galleryInputRefs = externalGalleryInputRefs || createGalleryInputRefs;
+  
+  // Local state for create mode
+  const [localImagePreview, setLocalImagePreview] = useState<string | null>(null);
+  const [localGalleryPreviews, setLocalGalleryPreviews] = useState<(string | null)[]>([]);
+  const [localNewDisplayImage, setLocalNewDisplayImage] = useState<File | null>(null);
+  const [localNewGalleryImages, setLocalNewGalleryImages] = useState<(File | string | null)[]>([]);
+  
+  // Use external state if provided, otherwise use local state
+  const imagePreview = isEditMode ? externalImagePreview : localImagePreview;
+  const setImagePreview = isEditMode ? externalSetImagePreview : setLocalImagePreview;
+  const galleryPreviews = isEditMode ? externalGalleryPreviews : localGalleryPreviews;
+  const setGalleryPreviews = isEditMode ? externalSetGalleryPreviews : setLocalGalleryPreviews;
+  
   const [initialValues, setInitialValues] = useState<MediaFormValues>({
     tourLink: '',
     videoLink: '',
@@ -63,46 +95,67 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
 
   const formikRef = useRef<any>(null);
 
-useEffect(() => {
-  if (formData.media) {
-    setInitialValues({
-      tourLink: formData.media.tourLink || '',
-      videoLink: formData.media.videoLink || '',
-      mapUrl: formData.media.mapUrl || '',
-      images: formData.media.images || [],
-    });
+  useEffect(() => {
+    if (initialData) {
+      setInitialValues({
+        tourLink: initialData.tourLink || '',
+        videoLink: initialData.videoLink || '',
+        mapUrl: initialData.mapUrl || '',
+        images: initialData.images || [],
+      });
 
-    const images = formData.media.images || [];
-    const displayImage = imagePreview
-    const galleryImages = images
-
-    // Handle display image preview
-    if (displayImage) {
-      if (typeof displayImage === 'string') {
-        setImagePreview(displayImage);
-      } else if (displayImage instanceof File) {
-        setImagePreview(URL.createObjectURL(displayImage));
+      const images = initialData.images || [];
+      
+      // Handle display image preview
+      const displayImage = images[0];
+      if (displayImage) {
+        if (typeof displayImage === 'string') {
+          if (setImagePreview) {
+            setImagePreview(displayImage);
+          } else {
+            setLocalImagePreview(displayImage);
+          }
+        } else if (displayImage instanceof File) {
+          const preview = URL.createObjectURL(displayImage);
+          if (setImagePreview) {
+            setImagePreview(preview);
+          } else {
+            setLocalImagePreview(preview);
+          }
+        } else {
+          if (setImagePreview) {
+            setImagePreview(null);
+          } else {
+            setLocalImagePreview(null);
+          }
+        }
       } else {
-        setImagePreview(null);
+        if (setImagePreview) {
+          setImagePreview(null);
+        } else {
+          setLocalImagePreview(null);
+        }
       }
-    } else {
-      setImagePreview(null);
+
+      // Handle gallery images previews (skip first image which is display image)
+      const galleryImages = images.slice(1);
+      const galleryImagePreviews = galleryImages.map(image => {
+        if (typeof image === 'string') {
+          return image;
+        } else if (image instanceof File) {
+          return URL.createObjectURL(image);
+        } else {
+          return null;
+        }
+      });
+
+      if (setGalleryPreviews) {
+        setGalleryPreviews(galleryImagePreviews);
+      } else {
+        setLocalGalleryPreviews(galleryImagePreviews);
+      }
     }
-
-    // Handle gallery images previews
-    const galleryImagePreviews = galleryImages.map(image => {
-      if (typeof image === 'string') {
-        return image;
-      } else if (image instanceof File) {
-        return URL.createObjectURL(image);
-      } else {
-        return null;
-      }
-    });
-
-    setGalleryPreviews(galleryImagePreviews);
-  }
-}, [formData.media]);
+  }, [initialData]);
 
   useImperativeHandle(ref, () => ({
     handleSubmit: () => {
@@ -124,28 +177,59 @@ useEffect(() => {
       const reader = new FileReader();
       reader.onloadend = () => {
         if (isDisplayImage) {
-          // Update the local state for the preview
-          setImagePreview(reader.result as string);
+          // Update image preview
+          if (setImagePreview) {
+            setImagePreview(reader.result as string);
+          } else {
+            setLocalImagePreview(reader.result as string);
+          }
           
-          // Use Formik's setFieldValue to update the 'images' array
-          // This replaces the first element (index 0) with the new file
+          // Update display image
+          if (setNewDisplayImage) {
+            setNewDisplayImage(file);
+          } else {
+            setLocalNewDisplayImage(file);
+          }
+          
+          // Update Formik's images array
           formikRef.current?.setFieldValue('images', [file, ...formikRef.current.values.images.slice(1)]);
         } else {
-          // Update the local state for the gallery previews
-          const newPreviews = [...galleryPreviews];
+          // Update gallery preview
+          const newPreviews = [...(galleryPreviews || [])];
           newPreviews[index!] = reader.result as string;
-          setGalleryPreviews(newPreviews);
+          if (setGalleryPreviews) {
+            setGalleryPreviews(newPreviews);
+          } else {
+            setLocalGalleryPreviews(newPreviews);
+          }
           
-          // Use Formik's setFieldValue to update the 'images' array
-          // The gallery images in Formik's state start from index 1
+          // Update gallery images
+          if (setNewGalleryImages) {
+            const currentGalleryImages = newGalleryImages || [];
+            const updatedGalleryImages = [...currentGalleryImages];
+            if (index! < updatedGalleryImages.length) {
+              updatedGalleryImages[index!] = file;
+            } else {
+              updatedGalleryImages.push(file);
+            }
+            setNewGalleryImages(updatedGalleryImages);
+          } else {
+            const updatedLocalGalleryImages = [...localNewGalleryImages];
+            if (index! < updatedLocalGalleryImages.length) {
+              updatedLocalGalleryImages[index!] = file;
+            } else {
+              updatedLocalGalleryImages.push(file);
+            }
+            setLocalNewGalleryImages(updatedLocalGalleryImages);
+          }
+          
+          // Update Formik's images array
           const formikIndex = index! + 1;
           const currentImages = [...formikRef.current.values.images];
           
           if (formikIndex < currentImages.length) {
-            // Replace existing image
             currentImages[formikIndex] = file;
           } else {
-            // Add a new image
             currentImages.push(file);
           }
           
@@ -155,18 +239,94 @@ useEffect(() => {
       reader.readAsDataURL(file);
     }
   };
+
   const handleAddGalleryImage = () => {
-    setGalleryPreviews([...galleryPreviews, null]);
+    if (setGalleryPreviews) {
+      const newPreviews = [...(galleryPreviews || []), null];
+      setGalleryPreviews(newPreviews);
+    } else {
+      const newPreviews = [...localGalleryPreviews, null];
+      setLocalGalleryPreviews(newPreviews);
+    }
+    
+    if (setNewGalleryImages) {
+      const newImages = [...(newGalleryImages || []), null];
+      setNewGalleryImages(newImages);
+    } else {
+      const newImages = [...localNewGalleryImages, null];
+      setLocalNewGalleryImages(newImages);
+    }
   };
 
   const handleRemoveGalleryImage = (index: number) => {
-    const newPreviews = [...galleryPreviews];
-    newPreviews.splice(index, 1);
-    setGalleryPreviews(newPreviews);
+    if (setGalleryPreviews) {
+      const newPreviews = [...(galleryPreviews || [])];
+      newPreviews.splice(index, 1);
+      setGalleryPreviews(newPreviews);
+    } else {
+      const newPreviews = [...localGalleryPreviews];
+      newPreviews.splice(index, 1);
+      setLocalGalleryPreviews(newPreviews);
+    }
 
+    if (setNewGalleryImages) {
+      const newImages = [...(newGalleryImages || [])];
+      newImages.splice(index, 1);
+      setNewGalleryImages(newImages);
+    } else {
+      const newImages = [...localNewGalleryImages];
+      newImages.splice(index, 1);
+      setLocalNewGalleryImages(newImages);
+    }
+
+    // Update Formik's images array
     const currentImages = formikRef.current?.values.images || [];
-    currentImages.splice(index + 1, 1);
-    formikRef.current?.setFieldValue('images', currentImages);
+    const updatedImages = [...currentImages];
+    updatedImages.splice(index + 1, 1);
+    formikRef.current?.setFieldValue('images', updatedImages);
+  };
+
+  const handleSubmitForm = (values: MediaFormValues) => {
+    // Combine form values with image files
+    const finalImages = [...values.images];
+    
+    // Ensure display image is at index 0
+    if (isEditMode && setNewDisplayImage && newDisplayImage) {
+      finalImages[0] = newDisplayImage;
+    } else if (!isEditMode && localNewDisplayImage) {
+      finalImages[0] = localNewDisplayImage;
+    }
+    
+    // Add gallery images
+    const galleryImages = isEditMode ? newGalleryImages : localNewGalleryImages;
+    if (galleryImages) {
+      galleryImages.forEach((img, index) => {
+        if (img && index < galleryImages.length - 1) { // Skip null placeholders
+          finalImages[index + 1] = img;
+        }
+      });
+    }
+    
+    setMedia({
+      ...values,
+      images: finalImages.filter(img => img !== null) as (File | string)[],
+    });
+  };
+
+  const triggerFileInput = () => {
+    if (externalTriggerFileInput) {
+      externalTriggerFileInput();
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const triggerGalleryFileInput = (index: number) => {
+    if (externalTriggerGalleryFileInput) {
+      externalTriggerGalleryFileInput(index);
+    } else {
+      galleryInputRefs.current[index]?.click();
+    }
   };
 
   return (
@@ -175,11 +335,7 @@ useEffect(() => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       enableReinitialize={true}
-      onSubmit={(values: MediaFormValues) => {
-        setMedia({
-          ...values,
-        });
-      }}
+      onSubmit={handleSubmitForm}
     >
       {({ values, handleChange, touched, errors, setFieldValue }) => (
         <Form className="max-w-xl">
@@ -233,7 +389,7 @@ useEffect(() => {
               Upload additional images for your property gallery.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {galleryPreviews.map((preview, index) => (
+              {(galleryPreviews || []).map((preview, index) => (
                 <div key={index} className="relative w-full aspect-square border-2 border-dashed border-gray-300 rounded-lg group overflow-hidden">
                   {preview ? (
                     <img

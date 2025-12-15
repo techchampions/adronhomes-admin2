@@ -1,17 +1,13 @@
 import React, {
   forwardRef,
-  useContext,
   useEffect,
   useImperativeHandle,
   useMemo,
-  useState,
   ChangeEvent,
-  useRef
 } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import InputField from "../../../components/input/inputtext";
-import { PropertyContext } from "../../../MyContext/MyContext";
 import { BasicDetailsHandles } from "../types/formRefs";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
@@ -35,21 +31,50 @@ import {
 } from "../../../components/Redux/country/countrythunkand slice";
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 import MultipleFileUploadField from "../../../components/input/multiplefile";
+import { BasicDetailsFormValues } from "../../../MyContext/MyContext";
 
+// Import the BasicDetailsFormValues interface from types
+// import { BasicDetailsFormValues } from "../../../types/propertyTypes";
 
+interface BasicDetailsProps {
+  // Props for Redux actions
+  setBasicDetails: (data: BasicDetailsFormValues) => void;
+  setIsLandProperty?: (isLand: boolean) => void;
+  setIsLandProperty2?: (isLand: boolean) => void;
+  setSales?: (sales: boolean) => void;
+  
+  // Props for initial data
+  initialData?: BasicDetailsFormValues;
+  
+  // Props for edit mode
+  isEditMode?: boolean;
+  previousPropType?: string;
+}
 
 // Main BasicDetails component
-const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails, setSales,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
+const BasicDetails = forwardRef<BasicDetailsHandles, BasicDetailsProps>(({
+  setBasicDetails,
+  setIsLandProperty,
+  setIsLandProperty2,
+  setSales,
+  initialData,
+  isEditMode = false,
+  previousPropType
+}, ref) => {
   const dispatch = useDispatch<AppDispatch>();
-    // const [propertyFiles, setPropertyFiles] = useState<any[]>(
-    //   formData.basicDetails.propertyFiles || []
-    // );
   
   // Get data from Redux store
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
+
+  // Also get form data from Redux store if needed
+  const createFormData = useSelector((state: RootState) => state.createProperty);
+  const editFormData = useSelector((state: RootState) => state.editProperty);
+
+  // Determine which form data to use based on mode
+  const formData = isEditMode ? editFormData : createFormData;
+  const metadata = isEditMode ? editFormData.metadata : createFormData.metadata;
 
   const propertyTypeOptions = [
     { value: "2", label: "Residential" },
@@ -58,8 +83,8 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   ];
 
   const categoryOptions = [
-    { value: "1", label: "Adron Court" },
-    { value: "2", label: "Vidco Series" },
+    { value: 1, label: "Adron Court" },
+    { value: 2, label: "Vidco Series" },
   ];
 
   const purposeOptions = [
@@ -68,23 +93,78 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   ];
 
   const validationSchema = Yup.object().shape({
-
+    // propertyName: Yup.string().required("Property name is required"),
+    // propertyType: Yup.string().required("Property type is required"),
+    // price: Yup.string()
+    //   .required("Price is required")
+    //   .test(
+    //     'is-number',
+    //     'Price must be a valid number',
+    //     (value) => !value || /^\d+$/.test(value.replace(/[₦,]/g, ''))
+    //   ),
+    // address: Yup.string().required("Address is required"),
+    // country: Yup.string().required("Country is required"),
+    // state: Yup.string().required("State is required"),
+    // purpose: Yup.array()
+    //   .of(Yup.string())
+    //   .min(1, "At least one purpose is required"),
+    // propertyFiles: Yup.array()
+    //   .test(
+    //     'files-check',
+    //     'Files are required',
+    //     (value) => value && value.length > 0
+    //   )
+    //   .optional(),
   });
+
+  // Use initialData if provided, otherwise use Redux form data
+  const initialValues = initialData || formData.basicDetails;
 
   const formik = useFormik({
     initialValues: {
-      ...formData.basicDetails,
-      category_id: formData.basicDetails.category_id || "",
-      purpose: formData.basicDetails.purpose || [],
-       propertyFiles: formData.basicDetails.propertyFiles || [],
+      ...initialValues,
+      category_id: initialValues.category_id || "",
+      purpose: initialValues.purpose || [],
+      propertyFiles: initialValues.propertyFiles || [],
     },
+      validateOnMount: true,
+  enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
+      // Check if property type is Land and call setIsLandProperty if provided
+      if (setIsLandProperty && values.propertyType) {
+        const selectedOption = propertyTypeOptions.find(
+          opt => opt.value === values.propertyType
+        );
+        if (selectedOption?.label === "Land") {
+          setIsLandProperty(true);
+        } else {
+          setIsLandProperty(false);
+        }
+      }
+
+      // Similarly for setIsLandProperty2 if provided
+      if (setIsLandProperty2 && values.propertyType) {
+        const selectedOption = propertyTypeOptions.find(
+          opt => opt.value === values.propertyType
+        );
+        if (selectedOption?.label === "Land") {
+          setIsLandProperty2(true);
+        } else {
+          setIsLandProperty2(false);
+        }
+      }
+
+      // Update the form data via the setter function
       setBasicDetails(values);
-      const salePurpose = values.purpose.find(p => p.toLowerCase() === 'sale');
-      setSales(salePurpose ? false : true);
+      
+      // Set sales flag if setSales function is provided
+      if (setSales) {
+        const salePurpose = values.purpose.find(p => p.toLowerCase() === 'sale');
+        setSales(salePurpose ? false : true);
+      }
     },
-    enableReinitialize: true,
+    // enableReinitialize: true,
   });
 
   const countriesOptions = useMemo(() => 
@@ -115,36 +195,69 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [lgas]
   );
 
-
   const handlePurposeChange = (value: string) => {
     const normalized = value.toLowerCase();
     formik.setFieldValue("purpose", [normalized]);
-    setSales(normalized === "sale" ? false : true);
+    
+    // Set sales flag if setSales function is provided
+    if (setSales) {
+      setSales(normalized === "sale" ? false : true);
+    }
   };
 
-  useImperativeHandle(ref, () => ({
-    handleSubmit: async () => {
-      const errors = await formik.validateForm();
-      const hasErrors = Object.keys(errors).length > 0;
-
-      if (hasErrors) {
-        formik.setTouched(
-          Object.keys(errors).reduce((acc, key) => {
-            acc[key] = true;
-            return acc;
-          }, {} as { [field: string]: boolean }),
-          true
-        );
-        return false;
-      } else {
-        formik.handleSubmit();
-        return true;
+  // Handle property type change
+  const handlePropertyTypeChange = (value: string) => {
+    formik.setFieldValue("propertyType", value);
+    
+    // Update land property flags if setter functions are provided
+    if (setIsLandProperty || setIsLandProperty2) {
+      const selectedOption = propertyTypeOptions.find(
+        opt => opt.value === value
+      );
+      const isLand = selectedOption?.label === "Land";
+      
+      if (setIsLandProperty) {
+        setIsLandProperty(isLand);
       }
-    },
-    isValid: formik.isValid,
-  }));
+      if (setIsLandProperty2) {
+        setIsLandProperty2(isLand);
+      }
+    }
+  };
 
-  useEffect(() => {
+useImperativeHandle(ref, () => ({
+  handleSubmit: async () => {
+    const errors = await formik.validateForm();
+
+    if (Object.keys(errors).length > 0) {
+      formik.setTouched(
+        Object.keys(errors).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {} as Record<string, boolean>),
+        true
+      );
+      return false;
+    }
+
+    formik.submitForm();
+    return true;
+  },
+  isValid: formik.isValid,
+  values: formik.values,
+}));
+
+
+  useEffect(() => {const validateStep = async (ref: any) => {
+  if (!ref?.current) return false;
+
+  await ref.current.submitForm();
+
+  const errors = await ref.current.validateForm();
+  return Object.keys(errors).length === 0;
+};
+
+
     dispatch(fetchAllCountries());
   }, [dispatch]);
 
@@ -179,7 +292,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-[30px]">
-      
       <InputField
         label="Property Name"
         placeholder="Enter property name"
@@ -188,16 +300,19 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={formik.handleChange}
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
- {selectedPropertyId&&<p className="text-base text-black">
-  <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
-</p>
-}
+      
+      {isEditMode && previousPropType && (
+        <p className="text-base text-black">
+          <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
+        </p>
+      )}
+      
       <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
         name="propertyType"
         value={formik.values.propertyType}
-        onChange={(value) => formik.setFieldValue("propertyType", value)}
+        onChange={handlePropertyTypeChange}
         options={propertyTypeOptions}
         dropdownTitle="Property Types"
         error={formik.touched.propertyType && formik.errors.propertyType}
@@ -286,8 +401,8 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         isLoading={loading.states}
         isSearchable={true}
       />
-      
-      {/* <EnhancedOptionInputField
+
+      <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
         name="lga"
@@ -299,7 +414,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         disabled={!formik.values.state}
         isLoading={loading.lgas}
         isSearchable={true}
-      /> */}
+      />
 
       <EnhancedOptionInputField
         label="Purpose"
@@ -319,12 +434,12 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         name="propertyFiles"
         multiple={true}
         onChange={(files) => {
-          // Update Formik state directly instead of using local state
           formik.setFieldValue("propertyFiles", files);
         }}
         value={formik.values.propertyFiles || []} 
         error={formik.touched.propertyFiles && formik.errors.propertyFiles}
       />
+      
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}
@@ -335,13 +450,15 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
           Error loading states: {errors.states.message}
         </div>
       )}
-      {/* {errors.lgas && (
+      {errors.lgas && (
         <div className="text-red-500 text-sm">
           Error loading LGAs: {errors.lgas.message}
         </div>
-      )} */}
+      )}
     </form>
   );
 });
+
+BasicDetails.displayName = "BasicDetails";
 
 export default BasicDetails;

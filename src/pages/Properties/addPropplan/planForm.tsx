@@ -2,14 +2,12 @@ import React, {
   useImperativeHandle,
   useState,
   forwardRef,
-  useContext,
   useEffect,
 } from "react";
 import InputField from "../../../components/input/inputtext";
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 import { CITTA_LINKS, formatToNaira, validationSchema } from "./types";
-import { useFormik } from "formik";
-import { PropertyContext } from "../../../MyContext/MyContext";
+import { getIn, useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchPropertyCodes,
@@ -19,6 +17,7 @@ import {
 } from "../../../components/Redux/citta/propertyCodesSlice";
 import { useAppDispatch } from "../../../components/Redux/hook";
 import { resetSuccess } from "../../../components/Redux/Login/login_slice";
+// import { LandSizeSection } from "../../../types/propertyTypes";
 
 interface Duration {
   id: any;
@@ -48,63 +47,109 @@ interface PropertyListingFormValues {
   landSizeSections: LandSizeSection[];
 }
 
+// Define the ref interface for the component
+export interface PropertyListingPageRef {
+  handleSubmit: () => Promise<boolean>;
+  isValid: boolean;
+  values: LandSizeSection[];
+}
+
+interface PropertyListingPageProps {
+  // Props for setting data
+  setLandSizeSections: (data: LandSizeSection[]) => void;
+  
+  // Props for initial data
+  initialData?: LandSizeSection[];
+  
+  // Props for edit mode
+  isEditMode?: boolean;
+}
+
+// Create interface for form values
+interface PropertyListingFormValues {
+  landSizeSections: LandSizeSection[];
+}
+
 const PropertyListingPage = forwardRef<
   PropertyListingPageRef,
   PropertyListingPageProps
->((props, ref) => {
+>(({
+  setLandSizeSections,
+  initialData = [],
+  isEditMode = false
+}, ref) => {
   const dispatch = useAppDispatch();
-  const { formData, setLandSizeSections } = useContext(PropertyContext)!;
+  const [landSizeSections, setLocalLandSizeSections] = useState<LandSizeSection[]>(initialData);
   const [propertyName, setPropertyName] = useState("");
   const [propertyDescription, setPropertyDescription] = useState("");
   const [landPlan, setLandPlan] = useState<any>(null);
+  
+  // Get property codes from Redux
   const dropdownOptions = useSelector(selectPropertyCodesForDropdown);
   const dropdownOptionsLoading = useSelector(selectPropertyCodesLoading);
   const success = useSelector(selectPropertyCodesSuccess);
+  
+  // Track if submit has been attempted
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
+  // Fetch property codes on mount
   useEffect(() => {
     dispatch(fetchPropertyCodes());
   }, [dispatch]);
 
+  // Reset success state
   useEffect(() => {
     if (success) {
       dispatch(resetSuccess());
     }
   }, [success]);
+
+  // Update local state when initialData changes
+  useEffect(() => {
+    if (initialData && initialData.length > 0) {
+      setLocalLandSizeSections(initialData);
+    }
+  }, [initialData]);
+
+  // Add a new land size section
   const addLandSizeSection = () => {
     const newSection: LandSizeSection = {
       id: Date.now(),
-      size: 500, // Default new size
-      durations: [{ id: Date.now() + 1, duration: 3, price: 0, cittaLink: "" }],
+      size: "",
+      durations: [{ 
+        id: Date.now() + 1, 
+        duration: "", 
+        price: "", 
+        cittaLink: "" 
+      }],
     };
 
-    setLandSizeSections([...formData.LandSizeSection, newSection]);
+    const updatedSections = [...landSizeSections, newSection];
+    setLocalLandSizeSections(updatedSections);
   };
 
   // Remove a land size section
   const removeLandSizeSection = (sectionId: number) => {
-    if (formData.LandSizeSection.length > 1) {
-      const updatedSections = formData.LandSizeSection.filter(
+    if (landSizeSections.length > 1) {
+      const updatedSections = landSizeSections.filter(
         (section) => section.id !== sectionId
       );
-      setLandSizeSections(updatedSections);
+      setLocalLandSizeSections(updatedSections);
     }
   };
 
   // Add a duration to a specific land size section
   const addDurationToSection = (sectionId: number) => {
-    const updatedSections = formData.LandSizeSection.map((section) => {
+    const updatedSections = landSizeSections.map((section) => {
       if (section.id === sectionId) {
-        const lastDuration = section.durations[section.durations.length - 1];
-        const newDuration = lastDuration ? lastDuration.duration + 3 : 3;
-
         return {
           ...section,
           durations: [
             ...section.durations,
             {
               id: Date.now(),
-              duration: newDuration,
-              price: 0,
+              duration: "",
+              price: "",
               cittaLink: "",
             },
           ],
@@ -112,12 +157,12 @@ const PropertyListingPage = forwardRef<
       }
       return section;
     });
-    setLandSizeSections(updatedSections);
+    setLocalLandSizeSections(updatedSections);
   };
 
   // Remove a duration from a section
   const removeDurationFromSection = (sectionId: number, durationId: number) => {
-    const updatedSections = formData.LandSizeSection.map((section) => {
+    const updatedSections = landSizeSections.map((section) => {
       if (section.id === sectionId && section.durations.length > 1) {
         return {
           ...section,
@@ -126,26 +171,26 @@ const PropertyListingPage = forwardRef<
       }
       return section;
     });
-    setLandSizeSections(updatedSections);
+    setLocalLandSizeSections(updatedSections);
   };
 
   // Update land size
   const updateLandSize = (sectionId: number, value: string) => {
-    const sizeValue = parseFloat(value) || null;
-    const updatedSections = formData.LandSizeSection.map((section) =>
+    const sizeValue = value || "";
+    const updatedSections = landSizeSections.map((section) =>
       section.id === sectionId ? { ...section, size: sizeValue } : section
     );
-    setLandSizeSections(updatedSections);
+    setLocalLandSizeSections(updatedSections);
   };
 
   // Update duration
   const updateDuration = (
     sectionId: number,
     durationId: number,
-    field: keyof Duration,
+    field: keyof LandSizeSection['durations'][0],
     value: string
   ) => {
-    const updatedSections = formData.LandSizeSection.map((section) => {
+    const updatedSections = landSizeSections.map((section) => {
       if (section.id === sectionId) {
         return {
           ...section,
@@ -153,10 +198,7 @@ const PropertyListingPage = forwardRef<
             duration.id === durationId
               ? {
                   ...duration,
-                  [field]:
-                    field === "duration" || field === "price"
-                      ? parseFloat(value) || null
-                      : value,
+                  [field]: value,
                 }
               : duration
           ),
@@ -164,32 +206,33 @@ const PropertyListingPage = forwardRef<
       }
       return section;
     });
-    setLandSizeSections(updatedSections);
+    setLocalLandSizeSections(updatedSections);
   };
 
   const formik = useFormik<PropertyListingFormValues>({
     initialValues: {
-      landSizeSections: formData.LandSizeSection,
+      landSizeSections: landSizeSections,
     },
     enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
       // Handle form submission
       setLandSizeSections(values.landSizeSections);
-      alert(values.landSizeSections);
-      // You can also set the form data or trigger any other actions here
     },
   });
 
-  // Update formik values when formData changes
-  React.useEffect(() => {
-    if (formData.LandSizeSection !== formik.values.landSizeSections) {
-      formik.setValues({ landSizeSections: formData.LandSizeSection });
+  // Update formik values when local state changes
+  useEffect(() => {
+    if (landSizeSections !== formik.values.landSizeSections) {
+      formik.setValues({ landSizeSections });
     }
-  }, [formData.LandSizeSection]);
+  }, [landSizeSections]);
 
   useImperativeHandle(ref, () => ({
     handleSubmit: async () => {
+      // Mark submit as attempted
+      setSubmitAttempted(true);
+      
       // Validate all form fields
       const errors = await formik.validateForm();
       const hasErrors = Object.keys(errors).length > 0;
@@ -228,46 +271,22 @@ const PropertyListingPage = forwardRef<
       }
     },
     isValid: formik.isValid,
+    get values() {
+      return formik.values.landSizeSections;
+    },
   }));
 
   // Helper function to get error message for a field
   const getErrorMessage = (fieldPath: string): string | undefined => {
-    const error = formik.errors as any;
-    if (error && error.landSizeSections) {
-      const pathParts = fieldPath.split(".");
-      let current = error.landSizeSections;
-
-      for (let i = 0; i < pathParts.length; i++) {
-        if (current && current[pathParts[i]] !== undefined) {
-          current = current[pathParts[i]];
-        } else {
-          return undefined;
-        }
-      }
-
-      return typeof current === "string" ? current : undefined;
+    // Only show error if submit has been attempted AND the field has an error
+    if (submitAttempted) {
+      return getIn(formik.errors, fieldPath);
     }
     return undefined;
   };
-
-  // Helper function to check if a field is touched
+  
   const isFieldTouched = (fieldPath: string): boolean => {
-    const touched = formik.touched as any;
-    if (touched && touched.landSizeSections) {
-      const pathParts = fieldPath.split(".");
-      let current = touched.landSizeSections;
-
-      for (let i = 0; i < pathParts.length; i++) {
-        if (current && current[pathParts[i]] !== undefined) {
-          current = current[pathParts[i]];
-        } else {
-          return false;
-        }
-      }
-
-      return current === true;
-    }
-    return false;
+    return getIn(formik.touched, fieldPath) || false;
   };
 
   return (
@@ -278,7 +297,7 @@ const PropertyListingPage = forwardRef<
           <div className="">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-gray-800">
-                {/* Land Sizes & Pricing */}
+                Land Sizes & Pricing
               </h2>
               <button
                 type="button"
@@ -304,13 +323,13 @@ const PropertyListingPage = forwardRef<
 
             {/* Land Size Sections */}
             <div className="space-y-8">
-              {formData.LandSizeSection.map((section, sectionIndex) => (
+              {landSizeSections.map((section, sectionIndex) => (
                 <div
                   key={section.id}
                   className="border border-gray-200 rounded-2xl p-6 relative bg-gray-50/50"
                 >
                   {/* Remove section button (only show if more than one section) */}
-                  {formData.LandSizeSection.length > 1 && (
+                  {landSizeSections.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeLandSizeSection(section.id)}
@@ -340,15 +359,13 @@ const PropertyListingPage = forwardRef<
                       placeholder="Enter land size in square meters"
                       type="number"
                       name={`landSizeSections[${sectionIndex}].size`}
-                      value={section.size}
+                      value={section.size || ""}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         updateLandSize(section.id, e.target.value)
                       }
-                      error={
-                        isFieldTouched(`${sectionIndex}.size`) &&
-                        getErrorMessage(`${sectionIndex}.size`)
-                      }
-                      // onBlur={() => formik.setFieldTouched(`landSizeSections[${sectionIndex}].size`, true)}
+                      error={getErrorMessage(
+                        `landSizeSections[${sectionIndex}].size`
+                      )}
                       required
                     />
                   </div>
@@ -394,7 +411,7 @@ const PropertyListingPage = forwardRef<
                             placeholder="Enter duration in months"
                             type="number"
                             name={`landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`}
-                            value={duration.duration}
+                            value={duration.duration || ""}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
                             ) =>
@@ -405,14 +422,9 @@ const PropertyListingPage = forwardRef<
                                 e.target.value
                               )
                             }
-                            error={
-                              isFieldTouched(
-                                `${sectionIndex}.durations[${durationIndex}].duration`
-                              ) &&
-                              getErrorMessage(
-                                `${sectionIndex}.durations[${durationIndex}].duration`
-                              )
-                            }
+                            error={getErrorMessage(
+                              `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`
+                            )}
                             required
                           />
                         </div>
@@ -424,27 +436,22 @@ const PropertyListingPage = forwardRef<
                             placeholder="Enter price"
                             type="text"
                             name={`landSizeSections[${sectionIndex}].durations[${durationIndex}].price`}
-                            value={formatToNaira(duration.price)}
+                            value={formatToNaira(duration.price || "")}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
                             ) => {
                               const raw = e.target.value.replace(/[^0-9]/g, "");
-                              const amount = raw ? parseInt(raw) : "";
+                              const amount = raw ? raw : "";
                               updateDuration(
                                 section.id,
                                 duration.id,
                                 "price",
-                                amount.toString()
+                                amount
                               );
                             }}
-                            error={
-                              isFieldTouched(
-                                `${sectionIndex}.durations[${durationIndex}].price`
-                              ) &&
-                              getErrorMessage(
-                                `${sectionIndex}.durations[${durationIndex}].price`
-                              )
-                            }
+                            error={getErrorMessage(
+                              `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`
+                            )}
                             required
                           />
                         </div>
@@ -457,7 +464,7 @@ const PropertyListingPage = forwardRef<
                                 label="Connect Citta Id"
                                 placeholder="Select Citta link"
                                 name={`landSizeSections[${sectionIndex}].durations[${durationIndex}].cittaLink`}
-                                value={duration.cittaLink}
+                                value={duration.cittaLink || ""}
                                 onChange={(value: string) =>
                                   updateDuration(
                                     section.id,
@@ -469,14 +476,9 @@ const PropertyListingPage = forwardRef<
                                 options={dropdownOptions}
                                 isSearchable
                                 isLoading={dropdownOptionsLoading}
-                                error={
-                                  isFieldTouched(
-                                    `${sectionIndex}.durations[${durationIndex}].cittaLink`
-                                  ) &&
-                                  getErrorMessage(
-                                    `${sectionIndex}.durations[${durationIndex}].cittaLink`
-                                  )
-                                }
+                                error={getErrorMessage(
+                                  `landSizeSections[${sectionIndex}].durations[${durationIndex}].cittaLink`
+                                )}
                               />
                             </div>
 
@@ -515,7 +517,7 @@ const PropertyListingPage = forwardRef<
                   </div>
 
                   {/* Section separator */}
-                  {sectionIndex < formData.LandSizeSection.length - 1 && (
+                  {sectionIndex < landSizeSections.length - 1 && (
                     <div className="mt-8 pt-8 border-t border-gray-300"></div>
                   )}
                 </div>

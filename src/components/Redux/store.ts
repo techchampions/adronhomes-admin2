@@ -62,7 +62,22 @@ import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
 import passwordResetReducer from "./passwordRese/passwordReset_slice"
 import deleteCustomerredux from "./customers/deletecut"
 import propertyCodesReducer from "./citta/propertyCodesSlice"
+import createPropertyReducer from "./propertyForm/createPropertySlice";
+import editPropertyReducer from "./editProperty/editpropslice";
 export const store = configureStore({
+   middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: [
+          "createProperty.basicDetails.propertyFiles",
+          "editProperty.basicDetails.propertyFiles",
+        ],
+        ignoredActions: [
+          "editProperty/setEditBasicDetails",
+          "createProperty/setBasicDetails",
+        ],
+      },
+    }),
   reducer: {
     auth: authReducer,
     user: userReducer,
@@ -125,7 +140,9 @@ export const store = configureStore({
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
   deleteCustomer:deleteCustomerredux,
-propertyCodes:propertyCodesReducer},
+propertyCodes:propertyCodesReducer,
+  createProperty: createPropertyReducer,
+  editProperty: editPropertyReducer,}
 });
 
 export type AppDispatch = typeof store.dispatch;

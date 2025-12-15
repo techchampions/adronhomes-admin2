@@ -1,15 +1,26 @@
-import React, { forwardRef, useImperativeHandle, useState, useEffect, useContext } from "react";
+"use client";
+
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import { BiX } from "react-icons/bi";
 import * as Yup from "yup";
-import { PropertyContext } from "../../../MyContext/MyContext";
+import { FeaturesFormValues } from "../../../MyContext/MyContext";
 
 interface FeaturesInputHandles {
   handleSubmit: () => void;
   isValid: boolean;
+  values: FeaturesFormValues;
 }
 
-interface FeaturesFormValues {
-  features: string[];
+interface FeaturesInputProps {
+  setFeatures: (data: FeaturesFormValues) => void;
+  initialData?: FeaturesFormValues;
+  isEditMode?: boolean;
 }
 
 const predefinedFeatures = [
@@ -17,150 +28,240 @@ const predefinedFeatures = [
   "Swimming Pool",
   "Drainage",
   "Super Market",
-  "Street Light"
+  "Street Light",
+  "24/7 Security",
+  "Parking Space",
+  "Garden",
+  "Playground",
+  "Clubhouse",
+  "Power Supply",
+  "Water Supply",
+  "Internet",
+  "CCTV",
+  "Elevator",
 ];
 
-const FeaturesInput = forwardRef<FeaturesInputHandles>((props, ref) => {
-  const { formData, setFeatures: setContextFeatures } = useContext(PropertyContext)!;
-  const [features, setLocalFeatures] = useState<string[]>([]);
+const FeaturesInput = forwardRef<
+  FeaturesInputHandles,
+  FeaturesInputProps
+>(({ setFeatures, initialData, isEditMode = false }, ref) => {
+  const hydratedRef = useRef(false);
+
+  const [localFeatures, setLocalFeatures] = useState<string[]>([]);
   const [newFeature, setNewFeature] = useState("");
   const [touched, setTouched] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Initialize with context values on first load
+  /* --------------------------------
+     HYDRATE ONCE (SAFE)
+  -------------------------------- */
   useEffect(() => {
-    if (initialLoad && formData.features.features && formData.features.features.length > 0) {
-      setLocalFeatures(formData.features.features);
-      setTouched(true); // Mark as touched to show validation if empty
-      setInitialLoad(false);
+    if (!hydratedRef.current) {
+      hydratedRef.current = true;
+      const incoming = initialData?.features ?? [];
+      setLocalFeatures(incoming);
+      setFeatures({ features: incoming });
     }
-  }, [formData.features.features, initialLoad]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Sync with context whenever features change
-  useEffect(() => {
-    if (!initialLoad) {
-      setContextFeatures({ features });
-    }
-  }, [features, setContextFeatures, initialLoad]);
-
-  const validationSchema = Yup.object().shape({
-    features: Yup.array()
-      .min(1, "At least one feature is required")
-      .required("Features are required"),
+  /* --------------------------------
+     VALIDATION
+  -------------------------------- */
+  const schema = Yup.object({
+    features: Yup.array().min(1, "At least one feature is required"),
   });
-
-  const removeFeature = (featureToRemove: string) => {
-    setTouched(true);
-    setLocalFeatures(features.filter((feature) => feature !== featureToRemove));
-  };
-
-  const addFeature = () => {
-    if (newFeature.trim() && !features.includes(newFeature.trim())) {
-      setTouched(true);
-      setLocalFeatures([...features, newFeature.trim()]);
-      setNewFeature("");
-    }
-  };
-
-  const toggleFeature = (feature: string) => {
-    setTouched(true);
-    if (features.includes(feature)) {
-      removeFeature(feature);
-    } else {
-      setLocalFeatures([...features, feature]);
-    }
-  };
 
   const validate = async () => {
     try {
-      await validationSchema.validate({ features });
-      // alert(features)÷
+      await schema.validate({ features: localFeatures });
+      setValidationError(null);
       return true;
-    } catch (error) {
+    } catch (e: any) {
+      setValidationError(e.message);
       return false;
     }
   };
 
+  /* --------------------------------
+     USER ACTIONS
+  -------------------------------- */
+  const updateFeatures = (next: string[]) => {
+    setTouched(true);
+    setLocalFeatures(next);
+    setFeatures({ features: next });
+  };
+
+  const toggleFeature = (feature: string) => {
+    updateFeatures(
+      localFeatures.includes(feature)
+        ? localFeatures.filter((f) => f !== feature)
+        : [...localFeatures, feature]
+    );
+  };
+
+  const removeFeature = (feature: string) => {
+    updateFeatures(localFeatures.filter((f) => f !== feature));
+  };
+
+  const addFeature = () => {
+    const value = newFeature.trim();
+    if (!value) {
+      setValidationError("Please enter a feature name");
+      return;
+    }
+    if (localFeatures.includes(value)) {
+      setValidationError("This feature is already added");
+      return;
+    }
+
+    updateFeatures([...localFeatures, value]);
+    setNewFeature("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addFeature();
+    }
+  };
+
+  /* --------------------------------
+     IMPERATIVE API
+  -------------------------------- */
   useImperativeHandle(ref, () => ({
-    handleSubmit: async () => {
-      const isValid = await validate();
-      if (isValid) {
-        setContextFeatures({ features });
-      }
+    handleSubmit: validate,
+    isValid: localFeatures.length > 0,
+    get values() {
+      return { features: localFeatures };
     },
-    isValid: features.length > 0 || (formData.features.features && formData.features.features.length > 0)
   }));
 
+  /* --------------------------------
+     UI (UNCHANGED)
+  -------------------------------- */
   return (
     <div className="mx-auto">
-      <div className="mb-4">
-        {/* Predefined features with checkboxes */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3">Common Features</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {predefinedFeatures.map((feature) => (
-              <div key={feature} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={`feature-${feature}`}
-                  checked={features.includes(feature)}
-                  onChange={() => toggleFeature(feature)}
-                  className="mr-2 h-4 w-4 rounded border-gray-300 accent-black"
-                />
-                <label htmlFor={`feature-${feature}`} className="text-sm text-gray-700">
-                  {feature}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">
+        Property Features
+      </h2>
 
-        {/* Selected features display */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {features.map((feature) => (
+      {isEditMode && initialData?.features?.length! > 0 && (
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+          <p className="text-sm text-[#57713A]">
+            <span className="font-semibold">Current Features:</span>{" "}
+            {initialData?.features.length} loaded
+          </p>
+        </div>
+      )}
+
+      {/* Predefined features */}
+      <div className="mb-8">
+        <h3 className="text-lg font-medium mb-4">
+          Select Common Features
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {predefinedFeatures.map((feature) => (
             <div
               key={feature}
-              className="flex items-center bg-[#FFFFFF] rounded-full shadow px-3 py-1 text-sm"
+              className="flex items-center p-2 hover:bg-gray-50 rounded-lg"
             >
-              <img src="/markgood.svg" className="mr-3" alt="feature icon" />
-              {feature}
-              <button
-                type="button"
-                onClick={() => removeFeature(feature)}
-                className="ml-2 font-[325] text-gray-500 hover:text-gray-700"
-              >
-                <BiX size={16} />
-              </button>
+              <input
+                type="checkbox"
+                checked={localFeatures.includes(feature)}
+                onChange={() => toggleFeature(feature)}
+                className="mr-3 h-4 w-4 accent-[#57713A]"
+              />
+              <label className="text-sm cursor-pointer">
+                {feature}
+              </label>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Custom feature input */}
-        <div className="flex items-center">
+      {/* Selected features */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3">
+          Selected Features ({localFeatures.length})
+        </h3>
+
+        {localFeatures.length === 0 ? (
+          <div className="p-4 bg-[#57713A]/30 rounded-lg">
+            <p className="text-sm text-[#57713A]">
+              No features selected
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg">
+            {localFeatures.map((feature) => (
+              <div
+                key={feature}
+                className="flex items-center bg-[#57713A]/10 rounded-full px-3 py-1.5 text-sm border-[#57713A] border"
+              >
+                <img
+                  src="/markgood.svg"
+                  className="mr-2 w-4 h-4"
+                  alt=""
+                />
+                <span>{feature}</span>
+                <button
+                  onClick={() => removeFeature(feature)}
+                  className="ml-2 text-gray-400 hover:text-red-500"
+                >
+                  <BiX size={18} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add custom feature */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium mb-3">
+          Add Custom Feature
+        </h3>
+
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
-            type="text"
             value={newFeature}
             onChange={(e) => setNewFeature(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && addFeature()}
-            placeholder="Input Feature"
-            className="flex-grow max-w-xl relative bg-[#F5F5F5] flex items-center px-[24px] py-[10px] outline-none focus:outline-none text-[14px] rounded-[60px]"
+            onKeyPress={handleKeyPress}
+            placeholder="Enter custom feature..."
+            className="flex-1 bg-gray-100 border rounded-[60px] px-5 py-3 text-sm"
           />
+
           <button
             type="button"
             onClick={addFeature}
-            className="ml-4 text-dark font-bold text-sm"
+            className="px-6 py-3 bg-[#57713A]/30 text-[#57713A] hover:bg-[#57713A]/50 rounded-[60px]"
           >
             Add Feature
           </button>
         </div>
-        {touched && features.length === 0 && (
-          <div className="text-red-500 text-sm mt-2">At least one feature is required</div>
-        )}
       </div>
+
+      {/* Validation */}
+      {validationError && (
+        <div className="p-3 bg-red-50 rounded-lg">
+          <p className="text-sm text-red-600">
+            {validationError}
+          </p>
+        </div>
+      )}
+
+      {touched && localFeatures.length === 0 && !validationError && (
+        <div className="p-3 bg-[#57713A]/30 rounded-lg">
+          <p className="text-sm text-[#57713A]">
+            At least one feature is required
+          </p>
+        </div>
+      )}
     </div>
   );
 });
 
 FeaturesInput.displayName = "FeaturesInput";
-
 export default FeaturesInput;

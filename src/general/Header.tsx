@@ -7,6 +7,8 @@ import PersonnelModal from "../pages/Personnel/createPersonnelModal";
 import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
 import SyncCitaModal from "./SyncCitaModal";
+import { useCreatePropertyForm } from "../components/Redux/hooks/usePropertyForms";
+
 
 
 interface HeaderProps {
@@ -57,7 +59,8 @@ export default function Header({
   const [showSyncCitaModal, setShowSyncCitaModal] = useState(false); // State for Sync Cita modal
   const location = useLocation();
   const navigate = useNavigate();
-
+ const{setIsCreateLandProperty,setIsCreateLandProperty2} = useCreatePropertyForm();
+ 
   const isPersonnelPage = location.pathname === "/personnel";
   const isFormPage = location.pathname === "/properties/form";
 
@@ -80,6 +83,8 @@ export default function Header({
       setIsCancelState(false);
       resetFormData();
       setIsLandProperty(false);
+      setIsCreateLandProperty(false)
+      setIsCreateLandProperty2(false)
     } else {
       // Normal state behavior
       if (isPersonnelPage) {
@@ -201,12 +206,16 @@ export default function Header({
             setIsLandProperty(true);
             setShowBulkModal(false);
             setIsCancelState(true);
+             setIsCreateLandProperty(true)
+              setIsCreateLandProperty2(true)
           }}
           onSelects={(isBulk) => {
             navigate("/properties/form");
             setShowBulkModal(false);
             setIsLandProperty(false);
+             setIsCreateLandProperty(false)
             setIsCancelState(true);
+            setIsCreateLandProperty2(false)
           }}
           onClose={() => setShowBulkModal(false)}
           x={() => {

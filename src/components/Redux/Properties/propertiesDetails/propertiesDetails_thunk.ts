@@ -163,6 +163,7 @@ export interface SavedPropertyUser {
 }
 
 export interface PropertyDataResponse {
+  properties: any;
   status: string;
   message: string;
   data: {

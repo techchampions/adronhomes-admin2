@@ -1,11 +1,11 @@
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { BiX } from "react-icons/bi";
 import { IoMdCheckmarkCircle } from "react-icons/io";
-import { PropertyContext } from "../../MyContext/MyContext";
 import OptionInputField from "../input/drop_down";
 import { useDispatch } from "react-redux";
 import { removePropertyDetail } from "../Redux/Properties/deleteSliceDetails";
 import { AppDispatch } from "../Redux/store";
+import { useCreatePropertyForm } from "../Redux/hooks/usePropertyForms"; // Changed to useCreatePropertyForm
 
 interface Fee {
   id: number;
@@ -70,12 +70,19 @@ export default function InfrastructureFeesModalss({
   isOpen,
   onClose,
 }: InfrastructureFeesModalProps) {
+  // Use create property form hook instead of context
   const {
-    formData,
-    setFees,
-    fees,
-     setNewFees,newFees
-  } = useContext(PropertyContext)!;
+    basicDetails,
+    setCreateFees,
+    setCreateNewFees,
+    // fees: reduxFees,
+    // newFees: reduxNewFees,
+    metadata
+  } = useCreatePropertyForm();
+  
+
+  const {fees,newFees}=metadata
+
   
   const useAppDispatch = () => useDispatch<AppDispatch>();
   const dispatch = useAppDispatch();
@@ -93,17 +100,17 @@ export default function InfrastructureFeesModalss({
   ];
 
   const mappedPurposes =
-    Array.isArray(formData.basicDetails.purpose) &&
-    formData.basicDetails.purpose.length > 0
-      ? formData.basicDetails.purpose.map((purpose) => ({
+    Array.isArray(basicDetails.purpose) &&
+    basicDetails.purpose.length > 0
+      ? basicDetails.purpose.map((purpose) => ({
           label: purpose,
           value: purpose,
         }))
       : [];
 
   const toggleFee = (id: number) => {
-    setFees(
-      fees.map((fee) => (fee.id === id ? { ...fee, checked: !fee.checked } : fee))
+    setCreateFees(
+      fees.map((fee: Fee) => (fee.id === id ? { ...fee, checked: !fee.checked } : fee))
     );
   };
 
@@ -120,17 +127,23 @@ export default function InfrastructureFeesModalss({
     
     // If it's a new fee (not in database), just remove it locally
     if (feeToDelete?.isNew) {
-      setFees(fees.filter((fee) => fee.id !== feeToRemove));
+      const updatedFees = fees.filter((fee: Fee) => fee.id !== feeToRemove);
+      setCreateFees(updatedFees);
+      // Also remove from newFees if it exists there
+      if (newFees.length > 0) {
+        setCreateNewFees(newFees.filter((fee: Fee) => fee.id !== feeToRemove));
+      }
       setShowConfirmation(false);
       setFeeToRemove(null);
       return;
     }
     
-    // If it's an existing fee, call the API
+    // If it's an existing fee, call the API (for edit flows, not create)
     setRemoveLoading(true);
     try {
       await dispatch(removePropertyDetail(feeToRemove.toString())).unwrap();
-      setFees(fees.filter((fee) => fee.id !== feeToRemove));
+      const updatedFees = fees.filter((fee: Fee) => fee.id !== feeToRemove);
+      setCreateFees(updatedFees);
       setShowConfirmation(false);
       setFeeToRemove(null);
     } catch (error) {
@@ -143,7 +156,7 @@ export default function InfrastructureFeesModalss({
   const addFee = () => {
     if (newFeeName && newFeeAmount && newFeetype && newFeePurpose) {
       const newFee: Fee = {
-        id: Math.max(...fees.map((f) => f.id), 0) + 1,
+        id: Math.max(...fees.map((f: Fee) => f.id), 0) + 1,
         name: newFeeName,
         type: newFeetype,
         amount: newFeeAmount.startsWith("₦") ? newFeeAmount : `₦${newFeeAmount}`,
@@ -151,8 +164,11 @@ export default function InfrastructureFeesModalss({
         purpose: newFeePurpose,
         isNew: true,
       };
-      setFees([...fees, newFee]);
-       setNewFees([newFee]);
+      
+      const updatedFees = [...fees, newFee];
+      setCreateFees(updatedFees);
+      setCreateNewFees([...newFees, newFee]);
+      
       setNewFeeName("");
       setNewFeeAmount("");
       setNewFeetype("");
@@ -178,7 +194,7 @@ export default function InfrastructureFeesModalss({
             </button>
           </div>
           <div className="p-6 space-y-4">
-            {fees.map((fee) => (
+            {fees.map((fee: Fee) => (
               <div
                 key={fee.id}
                 className="flex items-center justify-between p-4 bg-[#FFFFFF] rounded-[20px] shadow"
