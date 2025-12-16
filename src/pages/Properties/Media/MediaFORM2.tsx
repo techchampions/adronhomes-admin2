@@ -87,15 +87,19 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
     images: [],
   });
 
-  const validationSchema = Yup.object().shape({
-    images: Yup.array()
-      .test(
-        'at-least-one-image',
-        'At least one image is required',
-        (value) => !!value && value.length > 0
-      )
-      .required("Images are required"),
-  });
+const validationSchema = Yup.object({
+  images: Yup.array()
+    .required("Display image is required")
+    .test(
+      "display-image-required",
+      "Display image is required",
+      (images) => {
+        if (!images) return false;
+        const displayImage = images[0];
+        return displayImage instanceof File || typeof displayImage === "string";
+      }
+    ),
+});
 
 
   const formikRef = useRef<any>(null);
@@ -168,12 +172,9 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
         formikRef.current.handleSubmit();
       }
     },
-    get isValid() {
-      if (!formikRef.current) return false;
-      
-      formikRef.current.validateForm();
-      return formikRef.current.isValid;
-    },
+  get isValid() {
+    return !!formikRef.current?.values.images?.[0];
+  },
   }));
 
   const handleImageChange = (files: File[], isDisplayImage: boolean, index?: number) => {
