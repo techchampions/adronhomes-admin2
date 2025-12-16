@@ -29,7 +29,7 @@ export const validationSchema = Yup.object({
                 .min(1, "Price must be greater than 0")
                 .required("Price is required"),
 
-              cittaLink: Yup.string().required("Citta link is required"),
+              citta_id: Yup.string().required("Citta link is required"),
             })
           )
           .min(1, "At least one duration is required"),

@@ -346,8 +346,8 @@ useImperativeHandle(ref, () => ({
       />
 
       <InputField
-        label="Initial Deposit"
-        placeholder="Enter initial deposit"
+        label="Subscription Form"
+        placeholder="Enter Subscription "
         name="initialDeposit"
         value={formatToNaira(formik.values.initialDeposit)}
         onChange={(e) => {
@@ -402,7 +402,7 @@ useImperativeHandle(ref, () => ({
         isSearchable={true}
       />
 
-      <EnhancedOptionInputField
+      {/* <EnhancedOptionInputField
         label="LGA"
         placeholder={loading.lgas ? "Loading LGAs..." : "Select LGA"}
         name="lga"
@@ -414,7 +414,7 @@ useImperativeHandle(ref, () => ({
         disabled={!formik.values.state}
         isLoading={loading.lgas}
         isSearchable={true}
-      />
+      /> */}
 
       <EnhancedOptionInputField
         label="Purpose"

@@ -266,7 +266,7 @@ export default function EditProperty() {
               );
               formPayload.append(
                 `land_sizes[${i}][durations][${j}][citta_id]`,
-                String(d.cittaLink || "")
+                String(d.citta_id || "")
               );
             });
           }

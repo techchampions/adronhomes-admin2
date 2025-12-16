@@ -1017,11 +1017,11 @@ export default function PropertyListing() {
                     {/* Citta Link */}
                     <input
                       type="text"
-                      value={d.cittaLink}
+                      value={d.citta_id}
                       placeholder="Citta Link"
                       onChange={(e) => {
                         const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].cittaLink = e.target.value;
+                        updated[secIndex].durations[dIndex].citta_id = e.target.value;
                         setLocalLandSizeSections(updated);
                       }}
                       className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
@@ -1054,7 +1054,7 @@ export default function PropertyListing() {
                       id: Date.now(),
                       duration: "",
                       price: "",
-                      cittaLink: "",
+                      citta_id: "",
                     });
                     setLocalLandSizeSections(updated);
                   }}
@@ -1146,13 +1146,13 @@ export default function PropertyListing() {
                           </div>
                           <div>
                             <span className="text-gray-500">Citta Id:</span>{" "}
-                            {duration.cittaLink ? (
+                            {duration.citta_id ? (
                               <div
                           
-                           
+                            className="text-gray-500"
                             
                               >
-                                {duration.idttaLink}
+                                {duration.citta_id}
                               </div>
                             ) : (
                               "N/A"

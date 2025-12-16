@@ -581,7 +581,7 @@ const setLandSizeSections=(data:LandSizeSection[])=>{
     formPayload.append(`land_sizes[${i}][durations][${j}][id]`, (d.id));
     formPayload.append(`land_sizes[${i}][durations][${j}][duration]`, (d.duration));
     formPayload.append(`land_sizes[${i}][durations][${j}][price]`, (d.price));
-    formPayload.append(`land_sizes[${i}][durations][${j}][cittaLink]`, (d.cittaLink));
+    formPayload.append(`land_sizes[${i}][durations][${j}][citta_id]`, (d.citta_id));
   });
 });
 

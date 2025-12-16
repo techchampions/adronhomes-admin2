@@ -289,7 +289,7 @@ const editPropertySlice = createSlice({
           id: d.id?.toString() || "",
           duration: d.duration?.toString() || "",
           price: d.price?.toString() || "",
-          cittaLink: d.citta_id || "",
+          citta_id: d.citta_id || "",
           is_active: d.is_active || true,
         })) || [],
       })) || [];

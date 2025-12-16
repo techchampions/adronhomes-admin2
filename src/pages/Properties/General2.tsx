@@ -227,8 +227,8 @@ export default function General() {
               String(d.price)
             );
             formPayload.append(
-              `land_sizes[${i}][durations][${j}][cittaLink]`,
-              String(d.cittaLink)
+              `land_sizes[${i}][durations][${j}][citta_id]`,
+              String(d.citta_id)
             );
           });
         });

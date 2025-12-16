@@ -23,7 +23,7 @@ interface Duration {
   id: any;
   duration: any; // in months
   price: any;
-  cittaLink: any;
+  citta_id: any;
 }
 
 export interface LandSizeSection {
@@ -120,7 +120,7 @@ const PropertyListingPage = forwardRef<
         id: Date.now() + 1, 
         duration: "", 
         price: "", 
-        cittaLink: "" 
+        citta_id: "" 
       }],
     };
 
@@ -150,7 +150,7 @@ const PropertyListingPage = forwardRef<
               id: Date.now(),
               duration: "",
               price: "",
-              cittaLink: "",
+              citta_id: "",
             },
           ],
         };
@@ -253,7 +253,7 @@ const PropertyListingPage = forwardRef<
                 `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`
               ] = true;
               acc[
-                `landSizeSections[${sectionIndex}].durations[${durationIndex}].cittaLink`
+                `landSizeSections[${sectionIndex}].durations[${durationIndex}].citta_id`
               ] = true;
             });
 
@@ -463,13 +463,13 @@ const PropertyListingPage = forwardRef<
                               <EnhancedOptionInputField
                                 label="Connect Citta Id"
                                 placeholder="Select Citta link"
-                                name={`landSizeSections[${sectionIndex}].durations[${durationIndex}].cittaLink`}
-                                value={duration.cittaLink || ""}
+                                name={`landSizeSections[${sectionIndex}].durations[${durationIndex}].citta_id`}
+                                value={duration.citta_id || ""}
                                 onChange={(value: string) =>
                                   updateDuration(
                                     section.id,
                                     duration.id,
-                                    "cittaLink",
+                                    "citta_id",
                                     value
                                   )
                                 }
@@ -477,7 +477,7 @@ const PropertyListingPage = forwardRef<
                                 isSearchable
                                 isLoading={dropdownOptionsLoading}
                                 error={getErrorMessage(
-                                  `landSizeSections[${sectionIndex}].durations[${durationIndex}].cittaLink`
+                                  `landSizeSections[${sectionIndex}].durations[${durationIndex}].citta_id`
                                 )}
                               />
                             </div>
