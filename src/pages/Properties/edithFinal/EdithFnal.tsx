@@ -1145,16 +1145,15 @@ export default function PropertyListing() {
                             {duration.price || "N/A"}
                           </div>
                           <div>
-                            <span className="text-gray-500">Citta Link:</span>{" "}
+                            <span className="text-gray-500">Citta Id:</span>{" "}
                             {duration.cittaLink ? (
-                              <a
-                                href={duration.cittaLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-500 hover:underline"
+                              <div
+                          
+                           
+                            
                               >
-                                View Link
-                              </a>
+                                {duration.idttaLink}
+                              </div>
                             ) : (
                               "N/A"
                             )}

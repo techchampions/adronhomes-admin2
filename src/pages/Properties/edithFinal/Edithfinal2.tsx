@@ -1161,14 +1161,11 @@ export default function PropertyListing() {
                                   Citta Link:
                                 </span>{" "}
                                 {duration.cittaLink ? (
-                                  <a
-                                    href={duration.cittaLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline"
+                                  <div
+                                   
                                   >
-                                    View Link
-                                  </a>
+                                {duration.idttaLink}
+                                  </div>
                                 ) : (
                                   "N/A"
                                 )}

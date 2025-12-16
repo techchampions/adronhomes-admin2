@@ -89,9 +89,14 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
 
   const validationSchema = Yup.object().shape({
     images: Yup.array()
-      .min(1, "At least one image is required")
+      .test(
+        'at-least-one-image',
+        'At least one image is required',
+        (value) => !!value && value.length > 0
+      )
       .required("Images are required"),
   });
+
 
   const formikRef = useRef<any>(null);
 
@@ -174,7 +179,7 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
   const handleImageChange = (files: File[], isDisplayImage: boolean, index?: number) => {
     if (files.length > 0) {
       const file = files[0];
-      const reader = new FileReader();
+      const reader = new FileReader();``
       reader.onloadend = () => {
         if (isDisplayImage) {
           // Update image preview

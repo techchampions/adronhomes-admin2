@@ -92,7 +92,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
     onSubmit: (values) => {
       setPaymentStructure(values);
     },
-    enableReinitialize: true,
+ enableReinitialize: true,
   });
 
   // Sync formik values when initialData changes
@@ -127,7 +127,8 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
         return true;
       }
     },
-    isValid: formik.isValid && formik.dirty,
+  isValid: formik.isValid,
+
     get values() {
       return formik.values;
     },
