@@ -231,8 +231,8 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       />
 
       <InputField
-        label="Initial Deposit"
-        placeholder="Enter initial deposit"
+               label="Subscription Form"
+        placeholder="Enter Subscription "
         name="initialDeposit"
         value={formatToNaira(formik.values.initialDeposit)}
         onChange={(e) => {

@@ -13,7 +13,7 @@ import { add_property_detail } from "../components/Redux/addProperty/addFees/add
 import { resetPropertyDetailState } from "../components/Redux/addProperty/addFees/add_property_detail_slice";
 import { useLocation, useNavigate } from "react-router-dom";
 
-interface Fee {
+export interface Fee {
   [x: string]: any;
   id: number;
   name: string;
@@ -23,7 +23,7 @@ interface Fee {
   purpose: any;
 }
 
-interface BasicDetailsFormValues {
+export interface BasicDetailsFormValues {
   propertyName: string;
   propertyType: any;
   price: string;
@@ -39,7 +39,7 @@ interface BasicDetailsFormValues {
   propertyFiles: File[];
 }
 
-interface BulkDetailsFormValues {
+export interface BulkDetailsFormValues {
   propertyName: string;
   propertyType: any;
   propertyUnits: string;
@@ -52,7 +52,7 @@ interface BulkDetailsFormValues {
   lga: any;
 }
 
-interface PropertySpecificationsFormValues {
+export interface PropertySpecificationsFormValues {
   bedrooms: string;
   bathrooms: string;
   propertySize: string;
@@ -73,7 +73,7 @@ interface PropertySpecificationsFormValues {
   titleDocumentTypeProp: string[];
 }
 
-interface LandFormValues {
+export interface LandFormValues {
   plotShape: string;
   topography: string;
   propertySize: string;
@@ -92,18 +92,18 @@ interface LandFormValues {
   nearbyLandmarks: string[];
 }
 
-interface FeaturesFormValues {
+ export interface FeaturesFormValues {
   features: string[];
 }
 
-interface MediaFormValues {
+export interface MediaFormValues {
   tourLink: string;
   videoLink: string;
   mapUrl: string;
   images: (File | string)[];
 }
 
-interface DiscountFormValues {
+export interface DiscountFormValues {
   discountName: string;
   discountType: string;
   discountOff: string;
@@ -112,14 +112,14 @@ interface DiscountFormValues {
   validTo: string;
 }
 
-interface PaymentStructureFormValues {
+export interface PaymentStructureFormValues {
   paymentType: string;
   paymentDuration: string;
   paymentSchedule: string[];
   feesCharges: string;
 }
 
-interface PropertyFormData {
+export interface PropertyFormData {
   basicDetails: BasicDetailsFormValues;
   bulkDetails: BulkDetailsFormValues;
   specifications: PropertySpecificationsFormValues;
@@ -133,7 +133,7 @@ interface PropertyFormData {
   };
 }
 
-interface PropertyContextType {
+export interface PropertyContextType {
   formData: PropertyFormData;
   director_name: any;
 
