@@ -142,7 +142,8 @@ export const createProperty = createAsyncThunk<
       }
 
       if (axiosError.response) {
-        const errorMessage = axiosError.response.data.message || 
+        const errorMessage = 
+        // axiosError.response.data.message || 
           (axiosError.response.data.errors 
             ? Object.values(axiosError.response.data.errors).flat().join(', ')
             : "Failed to create property");

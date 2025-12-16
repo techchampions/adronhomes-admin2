@@ -808,6 +808,7 @@ export default function PropertyListing() {
           </div>
         )}
       </div>
+      
       {selectedPropertyId ? (
         <InfrastructureFeesModalss
           isOpen={isModalOpen}
