@@ -61,9 +61,6 @@ import  walletslice from "./wallet/walllet_slice"
 import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
 import passwordResetReducer from "./passwordRese/passwordReset_slice"
 import deleteCustomerredux from "./customers/deletecut"
-import propertyCodesReducer from "./citta/propertyCodesSlice"
-import createPropertyReducer from "./propertyForm/createPropertySlice";
-import editPropertyReducer from "./editProperty/editpropslice";
 export const store = configureStore({
    middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -139,10 +136,7 @@ export const store = configureStore({
      wallet:walletslice,
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
-  deleteCustomer:deleteCustomerredux,
-propertyCodes:propertyCodesReducer,
-  createProperty: createPropertyReducer,
-  editProperty: editPropertyReducer,}
+  deleteCustomer:deleteCustomerredux },
 });
 
 export type AppDispatch = typeof store.dispatch;

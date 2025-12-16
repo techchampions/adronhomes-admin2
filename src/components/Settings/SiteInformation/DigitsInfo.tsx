@@ -15,7 +15,7 @@ const DigitsInfo = () => {
   const info = data?.data.data || [];
   const properties = info.find((item) => item.name === "Properties");
   const numOfClients = info.find((item) => item.name === "Number of Clients");
-  const team = info.find((item) => item.name === "Teams Members");
+  const team = info.find((item) => item.name === "Team Members");
   const location = info.find((item) => item.name === "Location");
   const exp = info.find((item) => item.name === "Years of Exp.");
 
@@ -29,7 +29,7 @@ const DigitsInfo = () => {
 
   const validationSchema = Yup.object().shape({
     properties: Yup.string().required("required"),
-    nomOfClients: Yup.string().required("required"),
+    numOfClients: Yup.string().required("required"),
     team: Yup.string().required("required"),
     location: Yup.string().required("required"),
     exp: Yup.string().required("required"),

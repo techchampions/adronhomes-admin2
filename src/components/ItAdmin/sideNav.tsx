@@ -103,9 +103,9 @@ export default function InfoTechSidebar() {
             Logout
           </div>
         </div>
-        <div className="text-[#79B833] hover:underline mt4">
-          <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
-        </div>
+         <div className="text-[#79B833] hover:underline mt4">
+                  <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
+                </div>
       </div>
     </div>
   );
@@ -197,9 +197,9 @@ export default function InfoTechSidebar() {
                   </div>
                 </div>
               </div>
-              <div className="text-[#79B833] hover:underline mt4">
-                <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
-              </div>
+               <div className="text-[#79B833] hover:underline mt4">
+                                <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
+                              </div>
             </div>
           </div>
         </>
