@@ -102,4 +102,7 @@ export const selectTotalCareerViews = (state: { singlejobDetails: JobDetailsStat
 export const selectTotalApplications = (state: { singlejobDetails: JobDetailsState }) =>
   state.singlejobDetails.totalApplications;
 
+export const selectJobDetailsLoading=(state:{singlejobDetails:JobDetailsState})=> state.singlejobDetails.loading;
+//  selectJobDetailsError
+
 export default jobDetailsSlice.reducer;
