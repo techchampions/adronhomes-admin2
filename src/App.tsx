@@ -76,6 +76,7 @@ import SettingsCard from "./marketer/SettingsCard";
 import ResetCard from "./components/Modals/settings/changepassword";
 import EditProperty from "./pages/Properties/GeneralEdit2";
 import General from "./pages/Properties/General2";
+import DuplicateProperty from "./pages/Properties/GeneralDuplicateProperty";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -263,6 +264,7 @@ const App = () => {
                   element={<Customers_payment />}
                 />
                 <Route path="/properties/form" element={<General />} />
+                 <Route path="/properties/Draftform/:id" element={<DuplicateProperty />} />
 
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />

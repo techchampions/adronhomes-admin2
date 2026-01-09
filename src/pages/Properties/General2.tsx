@@ -7,8 +7,6 @@ import PropertySpecifications from "./BasicDetails/PropertySpecifications/Proper
 import Payment_Structure from "./Payment_Structure/Payment_Structure";
 import Discount from "./Payment_Structure/Discount";
 import { useCreatePropertyForm } from "../../components/Redux/hooks/usePropertyForms";
-// import MediaFORM from "./Media/Media";
-// import PropertyListing from "./edithFinal/EdithFnal";
 import FeaturesInput from "./Features/Features";
 import LandForm from "./BasicDetails/PropertySpecifications/land";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +16,6 @@ import BasicDetails from "./BasicDetails/BasicDetails";
 import BasicDetailsLand from "./BasicDetails/BasicDetailsLand";
 import { toast } from "react-toastify";
 import PropertyListingPage from "./addPropplan/planForm";
-// import { createProperty } from "../../components/Redux/addProperty/addProperty_thunk";
 import { add_property_detail } from "../../components/Redux/addProperty/addFees/addFees_thunk";
 import {
   createProperty,

@@ -139,15 +139,15 @@ const initialState: EditPropertyFormData = {
   },
 };
 
-const editPropertySlice = createSlice({
-  name: "editProperty",
+const draftPropertySlice = createSlice({
+  name: "draftProperty",
   initialState,
   reducers: {
     // Reset entire form
-    resetEditForm: () => initialState,
+    resetDraftForm: () => initialState,
 
     // Set entire form data (for loading existing property)
-    setEditFormData: (
+    setDraftFormData: (
       state,
       action: PayloadAction<Partial<EditPropertyFormData>>
     ) => {
@@ -163,7 +163,7 @@ const editPropertySlice = createSlice({
     },
 
     // Load property data from API response
-    loadEditPropertyData: (state, action: PayloadAction<any>) => {
+    loadDraftPropertyData: (state, action: PayloadAction<any>) => {
       const property = action.payload;
 
       // Transform API data to form data
@@ -333,103 +333,103 @@ const editPropertySlice = createSlice({
     },
 
     // Metadata actions
-    setEditCurrentStep: (state, action: PayloadAction<number>) => {
+    setDraftCurrentStep: (state, action: PayloadAction<number>) => {
       state.metadata.currentStep = action.payload;
     },
 
-    setIsEditLandProperty: (state, action: PayloadAction<boolean>) => {
+    setIsDraftLandProperty: (state, action: PayloadAction<boolean>) => {
       state.metadata.isLandProperty = action.payload;
     },
 
-    setIsEditLandProperty2: (state, action: PayloadAction<boolean>) => {
+    setIsDraftLandProperty2: (state, action: PayloadAction<boolean>) => {
       state.metadata.isLandProperty2 = action.payload;
     },
 
-    setIsEditBulk: (state, action: PayloadAction<boolean>) => {
+    setIsDraftBulk: (state, action: PayloadAction<boolean>) => {
       state.metadata.isBulk = action.payload;
     },
 
-    setIsEditSubmitting: (state, action: PayloadAction<boolean>) => {
+    setIsDraftSubmitting: (state, action: PayloadAction<boolean>) => {
       state.metadata.isSubmitting = action.payload;
     },
 
-    setEditDirectorName: (state, action: PayloadAction<string>) => {
+    setDraftDirectorName: (state, action: PayloadAction<string>) => {
       state.metadata.director_name = action.payload;
     },
 
-    setEditPreviousPropType: (state, action: PayloadAction<string>) => {
+    setDraftPreviousPropType: (state, action: PayloadAction<string>) => {
       state.metadata.previousPropType = action.payload;
     },
 
-    setEditFees: (state, action: PayloadAction<Fee[]>) => {
+    setDraftFees: (state, action: PayloadAction<Fee[]>) => {
       state.metadata.fees = action.payload;
     },
 
-    setEditNewFees: (state, action: PayloadAction<Fee[]>) => {
+    setDraftNewFees: (state, action: PayloadAction<Fee[]>) => {
       state.metadata.newFees = action.payload;
     },
 
-    setEditImagePreview: (state, action: PayloadAction<string | null>) => {
+    setDraftImagePreview: (state, action: PayloadAction<string | null>) => {
       state.metadata.imagePreview = action.payload;
     },
 
-    setEditDisplayStatus: (
+    setDraftDisplayStatus: (
       state,
       action: PayloadAction<"draft" | "publish">
     ) => {
       state.display.status = action.payload;
     },
 
-    setEditIsLoaded: (state, action: PayloadAction<boolean>) => {
+    setDraftIsLoaded: (state, action: PayloadAction<boolean>) => {
       state.metadata.isLoaded = action.payload;
     },
 
     // Form data setters
-    setEditBasicDetails: (
+    setDraftBasicDetails: (
       state,
       action: PayloadAction<BasicDetailsFormValues>
     ) => {
       state.basicDetails = action.payload;
     },
 
-    setEditBulkDetails: (
+    setDraftBulkDetails: (
       state,
       action: PayloadAction<BulkDetailsFormValues>
     ) => {
       state.bulkDetails = action.payload;
     },
 
-    setEditSpecifications: (
+    setDraftSpecifications: (
       state,
       action: PayloadAction<PropertySpecificationsFormValues>
     ) => {
       state.specifications = action.payload;
     },
 
-    setEditLandForm: (state, action: PayloadAction<LandFormValues>) => {
+    setDraftLandForm: (state, action: PayloadAction<LandFormValues>) => {
       state.landForm = action.payload;
     },
 
-    setEditLandSizeSections: (
+    setDraftLandSizeSections: (
       state,
       action: PayloadAction<LandSizeSection[]>
     ) => {
       state.LandSizeSection = action.payload;
     },
 
-    setEditFeatures: (state, action: PayloadAction<FeaturesFormValues>) => {
+    setDraftFeatures: (state, action: PayloadAction<FeaturesFormValues>) => {
       state.features = action.payload;
     },
 
-    setEditMedia: (state, action: PayloadAction<MediaFormValues>) => {
+    setDraftMedia: (state, action: PayloadAction<MediaFormValues>) => {
       state.media = action.payload;
     },
 
-    setEditDiscount: (state, action: PayloadAction<DiscountFormValues>) => {
+    setDraftDiscount: (state, action: PayloadAction<DiscountFormValues>) => {
       state.discount = action.payload;
     },
 
-    setEditPaymentStructure: (
+    setDraftPaymentStructure: (
       state,
       action: PayloadAction<PaymentStructureFormValues>
     ) => {
@@ -437,14 +437,14 @@ const editPropertySlice = createSlice({
     },
 
     // Individual field updates
-    updateEditBasicDetail: <K extends keyof BasicDetailsFormValues>(
+    updateDraftBasicDetail: <K extends keyof BasicDetailsFormValues>(
       state: EditPropertyFormData,
       action: PayloadAction<{ field: K; value: BasicDetailsFormValues[K] }>
     ) => {
       state.basicDetails[action.payload.field] = action.payload.value;
     },
 
-    updateEditSpecification: <K extends keyof PropertySpecificationsFormValues>(
+    updateDraftSpecification: <K extends keyof PropertySpecificationsFormValues>(
       state: EditPropertyFormData,
       action: PayloadAction<{
         field: K;
@@ -454,7 +454,7 @@ const editPropertySlice = createSlice({
       state.specifications[action.payload.field] = action.payload.value;
     },
 
-    updateEditLandField: <K extends keyof LandFormValues>(
+    updateDraftLandField: <K extends keyof LandFormValues>(
       state: EditPropertyFormData,
       action: PayloadAction<{ field: K; value: LandFormValues[K] }>
     ) => {
@@ -462,51 +462,51 @@ const editPropertySlice = createSlice({
     },
 
     // Array helpers
-    addEditMediaImage: (state, action: PayloadAction<File | string>) => {
+    addDraftMediaImage: (state, action: PayloadAction<File | string>) => {
       state.media.images.push(action.payload);
     },
 
-    removeEditMediaImage: (state, action: PayloadAction<number>) => {
+    removeDraftMediaImage: (state, action: PayloadAction<number>) => {
       state.media.images.splice(action.payload, 1);
     },
 
-    clearEditMediaImages: (state) => {
+    clearDraftMediaImages: (state) => {
       state.media.images = [];
     },
   },
 });
 
 export const {
-  resetEditForm,
-  setEditFormData,
-  loadEditPropertyData,
-  setEditCurrentStep,
-  setIsEditLandProperty,
-  setIsEditLandProperty2,
-  setIsEditBulk,
-  setIsEditSubmitting,
-  setEditDirectorName,
-  setEditPreviousPropType,
-  setEditFees,
-  setEditNewFees,
-  setEditImagePreview,
-  setEditDisplayStatus,
-  setEditIsLoaded,
-  setEditBasicDetails,
-  setEditBulkDetails,
-  setEditSpecifications,
-  setEditLandForm,
-  setEditLandSizeSections,
-  setEditFeatures,
-  setEditMedia,
-  setEditDiscount,
-  setEditPaymentStructure,
-  updateEditBasicDetail,
-  updateEditSpecification,
-  updateEditLandField,
-  addEditMediaImage,
-  removeEditMediaImage,
-  clearEditMediaImages,
-} = editPropertySlice.actions;
+  resetDraftForm,
+  setDraftFormData,
+  loadDraftPropertyData,
+  setDraftCurrentStep,
+  setIsDraftLandProperty,
+  setIsDraftLandProperty2,
+  setIsDraftBulk,
+  setIsDraftSubmitting,
+  setDraftDirectorName,
+  setDraftPreviousPropType,
+  setDraftFees,
+  setDraftNewFees,
+  setDraftImagePreview,
+  setDraftDisplayStatus,
+  setDraftIsLoaded,
+  setDraftBasicDetails,
+  setDraftBulkDetails,
+  setDraftSpecifications,
+  setDraftLandForm,
+  setDraftLandSizeSections,
+  setDraftFeatures,
+  setDraftMedia,
+  setDraftDiscount,
+  setDraftPaymentStructure,
+  updateDraftBasicDetail,
+  updateDraftSpecification,
+  updateDraftLandField,
+  addDraftMediaImage,
+  removeDraftMediaImage,
+  clearDraftMediaImages,
+} = draftPropertySlice.actions;
 
-export default editPropertySlice.reducer;
+export default draftPropertySlice.reducer;

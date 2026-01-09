@@ -10,7 +10,7 @@ import { edit_property_detail } from "../../components/Redux/addProperty/addFees
 import { publishDraft } from "../../components/Redux/Properties/publishPropertythunk";
 import { resetPropertyState } from "../../components/Redux/addProperty/UpdateProperties/update_slice";
 import { resetPublishDraftState } from "../../components/Redux/Properties/publishpropertySlice";
-import { useEditPropertyForm } from "../../components/Redux/hooks/usePropertyForms";
+import { useDraftPropertyForm } from "../../components/Redux/hooks/usePropertyForms";
 import StepIndicator from "../../general/StepIndicator";
 import { EdithBackgroung } from "../../components/Tables/forProperties";
 import { IoArrowBackSharp } from "react-icons/io5";
@@ -31,15 +31,16 @@ import MediaFORM from "./Media/MediaFORM2";
 import { add_property_detail } from "../../components/Redux/addProperty/addFees/addFees_thunk";
 import PropertyListingPage from "./addPropplan/planForm";
 import ForProperties from "../../components/Tables/forProperties";
-import { setIsEditLandProperty } from "../../components/Redux/editProperty/editpropslice";
+import { setIsDraftLandProperty } from "../../components/Redux/draftProperty/draftPropertySlice";
 import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesModal";
+import { createProperty } from "../../components/Redux/addProperty/addProperty_slice";
 
-export default function EditProperty() {
+export default function DraftProperty() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // Use Redux for edit form
+  // Use Redux for draft form
   const {
     basicDetails,
     bulkDetails,
@@ -52,28 +53,28 @@ export default function EditProperty() {
     LandSizeSection,
     display,
     metadata,
-    setEditCurrentStep,
-    setIsEditSubmitting,
-    setEditDisplayStatus,
-    setEditBasicDetails,
-    setEditBulkDetails,
-    setEditSpecifications,
-    setEditLandForm,
-    setEditLandSizeSections,
-    setEditFeatures,
-    setEditMedia,
-    setEditDiscount,
-    setEditPaymentStructure,
-    setEditFees,
-    setEditNewFees,
-    setEditImagePreview,
-    setEditDirectorName,
-    setEditPreviousPropType,
-    setIsEditLandProperty2,
-    setIsEditBulk,
-    resetEditForm,
-    loadEditPropertyData,
-  } = useEditPropertyForm();
+    setDraftCurrentStep,
+    setIsDraftSubmitting,
+    setDraftDisplayStatus,
+    setDraftBasicDetails,
+    setDraftBulkDetails,
+    setDraftSpecifications,
+    setDraftLandForm,
+    setDraftLandSizeSections,
+    setDraftFeatures,
+    setDraftMedia,
+    setDraftDiscount,
+    setDraftPaymentStructure,
+    setDraftFees,
+    setDraftNewFees,
+    setDraftImagePreview,
+    setDraftDirectorName,
+    setDraftPreviousPropType,
+    setIsDraftLandProperty2,
+    setIsDraftBulk,
+    resetDraftForm,
+    loadDraftPropertyData,
+  } = useDraftPropertyForm();
 
   // Extract values from metadata
   const {
@@ -87,7 +88,7 @@ export default function EditProperty() {
     previousPropType,
     imagePreview,
     isLoaded,
-    propertyId: editPropertyId,
+    propertyId: draftPropertyId,
   } = metadata;
 
   const { data, loading, error } = useAppSelector(
@@ -106,9 +107,6 @@ export default function EditProperty() {
   const [newGalleryImages, setNewGalleryImages] = useState<
     (File | string | null)[]
   >([]);
-  const [ImagePreview, setImagePreview] = useState<(File | string | null)>(
-    
-  );
 
   // Create refs
   const basicDetailsRef = useRef<any>(null);
@@ -154,7 +152,7 @@ export default function EditProperty() {
   //           .unwrap()
   //           .then((response) => {
   //             if (response.properties) {
-  //               loadEditPropertyData(response.properties);
+  //               loadDraftPropertyData(response.properties);
   //               setGalleryPreviews(response.properties.photos || []);
   //               setNewGalleryImages(response.properties.photos || []);
   //             }
@@ -170,10 +168,10 @@ export default function EditProperty() {
   //     }
 
   //     return () => {
-  //       resetEditForm();
+  //       resetDraftForm();
   //       dispatch(clearPropertyData());
   //     };
-  //   }, [id, dispatch, navigate, resetEditForm, loadEditPropertyData]);
+  //   }, [id, dispatch, navigate, resetDraftForm, loadDraftPropertyData]);
 
   const propertyId = id;
   useEffect(() => {
@@ -194,18 +192,17 @@ export default function EditProperty() {
   useEffect(() => {
     if (data?.properties) {
       const property = data?.properties;
-      loadEditPropertyData(data.properties);
-         setEditImagePreview(property.display_image || null);
-      setImagePreview(property.display_image);
+      loadDraftPropertyData(data.properties);
+        setDraftImagePreview(property.display_image);
       setGalleryPreviews(property?.photos || []);
       setNewGalleryImages(property?.photos || []);
     }
   }, [data]);
 
   // Form submission
-  const submitEditForm = async (displayStatus: "draft" | "publish") => {
+  const submitDraftForm = async (displayStatus: "draft" | "publish") => {
     try {
-      setIsEditSubmitting(true);
+      setIsDraftSubmitting(true);
 
       // Build FormData payload
       const formPayload = new FormData();
@@ -378,19 +375,16 @@ export default function EditProperty() {
       formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
 
       // Dispatch update
-      await dispatch(
-        UpdateProperty({
-          UpdateId: parseInt(id!),
-          credentials: formPayload,
-        })
-      ).unwrap();
+        const result = await dispatch(
+             createProperty({ credentials: formPayload })
+           ).unwrap();
 
-      // Handle Fees
-      if (id) {
+       const createdPropertyId = result?.data.property.id || 0;
+      if (createdPropertyId) {
         const feePromises = newFees
           .filter((fee) => fee.checked)
           .map((fee) => ({
-            property_id: id.toString(),
+            property_id: createdPropertyId.toString(),
             name: fee.name,
             value: fee.amount.replace(/[^\d.]/g, ""),
             type: fee.type,
@@ -432,14 +426,14 @@ export default function EditProperty() {
       }
 
       // Reset form and navigate
-      resetEditForm();
+      resetDraftForm();
       dispatch(resetPropertyState());
       navigate("/properties");
     } catch (error: any) {
       console.error("Update failed:", error);
       toast.error(error.message || "Failed to update property or its fees.");
     } finally {
-      setIsEditSubmitting(false);
+      setIsDraftSubmitting(false);
     }
   };
 
@@ -558,28 +552,28 @@ export default function EditProperty() {
     }
 
     if (canProceed && currentStep < totalSteps) {
-      setEditCurrentStep(currentStep + 1);
+      setDraftCurrentStep(currentStep + 1);
     }
   };
 
   const handleDraftPublishSelect = async (option: "draft" | "publish") => {
     try {
-      setIsEditSubmitting(true);
+      setIsDraftSubmitting(true);
       setShowDraftPublishModal(false);
-      setEditDisplayStatus(option);
-      await submitEditForm(option);
-      setEditCurrentStep(1);
+      setDraftDisplayStatus(option);
+      await submitDraftForm(option);
+      setDraftCurrentStep(1);
     } catch (error) {
       console.error("Submission failed:", error);
       toast.error("Failed to update property. Please try again.");
     } finally {
-      setIsEditSubmitting(false);
+      setIsDraftSubmitting(false);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1 && !isSubmitting) {
-      setEditCurrentStep(currentStep - 1);
+      setDraftCurrentStep(currentStep - 1);
     } else if (currentStep === 1) {
       navigate("/properties");
     }
@@ -609,9 +603,9 @@ export default function EditProperty() {
   //     if (file) {
   //       const reader = new FileReader();
   //       reader.onloadend = () => {
-  //         setEditImagePreview(reader.result as string);
+  //         setDraftImagePreview(reader.result as string);
   //         setNewDisplayImage(file);
-  //         addEditMediaImage(file);
+  //         addDraftMediaImage(file);
   //       };
   //       reader.readAsDataURL(file);
   //     }
@@ -638,7 +632,7 @@ export default function EditProperty() {
   //           } else {
   //             updatedImages.push(file);
   //           }
-  //           setEditMedia({ ...media, images: updatedImages });
+  //           setDraftMedia({ ...media, images: updatedImages });
   //         };
   //         reader.readAsDataURL(file);
   //       }
@@ -684,14 +678,14 @@ export default function EditProperty() {
                 <IoArrowBackSharp className="mr-2" />
               </button>
               <h1 className="text-3xl font-bold text-gray-800 text-center md:text-left">
-                Edit Property
+                Create Draft Property
               </h1>
             </div>
             <div className="flex space-x-4 justify-center md:justify-end">
               <button
                 className={`bg-red-500 text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-red-600 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 `}
                 onClick={() => {
-                  resetEditForm();
+                  resetDraftForm();
                   navigate("/properties");
                 }}
                 disabled={isSubmitting}
@@ -703,7 +697,7 @@ export default function EditProperty() {
 
           <div className="w-full lg:flex justify-center hidden">
             <StepIndicator
-              setCurrentStep={setEditCurrentStep}
+              setCurrentStep={setDraftCurrentStep}
               currentStep={currentStep}
             />
           </div>
@@ -728,15 +722,15 @@ export default function EditProperty() {
                 <></>
               ) : // <BulkBasicDetails
               //   ref={bulkBasicDetailsRef}
-              //   setBulkDetails={setEditBulkDetails}
+              //   setBulkDetails={setDraftBulkDetails}
               //   initialData={bulkDetails}
               // />
               isLandProperty2 ? (
                 <BasicDetailsLand
                   ref={basicDetailsRef}
-                  setBasicDetails={setEditBasicDetails}
-                  setIsLandProperty={setIsEditLandProperty}
-                  setIsLandProperty2={setIsEditLandProperty2}
+                  setBasicDetails={setDraftBasicDetails}
+                  setIsLandProperty={setIsDraftLandProperty}
+                  setIsLandProperty2={setIsDraftLandProperty2}
                   initialData={basicDetails}
                   isEditMode={true}
                   previousPropType={previousPropType}
@@ -745,10 +739,10 @@ export default function EditProperty() {
               ) : (
                 <BasicDetails
                   ref={basicDetailsRef}
-                  setBasicDetails={setEditBasicDetails}
-                  setIsLandProperty={setIsEditLandProperty}
-                  setIsLandProperty2={setIsEditLandProperty2}
-                  //   setSales={setEditSales}
+                  setBasicDetails={setDraftBasicDetails}
+                  setIsLandProperty={setIsDraftLandProperty}
+                  setIsLandProperty2={setIsDraftLandProperty2}
+                  //   setSales={setDraftSales}
                   initialData={basicDetails}
                   isEditMode={true}
                   previousPropType={previousPropType}
@@ -762,9 +756,9 @@ export default function EditProperty() {
               {isLandProperty2 ? (
                 <LandForm
                   ref={landRef}
-                  setLandForm={setEditLandForm}
-                  setDirectorName={setEditDirectorName}
-                  setPreviousPropType={setEditPreviousPropType}
+                  setLandForm={setDraftLandForm}
+                  setDirectorName={setDraftDirectorName}
+                  setPreviousPropType={setDraftPreviousPropType}
                   initialData={landForm}
                   isEditMode={true}
                   directorName={director_name}
@@ -772,9 +766,9 @@ export default function EditProperty() {
               ) : (
                 <PropertySpecifications
                   ref={specificationsRef}
-                  setSpecifications={setEditSpecifications}
-                  setDirectorName={setEditDirectorName}
-                  setPreviousPropType={setEditPreviousPropType}
+                  setSpecifications={setDraftSpecifications}
+                  setDirectorName={setDraftDirectorName}
+                  setPreviousPropType={setDraftPreviousPropType}
                   initialData={specifications}
                   //   sales={sales}
                   isEditMode={true}
@@ -792,7 +786,7 @@ export default function EditProperty() {
               children={
                 <PropertyListingPage
                   ref={LandPlan}
-                  setLandSizeSections={setEditLandSizeSections}
+                  setLandSizeSections={setDraftLandSizeSections}
                   initialData={LandSizeSection}
                   isEditMode={true}
                 />
@@ -807,7 +801,7 @@ export default function EditProperty() {
               <MediaFORM
                 ref={mediaRef}
                 imagePreview={imagePreview}
-                  setImagePreview={setEditImagePreview} 
+                setImagePreview={setDraftImagePreview}
                 newDisplayImage={newDisplayImage}
                 setNewDisplayImage={setNewDisplayImage}
                 galleryPreviews={galleryPreviews}
@@ -818,7 +812,7 @@ export default function EditProperty() {
                 triggerFileInput={triggerFileInput}
                 triggerGalleryFileInput={triggerGalleryFileInput}
                 fileInputRef={fileInputRef}
-                setMedia={setEditMedia}
+                setMedia={setDraftMedia}
                 initialData={media}
                 isEditMode={true}
               />
@@ -831,7 +825,7 @@ export default function EditProperty() {
             <div className="bg-white rounded-lg p-6">
               <FeaturesInput
                 ref={featuresRef}
-                setFeatures={setEditFeatures}
+                setFeatures={setDraftFeatures}
                 initialData={features}
                 isEditMode={true}
               />
@@ -844,7 +838,7 @@ export default function EditProperty() {
             <div className="bg-white rounded-lg p-6 space-y-[30px]">
               <Payment_Structure
                 ref={paymentStructureRef}
-                setPaymentStructure={setEditPaymentStructure}
+                setPaymentStructure={setDraftPaymentStructure}
                 initialData={paymentStructure}
                 isLandProperty={isLandProperty2}
                 isEditMode={true}
@@ -863,7 +857,7 @@ export default function EditProperty() {
                   <div className="mt-24">
                     <Discount
                       ref={discountRef}
-                      setDiscount={setEditDiscount}
+                      setDiscount={setDraftDiscount}
                       initialData={discount}
                       isEditMode={true}
                       requireValidation={discountEnabled}

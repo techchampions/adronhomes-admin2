@@ -64,6 +64,7 @@ import deleteCustomerredux from "./customers/deletecut"
 import propertyCodesReducer from "./citta/propertyCodesSlice"
 import createPropertyReducer from "./propertyForm/createPropertySlice";
 import editPropertyReducer from "./editProperty/editpropslice";
+import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
 export const store = configureStore({
    middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -142,7 +143,9 @@ user_payments: userPaymentsReducers,
   deleteCustomer:deleteCustomerredux,
 propertyCodes:propertyCodesReducer,
   createProperty: createPropertyReducer,
-  editProperty: editPropertyReducer,}
+  editProperty: editPropertyReducer,
+draftProperty:duplicateDraftFormReducer,
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;

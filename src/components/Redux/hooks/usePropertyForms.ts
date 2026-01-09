@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import * as createActions from "../propertyForm/createPropertySlice";
 import * as editActions from "../editProperty/editpropslice"
-
+import * as draftActions from "../draftProperty/draftPropertySlice";
 // Create Property Hook
 export const useCreatePropertyForm = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -119,6 +119,70 @@ export const useEditPropertyForm = () => {
     
     get editPropertyId() {
       return editProperty.metadata.propertyId;
+    },
+  };
+};
+
+
+export const useDraftPropertyForm = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const draftProperty = useSelector((state: RootState) => state.draftProperty);
+
+  return {
+    // State
+    ...draftProperty,
+    
+    // Actions
+    resetDraftForm: () => dispatch(draftActions.resetDraftForm()),
+    setDraftFormData: (data: any) => dispatch(draftActions.setDraftFormData(data)),
+    loadDraftPropertyData: (propertyData: any) => dispatch(draftActions.loadDraftPropertyData(propertyData)),
+    setDraftCurrentStep: (step: number) => dispatch(draftActions.setDraftCurrentStep(step)),
+    setIsDraftLandProperty: (isLand: boolean) => dispatch(draftActions.setIsDraftLandProperty(isLand)),
+    setIsDraftLandProperty2: (isLand: boolean) => dispatch(draftActions.setIsDraftLandProperty2(isLand)),
+    setIsDraftBulk: (isBulk: boolean) => dispatch(draftActions.setIsDraftBulk(isBulk)),
+    setIsDraftSubmitting: (isSubmitting: boolean) => dispatch(draftActions.setIsDraftSubmitting(isSubmitting)),
+    setDraftDirectorName: (name: string) => dispatch(draftActions.setDraftDirectorName(name)),
+    setDraftPreviousPropType: (type: string) => dispatch(draftActions.setDraftPreviousPropType(type)),
+    setDraftFees: (fees: any[]) => dispatch(draftActions.setDraftFees(fees)),
+    setDraftNewFees: (fees: any[]) => dispatch(draftActions.setDraftNewFees(fees)),
+    setDraftImagePreview: (preview: string | null) => dispatch(draftActions.setDraftImagePreview(preview)),
+    setDraftDisplayStatus: (status: "draft" | "publish") => dispatch(draftActions.setDraftDisplayStatus(status)),
+    setDraftIsLoaded: (isLoaded: boolean) => dispatch(draftActions.setDraftIsLoaded(isLoaded)),
+    
+    // Form setters
+    setDraftBasicDetails: (data: any) => dispatch(draftActions.setDraftBasicDetails(data)),
+    setDraftBulkDetails: (data: any) => dispatch(draftActions.setDraftBulkDetails(data)),
+    setDraftSpecifications: (data: any) => dispatch(draftActions.setDraftSpecifications(data)),
+    setDraftLandForm: (data: any) => dispatch(draftActions.setDraftLandForm(data)),
+    setDraftLandSizeSections: (data: any[]) => dispatch(draftActions.setDraftLandSizeSections(data)),
+    setDraftFeatures: (data: any) => dispatch(draftActions.setDraftFeatures(data)),
+    setDraftMedia: (data: any) => dispatch(draftActions.setDraftMedia(data)),
+    setDraftDiscount: (data: any) => dispatch(draftActions.setDraftDiscount(data)),
+    setDraftPaymentStructure: (data: any) => dispatch(draftActions.setDraftPaymentStructure(data)),
+    
+    // Computed values
+    get isDraftLandProperty() {
+      return draftProperty.metadata.isLandProperty;
+    },
+    
+    get isDraftLandProperty2() {
+      return draftProperty.metadata.isLandProperty2;
+    },
+    
+    get isDraftBulk() {
+      return draftProperty.metadata.isBulk;
+    },
+    
+    get draftCurrentStep() {
+      return draftProperty.metadata.currentStep;
+    },
+    
+    get isDraftFormLoaded() {
+      return draftProperty.metadata.isLoaded;
+    },
+    
+    get draftPropertyId() {
+      return draftProperty.metadata.propertyId;
     },
   };
 };

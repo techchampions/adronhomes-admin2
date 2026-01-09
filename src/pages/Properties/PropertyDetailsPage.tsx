@@ -105,36 +105,52 @@ const PropertyDetailsPage = () => {
       {/* <EdithBackgroung> */}
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#79B833] to-[#79B833]/20 text-white p-6 flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleGoBack}
-                className="text-white hover:text-gray-200 text-2xl"
-              >
-                <IoArrowBackSharp />
-              </button>
-              <h1 className="text-3xl font-bold">{property.name}</h1>
-            </div>
-            <div className="flex space-x-4 mt-4 md:mt-0">
-              <button
-                onClick={() => navigate(`/properties/property-edith/${property.id}`)}
-                className="px-6 py-2 bg-white text-[#79B833] font-semibold rounded-full hover:bg-gray-100 transition"
-              >
-                Edit Property
-              </button>
-              <button
-                onClick={handlePublishToggle}
-                className="px-6 py-2 bg-[#79B833] text-white font-semibold rounded-full  transition"
-                disabled={publishLoading}
-              >
-                {publishLoading
-                  ? "Processing..."
-                  : property.is_active === 1
-                  ? "Move to Draft"
-                  : "Publish Now"}
-              </button>
-            </div>
-          </div>
+          <div className="bg-gradient-to-r from-[#79B833] to-[#79B833]/20 text-white px-4 py-5 sm:px-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+  
+  {/* Left section */}
+  <div className="flex items-center gap-3 w-full md:w-auto">
+    <button
+      onClick={handleGoBack}
+      className="text-white hover:text-gray-200 text-xl sm:text-2xl"
+    >
+      <IoArrowBackSharp />
+    </button>
+
+    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold truncate">
+      {property.name}
+    </h1>
+  </div>
+
+  {/* Right section */}
+  <div className="flex flex-wrap gap-3 w-full md:w-auto md:justify-end">
+    <button
+      onClick={() => navigate(`/properties/Draftform/${property.id}`)}
+      className="px-4 sm:px-6 py-2 bg-white text-[#79B833] font-semibold rounded-full hover:bg-gray-100 transition w-full sm:w-auto"
+    >
+      Duplicate Property
+    </button>
+
+    <button
+      onClick={() => navigate(`/properties/property-edith/${property.id}`)}
+      className="px-4 sm:px-6 py-2 bg-white text-[#79B833] font-semibold rounded-full hover:bg-gray-100 transition w-full sm:w-auto"
+    >
+      Edit Property
+    </button>
+
+    <button
+      onClick={handlePublishToggle}
+      disabled={publishLoading}
+      className="px-4 sm:px-6 py-2 bg-[#79B833] text-white font-semibold rounded-full transition w-full sm:w-auto disabled:opacity-60"
+    >
+      {publishLoading
+        ? "Processing..."
+        : property.is_active === 1
+        ? "Move to Draft"
+        : "Publish Now"}
+    </button>
+  </div>
+</div>
+
 
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-6">

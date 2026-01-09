@@ -245,7 +245,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
       </form>
 
       {/* Infrastructure Fees Modal Trigger for Land Properties */}
-      {isLandProperty && (
+      {isLandProperty || !isEditMode && (
         <div
           className="pt-5"
           onClick={(e) => {

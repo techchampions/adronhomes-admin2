@@ -25,7 +25,7 @@ interface MediaFORMProps {
   isEditMode?: boolean;
   
   // Edit mode props (optional for create mode)
-  imagePreview?: string | null;
+  imagePreview?: any | null;
   setImagePreview?: (preview: string | null) => void;
   newDisplayImage?: File | null;
   setNewDisplayImage?: (file: File | null) => void;
