@@ -65,6 +65,7 @@ import propertyCodesReducer from "./citta/propertyCodesSlice"
 import createPropertyReducer from "./propertyForm/createPropertySlice";
 import editPropertyReducer from "./editProperty/editpropslice";
 import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
+import assignMarketerSlice from "./AssignMarketerRequest/AssignMarketerRequest";
 export const store = configureStore({
    middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -145,6 +146,7 @@ propertyCodes:propertyCodesReducer,
   createProperty: createPropertyReducer,
   editProperty: editPropertyReducer,
 draftProperty:duplicateDraftFormReducer,
+assignMarketerRequest: assignMarketerSlice,
   },
 });
 

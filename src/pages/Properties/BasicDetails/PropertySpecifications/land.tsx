@@ -86,14 +86,11 @@ const LandForm = forwardRef<LandFormHandles, LandFormProps>(
       dispatch(directors());
     }, [dispatch]);
 
-    const {
-      loading: userLoading,
-      error: userError,
-      data,
-    } = useSelector((state: RootState) => state.directors);
+   const { data: directorsData, loading: directorsLoading, error: directorsError, success: directorsSuccess } = 
+     useSelector((state: RootState) => state.directors.directors);
 
-    const directorOptions: DropdownOption[] = Array.isArray(data)
-      ? data.map((person) => ({
+    const directorOptions: DropdownOption[] = Array.isArray(directorsData)
+      ? directorsData.map((person) => ({
           label: `${person.first_name} ${person.last_name}`,
           value: person.id,
         }))
@@ -271,7 +268,7 @@ const LandForm = forwardRef<LandFormHandles, LandFormProps>(
           dropdownTitle="Directors"
           error={formik.touched.director_id && formik.errors.director_id}
           isSearchable={true}
-          isLoading={userLoading}
+          isLoading={directorsLoading}
         />
 
         <div className="grid md:grid-cols-2 gap-12">
