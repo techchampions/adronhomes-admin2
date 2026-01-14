@@ -164,7 +164,7 @@ export default function PaymentById() {
           amount={formatCurrency(payment.amount_paid)}
           bankName={payment.payment_type === 'Virtual Wallet' ? payment.payment_type : payment.bank_name || "N/A"}
           date={formatDate(payment.created_at)}
-          receiptImage={payment.proof_of_payment || "/reciept.svg"}
+          receiptImage={payment.proof_of_payment || ""}
           fullReciept={payment.proof_of_payment || "/fullreciept.svg"}
           handleHistory={() => setIsPaymentListOpen(true)}
           id={Number(paymentId)}
