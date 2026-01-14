@@ -169,7 +169,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             <DetailRow label="Description" value={paymentData.description} />
             <DetailRow label="Payment Method" value={paymentData.method} />
             <DetailRow label="Amount" value={`₦${Number(paymentData.amount).toLocaleString()}`} />
-            <DetailRow label="Director" value={paymentData.director} />
+            {/* <DetailRow label="Director" value={paymentData.director} /> */}
             <DetailRow label="Payment Reference" value={paymentData.reference} copyable onCopy={() => handleCopy(paymentData.reference)} copied={copied} />
             <DetailRow
               label="Status"
