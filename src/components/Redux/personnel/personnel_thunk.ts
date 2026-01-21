@@ -133,15 +133,6 @@ export const personnels = createAsyncThunk<
 );
 
 
-// Rename your interface to avoid conflict with built-in FormData
-interface PersonnelFormData {
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  role: string;
-  email: string;
-  password: string;
-}
 
 // Your response interface remains the same
 export interface PersonnelResponse {
