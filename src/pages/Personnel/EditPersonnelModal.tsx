@@ -137,7 +137,7 @@ export default function EditPersonnelModal({
             role: personnel.role.toString(),
             email: personnel.email,
             password: "", // default empty
-            erp_id: personnel.erp_id || "", // added field
+            erp_id: personnel.referral_code || "", // added field
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
