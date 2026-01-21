@@ -30,6 +30,7 @@ export interface User {
   updated_at: string;
   personnel: string;
   contract_id: string | null;
+  erp_id?: string; // Add erp_id field
 }
 
 export interface EdithpersonelSuccessResponse {
