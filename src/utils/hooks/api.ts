@@ -394,8 +394,12 @@ export const getCustomers = async (
 };
 // GET CUSTOMERS
 export const getCustomersAndProperties =
-  async (): Promise<UsersAndPropertiesResponse> => {
-    const res = await adminApi.get(`/users-and-properties`);
+  async (params?:{
+    search?: string;
+  }): Promise<UsersAndPropertiesResponse> => {
+    const res = await adminApi.get(`/users-and-properties`,{
+      params: params,
+    });
     return res.data;
   };
 
