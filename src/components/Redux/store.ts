@@ -66,6 +66,7 @@ import createPropertyReducer from "./propertyForm/createPropertySlice";
 import editPropertyReducer from "./editProperty/editpropslice";
 import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
 import assignMarketerSlice from "./AssignMarketerRequest/AssignMarketerRequest";
+import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
 export const store = configureStore({
    middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -147,6 +148,7 @@ propertyCodes:propertyCodesReducer,
   editProperty: editPropertyReducer,
 draftProperty:duplicateDraftFormReducer,
 assignMarketerRequest: assignMarketerSlice,
+marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
   },
 });
 

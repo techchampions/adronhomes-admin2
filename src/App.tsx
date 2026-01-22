@@ -77,6 +77,7 @@ import ResetCard from "./components/Modals/settings/changepassword";
 import EditProperty from "./pages/Properties/GeneralEdit2";
 import General from "./pages/Properties/General2";
 import DuplicateProperty from "./pages/Properties/GeneralDuplicateProperty";
+import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -178,6 +179,7 @@ const App = () => {
                 />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
+                 <Route path="/personnel/:id" element={<PersonnelMarketersDashboard />} />
                 <Route path="/contracts" element={<Contract />} />
                 <Route
                   path="/contracts/details/:user_id/:plan_id"

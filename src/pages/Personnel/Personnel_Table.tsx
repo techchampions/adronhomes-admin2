@@ -1,6 +1,7 @@
 // Personnel_Table.tsx
 import React, { useContext, useEffect, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { personnels } from "../../components/Redux/personnel/personnel_thunk";
 import {
@@ -26,24 +27,24 @@ export interface UsersTable {
   Created: string;
   id: any;
   user: User; // Add the full user object
-  referral_code:any
+  referral_code: any;
 }
 
 interface UsersTableProps {
   userData: UsersTable[];
 }
 
-
 export default function UsersTableComponent({ userData }: UsersTableProps) {
+  const navigate = useNavigate();
   const pagination = useSelector(selectPersonnelPagination);
   const dispatch = useDispatch<AppDispatch>();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPersonnel, setEditingPersonnel] = useState<User | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [personelToDelete, setPersonelToDelete] = useState<User | null>(null);
-    const {
-option,
-setOption
+  const {
+    option,
+    setOption
   } = useContext(PropertyContext)!;
   const {
     loading: deleteloading,
@@ -53,10 +54,11 @@ setOption
   const { loading, success, error } = useSelector(
     (state: RootState) => state.editPersonnelSlice
   );
+  
   useEffect(() => {
     if (deletesuccess && personelToDelete) {
       toast.success("Property deleted successfully!");
-  dispatch(personnels({ role: option.value }));
+      dispatch(personnels({ role: option.value }));
       handleCloseDeleteModal();
     }
 
@@ -64,9 +66,10 @@ setOption
       toast.error(deleteerror || "Failed to delete property");
     }
   }, [deletesuccess, deleteerror, dispatch, personelToDelete]);
+  
   const handlePageChange = async (page: number) => {
     dispatch(setCurrentPage(page));
-  dispatch(personnels({ role: option.value }));
+    dispatch(personnels({ role: option.value }));
   };
 
   const handleEditPersonnel = (user: User) => {
@@ -89,6 +92,7 @@ setOption
     setPersonelToDelete(user);
     setIsDeleteModalOpen(true);
   };
+  
   const handleConfirmDelete = async () => {
     if (personelToDelete) {
       await dispatch(
@@ -96,6 +100,7 @@ setOption
       );
     }
   };
+  
   const [selectedPersonnel, setSelectedPersonnel] = useState<UsersTable | null>(
     null
   );
@@ -107,25 +112,30 @@ setOption
     setIsPersonnelModalOpen(true);
   };
 
+  // Add the view dashboard handler
+  const handleViewDashboard = (e: React.MouseEvent, userId: string | number) => {
+    e.stopPropagation();
+    navigate(`/personnel/${userId}`);
+  };
+
   // Convert table data to modal data format
   const getModalPersonnelData = (user: UsersTable): any => {
     return {
       id: user.id,
       fullName: user.User,
       email: user.Email,
-      role:user.Role,
+      role: user.Role,
       joinDate: user.Created,
-      referral_code:user.referral_code,
-      // lastActive: new Date().toISOString(), // You might want to get this from your API
-      // status: "Active", // You might want to get this from your API
+      referral_code: user.referral_code,
       avatar: "/default-avatar.png",
     };
   };
+  
   return (
     <>
-      <div className="w-full overflow-x-auto">
-        <div className="min-w-[800px] md:min-w-0">
-          <table className="w-full">
+    <div className="w-full overflow-x-auto">
+      <div className="max-w-[800px] md:min-w-0">
+        <table className="w-full table-auto">
             <thead>
               <tr className="text-left">
                 <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
@@ -140,6 +150,9 @@ setOption
                 <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
                   Created
                 </th>
+                <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
+                 View Report
+                </th>
                 <th className="pb-6 font-[325] text-[#757575] text-sm whitespace-nowrap">
                   Action
                 </th>
@@ -150,15 +163,23 @@ setOption
                 <tr
                   key={user.id}
                   className="hover:bg-gray-50 cursor-pointer"
-                 
                 >
-                  <td className="py-4 text-dark text-sm whitespace-nowrap"  onClick={() => handleRowClick(user)}>
+                  <td 
+                    className="py-4 text-dark text-sm whitespace-nowrap pr-8" 
+                    onClick={() => handleRowClick(user)}
+                  >
                     {user.User}
                   </td>
-                  <td className="py-4 font-[325] text-dark text-sm whitespace-nowrap"  onClick={() => handleRowClick(user)}>
+                  <td 
+                    className="py-4 font-[325] text-dark text-sm whitespace-nowrap pr-8" 
+                    onClick={() => handleRowClick(user)}
+                  >
                     {user.Email}
                   </td>
-                  <td className="py-4 font-[350] text-dark text-sm whitespace-nowrap"  onClick={() => handleRowClick(user)}>
+                  <td 
+                    className="py-4 font-[350] text-dark text-sm whitespace-nowrap pr-8" 
+                    onClick={() => handleRowClick(user)}
+                  >
                     <div className="flex items-center">
                       {user.Role}
                       <span className="ml-2">
@@ -166,29 +187,51 @@ setOption
                       </span>
                     </div>
                   </td>
-                  <td className="py-4 font-[325] text-dark text-sm whitespace-nowrap"  onClick={() => handleRowClick(user)}>
+                  <td 
+                    className="py-4 font-[325] text-dark text-sm whitespace-nowrap pr-8" 
+                    onClick={() => handleRowClick(user)}
+                  >
                     <div className="flex items-center">
                       {formatDate(user.Created)}
                     </div>
                   </td>
-                  <td className="py-4 font-[325] text-dark text-sm whitespace-nowrap" >
-                    <div className="flex space-x-2">
+                  <td 
+                    className="py-4 font-[325] text-dark text-sm whitespace-nowrap pr-8"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => handleViewDashboard(e, user.id)}
+                      className="px-3 py-1.5 bg-[#79B833] text-white text-xs rounded-full hover:bg-[#6aa02e] transition-colors"
+                    >
+                      View Dashboard
+                    </button>
+                  </td>
+                  <td 
+                    className="py-4 font-[325] text-dark text-sm whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex space-x-4">
                       <button
                         aria-label="Edit personnel"
                         onClick={() => handleEditPersonnel(user.user)}
+                        className="hover:opacity-80 transition-opacity"
                       >
                         <img
                           src="/ic_round-edit.svg"
                           className="w-[18px] h-[18px]"
+                          alt="Edit"
                         />
                       </button>
                       <button
                         aria-label="Delete personnel"
                         onClick={() => handleDeleteClick(user.user)}
+                        className="hover:opacity-80 transition-opacity"
                       >
                         <img
                           src="mingcute_delete-fill.svg"
                           className="w-[18px] h-[18px]"
+                          alt="Delete"
                         />
                       </button>
                     </div>
@@ -206,6 +249,7 @@ setOption
           className="mt-8 mb-4"
         />
       </div>
+      
       {/* delete property */}
       {isDeleteModalOpen && personelToDelete && (
         <ConfirmationModal
@@ -220,6 +264,7 @@ setOption
           loading={deleteloading}
         />
       )}
+      
       {/* Edit Personnel Modal */}
       {editingPersonnel && (
         <EditPersonnelModal
@@ -239,17 +284,3 @@ setOption
     </>
   );
 }
-// const roleOptions = [
-//   { value: 0, label: "Customer" },
-//   { value: 1, label: "Admin" },
-//   { value: 2, label: "Marketer" },
-//   { value: 3, label: "Director" },
-//   { value: 4, label: "Accountant" },
-//   { value: 5, label: "Hr" },
-// ];
-
-// const getRole = (value: any) => {
-//   const numericValue = Number(value); // Convert to number
-//   const role = roleOptions.find((r) => r.value === numericValue);
-//   return role ? role.label : "Unknown";
-// };

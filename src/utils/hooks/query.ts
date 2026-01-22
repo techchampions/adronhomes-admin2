@@ -149,12 +149,15 @@ export const useGetCustomers = (page: number) => {
   });
 };
 // CUSTOMER List
-export const useGetCustomersAndProperties = () => {
+export const useGetCustomersAndProperties = (params?: {
+  search?: string;
+}) => {
   return useQuery<UsersAndPropertiesResponse>({
-    queryKey: ["customers and properties"],
-    queryFn: getCustomersAndProperties,
+    queryKey: ["customers-and-properties", params],
+    queryFn: () => getCustomersAndProperties(params),
   });
 };
+
 
 // Query hook for Getting User
 export const useGetUser = () => {
