@@ -5,6 +5,7 @@ import { IoCopyOutline } from "react-icons/io5";
 import { FiShare2, FiDownload } from "react-icons/fi";
 import jsPDF from "jspdf";
 import domtoimage from "dom-to-image";
+import { formatDate } from "../../utils/formatdate";
 
 interface PaymentData {
   from: string;
@@ -178,7 +179,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             />
             <DetailRow
               label="Date"
-              value={new Date(paymentData.transactionDate).toLocaleDateString()}
+              value={formatDate(paymentData.transactionDate)}
             />
           </div>
         </div>
