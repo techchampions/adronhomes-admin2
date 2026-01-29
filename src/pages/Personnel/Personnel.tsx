@@ -37,17 +37,27 @@ const getRoleName = (roleId: number): string => {
       return "Unknown";
   }
 };
-
+const roles: string[] = [
+  "All",
+  "Admin",
+  "Marketer",
+  "Director",
+  "Accountant",
+  "HR",
+  "Legal",
+  "Info Tech",
+  "Client service",
+];
 export default function Personnel() {
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   const dispatch = useDispatch<AppDispatch>();
   const { data, error, loading, search, pagination } = useSelector(
-    (state: RootState) => state.getpersonnel
+    (state: RootState) => state.getpersonnel,
   );
 
-  const { option } = useContext(PropertyContext)!;
+  const { option, setOption } = useContext(PropertyContext)!;
 
   // Fetch data on mount, and when search or role changes
   useEffect(() => {
@@ -58,10 +68,10 @@ export default function Personnel() {
     dispatch(setPersonnelSearch(term)); // Resets page to 1 inside reducer
     dispatch(personnels({ role: option.value, search: term }));
   };
-  useEffect(()=>{
- dispatch(setPersonnelSearch(''))
-   dispatch(personnels({ role: option.value, search: "" }));
-  },[dispatch])
+  useEffect(() => {
+    dispatch(setPersonnelSearch(""));
+    dispatch(personnels({ role: option.value, search: "" }));
+  }, [dispatch]);
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
@@ -97,6 +107,17 @@ export default function Personnel() {
           onTabChange={setActiveTab}
           searchPlaceholder="Search for personnel"
           onSearch={handleSearch}
+          sortOptions={roles.map((role, index) => ({
+            value: index,
+            name: role,
+          }))}
+          defaultSort={roles.findIndex((role) => role === option.name)}
+          sort={true}
+          showTabs={true}
+          showSearchandSort={true}
+          onSortChange={(sortOption) => {
+            setOption(sortOption);
+          }}
         >
           {loading ? (
             <div className="w-full flex items-center justify-center">

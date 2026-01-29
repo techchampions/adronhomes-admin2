@@ -52,6 +52,7 @@ import publishDraftReducer from './Properties/publishpropertySlice'
 import exportPaymentsReducer from './export/exportPaymentsSlice'
 import exportCustomersReducer from './export/exportCustomersSlice'
 import countriesReducer from './country/countrythunkand slice'
+import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
 import legalDashboardSliceReducer  from './legalDashboard/legalDashboardSlice'
 import toggleLatestReducer from './Properties/toggleLatestslice'
 import exportContractsReducer from './export/exportContractSlice'
@@ -121,6 +122,7 @@ export const store = configureStore({
    itDashboard:itDashboardSliceReducer,
      deletepropertyDetail: deletepropertyDetailReducer,
      wallet:walletslice,
+     marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
   deleteCustomer:deleteCustomerredux },

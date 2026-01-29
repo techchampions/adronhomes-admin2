@@ -74,6 +74,7 @@ import UserWallet from "./pages/UserWallet/UserWallet";
 import UserPaymentsPage from "./pages/Transactions/UserPaymentsPage";
 import SettingsCard from "./marketer/SettingsCard";
 import ResetCard from "./components/Modals/settings/changepassword";
+import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
@@ -175,6 +176,7 @@ const App = () => {
                 />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
+                 <Route path="/personnel/:id" element={<PersonnelMarketersDashboard />} />
                 <Route path="/contracts" element={<Contract />} />
                 <Route
                   path="/contracts/details/:user_id/:plan_id"
