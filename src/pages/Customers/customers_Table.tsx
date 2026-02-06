@@ -40,7 +40,24 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
+const goToCustomer = (id: number) => {
+  const path = location.pathname;
 
+  // If already inside payments/customers
+  if (path.includes("/payments/customers")) {
+    navigate(`/payments/customers/${id}`);
+    return;
+  }
+
+  // If already inside client customers
+  if (path.includes("/client/customers")) {
+    navigate(`/client/customers/${id}`);
+    return;
+  }
+
+  // Default fallback
+  navigate(`/customers/${id}`);
+};
   const pagination = useSelector(selectCustomersPagination);
   const deleteState = useSelector((state: RootState) => state.deleteCustomer);
 
@@ -124,7 +141,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   {/* NAME */}
                   <td
                     className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
-                    onClick={() => navigate(`/customers/${row.id}`)}
+                      onClick={() => goToCustomer(row.id)}
                   >
                       <div className="truncate max-w-48">
                         {row.first_name || row.last_name
@@ -137,7 +154,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   {/* MARKETER */}
                   <td
                     className="pb-[31px] text-dark text-sm  whitespace-nowrap pr-4"
-                    onClick={() => navigate(`/customers/${row.id}`)}
+                      onClick={() => goToCustomer(row.id)}
                   >
                   <div className="truncate max-w-28"> {row.marketer
                       ? `${row.marketer.first_name || ""} ${
@@ -149,7 +166,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   {/* DATE */}
                   <td
                     className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
-                    onClick={() => navigate(`/customers/${row.id}`)}
+                      onClick={() => goToCustomer(row.id)}
                   >
                     {formatDate(row.created_at)}
                   </td>
@@ -157,7 +174,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   {/* PROPERTY PLANS */}
                   <td
                     className="pb-[31px] text-dark text-sm whitespace-nowrap pr-4"
-                    onClick={() => navigate(`/customers/${row.id}`)}
+                      onClick={() => goToCustomer(row.id)}
                   >
                     {row.property_plan_total ?? "N/A"}
                   </td>
@@ -165,7 +182,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   {/* SAVED PROPERTIES */}
                   <td
                     className="pb-[31px] text-dark text-sm whitespace-nowrap pr-4"
-                    onClick={() => navigate(`/customers/${row.id}`)}
+                      onClick={() => goToCustomer(row.id)}
                   >
              {row.virtual_account?.account_balance ?? "N/A"}
 
@@ -174,7 +191,7 @@ export default function CustomersTableComponent({ data }: CustomersTableprop) {
                   {/* PHONE */}
                   <td
                     className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
-                    onClick={() => navigate(`/customers/${row.id}`)}
+                      onClick={() => goToCustomer(row.id)}
                   >
                     {row.phone_number ?? "N/A"}
                   </td>

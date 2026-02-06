@@ -111,14 +111,28 @@ export interface Customer {
   unique_customer_id:any
 }
 
+
+export interface WalletAmount {
+  id: number;
+  account_name: string;
+  account_number: string;
+  account_bank: string;
+  account_balance: number;
+  user_id: number;
+  is_deactivated: number; 
+  is_generated: number;   
+  created_at: string;     
+  updated_at: string;    
+}
+
 // Interface for the overall API response
 export interface CustomerByIdResponse {
+  wallet_amount:WalletAmount
   status: string;
   message: string;
   total_paid: string;
   pending_paid: number; // Changed to number as per new response
   active_property: number;
-  wallet_amount:number;
   viewed_property: number;
   saved_property: number;
   owned_property: number;
