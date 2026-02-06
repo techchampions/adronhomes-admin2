@@ -373,7 +373,7 @@ export default function CustomerSinglePage() {
           </button>
           <MatrixCard
             title="Total Wallet Balance"
-            value={formatAsNaira(data.wallet_amount)}
+            value={formatAsNaira(data.wallet_amount.account_balance)??"N/A"}
             change="Includes total  wallet balance of this customer"
           />
         </div>
