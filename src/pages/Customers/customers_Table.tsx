@@ -114,7 +114,7 @@ const goToCustomer = (id: number) => {
            <thead>
               <tr className="text-left">
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
-                  Customer's Name
+                  Client's Name
                 </th>
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
                   Marketer in Charge
@@ -193,7 +193,7 @@ const goToCustomer = (id: number) => {
                     className="pb-[31px] text-dark text-sm truncate whitespace-nowrap pr-4"
                       onClick={() => goToCustomer(row.id)}
                   >
-                    {row.phone_number ?? "N/A"}
+                 <div className="truncate max-w-24">{row.phone_number ?? "N/A"}</div>
                   </td>
 
                   {/* DELETE BUTTON */}
