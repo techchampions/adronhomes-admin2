@@ -16,7 +16,7 @@ export default function Customers() {
   const { data, customers, loading, error, pagination, search } = useSelector(
     (state: RootState) => state.customers
   );
-  const tabs = ['Customers'];
+  const tabs = ['Client'];
 
   useEffect(() => {
     dispatch(customer({ page: pagination.currentPage, search }));
@@ -36,18 +36,22 @@ export default function Customers() {
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Customers"
-        subtitle="Manage the list of registered customers"
+        title="Client"
+        subtitle="Manage the list of registered Clients"
          buttonText="Export"
          onButtonClick={openCustomersModal}
       />
       <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen 
+         title="Total Registered Clients"
+           change="includes all registered Client"
                value={data?.total || 0}/>
+               
+               
         <MatrixCard
-          title="Total Active Customers"
+          title="Total Active Clients"
           value={data?.active_customer || 0}
-          change="includes all customers on  active contracts"
+          change="includes all clients's on  active contracts"
         />
         <MatrixCard
           title="Total Active Contracts"
@@ -59,7 +63,7 @@ export default function Customers() {
         <ReusableTable
           tabs={tabs}
           searchPlaceholder={"Search Customer"}
-          activeTab={"Customers"}
+          activeTab={"Client"}
           onSearch={(value) => dispatch(setCustomersSearch(value))}
         >{loading ? (
    <LoadingAnimations loading={loading} />

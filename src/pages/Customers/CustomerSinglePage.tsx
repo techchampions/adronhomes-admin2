@@ -316,8 +316,8 @@ export default function CustomerSinglePage() {
     <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
       <Header
         history={true}
-        title="Customers"
-        subtitle="Manage the list of registered customers"
+        title="Client"
+        subtitle="Manage the list of registered clients"
         showSearchAndButton={false}
       />
 
@@ -347,7 +347,7 @@ export default function CustomerSinglePage() {
           <MatrixCardGreen
             title="Total Amount Paid"
             value={formatAsNaira(parseInt(data.total_paid))}
-            change="Includes total amount paid by this customer"
+            change="Includes total amount paid by this client"
           />
         </div>
 
@@ -374,18 +374,18 @@ export default function CustomerSinglePage() {
           <MatrixCard
             title="Total Wallet Balance"
             value={formatAsNaira(data?.wallet_amount?.account_balance)??"N/A"}
-            change="Includes total  wallet balance of this customer"
+            change="Includes total  wallet balance of this client"
           />
         </div>
         <MatrixCard
           title="Total Pending Payments"
           value={formatAsNaira(data.pending_paid)}
-          change="Includes total pending payments of this customer"
+          change="Includes total pending payments of this client"
         />
         <MatrixCard
           title="Total Active Properties"
           value={data.active_property.toString()}
-          change="Includes all active property plans of this customer"
+          change="Includes all active property plans of this client"
         />
       </div>
 
