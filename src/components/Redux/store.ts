@@ -63,6 +63,7 @@ import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
 import passwordResetReducer from "./passwordRese/passwordReset_slice"
 import deleteCustomerredux from "./customers/deletecut"
 import erpContractsSyncReducer from "./Contract/erpContractsSync/erpContractsSyncSlice";
+import erpContractTransactionsReducer from "./Contract/erpContractTransactions/erpContractTransactionsSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -127,7 +128,8 @@ export const store = configureStore({
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
   deleteCustomer:deleteCustomerredux,
-erpContractsSync:erpContractsSyncReducer,},
+erpContractsSync:erpContractsSyncReducer,
+erpContractTransactions:erpContractTransactionsReducer},
 });
 
 export type AppDispatch = typeof store.dispatch;

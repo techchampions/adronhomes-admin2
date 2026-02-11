@@ -17,7 +17,6 @@ type ColumnConfig<T = any> = {
   width?: number;
   render?: (value: any, row: T) => React.ReactNode;
 };
-
 type TableCardProps<T = any> = {
   data: T[];
   columns: ColumnConfig<T>[];
@@ -28,8 +27,12 @@ type TableCardProps<T = any> = {
   onViewAllClick?: () => void;
   pagination?: PaginationProps;
   onPageChange?: (page: number) => void;
-  onRowClick?: (row: T, event: React.MouseEvent) => void; // Updated this
+  onRowClick?: (row: T, event: React.MouseEvent) => void;
+
+  citta?: boolean;
+  headerComponent?: React.ReactNode;
 };
+
 
 const DEFAULT_COLUMN_WIDTH = 180;
 
@@ -44,7 +47,11 @@ const TableCard = <T extends Record<string, any>>({
   pagination,
   onPageChange,
   onRowClick,
+
+  citta = false,
+  headerComponent,
 }: TableCardProps<T>) => {
+
   const getRowKey = (row: T, index: number) => {
     if (typeof rowKey === "function") return rowKey(row);
     return row[rowKey] || index;
@@ -91,22 +98,44 @@ const TableCard = <T extends Record<string, any>>({
 
   return (
     <div className={`bg-white p-6 rounded-[30px] ${className}`}>
-      {(title || viewAllText) && (
-        <div className="w-full flex justify-between items-center mb-6">
-          {title && <h2 className="text-xl font-[350] text-dark">{title}</h2>}
-          {viewAllText && (
-            <button
-              className="text-sm font-bold text-dark hover:text-blue-600 transition-colors"
-              onClick={onViewAllClick}
-            >
-              {viewAllText}
-            </button>
-          )}
-        </div>
+     {/* Header */}
+{(title || viewAllText || (citta && headerComponent)) && (
+  <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    
+    {/* Left side: Title + optional component */}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      {title && (
+        <h2 className="text-xl font-[350] text-dark whitespace-nowrap">
+          {title}
+        </h2>
       )}
 
+   
+    </div>
+
+    {/* Right side: View All */}
+     <div className="flex items-start gap-4 w-full sm:w-auto justify-start sm:justify-end">
+        {citta && headerComponent && (
+        <div className="flex ">
+          {headerComponent}
+        </div>
+      )}
+    {viewAllText && (
+      <button
+        className="text-sm font-bold text-dark hover:text-blue-600 transition-colors"
+        onClick={onViewAllClick}
+      >
+        {viewAllText}
+      </button>
+    )}
+     </div>
+  </div>
+)}
+
+
+
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full overflow-x-auto">
           <thead>
             <tr className="text-left text-[#757575] text-sm">
               {columns.map((column) => (
