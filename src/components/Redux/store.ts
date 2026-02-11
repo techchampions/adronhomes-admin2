@@ -62,6 +62,7 @@ import  walletslice from "./wallet/walllet_slice"
 import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
 import passwordResetReducer from "./passwordRese/passwordReset_slice"
 import deleteCustomerredux from "./customers/deletecut"
+import erpContractsSyncReducer from "./Contract/erpContractsSync/erpContractsSyncSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -125,7 +126,8 @@ export const store = configureStore({
      marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
-  deleteCustomer:deleteCustomerredux },
+  deleteCustomer:deleteCustomerredux,
+erpContractsSync:erpContractsSyncReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;

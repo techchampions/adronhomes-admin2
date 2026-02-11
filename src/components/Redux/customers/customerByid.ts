@@ -4,7 +4,7 @@ import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { RootState } from "../store"; // Assuming you have a RootState defined in your store
+import { RootState } from "../store";
 import api from "../middleware";
 
 // --- Interfaces for the new response structure ---
@@ -56,8 +56,8 @@ export interface PlanData {
   paid_other_amount: number;
   contract_id: string | null;
   number_of_unit: number;
-  property: PropertyInPlan; 
-  unique_customer_id:any
+  property: PropertyInPlan;
+  unique_customer_id: any;
 }
 
 // Interface for Pagination Links
@@ -108,9 +108,61 @@ export interface Customer {
   updated_at: string;
   personnel: string;
   contract_id: string | null;
-  unique_customer_id:any
+  unique_customer_id: any;
 }
 
+// Interface for Citta Contract Paginated Response
+export interface CittaContract {
+  current_page: number;
+  data: ContractData[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLink[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
+}
+
+
+export interface ContractData {
+  id: number;
+  customerName: string;
+  customerCode: string;
+  dateOfBirth: string;
+  userId: number;
+  propertyId: number | null;
+  contractId: string;
+  customerAddress: string;
+  contractDate: string;
+  propertyEstate: string;
+  propertyName: string;
+  customerTown: string;
+  customerState: string;
+  customerEmail: string;
+  customerPhone: string;
+  customerSMSPhone: string;
+  customerTitle: string;
+  customerGender: "Male" | "Female" | "Other";
+  customerMarital: "Single" | "Married" | "Divorced" | "Widowed" | string;
+  fullPayment: "Y" | "N";
+  fullPaymentDate: string | null;
+  quantity: string;
+  propertyCost: string;
+  propertyDiscount: string;
+  propertyNetValue: string;
+  propertyTenor: number;
+  firstPaymentDate: string;
+  lastPaymentDate: string;
+  propertyBranch: string;
+  currentbalance: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface WalletAmount {
   id: number;
@@ -119,30 +171,32 @@ export interface WalletAmount {
   account_bank: string;
   account_balance: number;
   user_id: number;
-  is_deactivated: number; 
-  is_generated: number;   
-  created_at: string;     
-  updated_at: string;    
+  is_deactivated: number;
+  is_generated: number;
+  created_at: string;
+  updated_at: string;
 }
 
 // Interface for the overall API response
 export interface CustomerByIdResponse {
-  wallet_amount:WalletAmount
+  citta_contract: CittaContract;
+  wallet_amount: WalletAmount;
   status: string;
   message: string;
   total_paid: string;
-  pending_paid: number; // Changed to number as per new response
+  pending_paid: number;
   active_property: number;
   viewed_property: number;
   saved_property: number;
   owned_property: number;
   customer: Customer;
-  limit_active_plan: PlanData[]; // Now an array of PlanData
-  limit_completed_property: PlanData[]; // Now an array of PlanData
-  active_plan: PaginatedPlans; // Now includes pagination
-  completed_property: PaginatedPlans; // Now includes pagination
-  unique_customer_id:any
+  limit_active_plan: PlanData[];
+  limit_completed_property: PlanData[];
+  active_plan: PaginatedPlans;
+  completed_property: PaginatedPlans;
+  unique_customer_id: any;
 }
+
 const savedUsername = localStorage.getItem("username") || "";
 
 // Error Response Interface
@@ -162,14 +216,21 @@ interface CustomerByIdState {
     totalItems: number;
     totalPages: number;
   };
-
   completedPropertyPagination: {
     currentPage: number;
     perPage: number;
     totalItems: number;
     totalPages: number;
   };
-  username:string
+  cittaContractPagination: {
+    currentPage: number;
+    perPage: number;
+    totalItems: number;
+    totalPages: number;
+  };
+  username: string;
+  cittaContractLoading: boolean;
+  cittaContractError: ErrorResponse | null;
 }
 
 const initialState: CustomerByIdState = {
@@ -178,17 +239,25 @@ const initialState: CustomerByIdState = {
   error: null,
   activePlanPagination: {
     currentPage: 1,
-    perPage: 20, // Default or initial value
+    perPage: 20,
     totalItems: 0,
     totalPages: 1,
   },
   completedPropertyPagination: {
     currentPage: 1,
-    perPage: 20, // Default or initial value
+    perPage: 20,
     totalItems: 0,
     totalPages: 1,
   },
-  username: savedUsername
+  cittaContractPagination: {
+    currentPage: 1,
+    perPage: 10, // Default per page for citta contracts
+    totalItems: 0,
+    totalPages: 1,
+  },
+  username: savedUsername,
+  cittaContractLoading: false,
+  cittaContractError: null,
 };
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -196,12 +265,25 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // --- Async Thunk for fetching customer by ID ---
 export const fetchCustomerById = createAsyncThunk<
   CustomerByIdResponse,
-  { customerId: number; activePage?: number; completedPage?: number }, // Added optional page parameters
+  {
+    customerId: number;
+    activePage?: number;
+    completedPage?: number;
+    cittaContractPage?: number; // New parameter for citta contracts pagination
+  },
   { rejectValue: ErrorResponse; state: RootState }
 >(
   "customer/fetchCustomerById",
-  async ({ customerId, activePage = 1, completedPage = 1 }, { rejectWithValue }) => {
-    const token = Cookies.get('token');
+  async (
+    {
+      customerId,
+      activePage = 1,
+      completedPage = 1,
+      cittaContractPage = 1, // Default to page 1
+    },
+    { rejectWithValue },
+  ) => {
+    const token = Cookies.get("token");
 
     if (!token) {
       toast.error("Authentication required. Please login.");
@@ -211,16 +293,16 @@ export const fetchCustomerById = createAsyncThunk<
     }
 
     try {
-      // Modify the URL to include pagination parameters for active_plan and completed_property
+      // Modify the URL to include pagination parameters for all sections
       const response = await api.get<CustomerByIdResponse>(
-        `${BASE_URL}/api/admin/customer/${customerId}?active_page=${activePage}&completed_page=${completedPage}`,
+        `${BASE_URL}/api/admin/customer/${customerId}?active_page=${activePage}&completed_page=${completedPage}&citta_page=${cittaContractPage}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'identifier': "dMNOcdMNOPefFGHIlefFGHIJKLmno",
-            'device_id': "1010l0010l1",
-          }
-        }
+            Authorization: `Bearer ${token}`,
+            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+            device_id: "1010l0010l1",
+          },
+        },
       );
 
       return response.data;
@@ -228,14 +310,15 @@ export const fetchCustomerById = createAsyncThunk<
       const axiosError = error as AxiosError<ErrorResponse>;
 
       if (axiosError.response?.status === 401) {
-        Cookies.remove('token');
+        Cookies.remove("token");
         toast.error("Session expired. Please login again.");
       }
 
       if (axiosError.response) {
-        const errorMessage = axiosError.response.data.message ||
+        const errorMessage =
+          axiosError.response.data.message ||
           (axiosError.response.data.errors
-            ? Object.values(axiosError.response.data.errors).flat().join(', ')
+            ? Object.values(axiosError.response.data.errors).flat().join(", ")
             : "Failed to fetch customer data");
 
         toast.error(errorMessage);
@@ -251,7 +334,73 @@ export const fetchCustomerById = createAsyncThunk<
         message: errorMessage,
       });
     }
-  }
+  },
+);
+
+// --- Async Thunk for fetching only citta contracts (if needed separately) ---
+export const fetchCittaContracts = createAsyncThunk<
+  CittaContract,
+  {
+    customerId: number;
+    page?: number;
+    perPage?: number;
+  },
+  { rejectValue: ErrorResponse; state: RootState }
+>(
+  "customer/fetchCittaContracts",
+  async ({ customerId, page = 1, perPage = 10 }, { rejectWithValue }) => {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      toast.error("Authentication required. Please login.");
+      return rejectWithValue({
+        message: "Authentication required. Please login.",
+      });
+    }
+
+    try {
+      // If your API has a separate endpoint for citta contracts
+      const response = await api.get<CittaContract>(
+        `${BASE_URL}/api/admin/customer/${customerId}/citta-contracts?page=${page}&per_page=${perPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+            device_id: "1010l0010l1",
+          },
+        },
+      );
+
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.status === 401) {
+        Cookies.remove("token");
+        toast.error("Session expired. Please login again.");
+      }
+
+      if (axiosError.response) {
+        const errorMessage =
+          axiosError.response.data.message ||
+          (axiosError.response.data.errors
+            ? Object.values(axiosError.response.data.errors).flat().join(", ")
+            : "Failed to fetch citta contracts");
+
+        toast.error(errorMessage);
+        return rejectWithValue(axiosError.response.data);
+      }
+
+      const errorMessage = axiosError.request
+        ? "No response from server. Please check your network connection."
+        : "An unexpected error occurred. Please try again.";
+
+      toast.error(errorMessage);
+      return rejectWithValue({
+        message: errorMessage,
+      });
+    }
+  },
 );
 
 // --- Customer By Id Slice ---
@@ -264,53 +413,113 @@ const customerByIdSlice = createSlice({
       state.data = null;
       state.error = null;
       state.activePlanPagination = initialState.activePlanPagination;
-      state.completedPropertyPagination = initialState.completedPropertyPagination;
+      state.completedPropertyPagination =
+        initialState.completedPropertyPagination;
+      state.cittaContractPagination = initialState.cittaContractPagination;
+      state.cittaContractLoading = false;
+      state.cittaContractError = null;
     },
-  setUsername: (state, action: PayloadAction<string>) => {
-  // Clear previous username
-  localStorage.removeItem("username");
-
-  // Save new username
-  localStorage.setItem("username", action.payload);
-
-  // Update redux state
-  state.username = action.payload;
-},
-
+    setUsername: (state, action: PayloadAction<string>) => {
+      localStorage.removeItem("username");
+      localStorage.setItem("username", action.payload);
+      state.username = action.payload;
+    },
     setActivePlanCurrentPage: (state, action: PayloadAction<number>) => {
       state.activePlanPagination.currentPage = action.payload;
     },
     setCompletedPropertyCurrentPage: (state, action: PayloadAction<number>) => {
       state.completedPropertyPagination.currentPage = action.payload;
     },
+    setCittaContractCurrentPage: (state, action: PayloadAction<number>) => {
+      state.cittaContractPagination.currentPage = action.payload;
+    },
+    setCittaContractPerPage: (state, action: PayloadAction<number>) => {
+      state.cittaContractPagination.perPage = action.payload;
+      state.cittaContractPagination.currentPage = 1; // Reset to first page when changing per page
+    },
+    resetCittaContractPagination: (state) => {
+      state.cittaContractPagination = initialState.cittaContractPagination;
+    },
+    updateCittaContractData: (state, action: PayloadAction<CittaContract>) => {
+      if (state.data) {
+        state.data.citta_contract = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
+      // Main customer fetch
       .addCase(fetchCustomerById.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchCustomerById.fulfilled, (state, action: PayloadAction<CustomerByIdResponse>) => {
-        state.loading = false;
-        state.data = action.payload;
-        // Update pagination for active plans
-        state.activePlanPagination = {
-          currentPage: action.payload.active_plan.current_page,
-          perPage: action.payload.active_plan.per_page,
-          totalItems: action.payload.active_plan.total,
-          totalPages: action.payload.active_plan.last_page,
-        };
-        // Update pagination for completed properties
-        state.completedPropertyPagination = {
-          currentPage: action.payload.completed_property.current_page,
-          perPage: action.payload.completed_property.per_page,
-          totalItems: action.payload.completed_property.total,
-          totalPages: action.payload.completed_property.last_page,
-        };
-      })
+      .addCase(
+        fetchCustomerById.fulfilled,
+        (state, action: PayloadAction<CustomerByIdResponse>) => {
+          state.loading = false;
+          state.data = action.payload;
+
+          // Update pagination for active plans
+          state.activePlanPagination = {
+            currentPage: action.payload.active_plan.current_page,
+            perPage: action.payload.active_plan.per_page,
+            totalItems: action.payload.active_plan.total,
+            totalPages: action.payload.active_plan.last_page,
+          };
+
+          // Update pagination for completed properties
+          state.completedPropertyPagination = {
+            currentPage: action.payload.completed_property.current_page,
+            perPage: action.payload.completed_property.per_page,
+            totalItems: action.payload.completed_property.total,
+            totalPages: action.payload.completed_property.last_page,
+          };
+
+          // Update pagination for citta contracts
+          state.cittaContractPagination = {
+            currentPage: action.payload.citta_contract.current_page,
+            perPage: action.payload.citta_contract.per_page,
+            totalItems: action.payload.citta_contract.total,
+            totalPages: action.payload.citta_contract.last_page,
+          };
+        },
+      )
       .addCase(fetchCustomerById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || { message: "An unknown error occurred" };
+        state.error = action.payload || {
+          message: "An unknown error occurred",
+        };
+      })
+
+      // Separate citta contracts fetch
+      .addCase(fetchCittaContracts.pending, (state) => {
+        state.cittaContractLoading = true;
+        state.cittaContractError = null;
+      })
+      .addCase(
+        fetchCittaContracts.fulfilled,
+        (state, action: PayloadAction<CittaContract>) => {
+          state.cittaContractLoading = false;
+
+          // Update citta contracts in main data if exists
+          if (state.data) {
+            state.data.citta_contract = action.payload;
+          }
+
+          // Update pagination for citta contracts
+          state.cittaContractPagination = {
+            currentPage: action.payload.current_page,
+            perPage: action.payload.per_page,
+            totalItems: action.payload.total,
+            totalPages: action.payload.last_page,
+          };
+        },
+      )
+      .addCase(fetchCittaContracts.rejected, (state, action) => {
+        state.cittaContractLoading = false;
+        state.cittaContractError = action.payload || {
+          message: "An unknown error occurred",
+        };
       });
   },
 });
@@ -319,17 +528,37 @@ export const {
   resetCustomerByIdState,
   setActivePlanCurrentPage,
   setCompletedPropertyCurrentPage,
-  setUsername
+  setCittaContractCurrentPage,
+  setCittaContractPerPage,
+  resetCittaContractPagination,
+  updateCittaContractData,
+  setUsername,
 } = customerByIdSlice.actions;
 
 export default customerByIdSlice.reducer;
 
 // --- Selectors ---
-export const selectCustomerByIdData = (state: RootState) => state.customerById.data;
-export const selectCustomerByIdLoading = (state: RootState) => state.customerById.loading;
-export const selectCustomerByIdError = (state: RootState) => state.customerById.error;
-export const selectActivePlanPagination = (state: RootState) => state.customerById.activePlanPagination;
-export const selectCompletedPropertyPagination = (state: RootState) => state.customerById.completedPropertyPagination;
-export const selectCustomerActivePlans = (state: RootState) => state.customerById.data?.active_plan.data || [];
-export const selectCustomerCompletedProperties = (state: RootState) => state.customerById.data?.completed_property.data || [];
-export const selectCustomerUsername=(state:RootState)=>state.customerById.username
+export const selectCustomerByIdData = (state: RootState) =>
+  state.customerById.data;
+export const selectCustomerByIdLoading = (state: RootState) =>
+  state.customerById.loading;
+export const selectCustomerByIdError = (state: RootState) =>
+  state.customerById.error;
+export const selectActivePlanPagination = (state: RootState) =>
+  state.customerById.activePlanPagination;
+export const selectCompletedPropertyPagination = (state: RootState) =>
+  state.customerById.completedPropertyPagination;
+export const selectCittaContractPagination = (state: RootState) =>
+  state.customerById.cittaContractPagination;
+export const selectCittaContractLoading = (state: RootState) =>
+  state.customerById.cittaContractLoading;
+export const selectCittaContractError = (state: RootState) =>
+  state.customerById.cittaContractError;
+export const selectCustomerActivePlans = (state: RootState) =>
+  state.customerById.data?.active_plan.data || [];
+export const selectCustomerCompletedProperties = (state: RootState) =>
+  state.customerById.data?.completed_property.data || [];
+export const selectCustomerCittaContracts = (state: RootState) =>
+  state.customerById.data?.citta_contract.data || [];
+export const selectCustomerUsername = (state: RootState) =>
+  state.customerById.username;

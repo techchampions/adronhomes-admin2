@@ -13,7 +13,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, classNa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000033] bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-10 flex items-center justify-center bg-[#00000033] bg-opacity-50 p-4">
       <div className={`bg-white rounded-[30px] shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto ${className}`}>
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold text-dark">{title}</h2>
