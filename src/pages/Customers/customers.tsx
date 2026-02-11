@@ -16,7 +16,7 @@ export default function Customers() {
   const { data, customers, loading, error, pagination, search } = useSelector(
     (state: RootState) => state.customers
   );
-  const tabs = ['Client'];
+  const tabs = ['Clients'];
 
   useEffect(() => {
     dispatch(customer({ page: pagination.currentPage, search }));
@@ -36,7 +36,7 @@ export default function Customers() {
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Client"
+        title="Clientst"
         subtitle="Manage the list of registered Clients"
          buttonText="Export"
          onButtonClick={openCustomersModal}
@@ -62,7 +62,7 @@ export default function Customers() {
        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
           tabs={tabs}
-          searchPlaceholder={"Search Customer"}
+          searchPlaceholder={"Search Clients"}
           activeTab={"Client"}
           onSearch={(value) => dispatch(setCustomersSearch(value))}
         >{loading ? (

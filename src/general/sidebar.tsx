@@ -12,7 +12,7 @@ import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from "./icon";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/dashboard" },
-  { label: "Client", icon: Icon2, path: "/customers" },
+  { label: "Clients", icon: Icon2, path: "/customers" },
   { label: "Property Payments", icon: Icon3, path: "/payments" },
   { label: "Wallet Transactions", icon: Icon8, path: "/wallet-Transactions" },
   { label: "Contracts", icon: Icon7, path: "/contracts" },
