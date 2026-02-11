@@ -694,7 +694,7 @@ export default function CustomerSinglePage() {
   }
 
   if (!data) {
-    return <div className="text-center py-8">No customer data found</div>;
+    return <div className="text-center py-8">No client data found</div>;
   }
 
   return (
