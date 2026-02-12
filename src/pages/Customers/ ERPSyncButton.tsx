@@ -14,7 +14,7 @@ import { fetchERPContractsSync } from '../../components/Redux/Contract/erpContra
 
 interface ERPSyncButtonProps {
   userId: string;
-  customerData?: any; 
+  customerData?: any; // Customer data to check origin and contracts
   onSyncComplete?: (data: any) => void;
   onSyncError?: (error: string) => void;
   className?: string;
@@ -35,57 +35,48 @@ const ERPSyncButton: React.FC<ERPSyncButtonProps> = ({
   const error = useSelector(selectERPContractsError);
   const isSuccess = useSelector(selectERPContractsSuccess);
 
-  // Check if user can fetch data
+  // Check if user can fetch data (must be from citta origin)
   const canFetchERPData = () => {
-    // Check if customer data exists and is from "citta" origin
     if (!customerData?.customer) return false;
     
     // Only allow fetching if user was created via citta
     const isCittaOrigin = customerData.customer.created_origin === "citta";
     
-    // Check if citta contracts already exist
-    const hasCittaContracts = customerData.citta_contract?.total > 0;
-    
-    return isCittaOrigin && !hasCittaContracts;
+    return isCittaOrigin;
   };
 
-  // Check if we should hide the button completely
-  const shouldHideButton = () => {
-    if (!customerData?.customer) return true;
-    
-    const hasCittaContracts = customerData.citta_contract?.total > 0;
-    const isCittaOrigin = customerData.customer.created_origin === "citta";
-    
-    return hasCittaContracts || !isCittaOrigin;
+  // Check if user has existing citta contracts (already fetched before)
+  const hasExistingContracts = () => {
+    return customerData?.citta_contract?.total > 0;
   };
 
   // Handle success state auto-reset
   useEffect(() => {
-    if (isSuccess ) {
-     
+    if (isSuccess && erpData) {
+    //   const timer = setTimeout(() => {
         dispatch(resetERPContractsSyncState());
-
+    //   }, 3000);
       
-      
+    //   return () => clearTimeout(timer);
     }
-  }, [isSuccess, dispatch]);
+  }, [isSuccess, erpData, dispatch]);
 
   // Handle error state auto-reset
   useEffect(() => {
     if (error) {
-  
+      const timer = setTimeout(() => {
         dispatch(resetERPContractsSyncState());
- 
+      }, 5000);
       
-  
+      return () => clearTimeout(timer);
     }
   }, [error, dispatch]);
 
   const handleSync = async () => {
-    // Don't allow fetch if conditions aren't met
+    // Don't allow fetch if not from citta origin
     if (!canFetchERPData()) {
       if (onSyncError) {
-        onSyncError('Cannot fetch ERP data for this user');
+        onSyncError('Only Citta users can fetch ERP data');
       }
       return;
     }
@@ -105,7 +96,7 @@ const ERPSyncButton: React.FC<ERPSyncButtonProps> = ({
           onSyncComplete(data);
         }
         
-        // Optional: Log the sync result
+        // Log the sync result
         console.log('ERP Contracts Sync Successful:', {
           userId,
           linkedContracts: data?.contract_ids?.linkedContracts?.length || 0,
@@ -131,31 +122,40 @@ const ERPSyncButton: React.FC<ERPSyncButtonProps> = ({
 
   // Determine button label based on state
   const getButtonLabel = () => {
+    // Check if user is from citta origin
+    const isCittaOrigin = customerData?.customer?.created_origin === "citta";
+    
+    if (!isCittaOrigin) {
+      return 'Only for Citta Users';
+    }
+    
+    // Show loading state
+    if (isLoading) {
+      return 'Fetching ERP Data...';
+    }
+    
+    // Show success state from current sync
     if (erpData && isSuccess) {
       const contractCount = erpData.contract_ids?.erpContracts?.length || 0;
-      return `Sync Complete (${contractCount} contracts)`;
+      return `Refetch (${contractCount} contracts)`;
     }
     
-    // Check if user can fetch
-    const canFetch = canFetchERPData();
-    
-    if (!canFetch) {
-      if (customerData?.citta_contract?.total > 0) {
-        return 'ERP Data Already Fetched';
-      } else if (customerData?.customer?.created_origin !== "citta") {
-        return 'Only for Citta Users';
-      }
+    // Show refetch if user already has contracts
+    if (hasExistingContracts()) {
+      const contractCount = customerData?.citta_contract?.total || 0;
+      return `Refetch ERP Contracts (${contractCount})`;
     }
     
+    // Default state for eligible users
     return 'Fetch ERP Contracts';
   };
 
   // Determine if button should be disabled
   const getButtonDisabled = () => {
     if (isLoading) return true;
-    if (customerData?.citta_contract?.total > 0) return true;
+    
+    // Disable if not from citta origin
     if (customerData?.customer?.created_origin !== "citta") return true;
-    if (isSuccess && erpData) return true;
     
     return false;
   };
@@ -165,7 +165,7 @@ const ERPSyncButton: React.FC<ERPSyncButtonProps> = ({
     if (!customerData?.customer) return null;
     
     const isCittaOrigin = customerData.customer.created_origin === "citta";
-    const hasCittaContracts = customerData.citta_contract?.total > 0;
+    const hasCittaContracts = hasExistingContracts();
     
     if (!isCittaOrigin) {
       return (
@@ -175,19 +175,19 @@ const ERPSyncButton: React.FC<ERPSyncButtonProps> = ({
       );
     }
     
-    if (hasCittaContracts) {
-      return (
-        <StatusMessage $type="success">
-          ✅ ERP data  fetched ({customerData.citta_contract.total} contracts)
-        </StatusMessage>
-      );
-    }
+    // if (hasCittaContracts) {
+    //   return (
+    //     // <StatusMessage $type="success">
+    //     //   ✅ {customerData.citta_contract.total} ERP contracts available - Click Refetch to update
+    //     // </StatusMessage>
+    //   );
+    // }
     
     return null;
   };
 
-  // Hide entire component if conditions are met
-  if (shouldHideButton() && !erpData && !isLoading && !error && !isSuccess) {
+  // Don't show button at all for non-citta users
+  if (customerData?.customer && customerData.customer.created_origin !== "citta") {
     return null;
   }
 
@@ -202,6 +202,11 @@ const ERPSyncButton: React.FC<ERPSyncButtonProps> = ({
           duration={3000}
         />
         
+        {(erpData && isSuccess) || error ? (
+          <ResetButton onClick={handleReset}>
+            {error ? 'Dismiss Error' : 'Clear Data'}
+          </ResetButton>
+        ) : null}
       </ButtonWrapper>
 
       {/* Status Display */}
@@ -235,7 +240,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 20px;
+//   margin-bottom: 20px;
 `;
 
 const ButtonWrapper = styled.div`

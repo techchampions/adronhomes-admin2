@@ -36,7 +36,7 @@ export default function Customers() {
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Clientst"
+        title="Client"
         subtitle="Manage the list of registered Clients"
          buttonText="Export"
          onButtonClick={openCustomersModal}

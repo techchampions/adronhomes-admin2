@@ -1,7 +1,9 @@
+    
 // CustomerSinglePage.tsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { FaXmark } from "react-icons/fa6";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import ProfileCard from "../../general/ProfileCard";
@@ -27,11 +29,13 @@ import Modal from "./Modal";
 import { ContractData } from "../../components/Redux/customers/customerByid";
 import CittaContractModal from "./CittaContractModal";
 import {
-  selectERPContractsLoading,
   selectERPContractsSuccess,
 } from "../../components/Redux/Contract/erpContractsSync/erpContractsSyncSlice";
 
+import { ERPTransaction, fetchERPContractTransactions } from "../../components/Redux/Contract/erpContractTransactions/erpContractTransactionsThunk";
 import ERPSyncButton from "./ ERPSyncButton";
+import ERPContractTransactionsTable from "./ERPContractTransactionsTable";
+import ERPTransactionModal from "./ERPTransactionModal";
 
 interface TableRowData {
   id: number;
@@ -99,7 +103,12 @@ export default function CustomerSinglePage() {
   const [selectedContract, setSelectedContract] = useState<ContractData | null>(
     null,
   );
-
+  const [selectedTransaction, setSelectedTransaction] = useState<ERPTransaction | null>(null);
+  
+  // State for ERP Transactions
+  const [selectedContractForTransactions, setSelectedContractForTransactions] = useState<ContractData | null>(null);
+  const [showTransactionsTable, setShowTransactionsTable] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
 
   const erpSuccess = useSelector(selectERPContractsSuccess);
   const [contractModalOpen, setContractModalOpen] = useState(false);
@@ -107,23 +116,60 @@ export default function CustomerSinglePage() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalData, setModalData] = useState<TableRowData[]>([]);
   const [modalColumns, setModalColumns] = useState<any[]>([]);
-  const [modalPagination, setModalPagination] =
-    useState<PaginationProps | null>(null);
+  const [modalPagination, setModalPagination] = useState<PaginationProps | null>(null);
   const [modalHandlePageChange, setModalHandlePageChange] = useState<
     ((page: number) => void) | null
   >(null);
 
-  // Open contract modal
+  // Open Citta Contract modal
   const openContractModal = (contract: ContractData) => {
     setSelectedContract(contract);
     setContractModalOpen(true);
   };
 
-  // Close contract modal
+  // Close Citta Contract modal
   const closeContractModal = () => {
     setContractModalOpen(false);
     setSelectedContract(null);
   };
+
+  // Open ERP Transaction modal
+  const openTransactionModal = (transaction: ERPTransaction) => {
+    setSelectedTransaction(transaction);
+    setIsTransactionModalOpen(true);
+  };
+
+  // Close ERP Transaction modal
+  const closeTransactionModal = () => {
+    setIsTransactionModalOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  // Handle View ERP Transactions (opens the transactions table)
+  const handleViewContractTransactions = (contract: ContractData) => {
+    setSelectedContractForTransactions(contract);
+    setShowTransactionsTable(true);
+  };
+
+  // Handle Close ERP Transactions table
+  const handleCloseTransactions = () => {
+    setShowTransactionsTable(false);
+    setSelectedContractForTransactions(null);
+  };
+
+  // Listen for custom event from CittaContractModal
+  useEffect(() => {
+    const handleViewTransactionsEvent = (event: CustomEvent) => {
+      const contractData = event.detail;
+      handleViewContractTransactions(contractData);
+    };
+
+    window.addEventListener('viewContractTransactions', handleViewTransactionsEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('viewContractTransactions', handleViewTransactionsEvent as EventListener);
+    };
+  }, []);
 
   // Handlers for pagination
   const handlePageChange = (page: number) => {
@@ -350,7 +396,7 @@ export default function CustomerSinglePage() {
               {row.name}
             </div>
             <div className="text-sm text-gray-500 flex items-center">
-              <img src="/location.svg" className="mr-1" />
+              <img src="/location.svg" className="mr-1" alt="location" />
               <span className="truncate">{row.location}</span>
             </div>
           </div>
@@ -381,7 +427,7 @@ export default function CustomerSinglePage() {
               {row.name}
             </div>
             <div className="text-sm text-gray-500 flex items-center">
-              <img src="/location.svg" className="mr-1" />
+              <img src="/location.svg" className="mr-1" alt="location" />
               <span className="truncate">{row.location}</span>
             </div>
           </div>
@@ -395,28 +441,17 @@ export default function CustomerSinglePage() {
     { key: "FinalPayment", title: "Final Payment", width: 120 },
   ];
 
+  // FULL Citta Contracts Columns with TWO buttons for modal view
   const cittaContractsColumns = [
     {
       key: "contractDetails",
       title: "Contract Details",
       width: 250,
       render: (_: any, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
         return (
-          <div className="cursor-pointer hover:underline" onClick={handleClick}>
+          <div>
             <div className="font-medium text-dark truncate">
-              {row.contractDetails}
+              {row.contractDetails?.split("/")[0] || row.contractDetails}
             </div>
             <div className="text-sm text-gray-500 truncate mt-1">
               {row.location}
@@ -433,20 +468,8 @@ export default function CustomerSinglePage() {
       title: "Customer",
       width: 180,
       render: (_: any, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
         return (
-          <div className="min-w-0 cursor-pointer" onClick={handleClick}>
+          <div className="min-w-0">
             <div className="font-medium truncate">{row.customerName}</div>
           </div>
         );
@@ -456,52 +479,17 @@ export default function CustomerSinglePage() {
       key: "netValue",
       title: "Net Value",
       width: 130,
-      render: (value: string, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
-        return (
-          <div className="font-medium cursor-pointer" onClick={handleClick}>
-            {value}
-          </div>
-        );
-      },
+      render: (value: string) => <div className="font-medium">{value}</div>,
     },
     {
       key: "balanceDisplay",
       title: "Balance",
       width: 130,
-      render: (value: string, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
-        return (
-          <div
-            className={`font-medium cursor-pointer ${row.balanceClass || ""}`}
-            onClick={handleClick}
-          >
-            {value}
-          </div>
-        );
-      },
+      render: (value: string, row: TableRowData) => (
+        <div className={`font-medium ${row.balanceClass || ""}`}>
+          {value}
+        </div>
+      ),
     },
     {
       key: "duration",
@@ -517,55 +505,75 @@ export default function CustomerSinglePage() {
       key: "status",
       title: "Status",
       width: 120,
-      render: (value: string, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium cursor-pointer ${
-              value === "Full Payment"
-                ? "bg-green-100 text-green-800"
-                : "bg-yellow-100 text-yellow-800"
-            }`}
-            onClick={handleClick}
-          >
-            {value}
-          </span>
-        );
-      },
+      render: (value: string) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            value === "Full Payment"
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {value}
+        </span>
+      ),
     },
-  ];
-  // Simplified columns for main page
-  const cittaContractsColumnsSimple = [
     {
-      key: "contractDetails",
-      title: "Contract",
-      width: 250,
+      key: "actions",
+      title: "Actions",
+      width: 200,
       render: (_: any, row: TableRowData) => {
         const originalContract = cittaContractsData.find(
           (c: ContractData) =>
             c.id === row.id || c.id === row.originalContractId,
         );
 
-        const handleClick = (e: React.MouseEvent) => {
+        const handleViewCittaDetails = (e: React.MouseEvent) => {
           e.stopPropagation();
           if (originalContract) {
             openContractModal(originalContract);
           }
         };
 
+        const handleViewERPTransactions = (e: React.MouseEvent) => {
+          e.stopPropagation();
+          if (originalContract) {
+            handleViewContractTransactions(originalContract);
+          }
+        };
+
         return (
-          <div className="cursor-pointer hover:underline" onClick={handleClick}>
+          <div className="flex gap-2 overflow-auto">
+            <button
+              onClick={handleViewCittaDetails}
+              className="px-3 py-1.5 text-[10px] bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors font-medium flex items-center gap-1"
+              title="View Citta Contract Details"
+            >
+              <span>📄</span>
+              <span>Citta Details</span>
+            </button>
+            <button
+              onClick={handleViewERPTransactions}
+              className="px-3 py-1.5 text-xs bg-[#79B833] text-white rounded-full hover:bg-[#67a02a] transition-colors font-medium flex items-center gap-1"
+              title="View ERP Transactions"
+            >
+              <span>📋</span>
+              <span>ERP Transactions</span>
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  // SIMPLIFIED Citta Contracts Columns for main page with TWO buttons
+  const cittaContractsColumnsSimple = [
+    {
+      key: "contractDetails",
+      title: "Contract",
+      width: 250,
+      render: (_: any, row: TableRowData) => {
+        return (
+          <div>
             <div className="font-medium text-dark truncate">
               {row.contractDetails?.split("/")[0] || row.contractDetails}
             </div>
@@ -580,97 +588,73 @@ export default function CustomerSinglePage() {
       key: "netValue",
       title: "Amount",
       width: 130,
-      render: (value: string, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
-        return (
-          <div className="font-medium cursor-pointer" onClick={handleClick}>
-            {value}
-          </div>
-        );
-      },
+      render: (value: string) => <div className="font-medium">{value}</div>,
     },
     {
       key: "balanceDisplay",
       title: "Balance",
       width: 130,
-      render: (value: string, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
-        return (
-          <div
-            className={`font-medium cursor-pointer ${row.balanceClass || ""}`}
-            onClick={handleClick}
-          >
-            {value}
-          </div>
-        );
-      },
+      render: (value: string, row: TableRowData) => (
+        <div className={`font-medium ${row.balanceClass || ""}`}>
+          {value}
+        </div>
+      ),
     },
     {
       key: "duration",
       title: "Tenor",
       width: 100,
-      render: (value: string, row: TableRowData) => {
-        const originalContract = cittaContractsData.find(
-          (c: ContractData) =>
-            c.id === row.id || c.id === row.originalContractId,
-        );
-
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (originalContract) {
-            openContractModal(originalContract);
-          }
-        };
-
-        return (
-          <div className="cursor-pointer" onClick={handleClick}>
-            {value}
-          </div>
-        );
-      },
     },
     {
       key: "dueDate",
       title: "Due Date",
       width: 120,
-      render: (value: string, row: TableRowData) => {
+    },
+    {
+      key: "actions",
+      title: "Actions",
+      width: 200,
+      render: (_: any, row: TableRowData) => {
         const originalContract = cittaContractsData.find(
           (c: ContractData) =>
             c.id === row.id || c.id === row.originalContractId,
         );
 
-        const handleClick = (e: React.MouseEvent) => {
+        const handleViewCittaDetails = (e: React.MouseEvent) => {
           e.stopPropagation();
           if (originalContract) {
             openContractModal(originalContract);
           }
         };
 
+        const handleViewERPTransactions = (e: React.MouseEvent) => {
+          e.stopPropagation();
+          if (originalContract) {
+            handleViewContractTransactions(originalContract);
+          }
+        };
+
         return (
-          <div className="cursor-pointer" onClick={handleClick}>
-            {value}
+          <div className="flex gap-2 overflow-auto">
+            <button
+              onClick={handleViewCittaDetails}
+              className="px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors font-medium flex items-center gap-1"
+              title="View Citta Contract Details"
+            >
+              <span>📄</span>
+              <span>Citta 
+
+                details
+              </span>
+            </button>
+            <button
+              onClick={handleViewERPTransactions}
+              className="px-3 py-1.5 text-xs bg-[#79B833] text-white rounded-full hover:bg-[#67a02a] transition-colors font-medium flex items-center gap-1"
+              title="View ERP Transactions"
+            >
+              <span>📋</span>
+              <span>ERP TRNX</span>
+            </button>
           </div>
         );
       },
@@ -734,7 +718,6 @@ export default function CustomerSinglePage() {
             change="Includes total amount paid by this client"
           />
         </div>
-
 
         <div className="w-full relative">
           <button
@@ -809,36 +792,26 @@ export default function CustomerSinglePage() {
         loadingdelete={loadingdelete}
       />
 
-      {/* Citta Contracts Table */}
+      {/* ERP Sync Button */}
+      {/* <ERPSyncButton 
+        userId={String(id)}
+        customerData={data}
+      /> */}
 
-        <ERPSyncButton 
-          userId={String(id)}
-          customerData={data} // Pass the customer data to check origin and contracts
-          // onSyncComplete={(syncData) => {
-          //   console.log('ERP Sync completed:', syncData);
-          //   // Optionally refetch customer data after successful sync
-          //   if (id) {
-          //     dispatch(
-          //       fetchCustomerById({
-          //         customerId: Number(id),
-          //         activePage: activePlanPagination.currentPage,
-          //         completedPage: completedPropertyPagination.currentPage,
-          //         cittaContractPage: cittaContractPagination.currentPage,
-          //       })
-          //     );
-          //   }
-          // }}
-          // onSyncError={(error) => {
-          //   console.error('ERP Sync error:', error);
-          // }}
-        />
+      {/* Citta Contracts Table - WITH TWO BUTTONS */}
       <TableCard
+      citta={true}
+      headerComponent={
+          <ERPSyncButton 
+        userId={String(id)}
+        customerData={data}
+      />
+      }
         title="Citta Contracts"
         data={cittaContracts}
         columns={cittaContractsColumnsSimple}
         viewAllText={data?.citta_contract?.total > 0 ? "View All" : null}
         rowKey="id"
-        onRowClick={() => setContractModalOpen(true)}
         onViewAllClick={() =>
           openModal(
             "All Citta Contracts",
@@ -849,6 +822,34 @@ export default function CustomerSinglePage() {
           )
         }
       />
+
+      {/* ERP Transactions Section - Shows when ERP button is clicked */}
+      {showTransactionsTable && selectedContractForTransactions && (
+        <div className="mt-6 relative bg-white rounded-[30px] p-6">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h3 className="text-lg font-medium text-dark">
+                ERP Transactions
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Contract: {selectedContractForTransactions.contractId} • {selectedContractForTransactions.customerName}
+              </p>
+            </div>
+            <button
+              onClick={handleCloseTransactions}
+              className="text-gray-500 hover:text-gray-700 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              title="Close"
+            >
+              <FaXmark size={20} />
+            </button>
+          </div>
+          <ERPContractTransactionsTable
+            contractId={selectedContractForTransactions.contractId}
+            customerName={selectedContractForTransactions.customerName}
+            onViewTransaction={openTransactionModal}
+          />
+        </div>
+      )}
 
       {/* Active Plans Table */}
       <TableCard
@@ -886,11 +887,21 @@ export default function CustomerSinglePage() {
         }
       />
 
-      {/* Contract Details Modal */}
+      {/* Citta Contract Details Modal */}
       <CittaContractModal
         isOpen={contractModalOpen}
         onClose={closeContractModal}
         contractData={selectedContract!}
+        // onViewTransactions={handleViewContractTransactions}
+      />
+
+      {/* ERP Transaction Details Modal */}
+      <ERPTransactionModal
+        isOpen={isTransactionModalOpen}
+        onClose={closeTransactionModal}
+        transactionData={selectedTransaction!}
+        contractId={selectedTransaction?.ContractId}
+        customerName={selectedContractForTransactions?.customerName}
       />
 
       {/* View All Modal */}
