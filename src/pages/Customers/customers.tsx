@@ -43,7 +43,7 @@ const sortOptions = [
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Client"
+        title="Clients"
         subtitle="Manage the list of registered Clients"
         buttonText="Export"
         onButtonClick={openCustomersModal}
