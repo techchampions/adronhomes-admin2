@@ -44,7 +44,7 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<SortOption>(
-    sortOptions.find((opt) => opt.value === defaultSort) || sortOptions[0]
+    sortOptions.find((opt) => opt.value === defaultSort) || sortOptions[0],
   );
   const [isSortOpen, setIsSortOpen] = useState<boolean>(false);
 
@@ -108,16 +108,35 @@ export const ReusableTable: React.FC<ReusableTableProps> = ({
             {sort && (
               <div className="w-full lg:w-auto flex-1/3 relative">
                 <button
-                  className="lg:w-[130px] h-[42px] py-[13px] pr-[17px] pl-[20px] border border-[#272727] rounded-[50px] flex justify-center items-center text-sm text-dark"
                   onClick={() => setIsSortOpen(!isSortOpen)}
+                  className="
+    w-full
+    border border-[#272727]
+    rounded-full
+    flex items-center justify-between
+    px-4 py-2
+    sm:px-5 sm:py-2.5
+    md:px-6
+    text-xs sm:text-sm md:text-base
+    text-dark
+    transition-all duration-200
+    hover:bg-gray-100
+    focus:outline-none
+  "
                 >
-                  {selectedSort.name}
+                  <span className="truncate">{selectedSort.name}</span>
+
                   <FaCaretDown
-                    className={`w-[20px] h-[20px] ml-2 transition-transform ${
-                      isSortOpen ? "transform rotate-180" : ""
-                    }`}
+                    className={`
+      ml-2
+      w-4 h-4
+      sm:w-5 sm:h-5
+      transition-transform duration-200
+      ${isSortOpen ? "rotate-180" : ""}
+    `}
                   />
                 </button>
+
                 {isSortOpen && (
                   <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1">
                     {sortOptions.map((option) => (

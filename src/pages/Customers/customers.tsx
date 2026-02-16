@@ -26,7 +26,7 @@ export default function Customers() {
     return () => {
       dispatch(setCustomersSearch(""));
     };
-  }, [dispatch]);
+  }, [dispatch]); 
 
   const customersModalRef = useRef<ExportModalRef>(null);
   const openCustomersModal = () => {
@@ -34,15 +34,16 @@ export default function Customers() {
       customersModalRef.current.openModal();
     }
   };
-  const sortOptions = [
-    { value: "customer code", name: "Code" },
-    { value: "newest", name: "newest" },
-    { value: "oldest", name: "oldest" },
-  ];
+const sortOptions = [
+  { value: "customer_code", name: "Sort by Client Code" },
+  { value: "newest", name: "Sort by Newest" },
+  { value: "oldest", name: "Sort by Oldest" },
+];
+
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Client"
+        title="Clients"
         subtitle="Manage the list of registered Clients"
         buttonText="Export"
         onButtonClick={openCustomersModal}
