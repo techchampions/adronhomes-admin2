@@ -14,40 +14,46 @@ import { ExportModalRef } from "../../components/exportModal/modalexport";
 export default function Customers() {
   const dispatch = useDispatch<AppDispatch>();
   const { data, customers, loading, error, pagination, search } = useSelector(
-    (state: RootState) => state.customers
+    (state: RootState) => state.customers,
   );
-  const tabs = ['Clients'];
+  const tabs = ["Clients"];
+  const [sort, setSort] = React.useState<string>("customer code");
 
   useEffect(() => {
-    dispatch(customer({ page: pagination.currentPage, search }));
-  }, [dispatch, pagination.currentPage, search]);
+    dispatch(customer({ page: pagination.currentPage, search, filter: sort }));
+  }, [dispatch, pagination.currentPage, search,sort]);
   useEffect(() => {
     return () => {
       dispatch(setCustomersSearch(""));
     };
   }, [dispatch]);
 
- const customersModalRef = useRef<ExportModalRef>(null);
-   const openCustomersModal = () => {
+  const customersModalRef = useRef<ExportModalRef>(null);
+  const openCustomersModal = () => {
     if (customersModalRef.current) {
       customersModalRef.current.openModal();
     }
   };
+  const sortOptions = [
+    { value: "customer code", name: "Code" },
+    { value: "newest", name: "newest" },
+    { value: "oldest", name: "oldest" },
+  ];
   return (
     <div className="pb-[52px] relative">
       <Header
         title="Client"
         subtitle="Manage the list of registered Clients"
-         buttonText="Export"
-         onButtonClick={openCustomersModal}
+        buttonText="Export"
+        onButtonClick={openCustomersModal}
       />
       <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
-        <MatrixCardGreen 
-         title="Total Registered Clients"
-           change="includes all registered Client"
-               value={data?.total || 0}/>
-               
-               
+        <MatrixCardGreen
+          title="Total Registered Clients"
+          change="includes all registered Client"
+          value={data?.total || 0}
+        />
+
         <MatrixCard
           title="Total Active Clients"
           value={data?.active_customer || 0}
@@ -59,20 +65,27 @@ export default function Customers() {
           change="Includes all active contracts"
         />
       </div>
-       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
+          onSortChange={(sortOptions) => {setSort(sortOptions.value);}}
+           sortOptions={sortOptions.map((sortOptions, index) => ({
+            value: sortOptions.value,
+            name: sortOptions.name,
+          }))}
+            defaultSort={sortOptions.findIndex((option) => option.value === sortOptions[0].value) || 0}
           tabs={tabs}
           searchPlaceholder={"Search Clients"}
           activeTab={"Client"}
           onSearch={(value) => dispatch(setCustomersSearch(value))}
-        >{loading ? (
-   <LoadingAnimations loading={loading} />
-      ) :
-     (
-          <CustomersTableComponent data={customers} />)}
+        >
+          {loading ? (
+            <LoadingAnimations loading={loading} />
+          ) : (
+            <CustomersTableComponent data={customers} />
+          )}
         </ReusableTable>
       </div>
-        <ExportCustomersModal ref={customersModalRef} />
+      <ExportCustomersModal ref={customersModalRef} />
     </div>
   );
 }

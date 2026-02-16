@@ -43,7 +43,7 @@ export interface Customer {
   saved_property_total: number;
   // Updated marketer type
   marketer: Marketer;
-  virtual_account:VirtualAccount
+  virtual_account: VirtualAccount;
 }
 
 export interface CustomersList {
@@ -73,12 +73,11 @@ export interface VirtualAccount {
   account_bank: string;
   account_balance: number;
   user_id: number;
-  is_deactivated: number;  
-  created_at: string;      
-  updated_at: string;       
-  is_generated: number;    
+  is_deactivated: number;
+  created_at: string;
+  updated_at: string;
+  is_generated: number;
 }
-
 
 export interface CustomersData {
   total: number;
@@ -98,13 +97,13 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const customer = createAsyncThunk<
   CustomersResponse,
-  { page?: number; search?: string },
+  { page?: number; search?: string; filter?: string },
   { rejectValue: ErrorResponse }
 >(
   "customers/fetch",
-  async ({ page = 1, search = "" }, { rejectWithValue }) => {
+  async ({ page = 1, search = "", filter = "newest" }, { rejectWithValue }) => {
     const token = Cookies.get("token");
-    
+
     if (!token) {
       return rejectWithValue({
         message: "No authentication token found. Please login again.",
@@ -117,15 +116,12 @@ export const customer = createAsyncThunk<
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
             device_id: "1010l0010l1",
           },
-      params: search
-  ? { search } 
-  : { page, search },
-
-        }
+          params: search ? { search } : { page, search, filter }, // Include sort in params
+        },
       );
       return response.data;
     } catch (error) {
@@ -137,17 +133,20 @@ export const customer = createAsyncThunk<
 
       if (axiosError.response) {
         return rejectWithValue({
-          message: axiosError.response.data.message || "Failed to fetch dashboard data",
+          message:
+            axiosError.response.data.message ||
+            "Failed to fetch dashboard data",
           errors: axiosError.response.data.errors,
         });
       } else if (axiosError.request) {
         return rejectWithValue({
-          message: "No response from server. Please check your network connection.",
+          message:
+            "No response from server. Please check your network connection.",
         });
       }
       return rejectWithValue({
         message: "An unexpected error occurred. Please try again.",
       });
     }
-  }
+  },
 );

@@ -4,7 +4,7 @@ import { IoSearch } from "react-icons/io5";
 
 // Define the SortOption interface
 interface SortOption {
-  value: number;
+  value: any;
   name: string;
 }
 

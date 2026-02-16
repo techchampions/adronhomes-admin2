@@ -7,7 +7,6 @@ import PersonnelModal from "../pages/Personnel/createPersonnelModal";
 import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
 
-
 interface HeaderProps {
   title?: string;
   subtitle?: string;
