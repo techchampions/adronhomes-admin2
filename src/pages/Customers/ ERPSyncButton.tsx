@@ -247,8 +247,8 @@ const ButtonWrapper = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
-`;
 
+`;
 const ResetButton = styled.button`
   padding: 8px 16px;
   background-color: #f0f0f0;
