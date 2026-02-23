@@ -137,8 +137,8 @@ const {id}=useParams<{id:string}>();
     <div className="mb-[52px]">
       <Header
         copyCode={data?.marketer?.referral_code}
-        role={data?.marketer?.referral_code}
-        Name={`${data?.marketer?.first_name || ""} ${data?.marketer?.last_name || ""}`}
+        role={`${data?.marketer?.first_name || ""} ${data?.marketer?.last_name || ""}`}
+        Name={'Marketer Dashboard'}
       />
       <div className="space-y-[30px]">
         <div className="grid lg:grid-cols-4 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">

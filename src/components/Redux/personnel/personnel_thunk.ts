@@ -85,12 +85,12 @@ export const personnels = createAsyncThunk<
     }
 
     // Build query parameters
-    const params: Record<string, any> = { role };
-    if (search) {
-      params.search = search;
-    } else {
-      params.page = currentPage;
-    }
+    const params: Record<string, any> = { role,search, page: currentPage }; // Include page in params
+    // if (search) {
+    //   params.search = search;
+    // } else {
+    //   params.page = currentPage;
+    // }
 
     try {
       const response = await api.get<PersonnelsResponse>(

@@ -7,7 +7,7 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { customer } from "../../components/Redux/customers/customers_thunk";
 import LoadingAnimations from "../../components/LoadingAnimations";
-import { setCustomersSearch } from "../../components/Redux/customers/customers_slice"; // Assuming the slice file is named customers_slice
+import { setCustomersSearch } from "../../components/Redux/customers/customers_slice"; 
 import ExportCustomersModal from "../../components/exportModal/customerExport";
 import { ExportModalRef } from "../../components/exportModal/modalexport";
 
@@ -35,7 +35,7 @@ export default function Customers() {
     }
   };
 const sortOptions = [
-  { value: "customer_code", name: "Sort by Client Code" },
+  { value: "customer code", name: "Sort by Client Code" },
   { value: "newest", name: "Sort by Newest" },
   { value: "oldest", name: "Sort by Oldest" },
 ];
@@ -72,9 +72,11 @@ const sortOptions = [
            sortOptions={sortOptions.map((sortOptions, index) => ({
             value: sortOptions.value,
             name: sortOptions.name,
+
           }))}
             defaultSort={sortOptions.findIndex((option) => option.value === sortOptions[0].value) || 0}
           tabs={tabs}
+          sort={true}
           searchPlaceholder={"Search Clients"}
           activeTab={"Client"}
           onSearch={(value) => dispatch(setCustomersSearch(value))}

@@ -64,6 +64,7 @@ const userId=(id)
         subtitle="  property payments history"
         showSearchAndButton={false}
         history={true}
+    
       />
 
       {/* Stats Cards */}
@@ -86,7 +87,7 @@ const userId=(id)
 
       {/* Table */}
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-        <ReusableTable searchPlaceholder="Search payments..." tabs={tabs} activeTab={activeTab} showTabs={false}     onSearch={handleSearch}>
+        <ReusableTable searchPlaceholder="Search payments..." tabs={tabs} activeTab={activeTab} showTabs={false}     onSearch={handleSearch} >
           {loading && !paymentStats ? (
             <div className="flex justify-center items-center py-16">
               <LoadingAnimations loading={loading} />

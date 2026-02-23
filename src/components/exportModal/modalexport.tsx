@@ -10,7 +10,7 @@ export interface ExportModalRef {
 interface ExportModalProps {
   modalTitle: string;
   description: string;
-  exportType: 'payments' | 'customers';
+  exportType: 'payments' | 'customers' | string;
   onExport: (startDate: string, endDate: string) => void;
   isLoading: boolean;
   error: string | null;

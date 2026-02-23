@@ -111,13 +111,15 @@ export default function Personnel() {
             value: index,
             name: role,
           }))}
-          defaultSort={roles.findIndex((role) => role === option.name)}
+          defaultSort={roles.findIndex((role) => role === role[0]) || 0}
           sort={true}
           showTabs={true}
           showSearchandSort={true}
           onSortChange={(sortOption) => {
             setOption(sortOption);
           }}
+          // showResetButton={false}
+        
         >
           {loading ? (
             <div className="w-full flex items-center justify-center">
