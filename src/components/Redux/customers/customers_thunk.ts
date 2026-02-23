@@ -120,7 +120,7 @@ export const customer = createAsyncThunk<
             identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
             device_id: "1010l0010l1",
           },
-          params: search ? { search } : { page, search, filter }, // Include sort in params
+          params: { page, search, filter }, // Include sort in params
         },
       );
       return response.data;

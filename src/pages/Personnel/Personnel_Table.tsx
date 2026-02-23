@@ -204,7 +204,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
                       onClick={(e) => handleViewDashboard(e, user.id)}
                       className="px-3 py-1.5 bg-[#79B833] text-white text-xs rounded-full hover:bg-[#6aa02e] transition-colors"
                     >
-                      View Dashboard
+                      View Marketer's Dashboard
                     </button>
                   </td>
                   <td 
