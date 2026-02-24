@@ -1,7 +1,11 @@
 // exportCustomersSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { exportCustomers, ExportCustomersResponse } from "./exportCustomersThunk";
+// import { exportCustomers, ExportCustomersResponse } from "./exportCustomersThunk";
 import { RootState } from "../store";
+import {
+  exportPersonnel,
+  ExportPersonnelResponse,
+} from "./exportPersonnelThunk";
 
 interface ExportCustomersState {
   loading: boolean;
@@ -18,8 +22,8 @@ const initialState: ExportCustomersState = {
   downloadUrl: null,
   lastExportDate: null,
 };
-
-const exportCustomersSlice = createSlice({
+// Personnel
+const exportPersonnelSlice = createSlice({
   name: "exportCustomers",
   initialState,
   reducers: {
@@ -38,41 +42,42 @@ const exportCustomersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(exportCustomers.pending, (state) => {
+      .addCase(exportPersonnel.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
         state.downloadUrl = null;
       })
       .addCase(
-        exportCustomers.fulfilled,
-        (state, action: PayloadAction<ExportCustomersResponse>) => {
+        exportPersonnel.fulfilled,
+        (state, action: PayloadAction<ExportPersonnelResponse>) => {
           state.loading = false;
           state.success = action.payload.success;
           state.downloadUrl = action.payload.url;
           state.lastExportDate = new Date().toISOString();
-        }
+        },
       )
-      .addCase(exportCustomers.rejected, (state, action) => {
+      .addCase(exportPersonnel.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to export customers";
+        state.error = action.payload?.message || "Failed to export personnel";
         state.success = false;
         state.downloadUrl = null;
       });
   },
 });
 
-export const { 
-  resetExportState, 
-  clearDownloadUrl, 
-  setLastExportDate 
-} = exportCustomersSlice.actions;
+export const { resetExportState, clearDownloadUrl, setLastExportDate } =
+  exportPersonnelSlice.actions;
 
-export default exportCustomersSlice.reducer;
+export default exportPersonnelSlice.reducer;
 
-
-export const selectExportCustomersLoading = (state: RootState) => state.exportCustomers.loading;
-export const selectExportCustomersError = (state: RootState) => state.exportCustomers.error;
-export const selectExportCustomersSuccess = (state: RootState) => state.exportCustomers.success;
-export const selectCustomersDownloadUrl = (state: RootState) => state.exportCustomers.downloadUrl;
-export const selectCustomersLastExportDate = (state: RootState) => state.exportCustomers.lastExportDate;
+export const selectExportPersonnelLoading = (state: RootState) =>
+  state.exportPersonnel.loading;
+export const selectExportPersonnelError = (state: RootState) =>
+  state.exportPersonnel.error;
+export const selectExportPersonnelSuccess = (state: RootState) =>
+  state.exportPersonnel.success;
+export const selectPersonnelDownloadUrl = (state: RootState) =>
+  state.exportPersonnel.downloadUrl;
+export const selectPersonnelLastExportDate = (state: RootState) =>
+  state.exportPersonnel.lastExportDate;

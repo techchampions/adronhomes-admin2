@@ -766,6 +766,7 @@ export default function CustomerSinglePage() {
       )}
 
       <ProfileCard
+      edith={true}
         profileImage={data.customer.profile_picture || "/unknown.png"}
         name={`${data.customer.first_name} ${data.customer.last_name}`}
         dateJoined={formatDate(data.customer.created_at)}

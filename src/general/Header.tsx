@@ -19,6 +19,9 @@ interface HeaderProps {
   handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
   viewForm?: boolean;
+  personel?: boolean; // Add personel prop
+  onPersonelButtonClick?: () => void; // Add personel button click handler
+  Personnel_Text?: string;
 }
 
 export default function Header({
@@ -31,6 +34,9 @@ export default function Header({
   showSearchAndButton = true,
   viewForm = false,
   handleViewPurchaseFormClick,
+  personel = false, // Default to false
+  onPersonelButtonClick, // Personel button click handler
+  Personnel_Text = "Create Personnel",
 }: HeaderProps) {
   const {
     showBulkModal,
@@ -93,6 +99,13 @@ export default function Header({
     return isPersonnelPage ? "Create Personnel" : buttonText;
   };
 
+  // Handle personel button click
+  const handlePersonelButtonClick = () => {
+    if (onPersonelButtonClick) {
+      onPersonelButtonClick();
+    }
+  };
+
   return (
     <>
       <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between it pt-16 pb-4 px-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
@@ -124,21 +137,17 @@ export default function Header({
         <div className="w-full lg:w-auto flex flex-col lg:flex-row lg:flex-wrap items-center gap-3 lg:gap-4 mt-4 sm:mt-0">
           {showSearchAndButton && (
             <>
-              {/* <div
+              {/* Search input is commented out as in original */}
 
-                className={`relative h-[45px] lg:h-[51px] w-full sm:w-64 lg:w-[410px] rounded-full border transition-all font-[400] ${isSearchFocused
-                  ? "border-[#79B833] shadow-sm"
-                  : "border-[#D8D8D8]"} bg-white overflow-hidden`}
-              >
-                <input
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  className="w-full h-full px-4 lg:px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setIsSearchFocused(false)}
-                />
-
-              </div> */}
+              {/* Personel button - only shows when personel is true */}
+              {personel && (
+                <button
+                  className="text-[#79B833] border-[#79B833] border bg-white   text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap order-first lg:order-none mb-2 lg:mb-0"
+                  onClick={handlePersonelButtonClick}
+                >
+                  {Personnel_Text}
+                </button>
+              )}
 
               <button
                 className={`text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap ${

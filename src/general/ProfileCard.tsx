@@ -1,5 +1,5 @@
+// ProfileCard.tsx
 import React, { useState } from "react";
-import { GoDotFill } from "react-icons/go";
 import MessageModal from "../components/Modals/Massaging";
 import { toast } from "react-toastify";
 import { sendMessage } from "../components/Redux/customers/send_message";
@@ -7,7 +7,10 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../components/Redux/store";
 import ConfirmationModal from "../components/Modals/delete";
 import { deleteUser } from "../components/Redux/customers/delete_customers";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { FiEdit } from "react-icons/fi";
+import EditProfileModal from "../components/Modals/edithProfileModal";
+// import EditProfileModal from "../components/Modals/EditProfileModal";
 
 interface ProfileCardProps {
   loadingdelete: any;
@@ -34,6 +37,7 @@ interface ProfileCardProps {
     sendMessage: string;
     removeClient: string;
   };
+  edith?: boolean;
 }
 
 export default function ProfileCard({
@@ -51,16 +55,16 @@ export default function ProfileCard({
   userImage,
   loading,
   loadingdelete,
+  edith = false,
 }: ProfileCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpendelete, setIsOpendelete] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const dispatch = useDispatch<AppDispatch>();
-
   const navigate = useNavigate();
-  const handleSend = async () => {
-    console.log("Sending message:", message);
 
+  const handleSend = async () => {
     if (!message.trim()) {
       toast.error("Message cannot be empty");
       return;
@@ -75,13 +79,11 @@ export default function ProfileCard({
       const result = await dispatch(sendMessage({ userId, message }));
 
       if (sendMessage.fulfilled.match(result)) {
-        // toast.success(result.payload.message || "Message sent successfully");
         setIsOpen(false);
         setMessage(""); 
+        toast.success("Message sent successfully");
       } else if (sendMessage.rejected.match(result)) {
-        const errorMessage =
-          result.payload?.message || "Failed to send message";
-        // toast.error(errorMessage);
+        toast.error(result.payload?.message || "Failed to send message");
       }
     } catch (error) {
       console.error("Error sending message:", error);
@@ -94,24 +96,32 @@ export default function ProfileCard({
       const result = await dispatch(deleteUser(userId));
 
       if (deleteUser.fulfilled.match(result)) {
-        // toast.success(result.payload.message || "User deleted successfully");
         setIsOpendelete(false);
+        toast.success("User deleted successfully");
         navigate("/customers");
       } else if (deleteUser.rejected.match(result)) {
-        const errorMessage = result.payload?.message || "Failed to delete user";
-        // toast.error(errorMessage);
+        toast.error(result.payload?.message || "Failed to delete user");
       }
     } catch (error) {
       console.error("Error deleting user:", error);
-      // toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
     } finally {
       setIsOpendelete(false);
     }
   };
 
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditModalOpen(false);
+    toast.success("Profile updated successfully");
+  };
+
   return (
     <>
-      <div className="bg-white rounded-[30px] pr-6 pl-6 pt-6  md:pt-0 lg:px-8 lg:pl-[152px] md:pr-[20px] md:pb-[34px] lg:flex md:space-x-8 lg:space-x-[70px] pb-[34px] ">
+      <div className="bg-white rounded-[30px] pr-6 pl-6 pt-6 md:pt-0 lg:px-8 lg:pl-[152px] md:pr-[20px] md:pb-[34px] lg:flex md:space-x-8 lg:space-x-[70px] pb-[34px]">
         <div className="w-full lg:w-[256px] justify-center flex flex-col items-center pt-[34px] mb-8 lg:mb-0 pb-6">
           <img
             src={profileImage}
@@ -133,7 +143,6 @@ export default function ProfileCard({
         <div className="flex flex-col w-full">
           <div className="bg-[#F5F5F5] px-4 md:px-[48px] pt-[31px] pb-[34px] flex flex-col sm:flex-row justify-between gap-4 rounded-b-[40px] rounded-t-[40px] lg:rounded-t-none lg:rounded-b-[40px] mb-[20px]">
             <div className="grid lg:grid-cols-3 gap-4 w-full">
-              {/* Viewed Properties */}
               <div className="flex flex-col items-center max-w-full">
                 <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
                   {stats.viewedProperties}
@@ -142,8 +151,6 @@ export default function ProfileCard({
                   Viewed Properties
                 </h1>
               </div>
-
-              {/* Saved Properties */}
               <div className="flex flex-col items-center max-w-full">
                 <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
                   {stats.savedProperties}
@@ -152,8 +159,6 @@ export default function ProfileCard({
                   Saved Properties
                 </h1>
               </div>
-
-              {/* Owned Properties */}
               <div className="flex flex-col items-center max-w-full">
                 <p className="text-[32px] font-[350] mb-[8px] truncate w-full text-center">
                   {stats.ownedProperties}
@@ -169,15 +174,12 @@ export default function ProfileCard({
             <div className="md:text-base text-sm font-[350] text-dark mb-2 gap-2 flex">
               <p className="text-[#767676]">Customer Code: </p>
               <div className="grid grid-cols-2 gap-x-2 truncate">
-                <span className="md:text-base text-sm  font-[350] text-dark truncate">
+                <span className="md:text-base text-sm font-[350] text-dark truncate">
                   {paymentInfo.amount}
                 </span>
-                {/* <span className="md:text-base text-sm  font-[350] text-dark truncate">
-                  {paymentInfo.date}
-                </span> */}
               </div>
             </div>
-            <div className="grid grid-cols-2  max-w-full mb-4">
+            <div className="grid grid-cols-2 max-w-full mb-4">
               <span className="text-[#767676] font-[325] md:text-base text-sm truncate">
                 Marketer in charge:
               </span>
@@ -187,39 +189,52 @@ export default function ProfileCard({
             </div>
             <div className="flex flex-col sm:flex-row gap-4 mt-5">
               <button
-                className="bg-[#272727] text-white font-bold text-sm rounded-[30px] py-[14px] px-[44px]"
+                className="bg-[#272727] text-white font-bold text-sm rounded-[30px] py-[14px] px-[44px] hover:bg-gray-800 transition-colors"
                 onClick={() => setIsOpen(true)}
               >
                 {buttonTexts.sendMessage}
               </button>
-              {/* <button
-                className="bg-white text-[#D70E0E] font-bold text-sm rounded-[30px] py-[14px] px-[44px] border border-[#D70E0E]"
-                onClick={() => setIsOpendelete(true)}
-              >
-                {buttonTexts.removeClient}
-              </button> */}
+              
+              {edith && (
+                <button
+                  onClick={handleEditClick}
+                  className="bg-white text-[#272727] border-2 border-[#272727] font-bold text-sm rounded-[30px] py-[14px] px-[44px] hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <FiEdit className="text-base" />
+                  <span>Edit</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
-        <MessageModal
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          handleSend={() => handleSend()}
-          message={message}
-          setMessage={setMessage}
-          userImage={userImage}
-          userNmae={userNmae}
-          loading={loading}
-        />
-        <ConfirmationModal
-          isOpen={isOpendelete}
-          title={"Delete User"}
-          description={`Are you sure you want to delete ${name}`}
-          onClose={() => setIsOpendelete(false)}
-          onConfirm={handleDelete}
-          loading={loadingdelete}
-        />
       </div>
+
+      <MessageModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleSend={handleSend}
+        message={message}
+        setMessage={setMessage}
+        userImage={userImage}
+        userNmae={userNmae}
+        loading={loading}
+      />
+
+      <ConfirmationModal
+        isOpen={isOpendelete}
+        title="Delete User"
+        description={`Are you sure you want to delete ${name}?`}
+        onClose={() => setIsOpendelete(false)}
+        onConfirm={handleDelete}
+        loading={loadingdelete}
+      />
+
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        userId={userId}
+        onSuccess={handleEditSuccess}
+      />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import UsersTableComponent from "./Personnel_Table";
@@ -12,6 +12,8 @@ import {
   setPersonnelSearch,
   setCurrentPage,
 } from "../../components/Redux/personnel/personnel_slice";
+import ExportPersonnelModal from "../../components/exportModal/PersonnelExport";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 const getRoleName = (roleId: number): string => {
   switch (roleId) {
@@ -51,7 +53,12 @@ const roles: string[] = [
 export default function Personnel() {
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
-
+  const PersonnelModalRef = useRef<ExportModalRef>(null);
+  const openPersonnelModal = () => {
+    if (PersonnelModalRef.current) {
+      PersonnelModalRef.current.openModal();
+    }
+  };
   const dispatch = useDispatch<AppDispatch>();
   const { data, error, loading, search, pagination } = useSelector(
     (state: RootState) => state.getpersonnel,
@@ -98,6 +105,10 @@ export default function Personnel() {
       <Header
         title="Personnel"
         subtitle="Manage the list of personnel and their access"
+          //  onButtonClick={}
+           personel={true}
+           Personnel_Text="Export"
+           onPersonelButtonClick={()=>{openPersonnelModal()}}
       />
 
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] relative">
@@ -137,6 +148,7 @@ export default function Personnel() {
           )}
         </ReusableTable>
       </div>
+       <ExportPersonnelModal ref={PersonnelModalRef} />
     </div>
   );
 }

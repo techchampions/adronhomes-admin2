@@ -5,21 +5,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   resetExportState, 
   clearDownloadUrl,
-  selectExportCustomersLoading as selectExportLoading,
-  selectExportCustomersError as selectExportError,
-  selectExportCustomersSuccess as selectExportSuccess,
-  selectCustomersDownloadUrl as selectDownloadUrl,
-  selectCustomersLastExportDate as selectLastExportDate
-}  from '../Redux/export/exportCustomersSlice';
-import { exportCustomers } from '../Redux/export/exportCustomersThunk';
+  selectExportPersonnelLoading as selectExportLoading,
+  selectExportPersonnelError as selectExportError,
+  selectExportPersonnelSuccess as selectExportSuccess,
+  selectPersonnelDownloadUrl as selectDownloadUrl,
+  selectPersonnelLastExportDate as selectLastExportDate
+}  from '../Redux/export/exportPersonnelSlice';
+import { exportPersonnel } from '../Redux/export/exportPersonnelThunk';
 import ExportModal, { ExportModalRef } from './modalexport';
 
-interface ExportCustomersModalProps {
+interface ExportPersonnelModalProps {
   ref: React.RefObject<ExportModalRef | null>
 
 }
 
-const ExportPersonnelModal: React.FC<ExportCustomersModalProps> = React.forwardRef((props, ref) => {
+const ExportPersonnelModal: React.FC<ExportPersonnelModalProps> = React.forwardRef((props, ref) => {
   const dispatch = useDispatch();
   
   // Redux selectors
@@ -32,7 +32,7 @@ const ExportPersonnelModal: React.FC<ExportCustomersModalProps> = React.forwardR
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
   const handleExport = (startDate: string, endDate: string) => {
-    dispatch(exportCustomers({
+    dispatch(exportPersonnel({
       start_date: startDate,
       end_date: endDate
     }) as any);
