@@ -766,6 +766,7 @@ export default function CustomerSinglePage() {
       )}
 
       <ProfileCard
+        edith={true}
         profileImage={data.customer.profile_picture || "/unknown.png"}
         name={`${data.customer.first_name} ${data.customer.last_name}`}
         dateJoined={formatDate(data.customer.created_at)}
@@ -789,8 +790,14 @@ export default function CustomerSinglePage() {
         userNmae={`${data.customer.first_name} ${data.customer.last_name}`}
         userImage={data.customer.profile_picture}
         loading={messagingcustomerloading}
-        loadingdelete={loadingdelete}
-      />
+        loadingdelete={loadingdelete} handleSuccess={() => dispatch(
+        fetchCustomerById({
+          customerId: Number(id),
+          activePage: activePlanPagination.currentPage,
+          completedPage: completedPropertyPagination.currentPage,
+          cittaContractPage: cittaContractPagination.currentPage,
+        }),
+      )}      />
 
       {/* ERP Sync Button */}
       {/* <ERPSyncButton 

@@ -70,76 +70,159 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
+// ─── Helper: Generate PDF Blob (reusable for both download & share) ───
+const generatePdfBlob = async (): Promise<Blob | null> => {
+  if (!pdfRef.current) return null;
 
-  const generatePdf = async () => {
-    if (!pdfRef.current) return null;
-    setIsGenerating(true);
+  setIsGenerating(true);
 
-    try {
-      const imgData = await domtoimage.toPng(pdfRef.current, {
-        quality: 1,
-        bgcolor: "#ffffff",
-        cacheBust: true,
-        width: pdfRef.current.offsetWidth * 2,
-        height: pdfRef.current.offsetHeight * 2,
-        style: {
-          transform: "scale(2)",
-          transformOrigin: "top left",
-          width: `${pdfRef.current.offsetWidth}px`,
-          height: `${pdfRef.current.offsetHeight}px`,
-        },
-      });
-
-      const pdf = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-
-      const img = new Image();
-      img.src = imgData;
-      await new Promise((resolve) => (img.onload = resolve));
-
-      const aspectRatio = img.naturalWidth / img.naturalHeight;
-      let finalWidth = pdfWidth - 40;
-      let finalHeight = finalWidth / aspectRatio;
-      if (finalHeight > pdfHeight - 40) {
-        finalHeight = pdfHeight - 40;
-        finalWidth = finalHeight * aspectRatio;
-      }
-
-      pdf.addImage(imgData, "PNG", (pdfWidth - finalWidth) / 2, 20, finalWidth, finalHeight);
-      pdf.save("transaction-receipt.pdf");
-
-      return pdf;
-    } catch (err) {
-      console.error("PDF generation error:", err);
-    } finally {
-      setIsGenerating(false);
-    }
+  const element = pdfRef.current;
+  const originalStyles = {
+    height: element.style.height,
+    maxHeight: element.style.maxHeight,
+    overflow: element.style.overflow,
+    overflowY: element.style.overflowY,
+    overflowX: element.style.overflowX,
+    position: element.style.position || '',
   };
 
-  const handleDownload = async () => {
-    await generatePdf();
-  };
+  try {
+    // Expand to capture full scrollable content
+    element.style.height = "auto";
+    element.style.maxHeight = "none";
+    element.style.overflow = "visible";
+    element.style.overflowY = "visible";
+    element.style.overflowX = "visible";
 
-  const handleShare = async () => {
-    const pdf = await generatePdf();
-    if (!pdf) return;
+    // Wait for reflow
+    await new Promise((resolve) => setTimeout(resolve, 120));
 
-    const pdfBlob = pdf.output("blob");
-    const file = new File([pdfBlob], "transaction-receipt.pdf", {
-      type: "application/pdf",
+    const scale = 2;
+
+    const dataUrl = await domtoimage.toPng(element, {
+      quality: 0.98,
+      bgcolor: "#ffffff",
+      cacheBust: true,
+      width: element.scrollWidth * scale,
+      height: element.scrollHeight * scale,
+      style: {
+        transform: `scale(${scale})`,
+        transformOrigin: "top left",
+        width: `${element.scrollWidth}px`,
+        height: `${element.scrollHeight}px`,
+      },
     });
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ title: "Transaction Receipt", files: [file] });
-      } catch (err) {
-        console.error("Share failed:", err);
-      }
-    } else {
-      alert("Sharing not supported on this device. PDF downloaded instead.");
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: "a4",
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const margin = 30;
+    const maxContentWidth = pdfWidth - margin * 2;
+
+    const img = new Image();
+    img.src = dataUrl;
+    await new Promise((resolve) => (img.onload = resolve));
+
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    let renderWidth = maxContentWidth;
+    let renderHeight = renderWidth / imgRatio;
+
+    if (renderHeight > pdfHeight - margin * 2) {
+      renderHeight = pdfHeight - margin * 2;
+      renderWidth = renderHeight * imgRatio;
     }
+
+    const x = (pdfWidth - renderWidth) / 2;
+    const y = margin;
+
+    pdf.addImage(img, "PNG", x, y, renderWidth, renderHeight);
+
+    // Return blob instead of saving directly
+    return pdf.output('blob');
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    alert("Failed to generate receipt. Please try again.");
+    return null;
+  } finally {
+    // Always restore styles
+    element.style.height = originalStyles.height;
+    element.style.maxHeight = originalStyles.maxHeight;
+    element.style.overflow = originalStyles.overflow;
+    element.style.overflowY = originalStyles.overflowY;
+    element.style.overflowX = originalStyles.overflowX;
+    element.style.position = originalStyles.position;
+
+    setIsGenerating(false);
+  }
+};
+
+// ─── Download: generates → saves ───
+const handleDownload = async () => {
+  const blob = await generatePdfBlob();
+  if (!blob) return;
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `receipt-${paymentData.reference || "transaction"}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url); // clean up
+};
+
+// ─── Share: generates → tries native share → fallback to download ───
+const handleShare = async () => {
+  if (!pdfRef.current) return;
+
+  const blob = await generatePdfBlob();
+  if (!blob) return;
+
+  const fileName = `receipt-${paymentData.reference || "transaction"}.pdf`;
+
+  const file = new File([blob], fileName, {
+    type: 'application/pdf',
+  });
+
+  const shareData = {
+    title: "Transaction Receipt",
+    text: `Here's the receipt for reference ${paymentData.reference || "transaction"}.`,
+    files: [file],
   };
+
+  // Check if we can share files
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share(shareData);
+      // Success — no need to do anything else
+      return;
+    } catch (err: any) {
+      // User cancelled or share failed — don't alert on cancel (common)
+      if (err.name !== 'AbortError') {
+        console.error("Share failed:", err);
+        alert("Sharing failed. The PDF has been downloaded instead.");
+      }
+    }
+  }
+
+  // Fallback: download if share not supported or failed
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  alert("Sharing not supported on this device/browser. PDF downloaded instead.");
+};
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-[rgba(102,102,102,0.2)] p-2 sm:p-4 scrollbar-hide">
