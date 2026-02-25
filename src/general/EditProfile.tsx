@@ -7,8 +7,8 @@ import { toast } from "react-toastify";
 import Button from "../components/input/Button";
 // import InputField from "../components/input/inputtext";
 import ProfilePictureField from "../components/Modals/ProfilePictureField";
-import { selectUser, selectUpdateLoading, selectUpdateError, selectUpdateSuccess, resetUpdateState } from "../components/Redux/profileUpdate/profileSlice";
-import { updateUserProfile } from "../components/Redux/profileUpdate/profileThunk";
+import { selectUser, selectUpdateLoading, selectUpdateError, selectUpdateSuccess, resetUpdateState, updateUserProfile } from "../components/Redux/profileUpdate/profileSlice";
+// import { updateUserProfile } from "../components/Redux/profileUpdate/profileThunk";
 import { AppDispatch } from "../components/Redux/store";
 import SmallLoader from "../components/SmallLoader";
 import InputField from "../components/Modals/InputField";
@@ -27,11 +27,12 @@ const EditProfile: React.FC<EditProfileProps> = ({ onSuccess }) => {
 
   useEffect(() => {
     if (updateSuccess) {
-      toast.success("Profile updated successfully");
+    //   toast.success("Profile updated successfully");
       dispatch(resetUpdateState());
-      if (onSuccess) {
-        onSuccess();
-      }
+    //   if (updateSuccess) {
+        onSuccess!();
+    //   }
+
     }
   }, [updateSuccess, dispatch, onSuccess]);
 
@@ -234,14 +235,16 @@ const EditProfile: React.FC<EditProfileProps> = ({ onSuccess }) => {
               >
                 Cancel
               </button>
-              <Button
-                label={updateLoading ? "Saving..." : "Save Changes"}
-                className="bg-black text-sm
+              <button
+                // label=
+                className="bg-black text-sm text-white
                  py-4 rounded-[30px]  hover:bg-gray-800 transition-colors w-1/2"
                 type="submit"
-                isLoading={updateLoading}
+                // isLoading={updateLoading}
                 disabled={updateLoading}
-              />
+              >
+{updateLoading ? "Saving..." : "Save Changes"}
+              </button>
             </div>
           </Form>
         )}

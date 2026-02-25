@@ -13,6 +13,7 @@ import EditProfileModal from "../components/Modals/edithProfileModal";
 // import EditProfileModal from "../components/Modals/EditProfileModal";
 
 interface ProfileCardProps {
+  handleSuccess: () => void;
   loadingdelete: any;
   loading: any;
   profileImage: string;
@@ -56,6 +57,7 @@ export default function ProfileCard({
   loading,
   loadingdelete,
   edith = false,
+  handleSuccess
 }: ProfileCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpendelete, setIsOpendelete] = useState(false);
@@ -116,7 +118,8 @@ export default function ProfileCard({
 
   const handleEditSuccess = () => {
     setIsEditModalOpen(false);
-    toast.success("Profile updated successfully");
+    // toast.success("Profile updated successfully");
+    handleSuccess(); // Call the parent component's success handler to refresh data if needed
   };
 
   return (
@@ -234,6 +237,7 @@ export default function ProfileCard({
         onClose={() => setIsEditModalOpen(false)}
         userId={userId}
         onSuccess={handleEditSuccess}
+
       />
     </>
   );
