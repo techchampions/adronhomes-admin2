@@ -10,6 +10,7 @@ import { deleteUser } from "../components/Redux/customers/delete_customers";
 import { useNavigate } from "react-router-dom";
 import { FiEdit } from "react-icons/fi";
 import EditProfileModal from "../components/Modals/edithProfileModal";
+import { BASE_URL } from "../components/Redux/UpdateContract/viewcontractFormDetails";
 // import EditProfileModal from "../components/Modals/EditProfileModal";
 
 interface ProfileCardProps {
@@ -127,7 +128,7 @@ export default function ProfileCard({
       <div className="bg-white rounded-[30px] pr-6 pl-6 pt-6 md:pt-0 lg:px-8 lg:pl-[152px] md:pr-[20px] md:pb-[34px] lg:flex md:space-x-8 lg:space-x-[70px] pb-[34px]">
         <div className="w-full lg:w-[256px] justify-center flex flex-col items-center pt-[34px] mb-8 lg:mb-0 pb-6">
           <img
-            src={profileImage}
+            src={ BASE_URL + profileImage}
             alt={name}
             className="w-[86px] h-[86px] rounded-full mb-[26px]"
           />

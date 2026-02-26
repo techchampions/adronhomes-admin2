@@ -12,12 +12,14 @@ import { selectUser, selectUpdateLoading, selectUpdateError, selectUpdateSuccess
 import { AppDispatch } from "../components/Redux/store";
 import SmallLoader from "../components/SmallLoader";
 import InputField from "../components/Modals/InputField";
-
+import { BASE_URL } from "../components/Redux/UpdateContract/viewcontractFormDetails";
+// const BASE_URL = 'https://your-api-domain.com';
 interface EditProfileProps {
   onSuccess?: () => void;
+  oncancel?:()=>void;
 }
 
-const EditProfile: React.FC<EditProfileProps> = ({ onSuccess }) => {
+const EditProfile: React.FC<EditProfileProps> = ({ onSuccess, oncancel }) => {
   const dispatch = useDispatch<AppDispatch>();
   
   const user = useSelector(selectUser);
@@ -62,7 +64,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onSuccess }) => {
     lga: user.lga || "",
     address: user.address || "",
     notification_enabled: user.notification_enabled || 1,
-    profilePicture: user.profile_picture || "",
+    profilePicture: BASE_URL + (user.profile_picture || ""),
   };
 
   const validationSchema = Yup.object({
@@ -149,7 +151,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onSuccess }) => {
                   type="email"
                   placeholder="Enter email"
                   isRequired={true}
-                  isReadOnly={true}
+                  // isReadOnly={true}
                 />
                 <InputField
                   name="phone"
@@ -231,7 +233,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ onSuccess }) => {
               <button
             
                 className="font-medium px-6 py-4 rounded-[30px] text-base   text-red-500 transition-colors w-1/2"
-                onClick={onSuccess}
+                onClick={oncancel}
               >
                 Cancel
               </button>

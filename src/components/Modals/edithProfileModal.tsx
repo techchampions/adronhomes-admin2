@@ -43,6 +43,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     handleClose();
   };
 
+    const handleCancel = () => {
+  
+    handleClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -64,7 +69,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               <SmallLoader />
             </div>
           ) : user ? (
-            <EditProfile onSuccess={handleSuccess} />
+            <EditProfile onSuccess={handleSuccess} oncancel={handleCancel} />
           ) : (
             <div className="text-center p-8 text-gray-500">
               Failed to load user data

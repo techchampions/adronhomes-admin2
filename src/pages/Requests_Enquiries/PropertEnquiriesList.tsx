@@ -61,6 +61,9 @@ export default function PropertyEnquiriesList({ data }: EnquiriesListProps) {
                   <td className="py-4 px-2 text-dark text-xs truncate max-w-[140px] font-medium">
                     {enquiry.phone}
                   </td>
+                       <td className="py-4 px-2 text-dark text-xs truncate max-w-[140px] font-medium">
+                    {enquiry.discovery_method}
+                  </td> 
                 </tr>
               ))}
             </tbody>

@@ -165,7 +165,7 @@ export const updateUserProfile = createAsyncThunk(
     try {
       console.log("Updating profile for user:", userId);
       
-      const response = await api.put(
+      const response = await api.post(
         `${BASE_URL}/api/admin/customer/${userId}/update`,
         data,
         {
