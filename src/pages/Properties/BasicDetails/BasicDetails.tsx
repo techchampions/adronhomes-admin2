@@ -19,7 +19,7 @@ import { formatToNaira } from "../../../utils/formatcurrency";
 import { AiOutlineUpload } from "react-icons/ai";
 import { MdClose } from "react-icons/md";
 
-// Import the Redux actions and selectors
+// Import the Redux actions and selectors for countries
 import {
   fetchAllCountries,
   fetchCountryStates,
@@ -33,23 +33,27 @@ import {
   selectLoadingStates,
   selectErrorStates,
 } from "../../../components/Redux/country/countrythunkand slice";
+
+// Import property categories Redux
+
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 import MultipleFileUploadField from "../../../components/input/multiplefile";
-
-
+import { fetchPropertyCategories } from "../../../components/Redux/Properties/propertycategory/propertycategorthunk";
 
 // Main BasicDetails component
 const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
-  const { formData, setBasicDetails, setSales,selectedPropertyId,previousPropType} = useContext(PropertyContext)!;
+  const { formData, setBasicDetails, setSales, selectedPropertyId, previousPropType } = useContext(PropertyContext)!;
   const dispatch = useDispatch<AppDispatch>();
-    // const [propertyFiles, setPropertyFiles] = useState<any[]>(
-    //   formData.basicDetails.propertyFiles || []
-    // );
   
-  // Get data from Redux store
+  // Get countries data from Redux store
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
+  
+  // Get property categories from Redux store
+  const { categories: propertyCategories, loading: categoriesLoading, error: categoriesError } = useSelector(
+    (state: RootState) => state.propertyCategories
+  );
 
   const propertyTypeOptions = [
     { value: "2", label: "Residential" },
@@ -57,10 +61,13 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     { value: "4", label: "Commercial" },
   ];
 
-  const categoryOptions = [
-    { value: "1", label: "Adron Court" },
-    { value: "2", label: "Vidco Series" },
-  ];
+  // Create category options from Redux data
+  const categoryOptions = useMemo(() => {
+    return (propertyCategories || []).map((category: any) => ({
+      value: category.id.toString(),
+      label: category.category_name
+    }));
+  }, [propertyCategories]);
 
   const purposeOptions = [
     { value: "sale", label: "Sale" },
@@ -68,7 +75,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
   ];
 
   const validationSchema = Yup.object().shape({
-
+    // Add your validation schema here
   });
 
   const formik = useFormik({
@@ -76,7 +83,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       ...formData.basicDetails,
       category_id: formData.basicDetails.category_id || "",
       purpose: formData.basicDetails.purpose || [],
-       propertyFiles: formData.basicDetails.propertyFiles || [],
+      propertyFiles: formData.basicDetails.propertyFiles || [],
     },
     validationSchema,
     onSubmit: (values) => {
@@ -115,7 +122,6 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     [lgas]
   );
 
-
   const handlePurposeChange = (value: string) => {
     const normalized = value.toLowerCase();
     formik.setFieldValue("purpose", [normalized]);
@@ -144,8 +150,14 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
     isValid: formik.isValid,
   }));
 
+  // Fetch countries on component mount
   useEffect(() => {
     dispatch(fetchAllCountries());
+  }, [dispatch]);
+
+  // Fetch property categories on component mount
+  useEffect(() => {
+    dispatch(fetchPropertyCategories());
   }, [dispatch]);
 
   useEffect(() => {
@@ -188,10 +200,13 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         onChange={formik.handleChange}
         error={formik.touched.propertyName && formik.errors.propertyName}
       />
- {selectedPropertyId&&<p className="text-base text-black">
-  <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
-</p>
-}
+      
+      {selectedPropertyId && (
+        <p className="text-base text-black">
+          <span className="text-lg font-bold">Previous Property Type:</span> {previousPropType}
+        </p>
+      )}
+
       <EnhancedOptionInputField
         label="Property Type"
         placeholder="Select property type"
@@ -206,15 +221,23 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
 
       <EnhancedOptionInputField
         label="Category"
-        placeholder="Select category"
+        placeholder={categoriesLoading ? "Loading categories..." : "Select category"}
         name="category_id"
         value={formik.values.category_id}
         onChange={(value) => formik.setFieldValue("category_id", value)}
         options={categoryOptions}
         dropdownTitle="Categories"
         error={formik.touched.category_id && formik.errors.category_id}
-        isSearchable={false}
+        isLoading={categoriesLoading}
+        isSearchable={true}
       />
+
+      {/* Display category error if any */}
+      {categoriesError && (
+        <div className="text-red-500 text-sm mt-1">
+          Error loading categories: {categoriesError}
+        </div>
+      )}
 
       <InputField
         label="Price"
@@ -231,7 +254,7 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
       />
 
       <InputField
-               label="Subscription Form"
+        label="Subscription Form"
         placeholder="Enter Subscription "
         name="initialDeposit"
         value={formatToNaira(formik.values.initialDeposit)}
@@ -319,12 +342,12 @@ const BasicDetails = forwardRef<BasicDetailsHandles>((_, ref) => {
         name="propertyFiles"
         multiple={true}
         onChange={(files) => {
-          // Update Formik state directly instead of using local state
           formik.setFieldValue("propertyFiles", files);
         }}
         value={formik.values.propertyFiles || []} 
         error={formik.touched.propertyFiles && formik.errors.propertyFiles}
       />
+      
       {errors.countries && (
         <div className="text-red-500 text-sm">
           Error loading countries: {errors.countries.message}
