@@ -273,7 +273,7 @@ export default function EditProperty() {
           state: property.state || "",
           lga: property.lga || "N/A",
           category: property.category || "estate",
-          category_id: property.category_id || "",
+          category_id: property.category_id?.toString() || "",
           propertyFiles: property.property_files,
         });
       }

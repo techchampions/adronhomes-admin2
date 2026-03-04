@@ -75,7 +75,6 @@ import UserPaymentsPage from "./pages/Transactions/UserPaymentsPage";
 import SettingsCard from "./marketer/SettingsCard";
 import ResetCard from "./components/Modals/settings/changepassword";
 import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
-// import InfoTechSidebar from "./components/ItAdmin/sideNav";
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
@@ -101,7 +100,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     location.pathname !== "/" && location.pathname !== "/login-marketer";
 
   const isinfotech = location.pathname.startsWith("/info-tech");
-  // const marketer_login=
+  
   return (
     <div className="flex">
       {shouldShowSidebar && (
@@ -128,6 +127,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="w-full">{children}</div>
     </div>
   );
+};
+
+// Error page wrapper that maintains the sidebar based on URL
+const ErrorPageWrapper = ({ children }: { children: ReactNode }) => {
+  return <>{children}</>;
 };
 
 const App = () => {
@@ -176,7 +180,7 @@ const App = () => {
                 />
                 <Route path="/properties" element={<Properties />} />
                 <Route path="/personnel" element={<Personnel />} />
-                 <Route path="/personnel/:id" element={<PersonnelMarketersDashboard />} />
+                <Route path="/personnel/:id" element={<PersonnelMarketersDashboard />} />
                 <Route path="/contracts" element={<Contract />} />
                 <Route
                   path="/contracts/details/:user_id/:plan_id"
@@ -264,38 +268,42 @@ const App = () => {
                 />
                 <Route path="/properties/form" element={<General />} />
 
-                <Route path="error-500" element={<Error500 />} />
+                {/* Error Routes - Using the same URL matching logic */}
+                <Route path="/error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
 
                 {/* Marketer Routes */}
-                <Route element={<AuthGuard />}>
-                  <Route path="/marketer" element={<MarketersDashboard />} />
+                <Route path="/marketer">
+                  <Route index element={<MarketersDashboard />} />
                   <Route
-                    path="marketer-customer"
+                    path="customer"
                     element={<MarketerCustomer />}
                   />
                   <Route
-                    path="marketer-payment/:plan_id/:user_id"
+                    path="payment/:plan_id/:user_id"
                     element={<MarketerInvoice />}
                   />
+                  <Route path="settings" element={<SettingsCard />} />
+                  {/* Marketer Error Pages */}
                   <Route path="error-500" element={<Error500 />} />
                   <Route path="*" element={<Error404 />} />
                 </Route>
 
                 {/* Director Routes */}
-                <Route element={<AuthGuard />}>
-                  <Route path="/director" element={<DirectorsDashboard />} />
+                <Route path="/director">
+                  <Route index element={<DirectorsDashboard />} />
+                  {/* Director Error Pages */}
                   <Route path="error-500" element={<Error500 />} />
                   <Route path="*" element={<Error404 />} />
                 </Route>
 
                 {/* Payment Routes */}
-                <Route path="/payments" element={<AuthGuard />}>
+                <Route path="/payments">
+                  <Route index element={<Payment />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="customers" element={<Customers />} />
-                  <Route path="payments" element={<Payment />} />
                   <Route
-                    path="payments/status/:paymentId"
+                    path="status/:paymentId"
                     element={<PaymentById />}
                   />
                   <Route path="contracts" element={<Contract />} />
@@ -327,46 +335,35 @@ const App = () => {
                     path="customers/payment/:user_id/:plan_id"
                     element={<Customers_payment />}
                   />
+                  {/* Payment Error Pages */}
                   <Route path="error-500" element={<Error500 />} />
                   <Route path="*" element={<Error404 />} />
                 </Route>
               </Route>
 
-              {/* HR Routes (Unprotected) */}
-              <Route element={<AuthGuard />}>
-                <Route path="/human-resources" element={<HRDashboard />} />
+              {/* HR Routes */}
+              <Route path="/human-resources">
+                <Route index element={<HRDashboard />} />
                 <Route path="view-job/:jobId" element={<SingleJob />} />
+                {/* HR Error Pages */}
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
-              <Route path="/human-resources" element={<HRDashboard />} />
-              <Route
-                path="/human-resources/view-job/:jobId"
-                element={<SingleJob />}
-              />
-              <Route path="/human-resources" element={<HRDashboard />} />
-              <Route
-                path="/human-resources/view-job/:jobId"
-                element={<SingleJob />}
-              />
-              <Route path="/human-resources" element={<HRDashboard />} />
-              <Route path="/human-resources" element={<HRDashboard />} />
 
-              {/* Legal Routes (Unprotected) */}
-              <Route path="/legal" element={<AuthGuard />}>
+              {/* Legal Routes */}
+              <Route path="/legal">
                 <Route index element={<Page />} />
                 <Route
                   path="contracts/details/:user_id/:plan_id"
                   element={<LegalContractInvoice />}
                 />
+                {/* Legal Error Pages */}
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
-              {/* user wallet */}
-              <Route path="wallet-Transactions" element={<UserWallet />} />
 
-              {/* Client Routes (Unprotected) */}
-              <Route path="/client" element={<AuthGuard />}>
+              {/* Client Routes */}
+              <Route path="/client">
                 <Route
                   path="partnership-requests"
                   element={<ClientsPartnership />}
@@ -398,12 +395,13 @@ const App = () => {
                   path="contracts/details/:user_id/:plan_id"
                   element={<ContractInvoice />}
                 />
+                {/* Client Error Pages */}
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
 
-              {/* Info-Tech Route Group */}
-              <Route path="/info-tech" element={<AuthGuard />}>
+              {/* Info-Tech Routes */}
+              <Route path="/info-tech">
                 <Route index element={<Dashboard_It />} />
                 {/* Requests & Enquiries Routes */}
                 <Route
@@ -417,7 +415,6 @@ const App = () => {
                 <Route path="settings/reset-password" element={<ResetCard />} />
                 {/* Settings Routes */}
                 <Route path="settings" element={<Settings />} />
-
                 <Route path="settings/sliders" element={<SliderSettings />} />
                 <Route
                   path="settings/page-headers"
@@ -452,12 +449,15 @@ const App = () => {
                   path="settings/add-account"
                   element={<AccountDetails />}
                 />
-
+                {/* Info-Tech Error Pages */}
                 <Route path="error-500" element={<Error500 />} />
                 <Route path="*" element={<Error404 />} />
               </Route>
 
-              {/* Top-Level Catch-All for Unmatched Routes */}
+              {/* User Wallet */}
+              <Route path="/wallet-Transactions" element={<UserWallet />} />
+
+              {/* Global 404 - Only matches routes not caught by specific role 404s */}
               <Route path="*" element={<Error404 />} />
             </Routes>
           </AppLayout>
