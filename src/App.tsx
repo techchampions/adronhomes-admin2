@@ -632,6 +632,7 @@ const App = () => {
 
             {/* Client Routes */}
             <Route path="/client" element={<AuthGuard />}>
+            <Route index element={<Navigate to="/client/customers" replace />} />
               <Route path="partnership-requests" element={
                 <AppLayout>
                   <ClientsPartnership />
