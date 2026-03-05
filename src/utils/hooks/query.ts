@@ -98,10 +98,10 @@ export const useGetPropertyRequest = (page: number, director_id?: number) => {
     queryFn: () => getPropertyRequest(page, director_id),
   });
 };
-export const useGetPropertyRequestByID = (id: number) => {
+export const useGetPropertyRequestByID = (id: number, page: number) => {
   return useQuery<PropertyByIdRequestsResponse>({
-    queryKey: ["property-requests", id],
-    queryFn: () => getPropertyRequestByID(id),
+    queryKey: ["property-requests", id, page],
+    queryFn: () => getPropertyRequestByID(id, page),
   });
 };
 
