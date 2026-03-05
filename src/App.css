@@ -88,3 +88,18 @@ body {
   font-family: var(--font-family-gotham);
   font-weight: 400;
 }
+/* Add to your global CSS file (e.g., index.css or App.css) */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
