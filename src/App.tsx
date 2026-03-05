@@ -275,6 +275,11 @@ const AppLayout = ({ children, hideSidebar = false }: AppLayoutProps) => {
   );
 };
 
+// Error page wrapper that maintains the sidebar based on URL
+const ErrorPageWrapper = ({ children }: { children: ReactNode }) => {
+  return <>{children}</>;
+};
+
 const App = () => {
   const {
     formData,
