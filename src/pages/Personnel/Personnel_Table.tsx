@@ -51,14 +51,14 @@ const roleRoutes: Record<number, string> = {
 
 // Role display names for buttons
 const roleButtonText: Record<number, string> = {
-  1: "View Admin Dashboard",
-  2: "View Marketer Dashboard",
-  3: "View Director Dashboard",
-  4: "View Payments Dashboard",
-  5: "View HR Dashboard",
-  6: "View Legal Dashboard",
-  7: "View IT Dashboard",
-  8: "View Client Dashboard",
+  1: "Log into Admin Dashboard",
+  2: "Log into Marketer Dashboard",
+  3: "Log into Director Dashboard",
+  4: "Log into Payments Dashboard",
+  5: "Log into HR Dashboard",
+  6: "Log into Legal Dashboard",
+  7: "Log into IT Dashboard",
+  8: "Log into Client Dashboard",
 };
 
 export default function UsersTableComponent({ userData }: UsersTableProps) {
@@ -179,7 +179,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
       storeOriginalToken();
 
       // Show loading toast
-      const loadingToast = toast.loading(`Impersonating user...`);
+      const loadingToast = toast.loading(`Logging in as a user...`);
 
       const result = await dispatch(impersonateUser(userId)).unwrap();
 
@@ -204,7 +204,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
 
         // Update toast
         toast.update(loadingToast, {
-          render: "Impersonation successful! Redirecting...",
+          render: "Login successful! Redirecting...",
           type: "success",
           isLoading: false,
           autoClose: 2000,
@@ -227,8 +227,8 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
         }, 1500); // Delay to show success message
       }
     } catch (error: any) {
-      console.error("Impersonation failed:", error);
-      toast.error(error?.message || "Impersonation failed. Please try again.");
+      console.error("Login failed:", error);
+      toast.error(error?.message || "Login failed. Please try again.");
       setImpersonatingUserId(null);
     }
   };
@@ -307,7 +307,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
                   Created
                 </th>
                 <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
-                  Impersonate
+                  Loginto Personnel Dashboard
                 </th>
                 <th className="pb-6 font-[325] text-[#757575] text-sm pr-8 whitespace-nowrap">
                   View Report
@@ -434,7 +434,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
                         }}
                         className="px-3 py-1.5 bg-[#79B833] text-white text-xs rounded-full hover:bg-[#6aa02e] transition-colors"
                       >
-                        View Marketer's Dashboard
+                        View Marketer's report
                       </button>
                     </td>
                     <td
