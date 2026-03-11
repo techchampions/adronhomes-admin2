@@ -63,6 +63,7 @@ import TestimonialsPage from "./components/Settings/Testimonials/TestimonialsPag
 import SiteInformationPage from "./components/Settings/SiteInformation/SiteInformationPage";
 import { useAxiosInterceptor } from "./components/Redux/middleware";
 import Error500 from "./components/Error500";
+import Error404 from "./components/Error404";
 import MarketerInvoice from "./marketer/Payment/customers_payment";
 import Page from "./Legal/page";
 import LegalContractInvoice from "./Legal/contractDetails";
@@ -78,6 +79,29 @@ import ResetCard from "./components/Modals/settings/changepassword";
 import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 import { clearImpersonation } from "./components/Redux/adminimpersonate/adminimpersonateslice";
 
+// NotFoundRedirect Component - Handles 404 with toast and redirect
+const NotFoundRedirect = () => {
+  const navigate = useNavigate();
+  const token = Cookies.get("token");
+
+  useEffect(() => {
+    toast.error("Page not found", {
+      position: "top-right",
+      autoClose: 3000,
+      onClose: () => {
+        // Redirect to login if no token, otherwise to dashboard
+        if (!token) {
+          navigate("/");
+        } else {
+          navigate("/");
+        }
+      },
+    });
+  }, [navigate, token]);
+
+  return null;
+};
+
 // Floating Impersonation Button Component
 const ImpersonationFloatingButton = () => {
   const navigate = useNavigate();
@@ -85,150 +109,147 @@ const ImpersonationFloatingButton = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [impersonatedName, setImpersonatedName] = useState("");
   const [impersonatedRole, setImpersonatedRole] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     // Check if impersonation is active
-    const isImpersonating = sessionStorage.getItem('is_impersonating') === 'true';
-    const name = sessionStorage.getItem('impersonated_user_name') || "User";
-    const role = sessionStorage.getItem('impersonated_user_role') || "";
-    
+    const isImpersonating =
+      sessionStorage.getItem("is_impersonating") === "true";
+    const name = sessionStorage.getItem("impersonated_user_name") || "User";
+    const role = sessionStorage.getItem("impersonated_user_role") || "";
+
     // Map role number to role name
     let roleName = "";
-    switch(role) {
-      case "1": roleName = "Admin"; break;
-      case "2": roleName = "Marketer"; break;
-      case "3": roleName = "Director"; break;
-      case "4": roleName = "Payment"; break;
-      case "5": roleName = "HR"; break;
-      case "6": roleName = "Legal"; break;
-      case "7": roleName = "IT"; break;
-      case "8": roleName = "Client"; break;
-      default: roleName = "";
+    switch (role) {
+      case "1":
+        roleName = "Admin";
+        break;
+      case "2":
+        roleName = "Marketer";
+        break;
+      case "3":
+        roleName = "Director";
+        break;
+      case "4":
+        roleName = "Payment";
+        break;
+      case "5":
+        roleName = "HR";
+        break;
+      case "6":
+        roleName = "Legal";
+        break;
+      case "7":
+        roleName = "IT";
+        break;
+      case "8":
+        roleName = "Client";
+        break;
+      default:
+        roleName = "";
     }
 
     setIsVisible(isImpersonating);
     setImpersonatedName(name);
     setImpersonatedRole(roleName);
-  }, [location.pathname]); // Re-check on route changes
+  }, [location.pathname]);
 
   const handleReturnToMaster = () => {
-    const originalToken = sessionStorage.getItem('original_token');
-    
+    const originalToken = sessionStorage.getItem("original_token");
+
     if (originalToken) {
-      // Restore original token
-      Cookies.set('token', originalToken, {
-        // expires: 1,
+      Cookies.set("token", originalToken, {
         secure: true,
-        sameSite: 'strict'
+        sameSite: "strict",
       });
-      
-      // Clear impersonation state
+
       dispatch(clearImpersonation());
-      sessionStorage.removeItem('original_token');
-      sessionStorage.removeItem('is_impersonating');
-      sessionStorage.removeItem('impersonated_user_name');
-      sessionStorage.removeItem('impersonated_user_role');
-      
+      sessionStorage.removeItem("original_token");
+      sessionStorage.removeItem("is_impersonating");
+      sessionStorage.removeItem("impersonated_user_name");
+      sessionStorage.removeItem("impersonated_user_role");
+
       toast.success("Returned to master admin", {
         position: "top-right",
-        autoClose: 3000
+        autoClose: 3000,
       });
-      
-      // Navigate to admin dashboard
-      navigate('/personnel', { replace: true });
+
+      navigate("/personnel", { replace: true });
     }
   };
 
   if (!isVisible) return null;
 
   return (
-  <div className="fixed bottom-5 right-5 z-50 group">
-    <button
-      onClick={handleReturnToMaster}
-      className="
-        flex items-center justify-center gap-2.5
-        h-11 rounded-full
-        bg-[#79B833] hover:bg-[#79B833]/60
-        text-white
-        shadow-lg hover:shadow-[#79B833]/40
-        transition-all duration-300
-        pl-3 pr-3 group-hover:pr-5
-        overflow-hidden
-      "
-    >
-      {/* Icon – always visible */}
-      <svg
-        className="w-5 h-5 shrink-0"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2.5}
-          d="M10 19l-7-7m0 0l7-7m-7 7h18"
-        />
-      </svg>
-
-      {/* Text – hidden → appears on hover with smooth width transition */}
-      <span
+    <div className="fixed bottom-5 right-5 z-50 group">
+      <button
+        onClick={handleReturnToMaster}
         className="
-          text-sm font-medium whitespace-nowrap
-          max-w-0 group-hover:max-w-[180px]
-          opacity-0 group-hover:opacity-100
+          flex items-center justify-center gap-2.5
+          h-11 rounded-full
+          bg-[#79B833] hover:bg-[#79B833]/60
+          text-white
+          shadow-lg hover:shadow-[#79B833]/40
           transition-all duration-300
+          pl-3 pr-3 group-hover:pr-5
+          overflow-hidden
         "
       >
-        Return to Master
-      </span>
-    </button>
-
-    {/* Optional small tooltip / hint when not hovered */}
-    <div
-      className="
-        absolute bottom-full right-0 mb-2.5
-        pointer-events-none
-        opacity-0 group-hover:opacity-100
-        transition-opacity duration-200
-      "
-    >
-      <div className="bg-gray-900/90 text-white text-xs px-2.5 py-1 rounded-md whitespace-nowrap">
-       Return to main Admin
+        <svg
+          className="w-5 h-5 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.5}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        <span
+          className="
+            text-sm font-medium whitespace-nowrap
+            max-w-0 group-hover:max-w-[180px]
+            opacity-0 group-hover:opacity-100
+            transition-all duration-300
+          "
+        >
+          Return to Master
+        </span>
+      </button>
+      <div
+        className="
+          absolute bottom-full right-0 mb-2.5
+          pointer-events-none
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
+        "
+      >
+        <div className="bg-gray-900/90 text-white text-xs px-2.5 py-1 rounded-md whitespace-nowrap">
+          Return to main Admin
+        </div>
       </div>
     </div>
-  </div>
-);}
-
-// Custom 404 Handler Component
-const NotFoundHandler = () => {
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    toast.error("Page does not exist", {
-      position: "top-right",
-      autoClose: 3000,
-      onClose: () => navigate("/")
-    });
-  }, [navigate]);
-  
-  return null;
+  );
 };
 
 const AuthGuard = () => {
   const token = Cookies.get("token");
+  const location = useLocation();
+
   if (!token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
   return <Outlet />;
 };
 
 interface AppLayoutProps {
   children: ReactNode;
-  hideSidebar?: boolean;
 }
 
-const AppLayout = ({ children, hideSidebar = false }: AppLayoutProps) => {
+const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isCareerPage = location.pathname.startsWith("/human-resources");
   const isMarketerRoute = location.pathname.startsWith("/marketer");
@@ -236,12 +257,13 @@ const AppLayout = ({ children, hideSidebar = false }: AppLayoutProps) => {
   const isPayments = location.pathname.startsWith("/payments/");
   const isLegal = location.pathname.startsWith("/legal");
   const client = location.pathname.startsWith("/client/");
-  const isinfotech = location.pathname.startsWith("/info-tech");
-  
-  const shouldShowSidebar = !hideSidebar && 
-    location.pathname !== "/" && 
+  const shouldShowSidebar =
+    location.pathname !== "/" &&
     location.pathname !== "/login-marketer" &&
-    !location.pathname.includes("/error-500");
+    !location.pathname.includes("/error-500") &&
+    !location.pathname.includes("/error-404");
+
+  const isinfotech = location.pathname.startsWith("/info-tech");
 
   return (
     <div className="flex">
@@ -266,18 +288,12 @@ const AppLayout = ({ children, hideSidebar = false }: AppLayoutProps) => {
           )}
         </div>
       )}
-      <div className="w-full relative">
+      <div className="w-full">
         {children}
-        {/* Floating Impersonation Button - Shows on all routes when impersonating */}
         <ImpersonationFloatingButton />
       </div>
     </div>
   );
-};
-
-// Error page wrapper that maintains the sidebar based on URL
-const ErrorPageWrapper = ({ children }: { children: ReactNode }) => {
-  return <>{children}</>;
 };
 
 const App = () => {
@@ -295,479 +311,304 @@ const App = () => {
     <Provider store={store}>
       <QueryProvider>
         <PropertyProvider>
-          <Routes>
-            {/* Public Route */}
-            <Route path="/" element={
-              <AppLayout hideSidebar={true}>
-                <Login />
-              </AppLayout>
-            } />
-            <Route path="/login-marketer" element={
-              <AppLayout hideSidebar={true}>
-                <LoginMarketers />
-              </AppLayout>
-            } />
+          <AppLayout>
+            <Routes>
+              {/* Public Route */}
+              <Route path="/" element={<Login />} />
+              <Route path="/login-marketer" element={<LoginMarketers />} />
 
-            {/* Protected Routes */}
-            <Route element={<AuthGuard />}>
-              {/* Admin Routes */}
-              <Route path="/partnership-requests" element={
-                <AppLayout>
-                  <ClientsPartnership />
-                </AppLayout>
-              } />
-              <Route path="/dashboard" element={
-                <AppLayout>
-                  <Dashboard />
-                </AppLayout>
-              } />
-              <Route path="/customers" element={
-                <AppLayout>
-                  <Customers />
-                </AppLayout>
-              } />
-              <Route path="/payments" element={
-                <AppLayout>
-                  <Payment />
-                </AppLayout>
-              } />
-
-              <Route path="/payment/status/:paymentId" element={
-                <AppLayout>
-                  <PaymentById />
-                </AppLayout>
-              } />
-              <Route path="/properties/property-edith/:id" element={
-                <AppLayout>
-                  <EditProperty />
-                </AppLayout>
-              } />
-              <Route path="/properties/:id" element={
-                <AppLayout>
-                  <PropertyDetailsPage />
-                </AppLayout>
-              } />
-              <Route path="/properties" element={
-                <AppLayout>
-                  <Properties />
-                </AppLayout>
-              } />
-              <Route path="/personnel" element={
-                <AppLayout>
-                  <Personnel />
-                </AppLayout>
-              } />
-              <Route path="/personnel/:id" element={
-                <AppLayout>
-                  <PersonnelMarketersDashboard />
-                </AppLayout>
-              } />
-              <Route path="/contracts" element={
-                <AppLayout>
-                  <Contract />
-                </AppLayout>
-              } />
-              <Route path="/contracts/details/:user_id/:plan_id" element={
-                <AppLayout>
-                  <ContractInvoice />
-                </AppLayout>
-              } />
-              <Route path="/director/requests-enquiries" element={
-                <AppLayout>
-                  <RequestsEnquiries />
-                </AppLayout>
-              } />
-              <Route path="/requests-enquiries" element={
-                <AppLayout>
-                  <RequestsEnquiries />
-                </AppLayout>
-              } />
-
-              <Route path="/director/requests-enquiries/:id" element={
-                <AppLayout>
-                  <PropertyEnquiries />
-                </AppLayout>
-              } />
-              <Route path="/requests-enquiries/:id" element={
-                <AppLayout>
-                  <PropertyEnquiries />
-                </AppLayout>
-              } />
-              <Route path="/notifications" element={
-                <AppLayout>
-                  <Notifications />
-                </AppLayout>
-              } />
-              <Route path="/settings" element={
-                <AppLayout>
-                  <Settings />
-                </AppLayout>
-              } />
-              <Route path="/settings/sliders" element={
-                <AppLayout>
-                  <SliderSettings />
-                </AppLayout>
-              } />
-              <Route path="/settings/reset-password" element={
-                <AppLayout>
-                  <ResetCard />
-                </AppLayout>
-              } />
-              <Route path="/settings/page-headers" element={
-                <AppLayout>
-                  <HeaderSettings />
-                </AppLayout>
-              } />
-              <Route path="/settings/page-headers/edit/:id" element={
-                <AppLayout>
-                  <EditHeaderDetails />
-                </AppLayout>
-              } />
-              <Route path="/settings/page-headers/new" element={
-                <AppLayout>
-                  <AddHeaderDetails />
-                </AppLayout>
-              } />
-              <Route path="/settings/office-locations" element={
-                <AppLayout>
-                  <OfficeLocations />
-                </AppLayout>
-              } />
-              <Route path="/settings/site-information" element={
-                <AppLayout>
-                  <SiteInformationPage />
-                </AppLayout>
-              } />
-              <Route path="/settings/leadership" element={
-                <AppLayout>
-                  <LeaderShipSettings />
-                </AppLayout>
-              } />
-              <Route path="/settings/testimonials" element={
-                <AppLayout>
-                  <TestimonialsPage />
-                </AppLayout>
-              } />
-              <Route path="/settings/faqs" element={
-                <AppLayout>
-                  <FAQs />
-                </AppLayout>
-              } />
-              <Route path="/settings/add-account" element={
-                <AppLayout>
-                  <AccountDetails />
-                </AppLayout>
-              } />
-              <Route path="/customers/:id" element={
-                <AppLayout>
-                  <CustomerSinglePage />
-                </AppLayout>
-              } />
-              <Route path="/customers/transactions/:id" element={
-                <AppLayout>
-                  <UserPayments />
-                </AppLayout>
-              } />
-              <Route path="/customers/payment/:id" element={
-                <AppLayout>
-                  <UserPaymentsPage />
-                </AppLayout>
-              } />
-
-              <Route path="/customers/wallet-transactions/:id" element={
-                <AppLayout>
-                  <WalletTransactionsPage />
-                </AppLayout>
-              } />
-              <Route path="/customers/singlepage/payment" element={
-                <AppLayout>
-                  <CustomersPayment />
-                </AppLayout>
-              } />
-              <Route path="/properties/form" element={
-                <AppLayout>
-                  <General />
-                </AppLayout>
-              } />
-              <Route path="/customers/payment/:user_id/:plan_id" element={
-                <AppLayout>
-                  <Customers_payment />
-                </AppLayout>
-              } />
-
-              {/* Error 500 Route - No Sidebar */}
-              <Route path="/error-500" element={
-                <AppLayout hideSidebar={true}>
-                  <Error500 />
-                </AppLayout>
-              } />
-
-              {/* Marketer Routes */}
+              {/* Protected Routes */}
               <Route element={<AuthGuard />}>
-                <Route path="/marketer" element={
-                  <AppLayout>
-                    <MarketersDashboard />
-                  </AppLayout>
-                } />
-                <Route path="marketer-customer" element={
-                  <AppLayout>
-                    <MarketerCustomer />
-                  </AppLayout>
-                } />
-                <Route path="marketer-payment/:plan_id/:user_id" element={
-                  <AppLayout>
-                    <MarketerInvoice />
-                  </AppLayout>
-                } />
+                {/* Admin Routes */}
+                <Route
+                  path="/partnership-requests"
+                  element={<ClientsPartnership />}
+                />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/payments" element={<Payment />} />
+
+                <Route
+                  path="/payment/status/:paymentId"
+                  element={<PaymentById />}
+                />
+                <Route
+                  path="/properties/property-edith/:id"
+                  element={<EditProperty />}
+                />
+                <Route
+                  path="/properties/:id"
+                  element={<PropertyDetailsPage />}
+                />
+                <Route path="/properties" element={<Properties />} />
+                <Route path="/personnel" element={<Personnel />} />
+                <Route
+                  path="/personnel/:id"
+                  element={<PersonnelMarketersDashboard />}
+                />
+                <Route path="/contracts" element={<Contract />} />
+                <Route
+                  path="/contracts/details/:user_id/:plan_id"
+                  element={<ContractInvoice />}
+                />
+                <Route
+                  path="/director/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
+                <Route
+                  path="/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
+
+                <Route
+                  path="/director/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
+                />
+                <Route
+                  path="/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
+                />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/settings/sliders" element={<SliderSettings />} />
+                <Route
+                  path="/settings/reset-password"
+                  element={<ResetCard />}
+                />
+                <Route
+                  path="/settings/page-headers"
+                  element={<HeaderSettings />}
+                />
+                <Route
+                  path="/settings/page-headers/edit/:id"
+                  element={<EditHeaderDetails />}
+                />
+                <Route
+                  path="/settings/page-headers/new"
+                  element={<AddHeaderDetails />}
+                />
+                <Route
+                  path="/settings/office-locations"
+                  element={<OfficeLocations />}
+                />
+                <Route
+                  path="/settings/site-information"
+                  element={<SiteInformationPage />}
+                />
+                <Route
+                  path="/settings/leadership"
+                  element={<LeaderShipSettings />}
+                />
+                <Route
+                  path="/settings/testimonials"
+                  element={<TestimonialsPage />}
+                />
+                <Route path="/settings/faqs" element={<FAQs />} />
+                <Route
+                  path="/settings/add-account"
+                  element={<AccountDetails />}
+                />
+                <Route path="/customers/:id" element={<CustomerSinglePage />} />
+                <Route
+                  path="/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
+
+                <Route
+                  path="/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
+                <Route
+                  path="/customers/singlepage/payment"
+                  element={<CustomersPayment />}
+                />
+                <Route path="/properties/form" element={<General />} />
+                <Route
+                  path="/customers/payment/:user_id/:plan_id"
+                  element={<Customers_payment />}
+                />
+
+                <Route path="/error-500" element={<Error500 />} />
+
+                {/* Marketer Routes */}
+                <Route path="/marketer" element={<MarketersDashboard />} />
+                <Route
+                  path="/marketer-customer"
+                  element={<MarketerCustomer />}
+                />
+                <Route
+                  path="/marketer-payment/:plan_id/:user_id"
+                  element={<MarketerInvoice />}
+                />
+
+                {/* Director Routes */}
+                <Route path="/director" element={<DirectorsDashboard />} />
+
+                {/* Payment Routes */}
+                <Route path="/payments/dashboard" element={<Dashboard />} />
+                <Route path="/payments/customers" element={<Customers />} />
+                <Route path="/payments/payments" element={<Payment />} />
+                <Route
+                  path="/payments/payments/status/:paymentId"
+                  element={<PaymentById />}
+                />
+                <Route path="/payments/contracts" element={<Contract />} />
+                <Route
+                  path="/payments/contracts/details/:user_id/:plan_id"
+                  element={<ContractInvoice />}
+                />
+                <Route
+                  path="/payments/customers/:id"
+                  element={<CustomerSinglePage />}
+                />
+                <Route
+                  path="/payments/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/payments/customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
+                <Route
+                  path="/payments/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
+                <Route
+                  path="/payments/customers/singlepage/payment"
+                  element={<CustomersPayment />}
+                />
+                <Route
+                  path="/payments/customers/payment/:user_id/:plan_id"
+                  element={<Customers_payment />}
+                />
               </Route>
 
-              {/* Director Routes */}
+              {/* HR Routes */}
               <Route element={<AuthGuard />}>
-                <Route path="/director" element={
-                  <AppLayout>
-                    <DirectorsDashboard />
-                  </AppLayout>
-                } />
+                <Route path="/human-resources" element={<HRDashboard />} />
+                <Route
+                  path="/human-resources/view-job/:jobId"
+                  element={<SingleJob />}
+                />
               </Route>
 
-              {/* Payment Routes */}
-              <Route path="/payments" element={<AuthGuard />}>
-                <Route path="dashboard" element={
-                  <AppLayout>
-                    <Dashboard />
-                  </AppLayout>
-                } />
-                <Route path="customers" element={
-                  <AppLayout>
-                    <Customers />
-                  </AppLayout>
-                } />
-                <Route path="payments" element={
-                  <AppLayout>
-                    <Payment />
-                  </AppLayout>
-                } />
-                <Route path="payments/status/:paymentId" element={
-                  <AppLayout>
-                    <PaymentById />
-                  </AppLayout>
-                } />
-                <Route path="contracts" element={
-                  <AppLayout>
-                    <Contract />
-                  </AppLayout>
-                } />
-                <Route path="contracts/details/:user_id/:plan_id" element={
-                  <AppLayout>
-                    <ContractInvoice />
-                  </AppLayout>
-                } />
-                <Route path="customers/:id" element={
-                  <AppLayout>
-                    <CustomerSinglePage />
-                  </AppLayout>
-                } />
-                <Route path="customers/transactions/:id" element={
-                  <AppLayout>
-                    <UserPayments />
-                  </AppLayout>
-                } />
-                <Route path="customers/payment/:id" element={
-                  <AppLayout>
-                    <UserPaymentsPage />
-                  </AppLayout>
-                } />
-                <Route path="customers/wallet-transactions/:id" element={
-                  <AppLayout>
-                    <WalletTransactionsPage />
-                  </AppLayout>
-                } />
-                <Route path="customers/singlepage/payment" element={
-                  <AppLayout>
-                    <CustomersPayment />
-                  </AppLayout>
-                } />
-                <Route path="customers/payment/:user_id/:plan_id" element={
-                  <AppLayout>
-                    <Customers_payment />
-                  </AppLayout>
-                } />
+              {/* Legal Routes */}
+              <Route path="/legal" element={<AuthGuard />}>
+                <Route index element={<Page />} />
+                <Route
+                  path="/legal/contracts/details/:user_id/:plan_id"
+                  element={<LegalContractInvoice />}
+                />
               </Route>
-            </Route>
 
-            {/* HR Routes */}
-            <Route element={<AuthGuard />}>
-              <Route path="/human-resources" element={
-                <AppLayout>
-                  <HRDashboard />
-                </AppLayout>
-              } />
-              <Route path="view-job/:jobId" element={
-                <AppLayout>
-                  <SingleJob />
-                </AppLayout>
-              } />
-            </Route>
+              {/* User wallet */}
+              <Route path="/wallet-Transactions" element={<UserWallet />} />
 
-            {/* Legal Routes */}
-            <Route path="/legal" element={<AuthGuard />}>
-              <Route index element={
-                <AppLayout>
-                  <Page />
-                </AppLayout>
-              } />
-              <Route path="contracts/details/:user_id/:plan_id" element={
-                <AppLayout>
-                  <LegalContractInvoice />
-                </AppLayout>
-              } />
-            </Route>
+              {/* Client Routes */}
+              <Route path="/client" element={<AuthGuard />}>
+                <Route
+                  path="/client"
+                  element={<Navigate to="/client/customers" />}
+                />
+                <Route
+                  path="/client/partnership-requests"
+                  element={<ClientsPartnership />}
+                />
+                <Route path="/client/customers" element={<Customers />} />
+                <Route
+                  path="/client/customers/:id"
+                  element={<CustomerSinglePage />}
+                />
+                <Route
+                  path="/client/customers/transactions/:id"
+                  element={<UserPayments />}
+                />
+                <Route
+                  path="/client/customers/payment/:id"
+                  element={<UserPaymentsPage />}
+                />
+                <Route
+                  path="/client/customers/wallet-transactions/:id"
+                  element={<WalletTransactionsPage />}
+                />
+                <Route
+                  path="/client/customers/singlepage/payment"
+                  element={<CustomersPayment />}
+                />
+                <Route
+                  path="/client/customers/payment/:user_id/:plan_id"
+                  element={<Customers_payment />}
+                />
+                <Route path="/client/contracts" element={<Contract />} />
+                <Route
+                  path="/client/contracts/details/:user_id/:plan_id"
+                  element={<ContractInvoice />}
+                />
+              </Route>
 
-            {/* User wallet */}
-            <Route path="wallet-Transactions" element={
-              <AppLayout>
-                <UserWallet />
-              </AppLayout>
-            } />
+              {/* Info-Tech Route Group */}
+              <Route path="/info-tech" element={<AuthGuard />}>
+                <Route index element={<Dashboard_It />} />
+                <Route
+                  path="/info-tech/requests-enquiries"
+                  element={<RequestsEnquiries />}
+                />
+                <Route
+                  path="/info-tech/requests-enquiries/:id"
+                  element={<PropertyEnquiries />}
+                />
+                <Route
+                  path="/info-tech/settings/reset-password"
+                  element={<ResetCard />}
+                />
+                <Route path="/info-tech/settings" element={<Settings />} />
+                <Route
+                  path="/info-tech/settings/sliders"
+                  element={<SliderSettings />}
+                />
+                <Route
+                  path="/info-tech/settings/page-headers"
+                  element={<HeaderSettings />}
+                />
+                <Route
+                  path="/info-tech/settings/page-headers/edit/:id"
+                  element={<EditHeaderDetails />}
+                />
+                <Route
+                  path="/info-tech/settings/page-headers/new"
+                  element={<AddHeaderDetails />}
+                />
+                <Route
+                  path="/info-tech/settings/office-locations"
+                  element={<OfficeLocations />}
+                />
+                <Route
+                  path="/info-tech/settings/site-information"
+                  element={<SiteInformationPage />}
+                />
+                <Route
+                  path="/info-tech/settings/leadership"
+                  element={<LeaderShipSettings />}
+                />
+                <Route
+                  path="/info-tech/settings/testimonials"
+                  element={<TestimonialsPage />}
+                />
+                <Route path="/info-tech/settings/faqs" element={<FAQs />} />
+                <Route
+                  path="/info-tech/settings/add-account"
+                  element={<AccountDetails />}
+                />
+              </Route>
 
-            {/* Client Routes */}
-            <Route path="/client" element={<AuthGuard />}>
-            <Route index element={<Navigate to="/client/customers" replace />} />
-              <Route path="partnership-requests" element={
-                <AppLayout>
-                  <ClientsPartnership />
-                </AppLayout>
-              } />
-              <Route path="customers" element={
-                <AppLayout>
-                  <Customers />
-                </AppLayout>
-              } />
-              <Route path="customers/:id" element={
-                <AppLayout>
-                  <CustomerSinglePage />
-                </AppLayout>
-              } />
-              <Route path="customers/transactions/:id" element={
-                <AppLayout>
-                  <UserPayments />
-                </AppLayout>
-              } />
-              <Route path="customers/payment/:id" element={
-                <AppLayout>
-                  <UserPaymentsPage />
-                </AppLayout>
-              } />
-              <Route path="customers/wallet-transactions/:id" element={
-                <AppLayout>
-                  <WalletTransactionsPage />
-                </AppLayout>
-              } />
-              <Route path="customers/singlepage/payment" element={
-                <AppLayout>
-                  <CustomersPayment />
-                </AppLayout>
-              } />
-              <Route path="customers/payment/:user_id/:plan_id" element={
-                <AppLayout>
-                  <Customers_payment />
-                </AppLayout>
-              } />
-              <Route path="contracts" element={
-                <AppLayout>
-                  <Contract />
-                </AppLayout>
-              } />
-              <Route path="contracts/details/:user_id/:plan_id" element={
-                <AppLayout>
-                  <ContractInvoice />
-                </AppLayout>
-              } />
-            </Route>
-
-            {/* Info-Tech Route Group */}
-            <Route path="/info-tech" element={<AuthGuard />}>
-              <Route index element={
-                <AppLayout>
-                  <Dashboard_It />
-                </AppLayout>
-              } />
-              <Route path="requests-enquiries" element={
-                <AppLayout>
-                  <RequestsEnquiries />
-                </AppLayout>
-              } />
-              <Route path="requests-enquiries/:id" element={
-                <AppLayout>
-                  <PropertyEnquiries />
-                </AppLayout>
-              } />
-              <Route path="settings/reset-password" element={
-                <AppLayout>
-                  <ResetCard />
-                </AppLayout>
-              } />
-              <Route path="settings" element={
-                <AppLayout>
-                  <Settings />
-                </AppLayout>
-              } />
-              <Route path="settings/sliders" element={
-                <AppLayout>
-                  <SliderSettings />
-                </AppLayout>
-              } />
-              <Route path="settings/page-headers" element={
-                <AppLayout>
-                  <HeaderSettings />
-                </AppLayout>
-              } />
-              <Route path="settings/page-headers/edit/:id" element={
-                <AppLayout>
-                  <EditHeaderDetails />
-                </AppLayout>
-              } />
-              <Route path="settings/page-headers/new" element={
-                <AppLayout>
-                  <AddHeaderDetails />
-                </AppLayout>
-              } />
-              <Route path="settings/office-locations" element={
-                <AppLayout>
-                  <OfficeLocations />
-                </AppLayout>
-              } />
-              <Route path="settings/site-information" element={
-                <AppLayout>
-                  <SiteInformationPage />
-                </AppLayout>
-              } />
-              <Route path="settings/leadership" element={
-                <AppLayout>
-                  <LeaderShipSettings />
-                </AppLayout>
-              } />
-              <Route path="settings/testimonials" element={
-                <AppLayout>
-                  <TestimonialsPage />
-                </AppLayout>
-              } />
-              <Route path="settings/faqs" element={
-                <AppLayout>
-                  <FAQs />
-                </AppLayout>
-              } />
-              <Route path="settings/add-account" element={
-                <AppLayout>
-                  <AccountDetails />
-                </AppLayout>
-              } />
-            </Route>
-
-            {/* Catch-All Route - Shows Toast and Redirects to Login */}
-            <Route path="*" element={<NotFoundHandler />} />
-          </Routes>
-          
+              {/* 404 Route - This will catch all unmatched routes */}
+              <Route path="*" element={<NotFoundRedirect />} />
+            </Routes>
+          </AppLayout>
           {isInfrastructure && (
             <InfrastructureFeesModal
               isOpen={isInfrastructure}
