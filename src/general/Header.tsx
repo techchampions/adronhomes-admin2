@@ -19,8 +19,8 @@ interface HeaderProps {
   handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
   viewForm?: boolean;
-  personel?: boolean; // Add personel prop
-  onPersonelButtonClick?: () => void; // Add personel button click handler
+  personel?: boolean;
+  onPersonelButtonClick?: () => void;
   Personnel_Text?: string;
 }
 
@@ -34,8 +34,8 @@ export default function Header({
   showSearchAndButton = true,
   viewForm = false,
   handleViewPurchaseFormClick,
-  personel = false, // Default to false
-  onPersonelButtonClick, // Personel button click handler
+  personel = false,
+  onPersonelButtonClick,
   Personnel_Text = "Create Personnel",
 }: HeaderProps) {
   const {
@@ -54,13 +54,31 @@ export default function Header({
     setIsLandProperty,
     resetFormData,
   } = useContext(PropertyContext)!;
+  
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isPersonnelPage = location.pathname === "/personnel";
-  const isFormPage = location.pathname === "/properties/form";
+  // Check if we're on info-tech routes
+  const hasInfoTech = location.pathname.includes('/info-tech');
+  
+  // Update page detection to handle both regular and info-tech routes
+  const isPersonnelPage = location.pathname === "/personnel" || location.pathname === "/info-tech/personnel";
+  const isFormPage = location.pathname === "/properties/form" || location.pathname === "/info-tech/properties/form";
+
+  // Create navigation helper functions
+  const navigateToProperties = () => {
+    navigate(hasInfoTech ? '/info-tech/properties' : '/properties');
+  };
+
+  const navigateToPersonnel = () => {
+    navigate(hasInfoTech ? '/info-tech/personnel' : '/personnel');
+  };
+
+  const navigateToForm = () => {
+    navigate(hasInfoTech ? '/info-tech/properties/form' : '/properties/form');
+  };
 
   // Set cancel state based on URL when component mounts or location changes
   useEffect(() => {
@@ -77,7 +95,11 @@ export default function Header({
       onButtonClick();
     } else if (isCancelState || isFormPage) {
       // When in cancel state or on form page, navigate back
-      navigate(isPersonnelPage ? "/personnel" : "/properties");
+      if (isPersonnelPage) {
+        navigateToPersonnel();
+      } else {
+        navigateToProperties();
+      }
       setIsCancelState(false);
       resetFormData();
       setIsLandProperty(false);
@@ -109,7 +131,7 @@ export default function Header({
   return (
     <>
       <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between it pt-16 pb-4 px-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
-        <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0 ">
+        <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0">
           <h2 className="font-[325] text-xl sm:text-2xl md:text-3xl lg:text-[34px] leading-tight text-dark mb-2 break-words lg:break-normal">
             {title}
           </h2>
@@ -142,7 +164,7 @@ export default function Header({
               {/* Personel button - only shows when personel is true */}
               {personel && (
                 <button
-                  className="text-[#79B833] border-[#79B833] border bg-white   text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap order-first lg:order-none mb-2 lg:mb-0"
+                  className="text-[#79B833] border-[#79B833] border bg-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap order-first lg:order-none mb-2 lg:mb-0"
                   onClick={handlePersonelButtonClick}
                 >
                   {Personnel_Text}
@@ -178,13 +200,13 @@ export default function Header({
       {!isPersonnelPage && showBulkModal && (
         <BulkSelectModal
           onSelect={(isBulk) => {
-            navigate("/properties/form");
+            navigateToForm();
             setIsLandProperty(true);
             setShowBulkModal(false);
             setIsCancelState(true);
           }}
           onSelects={(isBulk) => {
-            navigate("/properties/form");
+            navigateToForm();
             setShowBulkModal(false);
             setIsLandProperty(false);
             setIsCancelState(true);
@@ -196,6 +218,7 @@ export default function Header({
           }}
         />
       )}
+      
       {createpersonnel && (
         <BulkPersonnelSelectModal
           onSelect={(isBulk) => {
@@ -212,6 +235,7 @@ export default function Header({
           x={() => setcreatepersonnel(false)}
         />
       )}
+      
       {showPersonnelModal && (
         <>
           {isUserBulk ? (

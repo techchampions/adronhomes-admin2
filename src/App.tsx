@@ -603,6 +603,22 @@ const App = () => {
                   path="/info-tech/settings/add-account"
                   element={<AccountDetails />}
                 />
+
+
+                {/* properties */}
+                <Route
+                  path="properties/property-edith/:id"
+                  element={<EditProperty />}
+                />
+                <Route
+                  path="properties/:id"
+                  element={<PropertyDetailsPage />}
+                />
+                <Route path="properties" element={<Properties />} />
+                {/* <Route path="properties/form" element={<General />} /> */}
+                <Route path="properties/form" element={<General />} />
+             
+{/* properties */}
               </Route>
 
               {/* 404 Route - This will catch all unmatched routes */}

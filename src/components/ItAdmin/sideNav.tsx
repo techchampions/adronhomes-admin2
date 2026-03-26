@@ -16,6 +16,7 @@ import { RootState } from "../Redux/store";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/info-tech" },
+    { label: "Properties", icon: Icon5, path: "/info-tech/properties" },
   // { label: "Requests & Enquiries", icon: Icon7, path: "/info-tech/Requests-Enquiries" },
   { label: "Settings", icon: Icon9, path: "/info-tech/settings" },
 ];
@@ -35,7 +36,7 @@ export default function InfoTechSidebar() {
     if (path === "/info-tech") {
       return currentPath === "/info-tech";
     }
-    
+
     // Other routes can use startsWith for nested routes
     return currentPath.startsWith(path);
   };
@@ -43,7 +44,7 @@ export default function InfoTechSidebar() {
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const DesktopSidebar = () => (

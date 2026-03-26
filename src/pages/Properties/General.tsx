@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import StepIndicator from "../../general/StepIndicator";
 import ForProperties from "../../components/Tables/forProperties";
 import BulkBasicDetails from "./BasicDetails/BulkBasicDetails";
@@ -11,15 +12,12 @@ import MediaFORM from "./Media/Media";
 import PropertyListing from "./edithFinal/EdithFnal";
 import FeaturesInput from "./Features/Features";
 import LandForm from "./BasicDetails/PropertySpecifications/land";
-// import FinalSubmission from "./FinalSubmission";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../components/Redux/store";
 import DraftPublishModal from "./DraftPublishModal";
 import BasicDetails from "./BasicDetails/BasicDetails";
 import BasicDetailsLand from "./BasicDetails/BasicDetailsLand";
 import { toast } from "react-toastify";
-
-
 
 export default function General() {
   const {
@@ -32,15 +30,25 @@ export default function General() {
     isSubmitting,
     setIsSubmitting,
     setPaymentStructure,
-    setDisplayStatus
+    setDisplayStatus,
   } = useContext(PropertyContext)!;
+
   const [discount, setDiscount] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  // const { loading, success, error } = useSelector((state: RootState) => state.addproperty);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
-const { loading, error, success, propertyId } = useSelector(
-  (state: RootState) => state.addproperty
-);
+
+  const { loading, error, success, propertyId } = useSelector(
+    (state: RootState) => state.addproperty,
+  );
+
+  // Create navigation helper function
+  const navigateToProperties = () => {
+    const hasInfoTech = location.pathname.includes("/info-tech");
+    navigate(hasInfoTech ? "/info-tech/properties" : "/properties");
+  };
+
   // Create refs for all form components
   const basicDetailsRef = useRef<any>(null);
   const bulkBasicDetailsRef = useRef<any>(null);
@@ -51,9 +59,20 @@ const { loading, error, success, propertyId } = useSelector(
   const discountRef = useRef<any>(null);
   const land = useRef<any>(null);
 
+  // Handle successful submission
+  useEffect(() => {
+    if (success && propertyId) {
+      toast.success("Property created successfully!");
+      navigateToProperties();
+    }
+    if (error) {
+      toast.error(error || "Failed to create property");
+    }
+  }, [success, error, propertyId, navigateToProperties]);
+
   const handleNext = async () => {
     if (isSubmitting) return;
-    
+
     let canProceed = true;
 
     // Validate current step before proceeding
@@ -114,9 +133,6 @@ const { loading, error, success, propertyId } = useSelector(
           return;
         }
         break;
-      // case 7:
-      //   await submitForm();
-        return;
     }
 
     if (canProceed) {
@@ -124,23 +140,22 @@ const { loading, error, success, propertyId } = useSelector(
     }
   };
 
-// General.tsx
-const handleDraftPublishSelect = async (option: "draft" | "publish") => {
-  try {
-    setIsSubmitting(true);
-    setShowDraftPublishModal(false);
-    setDisplayStatus(option); // Set the display status
+  const handleDraftPublishSelect = async (option: "draft" | "publish") => {
+    try {
+      setIsSubmitting(true);
+      setShowDraftPublishModal(false);
+      setDisplayStatus(option);
 
-    // Call submitForm with the selected option directly
-    await submitForm(option);
-    setCurrentStep(1); // Move to the final step after successful submission
-  } catch (error) {
-    console.error("Submission failed:", error);
-    toast.error("Failed to submit property. Please try again.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      // Call submitForm with the selected option directly
+      await submitForm(option);
+      setCurrentStep(1);
+    } catch (error) {
+      console.error("Submission failed:", error);
+      toast.error("Failed to submit property. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleBack = () => {
     if (currentStep > 1 && !isSubmitting) {
@@ -163,8 +178,8 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
     currentStep === 7
       ? "Submit"
       : currentStep === 6
-      ? "Confirm & Submit"
-      : "Next";
+        ? "Confirm & Submit"
+        : "Next";
 
   return (
     <div className="w-full">
@@ -273,7 +288,6 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
         )}
 
         {currentStep === 6 && <PropertyListing />}
-        {/* {currentStep === 7 && <FinalSubmission />} */}
 
         <div className="grid grid-cols-2 mb-[69px] w-full mt-20">
           <div className="w-full justify-start flex">
@@ -303,9 +317,25 @@ const handleDraftPublishSelect = async (option: "draft" | "publish") => {
                 >
                   {isSubmitting ? (
                     <div className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Processing...
                     </div>
