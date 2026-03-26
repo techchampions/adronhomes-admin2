@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   fetchPropertyData,
@@ -29,7 +29,7 @@ const PropertyDetailsPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data, loading, error } = useAppSelector(
-    (state) => state.propertyDetails
+    (state) => state.propertyDetails,
   );
   const {
     loading: publishLoading,
@@ -37,7 +37,7 @@ const PropertyDetailsPage = () => {
     error: publishError,
   } = useAppSelector((state) => state.publishDraft);
   const { success: Updatesuccess, error: UpdateError } = useAppSelector(
-    (state: RootState) => state.updateproperty
+    (state: RootState) => state.updateproperty,
   );
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<Property>>({});
@@ -63,7 +63,23 @@ const PropertyDetailsPage = () => {
       setNewGalleryImages(property.photos || []);
     }
   }, [data]);
+  // const navigate = useNavigate();
+  const location = useLocation();
+  // Create navigation helper functions
+  const navigateToProperties = () => {
+    const hasInfoTech = location.pathname.includes("/info-tech");
+    navigate(hasInfoTech ? "/info-tech/properties" : "/properties");
+  };
 
+  const navigateToEditProperty = (propertyId: number) => {
+    const hasInfoTech = location.pathname.includes("/info-tech");
+    navigate(
+      hasInfoTech
+        ? `/info-tech/properties/property-edith/${propertyId}`
+        : `/properties/property-edith/${propertyId}`,
+    );
+  };
+  // Fetch property data
   // Fetch property data
   useEffect(() => {
     if (id) {
@@ -72,13 +88,13 @@ const PropertyDetailsPage = () => {
         dispatch(fetchPropertyData({ id: propertyId }));
       } else {
         toast.error("Invalid property ID");
-        navigate("/properties");
+        navigateToProperties(); // Updated from navigate("/properties")
       }
     }
     return () => {
       dispatch(clearPropertyData());
     };
-  }, [id, dispatch, navigate]);
+  }, [id, dispatch]);
 
   useEffect(() => {
     if (publishSuccess) {
@@ -101,7 +117,7 @@ const PropertyDetailsPage = () => {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
@@ -177,7 +193,7 @@ const PropertyDetailsPage = () => {
       toast.success(
         `Property ${
           property?.is_active === 1 ? "drafted" : "published"
-        } successfully!`
+        } successfully!`,
       );
       dispatch(fetchPropertyData({ id: parseInt(id) }));
     } catch (error: any) {
@@ -289,24 +305,24 @@ const PropertyDetailsPage = () => {
         if (formData.discount_percentage)
           mainFormData.append(
             "discount_percentage",
-            String(formData.discount_percentage)
+            String(formData.discount_percentage),
           );
         if (formData.discount_units)
           mainFormData.append(
             "discount_units",
-            String(formData.discount_units)
+            String(formData.discount_units),
           );
         if (formData.discount_start_date)
           mainFormData.append(
             "discount_start_date",
-            formData.discount_start_date
+            formData.discount_start_date,
           );
         if (formData.discount_end_date)
           mainFormData.append("discount_end_date", formData.discount_end_date);
       }
 
       await dispatch(
-        UpdateProperty({ UpdateId: propertyId, credentials: mainFormData })
+        UpdateProperty({ UpdateId: propertyId, credentials: mainFormData }),
       ).unwrap();
 
       if (formData.details) {
@@ -323,7 +339,7 @@ const PropertyDetailsPage = () => {
             edit_property_detail({
               detailId: detail.id,
               formData: detailFormData,
-            })
+            }),
           ).unwrap();
         });
 
@@ -365,7 +381,7 @@ const PropertyDetailsPage = () => {
     ...new Set(
       formData.details
         ?.map((d) => d.purpose)
-        .filter((p) => p !== undefined && p !== null) || []
+        .filter((p) => p !== undefined && p !== null) || [],
     ),
   ];
 
@@ -399,17 +415,14 @@ const PropertyDetailsPage = () => {
                   : "Edit Property"}
               </button> */}
               <button
-                onClick={() =>
-                  navigate(`/properties/property-edith/${property.id}`)
-                }
+                onClick={() => navigateToEditProperty(property.id)} // Updated from navigate(`/properties/property-edith/${property.id}`)
                 className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
-                // disabled={isSubmitting}
               >
                 {isSubmitting
                   ? "Saving..."
                   : isEditing
-                  ? "Save Changes"
-                  : "Edit Property"}
+                    ? "Save Changes"
+                    : "Edit Property"}
               </button>
               <button
                 onClick={handlePublishToggle}
@@ -419,8 +432,8 @@ const PropertyDetailsPage = () => {
                 {publishLoading
                   ? "Processing..."
                   : property.is_active === 1
-                  ? "Add to Draft"
-                  : "Publish"}
+                    ? "Add to Draft"
+                    : "Publish"}
               </button>
             </div>
           </div>
@@ -898,7 +911,7 @@ const PropertyDetailsPage = () => {
                         onChange={(e) =>
                           handleArrayInputChange(
                             "features",
-                            e.target.value.split("\n")
+                            e.target.value.split("\n"),
                           )
                         }
                         className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"
@@ -986,7 +999,7 @@ const PropertyDetailsPage = () => {
                         onChange={(e) =>
                           handleArrayInputChange(
                             "payment_schedule",
-                            e.target.value.split("\n")
+                            e.target.value.split("\n"),
                           )
                         }
                         className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"
@@ -999,7 +1012,7 @@ const PropertyDetailsPage = () => {
                             <li key={index} className="text-gray-900">
                               {schedule}
                             </li>
-                          )
+                          ),
                         )}
                       </ul>
                     )}

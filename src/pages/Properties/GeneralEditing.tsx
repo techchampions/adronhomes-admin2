@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../components/Redux/hook";
 import { TbXboxX } from "react-icons/tb";
@@ -94,6 +94,15 @@ export default function EditProperty() {
   const [newGalleryImages, setNewGalleryImages] = useState<
     (File | string | null)[]
   >([]);
+
+   const location = useLocation();
+
+
+  const navigateToProperties = () => {
+    const hasInfoTech = location.pathname.includes('/info-tech');
+    navigate(hasInfoTech ? '/info-tech/properties' : '/properties');
+  };
+
   //  const [isLandProperty2, setIsLandProperty2] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null!);
   const propertyTypeOptions = [
@@ -218,7 +227,7 @@ export default function EditProperty() {
         dispatch(fetchPropertyData({ id }));
       } else {
         toast.error("Invalid property ID");
-        navigate("/properties");
+     navigateToProperties();
       }
     }
     return () => {
@@ -736,7 +745,7 @@ export default function EditProperty() {
       // Reset form and navigate
       resetFormData();
       dispatch(resetPropertyState());
-      navigate("/properties");
+   navigateToProperties();
     } catch (error: any) {
       console.error("Update failed:", error);
       toast.error(error.message || "Failed to update property or its fees.");
@@ -832,7 +841,7 @@ export default function EditProperty() {
     if (currentStep > 1 && !isSubmitting) {
       setCurrentStep(currentStep - 1);
     } else if (currentStep === 1) {
-      navigate("/properties");
+   navigateToProperties();
     }
   };
 
@@ -897,7 +906,7 @@ export default function EditProperty() {
                 className={`bg-red-500 text-white md:text-sm text-xs font-bold rounded-full w-full sm:w-[40%] py-3 px-6 md:px-10 hover:bg-red-600 transition-colors min-w-[140px] sm:min-w-[185px] h-[45px] flex justify-center items-center flex-1/4 `}
                 onClick={() => {
                   resetFormData();
-                  navigate("/properties"); // Navigate back to the properties list
+               navigateToProperties(); // Navigate back to the properties list
                 }}
                 disabled={isSubmitting}
               >

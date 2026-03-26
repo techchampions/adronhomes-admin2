@@ -25,7 +25,7 @@ import { directors } from "../../../components/Redux/directors/directors_thunk";
 import OptionInputField from "../../../components/input/drop_down";
 import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
 import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { resetToggleLatestState } from "../../../components/Redux/Properties/toggleLatestslice";
 import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatestThunk";
 
@@ -81,7 +81,7 @@ export interface PropertyData {
   unit_sold: any;
   property_view: any;
   property_requests: any;
-  director_id?: any | null; // Add director_id to the interface
+  director_id?: any | null;
 }
 
 interface PropertyTableProps {
@@ -96,6 +96,8 @@ export default function PropertyTableComponent({
   activeTab,
 }: PropertyTableProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(
     null
@@ -103,6 +105,12 @@ export default function PropertyTableComponent({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  // Create navigation helper function
+  const navigateToPropertyDetails = (propertyId: number) => {
+    const hasInfoTech = location.pathname.includes('/info-tech');
+    navigate(hasInfoTech ? `/info-tech/properties/${propertyId}` : `/properties/${propertyId}`);
+  };
 
   // Get the update state from Redux
   const { loading, success, error } = useSelector(
@@ -134,6 +142,7 @@ export default function PropertyTableComponent({
         value: person.id,
       }))
     : [];
+    
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
       toast.success("Property deleted successfully!");
@@ -149,6 +158,7 @@ export default function PropertyTableComponent({
       toast.error(deleteerror || "Failed to delete property");
     }
   }, [deletesuccess, deleteerror, dispatch, propertyToDelete]);
+  
   // Add these handler functions
   const handleDeleteClick = (property: PropertyData) => {
     setPropertyToDelete(property);
@@ -227,11 +237,11 @@ const pagination = useSelector((state: RootState) => {
         return "Commercial";
     }
   };
-  const navigate = useNavigate();
 
   const handleRowClick = (propertyId: number) => {
-    navigate(`/properties/${propertyId}`);
+    navigateToPropertyDetails(propertyId);
   };
+  
   const handleEditClick = (property: PropertyData) => {
     setEditingProperty(property);
     setImagePreview(property.display_image || null);
@@ -298,6 +308,7 @@ const pagination = useSelector((state: RootState) => {
       };
     });
   };
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -350,6 +361,7 @@ const pagination = useSelector((state: RootState) => {
       })
     );
   };
+  
   // handler for array fields
   const handleArrayInputChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -373,6 +385,7 @@ const pagination = useSelector((state: RootState) => {
   // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
+    setIsPropertyModalOpen(true);
   };
 
   const {
@@ -408,14 +421,17 @@ const pagination = useSelector((state: RootState) => {
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
   };
+  
   const {
     loading: toggleLatestLoading,
     success: toggleLatestSuccess,
     error: toggleLatestError,
   } = useSelector((state: RootState) => state.toggleLatest);
+  
   const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<
     number | null
   >(null);
+  
   useEffect(() => {
     if (toggleLatestSuccess) {
       dispatch(
@@ -430,6 +446,7 @@ const pagination = useSelector((state: RootState) => {
       dispatch(resetToggleLatestState());
     }
   }, [toggleLatestSuccess, toggleLatestError, dispatch]);
+  
   const handleToggleLatest = async (propertyId: number) => {
     setLoadingLatestPropertyId(propertyId);
     await dispatch(toggleLatest({ id: propertyId }));
@@ -452,7 +469,6 @@ const pagination = useSelector((state: RootState) => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Property Type
                 </th>
-
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
@@ -462,11 +478,10 @@ const pagination = useSelector((state: RootState) => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Featured
                 </th>
-
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Latest
                 </th>
-              </tr>
+               </tr>
             </thead>
             <tbody>
               {data && data.length > 0 ? (
@@ -483,7 +498,10 @@ const pagination = useSelector((state: RootState) => {
                         <div className="flex items-center">
                           <div
                             className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"
-                            onClick={() => handlePropertyClick(property)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePropertyClick(property);
+                            }}
                           >
                             <img
                               src={
@@ -508,6 +526,7 @@ const pagination = useSelector((state: RootState) => {
                               <img
                                 src={"/location.svg"}
                                 className="mr-1 shrink-0"
+                                alt="location"
                               />
                               <span className="truncate">
                                 {property.street_address}
@@ -546,7 +565,6 @@ const pagination = useSelector((state: RootState) => {
                         </div>
                       </div>
                     </td>
-
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -577,6 +595,7 @@ const pagination = useSelector((state: RootState) => {
                           <img
                             src="mingcute_delete-fill.svg"
                             className="w-[18px] h-[18px]"
+                            alt="delete"
                           />
                         </button>
                       </div>
@@ -617,8 +636,6 @@ const pagination = useSelector((state: RootState) => {
                       </label>
                     </td>
                     <td className="w-1/6 py-4 px-6 text-sm">
-                      {" "}
-                      {/* Add this new cell */}
                       <label className="inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -681,6 +698,15 @@ const pagination = useSelector((state: RootState) => {
           loading={deleteloading}
           confirmButtonText="Delete Property"
           cancelButtonText="Cancel"
+        />
+      )}
+
+      {/* Property Modal */}
+      {isPropertyModalOpen && selectedProperty && (
+        <PropertyModal
+          isOpen={isPropertyModalOpen}
+          onClose={() => setIsPropertyModalOpen(false)}
+          property={selectedProperty}
         />
       )}
 
