@@ -41,6 +41,9 @@ interface ContractData {
   currentbalance: string;
   created_at: string;
   updated_at: string;
+marketer1:string;
+marketer2:string;
+marketer3:string;
 }
 
 interface CittaContractModalProps {
@@ -418,7 +421,45 @@ const CittaContractModal: React.FC<CittaContractModalProps> = ({
               </div>
             </div>
           </div>
+                  {/* Marketers in charge */}
+      <div className="border-b border-b-gray-200 py-3 sm:py-4 w-full">
+            <h4 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Marketers in Charge</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="mb-1 text-xs sm:text-sm font-normal text-gray-600">Marketer one </p>
+                <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
+                  {contractData.marketer1 ?? 'not available'} 
+                </h1>
+              </div>
+              <div>
+                <p className="mb-1 text-xs sm:text-sm font-normal text-gray-600">Marketer two</p>
+                <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
+                  {contractData.marketer2 ?? 'not available'}
+                </h1>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <p className="mb-1 text-xs sm:text-sm font-normal text-gray-600">Marketer three</p>
+                <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
+               {contractData.marketer3 ?? 'not available'}
+                </h1>
+              </div>
+             
+            </div>
+            
+            {contractData.fullPaymentDate && (
+              <div className="mt-3">
+                <p className="mb-1 text-xs sm:text-sm font-normal text-gray-600">Full Payment Date</p>
+                <h1 className="font-normal text-gray-900 text-xs sm:text-sm md:text-base">
+                  {formatDate(contractData.fullPaymentDate)}
+                </h1>
+              </div>
+            )}
+          </div>
         </div>
+
 
         {/* Fixed Bottom Section (Actions) */}
         <div className=" mt-2 gap-2 w-full items-center flex-shrink-0 pt-4">
