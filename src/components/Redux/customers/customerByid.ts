@@ -162,6 +162,9 @@ export interface ContractData {
   currentbalance: string;
   created_at: string;
   updated_at: string;
+  marketer1:string;
+marketer2:string;
+marketer3:string;
 }
 
 export interface WalletAmount {
