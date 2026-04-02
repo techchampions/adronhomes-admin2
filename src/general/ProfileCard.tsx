@@ -183,14 +183,14 @@ export default function ProfileCard({
                 </span>
               </div>
             </div>
-            <div className="grid grid-cols-2 max-w-full mb-4">
+            {/* <div className="grid grid-cols-2 max-w-full mb-4">
               <span className="text-[#767676] font-[325] md:text-base text-sm truncate">
                 Marketer in charge:
               </span>
               <span className="text-dark font-[350] md:text-base text-sm truncate">
                 {marketerName}
               </span>
-            </div>
+            </div> */}
             <div className="flex flex-col sm:flex-row gap-4 mt-5">
               <button
                 className="bg-[#272727] text-white font-bold text-sm rounded-[30px] py-[14px] px-[44px] hover:bg-gray-800 transition-colors"
