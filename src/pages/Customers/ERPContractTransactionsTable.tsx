@@ -1,5 +1,5 @@
-// ERPContractTransactionsTable.tsx
-import React, { useState, useEffect } from "react";
+// ERPContractTransactionsTable.tsx (fixed version)
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import TableCard, { PaginationProps } from "../../general/TableCard";
@@ -14,6 +14,7 @@ import {
   selectERPTransactionsPagination,
   clearTransactions,
   setPage,
+  resetERPContractTransactionsState,
 } from "../../components/Redux/Contract/erpContractTransactions/erpContractTransactionsSlice";
 import { fetchERPContractTransactions } from "../../components/Redux/Contract/erpContractTransactions/erpContractTransactionsThunk";
 import { AppDispatch } from "../../components/Redux/store";
@@ -38,7 +39,8 @@ const ERPContractTransactionsTable: React.FC<
   const error = useSelector(selectERPTransactionsError);
   const pagination = useSelector(selectERPTransactionsPagination);
 
-  useEffect(() => {
+  // Fetch transactions when contractId or page changes
+  const fetchTransactions = useCallback(() => {
     if (contractId) {
       dispatch(
         fetchERPContractTransactions({
@@ -47,20 +49,36 @@ const ERPContractTransactionsTable: React.FC<
         }),
       );
     }
-
-    return () => {
-      dispatch(clearTransactions());
-    };
   }, [dispatch, contractId, pagination.currentPage]);
 
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  // Reset page when contractId changes
+  useEffect(() => {
+    // Reset to page 1 when contract changes
+    if (contractId) {
+      dispatch(setPage(1));
+      dispatch(clearTransactions());
+    }
+    
+    // Cleanup when component unmounts or contractId changes
+    return () => {
+      dispatch(resetERPContractTransactionsState());
+    };
+  }, [dispatch, contractId]);
+
   const handlePageChange = (page: number) => {
-    dispatch(setPage(page));
+    if (page !== pagination.currentPage) {
+      dispatch(setPage(page));
+      // The useEffect will trigger fetchTransactions with the new page
+    }
   };
 
   const openTransactionModal = (transaction: ERPTransaction) => {
     setSelectedTransaction(transaction);
     setIsModalOpen(true);
-    // Also call the parent callback if provided
     if (onViewTransaction) {
       onViewTransaction(transaction);
     }
@@ -87,117 +105,7 @@ const ERPContractTransactionsTable: React.FC<
     originalTransaction: transaction,
   }));
 
-  // Table columns configuration
-  const columns = [
-    {
-      key: "transactionRef",
-      title: "Reference",
-      width: 150,
-      render: (_: any, row: any) => {
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          openTransactionModal(row.originalTransaction);
-        };
-
-        return (
-          <div
-            className="cursor-pointer hover:text-blue-600 hover:underline font-medium"
-            onClick={handleClick}
-          >
-            {row.transactionRef}
-          </div>
-        );
-      },
-    },
-    {
-      key: "date",
-      title: "Date",
-      width: 120,
-      render: (value: string, row: any) => {
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          openTransactionModal(row.originalTransaction);
-        };
-
-        return (
-          <div
-            className="cursor-pointer hover:text-blue-600"
-            onClick={handleClick}
-          >
-            {value}
-          </div>
-        );
-      },
-    },
-    {
-      key: "description",
-      title: "Description",
-      width: 250,
-      render: (value: string, row: any) => {
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          openTransactionModal(row.originalTransaction);
-        };
-
-        return (
-          <div
-            className="cursor-pointer truncate hover:text-blue-600"
-            onClick={handleClick}
-            title={value}
-          >
-            {value}
-          </div>
-        );
-      },
-    },
-    {
-      key: "typeDisplay",
-      title: "Type",
-      width: 100,
-      render: (value: string, row: any) => {
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          openTransactionModal(row.originalTransaction);
-        };
-
-        return (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium cursor-pointer ${
-              row.type === "C"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-            onClick={handleClick}
-          >
-            {value}
-          </span>
-        );
-      },
-    },
-    {
-      key: "amount",
-      title: "Amount",
-      width: 150,
-      render: (value: string, row: any) => {
-        const handleClick = (e: React.MouseEvent) => {
-          e.stopPropagation();
-          openTransactionModal(row.originalTransaction);
-        };
-
-        return (
-          <div
-            className={`font-medium cursor-pointer ${row.amountClass}`}
-            onClick={handleClick}
-          >
-            {row.amountPrefix}
-            {value}
-          </div>
-        );
-      },
-    },
-  ];
-
-  // Simplified columns for compact view
+  // Table columns configuration (using compactColumns by default)
   const compactColumns = [
     {
       key: "transactionRef",
@@ -279,7 +187,7 @@ const ERPContractTransactionsTable: React.FC<
             }`}
             onClick={handleClick}
           >
-            {row.type}
+            {row.type === "C" ? "CREDIT" : "DEBIT"}
           </span>
         );
       },
@@ -323,13 +231,16 @@ const ERPContractTransactionsTable: React.FC<
     );
   }
 
+  // Only show "View All" if there are more than the current page size
+  const showViewAll = pagination.total > pagination.perPage;
+
   return (
     <div className={className}>
       <TableCard
         title={`ERP Transactions - Contract ${contractId}`}
         data={tableData}
         columns={compactColumns}
-        viewAllText={pagination.total > 5 ? "View All" : null}
+        viewAllText={showViewAll ? "View All" : null}
         rowKey="id"
         pagination={{
           currentPage: pagination.currentPage,
