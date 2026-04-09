@@ -83,7 +83,7 @@ export interface PropertyPlan {
   paid_infrastructure_amount: number;
   paid_other_amount: number;
   user?: User;
-    next_repayment_data:NextRepaymentData
+  next_repayment_data: NextRepaymentData;
   contract_id: string | null;
   number_of_unit: number;
   next_repayment_amount?: NextRepaymentAmount;
@@ -93,7 +93,7 @@ export interface CompletedPropertyPlansData {
   current_page: number;
   data: PropertyPlan[];
   first_page_url: string;
-  from: number;
+  from: number | null;  // Changed to allow null
   last_page: number;
   last_page_url: string;
   links: PaginationLinks[];
@@ -101,7 +101,7 @@ export interface CompletedPropertyPlansData {
   path: string;
   per_page: number;
   prev_page_url: string | null;
-  to: number;
+  to: number | null;  // Changed to allow null
   total: number;
 }
 
@@ -109,7 +109,7 @@ export interface ActivePropertyPlansData {
   current_page: number;
   data: PropertyPlan[];
   first_page_url: string;
-  from: number;
+  from: number | null;  // Changed to allow null
   last_page: number;
   last_page_url: string;
   links: PaginationLinks[];
@@ -117,10 +117,27 @@ export interface ActivePropertyPlansData {
   path: string;
   per_page: number;
   prev_page_url: string | null;
-  to: number;
+  to: number | null;  // Changed to allow null
   total: number;
-
 }
+
+// Add PendingPropertyPlansData interface
+export interface PendingPropertyPlansData {
+  current_page: number;
+  data: PropertyPlan[];
+  first_page_url: string;
+  from: number | null;
+  last_page: number;
+  last_page_url: string;
+  links: PaginationLinks[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
 interface NextRepaymentData {
   id: number;
   property_id: number;
@@ -153,7 +170,6 @@ export interface UpcomingPayment {
     status: number;
     monthly_duration: string;
     user: User;
-    
   };
 }
 
@@ -161,7 +177,7 @@ export interface UpcomingPaymentsData {
   current_page: number;
   data: UpcomingPayment[];
   first_page_url: string;
-  from: number;
+  from: number | null;  // Changed to allow null
   last_page: number;
   last_page_url: string;
   links: PaginationLinks[];
@@ -169,9 +185,8 @@ export interface UpcomingPaymentsData {
   path: string;
   per_page: number;
   prev_page_url: string | null;
-  to: number;
+  to: number | null;  // Changed to allow null
   total: number;
-
 }
 
 export interface MarketerDashboardResponse {
@@ -187,9 +202,20 @@ export interface MarketerDashboardResponse {
     total_completed_property_plans: number;
     total_active_property_plans: number;
     upcoming_payment_count: number;
+    
+    // Add pending property plans
+    pending_property_plans: PendingPropertyPlansData;
+    
+    // Existing fields
     completed_property_plans: CompletedPropertyPlansData;
     active_property_plans: ActivePropertyPlansData;
     upcoming_payment_customers: UpcomingPaymentsData;
+    
+    // Add click tracking fields
+    total_clicks_today: number;
+    total_clicks_this_week: number;
+    total_clicks_month: number;
+    total_clicks: number;
   };
 }
 
