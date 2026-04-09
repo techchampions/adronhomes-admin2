@@ -280,3 +280,88 @@ export function GreenCardMarketer({
     </div>
   );
 }
+
+interface ClickTrackingCardProps {
+  title?: string;
+  todayClicks?: number;
+  weekClicks?: number;
+  monthClicks?: number;
+  totalClicks?: number;
+  change?: string;
+  icon?: string;
+}
+
+export function ClickTrackingCard({
+  title = "Total Clicks",
+  todayClicks = 0,
+  weekClicks = 0,
+  monthClicks = 0,
+  totalClicks = 0,
+  change = "Total link clicks across all your shared campaigns",
+  icon = "/click-icon.svg",
+}: ClickTrackingCardProps) {
+  const stats = [
+    { label: "Today", value: todayClicks, color: "#79B833" },
+    { label: "Week", value: weekClicks, color: "#57713A" },
+    { label: "Month", value: monthClicks, color: "#45632E" },
+    { label: "Total", value: totalClicks, color: "#E8A735" },
+  ];
+
+  return (
+    <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] pb-6 md:pb-2">
+      <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-100 px-4 md:px-6 py-3 md:py-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+          {/* Left - Title */}
+          <div className="flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 15L21 21M18 9C18 13.9706 13.9706 18 9 18C4.02944 18 0 13.9706 0 9C0 4.02944 4.02944 0 9 0C13.9706 0 18 4.02944 18 9Z" 
+                stroke="#57713A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 6V9M9 12H9.01" stroke="#57713A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div className="flex flex-col">
+              <span className="font-gotham text-sm font-[350] text-dark">
+                {title}
+              </span>
+              <p className="font-gotham text-xs font-[325] text-[#767676]">
+                {change}
+              </p>
+            </div>
+          </div>
+
+          {/* Center - Stats in a row with circular indicators */}
+          <div className="flex items-center gap-6 md:gap-8">
+            {stats.map((stat, idx) => (
+              <div 
+                key={idx} 
+                className="flex items-center gap-2 group cursor-pointer"
+              >
+                {/* Circular indicator dot */}
+                <div 
+                  className="w-2 h-2 rounded-full transition-all duration-200 group-hover:scale-150"
+                  style={{ 
+                    backgroundColor: stat.color,
+                    boxShadow: `0 0 4px ${stat.color}`
+                  }}
+                />
+                
+                <div className="flex flex-col">
+                  <span className="font-gotham md:text-xl text-base font-[350] text-dark">
+                    {stat.value.toLocaleString()}
+                  </span>
+                  <span className="font-gotham text-[10px] md:text-xs font-[325] text-[#767676]">
+                    {stat.label}
+                  </span>
+                </div>
+                
+                {/* Tooltip on hover */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-50 bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                  {stat.value.toLocaleString()} clicks {stat.label.toLowerCase()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

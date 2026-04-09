@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { GreenCardMarketer, MatrixCard } from "../../components/firstcard";
+import { GreenCardMarketer, MatrixCard, ClickTrackingCard } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import CustomersTableAll from "./allcustomersTable"; 
 import CustomersTableAllActive from "./activePlans";
@@ -12,18 +12,42 @@ import NotFound from "../../components/NotFound";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import Upcomingdata from "./Upcomingdata ";
 import CompletedPlans from "./completedTable";
+import PendingPlans from "./pendingPlans"; // Create this component
 
 export default function MarketersDashboard() {
-  const tabs = [ "Active Plans", "Completed Plans", "Upcoming Payments"]; 
-  const [activeTab, setActiveTab] = useState("Active Plans");
+  const tabs = ["Pending Plans", "Active Plans", "Completed Plans", "Upcoming Payments"]; 
+  const [activeTab, setActiveTab] = useState("Pending Plans");
   const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
   const { data, error, loading } = useSelector((state: RootState) => state.marketerdashboard);
 
+  // Get click tracking data from Redux state
+  const clickTracking = useSelector((state: RootState) => state.marketerdashboard.clickTracking);
+
   useEffect(() => {
     dispatch(fetchMarketerDashboard({ currentpage: 1 }));
   }, [dispatch]);
+
+  // Function to prepare data for Pending Plans Table
+  const getPendingPlansData = (): any[] => {
+    if (!data?.pending_property_plans?.data) return [];
+    return data.pending_property_plans.data.map((item) => ({
+      name: item.user ? `${item.user.first_name} ${item.user.last_name}` : "N/A",
+      StartDate: item.start_date,
+      EndDate: item.end_date,
+      totalAmount: item.total_amount,
+      paid_amount: item.paid_amount,
+      remaining_balance: item.remaining_balance,
+      payment_percentage: item.payment_percentage,
+      plan_id: item.id,
+      user_id: item.user_id,
+      phoneNumber: item.user?.phone_number || "N/A",
+      unique_customer_id: item.user?.unique_customer_id || "N/A",
+      status: item.status,
+      next_payment_date: item.next_payment_date
+    }));
+  };
 
   // Function to prepare data for Active Plans Table
   const getActivePlansData = (): any[] => {
@@ -34,12 +58,11 @@ export default function MarketersDashboard() {
       EndDate: item.end_date,
       nextPayment: item.next_payment_date,
       paid_amount: item.paid_amount,
-      nextPaymentAmount: item.next_repayment_data.amount || 0,
+      nextPaymentAmount: item.next_repayment_data?.amount || 0,
       plan_id: item.id,
       user_id: item.user_id,
       total_amount: item.total_amount,
       remaining_balance: item.remaining_balance,
-
       unique_customer_id: item.user?.unique_customer_id || "N/A"
     }));
   };
@@ -57,7 +80,6 @@ export default function MarketersDashboard() {
       phoneNumber: item.user?.phone_number || "N/A",
       plan_id: item.id,
       user_id: item.user_id,
-
       unique_customer_id: item.user?.unique_customer_id || "N/A"
     }));
   };
@@ -76,18 +98,18 @@ export default function MarketersDashboard() {
       plan_id: item.plan_id,
       total_amount: item.property_plan.total_amount,
       remaining_balance: item.property_plan.remaining_balance,
-
       unique_customer_id: item.property_plan.user?.unique_customer_id || "N/A"
-
     }));
   };
 
+  const pendingPlans = getPendingPlansData();
   const activePlans = getActivePlansData();
   const completedPlans = getCompletedPlansData(); 
   const upcomingPayments = getUpcomingdata();
   const [searchTerm, setSearchTerm] = useState("");
   
   // Check if data arrays are empty
+  const isPendingPlansEmpty = pendingPlans.length === 0;
   const isActivePlansEmpty = activePlans.length === 0;
   const isCompletedPlansEmpty = completedPlans.length === 0; 
   const isUpcomingEmpty = upcomingPayments.length === 0;
@@ -98,16 +120,14 @@ export default function MarketersDashboard() {
     
     const searchLower = searchTerm.toLowerCase();
     return data.filter((item) => {
-      // Check all values in the object
       return Object.values(item).some((value) => {
         if (value === null || value === undefined) return false;
-        
-        // Convert value to string and check if it contains the search term
         return value.toString().toLowerCase().includes(searchLower);
       });
     });
   };
 
+  const filteredPendingPlans = filterData(pendingPlans, searchTerm);
   const filteredActivePlans = filterData(activePlans, searchTerm);
   const filteredCompletedPlans = filterData(completedPlans, searchTerm);
   const filteredUpcomingPayments = filterData(upcomingPayments, searchTerm);
@@ -117,13 +137,16 @@ export default function MarketersDashboard() {
   };
   
   return (
-    <div className="mb-[52px]">
+    <div className="mb-[52px] relative">
       <Header
         copyCode={data?.marketer?.referral_code}
         role={data?.marketer?.referral_code} 
         Name={`${data?.marketer?.first_name || ''} ${data?.marketer?.last_name || ''}`}
+      
       />
-      <div className="space-y-[30px]">
+
+      <div className="space-y-[6px]">
+        {/* First Row - Original Cards */}
         <div className="grid lg:grid-cols-4 gap-[10px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
           <GreenCardMarketer
             currency={true}
@@ -148,7 +171,17 @@ export default function MarketersDashboard() {
             change="Customers with upcoming payments"
           />
         </div>
-
+    <div className="pt-4">
+          <ClickTrackingCard
+            title="Link Performance"
+            todayClicks={clickTracking.total_clicks_today}
+            weekClicks={clickTracking.total_clicks_this_week}
+            monthClicks={clickTracking.total_clicks_month}
+            totalClicks={clickTracking.total_clicks}
+            change="Total link clicks across all your shared campaigns"
+          />
+      
+        </div>
         <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[26px]">
           <ReusableTable
             tabs={tabs}
@@ -168,6 +201,17 @@ export default function MarketersDashboard() {
                 </p>
                 <NotFound /> 
               </div>
+            ) : activeTab === "Pending Plans" ? (
+              isPendingPlansEmpty ? (
+                <div className="max-h-screen">
+                  <p className="text-center font-normal text-[#767676]">
+                    No pending plans found
+                  </p>
+                  <NotFound />
+                </div>
+              ) : (
+                <PendingPlans customerData={filteredPendingPlans} />
+              )
             ) : activeTab === "Active Plans" ? (
               isActivePlansEmpty ? (
                 <div className="max-h-screen">

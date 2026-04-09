@@ -2,7 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { BiCopy, BiCheck, BiShareAlt } from "react-icons/bi";
-import { FaFacebook, FaXTwitter, FaWhatsapp, FaInstagram } from "react-icons/fa6";
+import {
+  FaFacebook,
+  FaXTwitter,
+  FaWhatsapp,
+  FaInstagram,
+} from "react-icons/fa6";
 
 interface HeaderProps {
   searchPlaceholder?: string;
@@ -46,7 +51,7 @@ export default function Header({
   const shareToFacebook = () => {
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralUrl)}`,
-      "_blank"
+      "_blank",
     );
     setShowShareMenu(false);
   };
@@ -54,7 +59,7 @@ export default function Header({
   const shareToTwitter = () => {
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(referralUrl)}`,
-      "_blank"
+      "_blank",
     );
     setShowShareMenu(false);
   };
@@ -62,7 +67,7 @@ export default function Header({
   const shareToWhatsApp = () => {
     window.open(
       `https://wa.me/?text=${encodeURIComponent(shareText + " " + referralUrl)}`,
-      "_blank"
+      "_blank",
     );
     setShowShareMenu(false);
   };
@@ -87,8 +92,8 @@ export default function Header({
         <div className="flex-1 w-full max-w-md">
           <div
             className={`relative flex items-center h-12 px-5 rounded-2xl border transition-all duration-200 bg-gray-50 ${
-              isSearchFocused 
-                ? "border-[#79B833] shadow-md" 
+              isSearchFocused
+                ? "border-[#79B833] shadow-md"
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
@@ -105,7 +110,9 @@ export default function Header({
         {/* Right - Referral & Share */}
         <div className="flex flex-col items-end lg:items-start w-full lg:w-auto lg:min-w-[340px]">
           <div className="flex items-center gap-2 mb-3">
-            <p className="text-sm font-medium text-gray-700">Your Referral Link</p>
+            <p className="text-sm font-medium text-gray-700">
+              Your Referral Link
+            </p>
           </div>
 
           {/* URL Display */}
@@ -145,8 +152,10 @@ export default function Header({
               {/* Share Dropdown Menu - Horizontal */}
               {showShareMenu && (
                 <div className="absolute top-full right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-3 min-w-[320px] z-[9999]">
-                  <p className="px-2 py-1 text-xs font-semibold text-gray-500 border-b mb-2">Share via</p>
-                  
+                  <p className="px-2 py-1 text-xs font-semibold text-gray-500 border-b mb-2">
+                    Share via
+                  </p>
+
                   <div className="flex gap-2 justify-around">
                     <button
                       onClick={shareToWhatsApp}
@@ -156,7 +165,9 @@ export default function Header({
                       <div className="w-10 h-10 bg-[#25D366] text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <FaWhatsapp className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-medium text-gray-600">WhatsApp</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        WhatsApp
+                      </span>
                     </button>
 
                     <button
@@ -167,7 +178,9 @@ export default function Header({
                       <div className="w-10 h-10 bg-[#1877F2] text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <FaFacebook className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-medium text-gray-600">Facebook</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        Facebook
+                      </span>
                     </button>
 
                     <button
@@ -178,7 +191,9 @@ export default function Header({
                       <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <FaXTwitter className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-medium text-gray-600">X</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        X
+                      </span>
                     </button>
 
                     <button
@@ -189,7 +204,9 @@ export default function Header({
                       <div className="w-10 h-10 bg-gradient-to-tr from-[#f56040] via-[#c13584] to-[#405de6] text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <FaInstagram className="w-5 h-5" />
                       </div>
-                      <span className="text-xs font-medium text-gray-600">Instagram</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        Instagram
+                      </span>
                     </button>
                   </div>
                 </div>
