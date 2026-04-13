@@ -68,6 +68,7 @@ import  exportPersonnelReducer  from "./export/exportPersonnelSlice";
 import profileSlicereducer from "./profileUpdate/profileSlice";
 import propertyCategoriesReducer from "./Properties/propertycategory/propertyCategorySlice";
 import adminImpersonateSliceReducer from "./adminimpersonate/adminimpersonateslice";
+import contractPaymentsReducer from "./Contract/contract_payments_slice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -137,7 +138,8 @@ erpContractTransactions:erpContractTransactionsReducer,
 exportPersonnel:exportPersonnelReducer,
 profile:profileSlicereducer,
 propertyCategories:propertyCategoriesReducer,
-adminImpersonate: adminImpersonateSliceReducer,},
+adminImpersonate: adminImpersonateSliceReducer,
+contractPayments: contractPaymentsReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;
