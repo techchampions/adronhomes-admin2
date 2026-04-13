@@ -16,6 +16,7 @@ const navItems = [
   { label: "Property Payments", icon: Icon3, path: "/payments" },
   { label: "Wallet Transactions", icon: Icon8, path: "/wallet-Transactions" },
   { label: "Contracts", icon: Icon7, path: "/contracts" },
+    { label: "Contract Payments", icon: Icon7, path: "/contract-payments" },
   { label: "Properties", icon: Icon5, path: "/properties" },
   {
     label: "Client Partnership",

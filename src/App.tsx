@@ -78,6 +78,7 @@ import SettingsCard from "./marketer/SettingsCard";
 import ResetCard from "./components/Modals/settings/changepassword";
 import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 import { clearImpersonation } from "./components/Redux/adminimpersonate/adminimpersonateslice";
+import ContractPayments from "./pages/contract/ ContractPayments";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
 const NotFoundRedirect = () => {
@@ -507,6 +508,7 @@ const App = () => {
 
               {/* User wallet */}
               <Route path="/wallet-Transactions" element={<UserWallet />} />
+              <Route path="/contract-payments" element={<ContractPayments />} />
 
               {/* Client Routes */}
               <Route path="/client" element={<AuthGuard />}>
@@ -604,7 +606,6 @@ const App = () => {
                   element={<AccountDetails />}
                 />
 
-
                 {/* properties */}
                 <Route
                   path="properties/property-edith/:id"
@@ -617,8 +618,8 @@ const App = () => {
                 <Route path="properties" element={<Properties />} />
                 {/* <Route path="properties/form" element={<General />} /> */}
                 <Route path="properties/form" element={<General />} />
-             
-{/* properties */}
+
+                {/* properties */}
               </Route>
 
               {/* 404 Route - This will catch all unmatched routes */}
