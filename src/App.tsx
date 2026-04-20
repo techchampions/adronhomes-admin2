@@ -79,6 +79,10 @@ import ResetCard from "./components/Modals/settings/changepassword";
 import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 import { clearImpersonation } from "./components/Redux/adminimpersonate/adminimpersonateslice";
 import ContractPayments from "./pages/contract/ ContractPayments";
+import GiftFormPage from "./components/gift/giftForm/giftFormPage";
+import Gifts from "./components/gift/components/Gifts/Gifts";
+import GiftDetail from "./components/gift/components/GiftDetail";
+import EditGiftFormPage from "./components/gift/giftForm/GiftEditForm";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
 const NotFoundRedirect = () => {
@@ -326,6 +330,11 @@ const App = () => {
                   element={<ClientsPartnership />}
                 />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/gift-form" element={<GiftFormPage />} />
+                <Route path="/gifts" element={<Gifts />} />
+                <Route path="/gifts/:id" element={<GiftDetail />} />
+                <Route path="/gifts/edit/:id" element={<EditGiftFormPage />} />
+
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
 
