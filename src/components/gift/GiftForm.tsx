@@ -36,7 +36,7 @@ const giftTypeOptions = [
   {
     value: "standard",
     label: "Standard (Cow, Food, etc.)",
-    unit: "Piece/KG/Liter",
+    unit: "units",
   },
 ];
 
@@ -52,14 +52,14 @@ const houseUnitOptions = [
 ];
 
 const standardUnitOptions = [
-  { value: "piece", label: "Piece" },
-  { value: "kg", label: "Kilogram (kg)" },
-  { value: "liter", label: "Liter" },
-  { value: "bag", label: "Bag" },
-  { value: "crate", label: "Crate" },
-  { value: "bundle", label: "Bundle" },
-  { value: "dozen", label: "Dozen" },
-  { value: "ton", label: "Ton" },
+  // { value: "piece", label: "Piece" },
+  // { value: "kg", label: "Kilogram (kg)" },
+  // { value: "liter", label: "Liter" },
+  // { value: "bag", label: "Bag" },
+  // { value: "crate", label: "Crate" },
+  // { value: "bundle", label: "Bundle" },
+  // { value: "dozen", label: "Dozen" },
+  { value: "unit", label: "unit" },
 ];
 
 // Status options

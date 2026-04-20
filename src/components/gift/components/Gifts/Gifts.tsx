@@ -280,7 +280,7 @@ export default function Gifts() {
             data={transformedGifts}
             loading={loading}
             onEdit={handleEdit}
-            onDelete={handleDeleteClick}
+            // onDelete={handleDeleteClick}
             onStatusChange={handleStatusChange}
             onViewDetails={handleViewDetails}
           />

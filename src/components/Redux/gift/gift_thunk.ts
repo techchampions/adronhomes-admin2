@@ -7,24 +7,33 @@ export interface ErrorResponse {
   errors?: Record<string, string[]>;
 }
 
-
 export interface GiftRequest {
   id: number;
   user_id: number;
   gift_id: number;
   property_id: number;
   user_note: string | null;
-  status: 'pending' | 'granted' | 'rejected';
+  status: "pending" | "granted" | "rejected";
   processed_at: string;
   created_at: string;
+     user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string;
+    referral_link: string | null;
+},
   updated_at: string;
-  user: null | any;
+  // user: null | any;
   gift: {
     id: number;
     name: string;
     type: string;
     remaining_quantity: number;
   };
+
+
   property: {
     id: number;
     name: string;
@@ -67,6 +76,7 @@ export interface Gift {
   quantity_per_property: number;
   remaining_quantity: number;
   claimed_count: number;
+
   start_date: string;
   end_date: string;
   status: string;
@@ -110,6 +120,9 @@ export interface SingleGiftStats {
   total_fulfilled: number;
   total_unfulfilled: number;
   total_value: number;
+
+  total_claimed: number;
+  total_remaining: number;
 }
 
 // Create gift request
@@ -194,28 +207,38 @@ const getAuthHeaders = () => {
 };
 
 // Type guard to check if value is metadata object
-function isMetadataObject(value: any): value is CreateGiftRequest['metadata'] {
-  return value && typeof value === 'object' && !(value instanceof File) && ('brand' in value || 'warranty_period' in value);
+function isMetadataObject(value: any): value is CreateGiftRequest["metadata"] {
+  return (
+    value &&
+    typeof value === "object" &&
+    !(value instanceof File) &&
+    ("brand" in value || "warranty_period" in value)
+  );
 }
 
 // Helper function to safely append form data
 function appendFormData(formData: FormData, key: string, value: any): void {
   if (value === undefined || value === null) return;
-  
+
   // Handle metadata object
   if (key === "metadata" && isMetadataObject(value)) {
     if (value.brand) formData.append("metadata[brand]", value.brand);
-    if (value.warranty_period) formData.append("metadata[warranty_period]", value.warranty_period);
-    if (value.installation_included) formData.append("metadata[installation_included]", value.installation_included);
+    if (value.warranty_period)
+      formData.append("metadata[warranty_period]", value.warranty_period);
+    if (value.installation_included)
+      formData.append(
+        "metadata[installation_included]",
+        value.installation_included,
+      );
     return;
   }
-  
+
   // Handle file
   if (value instanceof File) {
     formData.append(key, value);
     return;
   }
-  
+
   // Handle primitive values (string, number, boolean)
   if (typeof value !== "object") {
     formData.append(key, value.toString());
@@ -234,7 +257,7 @@ export const createGift = createAsyncThunk<
   try {
     const headers = getAuthHeaders();
     const formData = new FormData();
-    
+
     // Safely append all form data
     Object.entries(giftData).forEach(([key, value]) => {
       appendFormData(formData, key, value);
@@ -243,13 +266,15 @@ export const createGift = createAsyncThunk<
     const response = await api.post<GiftMutationResponse>(
       `${BASE_URL}/api/admin/gifts`,
       formData,
-      { headers: { ...headers, "Content-Type": "multipart/form-data" } }
+      { headers: { ...headers, "Content-Type": "multipart/form-data" } },
     );
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
       message: error.response?.data?.message || "Failed to create gift",
@@ -265,28 +290,36 @@ export const fetchGifts = createAsyncThunk<
   GiftsListResponse,
   { page?: number; per_page?: number; search?: string; status?: string },
   { rejectValue: ErrorResponse }
->("gifts/fetchAll", async ({ page = 1, per_page = 20, search = "", status = "" }, { rejectWithValue }) => {
-  try {
-    const headers = getAuthHeaders();
-    const params: any = { page, per_page };
-    if (search) params.search = search;
-    if (status) params.status = status;
+>(
+  "gifts/fetchAll",
+  async (
+    { page = 1, per_page = 20, search = "", status = "" },
+    { rejectWithValue },
+  ) => {
+    try {
+      const headers = getAuthHeaders();
+      const params: any = { page, per_page };
+      if (search) params.search = search;
+      if (status) params.status = status;
 
-    const response = await api.get<GiftsListResponse>(
-      `${BASE_URL}/api/admin/gifts`,
-      { headers, params }
-    );
-    return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      const response = await api.get<GiftsListResponse>(
+        `${BASE_URL}/api/admin/gifts`,
+        { headers, params },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        Cookies.remove("token");
+        return rejectWithValue({
+          message: "Session expired. Please login again.",
+        });
+      }
+      return rejectWithValue({
+        message: error.response?.data?.message || "Failed to fetch gifts",
+      });
     }
-    return rejectWithValue({
-      message: error.response?.data?.message || "Failed to fetch gifts",
-    });
-  }
-});
+  },
+);
 
 // ============================================
 // FETCH SINGLE GIFT BY ID
@@ -300,13 +333,15 @@ export const fetchGiftById = createAsyncThunk<
     const headers = getAuthHeaders();
     const response = await api.get<SingleGiftResponse>(
       `${BASE_URL}/api/admin/gifts/${id}`,
-      { headers }
+      { headers },
     );
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     if (error.response?.status === 404) {
       return rejectWithValue({ message: "Gift not found" });
@@ -333,7 +368,7 @@ export const updateGift = createAsyncThunk<
       // Use FormData for file upload
       const formData = new FormData();
       formData.append("_method", "PUT");
-      
+
       // Safely append all form data
       Object.entries(data).forEach(([key, value]) => {
         appendFormData(formData, key, value);
@@ -342,7 +377,7 @@ export const updateGift = createAsyncThunk<
       const response = await api.post<GiftMutationResponse>(
         `${BASE_URL}/api/admin/gifts/${id}`,
         formData,
-        { headers: { ...headers, "Content-Type": "multipart/form-data" } }
+        { headers: { ...headers, "Content-Type": "multipart/form-data" } },
       );
       return response.data;
     } else {
@@ -350,14 +385,16 @@ export const updateGift = createAsyncThunk<
       const response = await api.put<GiftMutationResponse>(
         `${BASE_URL}/api/admin/gifts/${id}`,
         data,
-        { headers: { ...headers, "Content-Type": "application/json" } }
+        { headers: { ...headers, "Content-Type": "application/json" } },
       );
       return response.data;
     }
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
       message: error.response?.data?.message || "Failed to update gift",
@@ -378,14 +415,16 @@ export const deleteGift = createAsyncThunk<
     const headers = getAuthHeaders();
     const response = await api.delete<{ success: boolean; message: string }>(
       `${BASE_URL}/api/admin/gifts/${id}`,
-      
-      { headers }
+
+      { headers },
     );
     return { ...response.data, id };
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
       message: error.response?.data?.message || "Failed to delete gift",
@@ -406,13 +445,15 @@ export const updateGiftStatus = createAsyncThunk<
     const response = await api.patch<GiftMutationResponse>(
       `${BASE_URL}/api/admin/gifts/${id}/status`,
       { status },
-      { headers: { ...headers, "Content-Type": "application/json" } }
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
       message: error.response?.data?.message || "Failed to update gift status",
@@ -427,25 +468,31 @@ export const assignGiftToProperty = createAsyncThunk<
   { success: boolean; message: string; data: any },
   { giftId: number; propertyId: number },
   { rejectValue: ErrorResponse }
->("gifts/assignToProperty", async ({ giftId, propertyId }, { rejectWithValue }) => {
-  try {
-    const headers = getAuthHeaders();
-    const response = await api.post(
-      `${BASE_URL}/api/admin/gifts/${giftId}/assign`,
-      { property_id: propertyId },
-      { headers: { ...headers, "Content-Type": "application/json" } }
-    );
-    return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+>(
+  "gifts/assignToProperty",
+  async ({ giftId, propertyId }, { rejectWithValue }) => {
+    try {
+      const headers = getAuthHeaders();
+      const response = await api.post(
+        `${BASE_URL}/api/admin/gifts/${giftId}/assign`,
+        { property_id: propertyId },
+        { headers: { ...headers, "Content-Type": "application/json" } },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        Cookies.remove("token");
+        return rejectWithValue({
+          message: "Session expired. Please login again.",
+        });
+      }
+      return rejectWithValue({
+        message:
+          error.response?.data?.message || "Failed to assign gift to property",
+      });
     }
-    return rejectWithValue({
-      message: error.response?.data?.message || "Failed to assign gift to property",
-    });
-  }
-});
+  },
+);
 
 // ============================================
 // BULK ASSIGN GIFTS TO PROPERTIES
@@ -462,25 +509,32 @@ export const bulkAssignMultipleGifts = createAsyncThunk<
   { success: boolean; message: string; data: any },
   BulkAssignMultipleGiftsRequest,
   { rejectValue: ErrorResponse }
->("gifts/bulkAssignMultiple", async ({ gift_ids, property_ids }, { rejectWithValue }) => {
-  try {
-    const headers = getAuthHeaders();
-    const response = await api.post(
-      `${BASE_URL}/api/admin/gifts/bulk-assign`,
-      { gift_ids, property_ids },
-      { headers: { ...headers, "Content-Type": "application/json" } }
-    );
-    return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+>(
+  "gifts/bulkAssignMultiple",
+  async ({ gift_ids, property_ids }, { rejectWithValue }) => {
+    try {
+      const headers = getAuthHeaders();
+      const response = await api.post(
+        `${BASE_URL}/api/admin/gifts/bulk-assign`,
+        { gift_ids, property_ids },
+        { headers: { ...headers, "Content-Type": "application/json" } },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        Cookies.remove("token");
+        return rejectWithValue({
+          message: "Session expired. Please login again.",
+        });
+      }
+      return rejectWithValue({
+        message:
+          error.response?.data?.message ||
+          "Failed to assign gifts to properties",
+      });
     }
-    return rejectWithValue({
-      message: error.response?.data?.message || "Failed to assign gifts to properties",
-    });
-  }
-});
+  },
+);
 
 // ============================================
 // GET GIFT STATISTICS
@@ -492,51 +546,57 @@ export const getGiftStatistics = createAsyncThunk<
 >("gifts/getStatistics", async (_, { rejectWithValue }) => {
   try {
     const headers = getAuthHeaders();
-    const response = await api.get(
-      `${BASE_URL}/api/admin/gifts/statistics`,
-      { headers }
-    );
+    const response = await api.get(`${BASE_URL}/api/admin/gifts/statistics`, {
+      headers,
+    });
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
-      message: error.response?.data?.message || "Failed to fetch gift statistics",
+      message:
+        error.response?.data?.message || "Failed to fetch gift statistics",
     });
   }
 });
-
-
 
 export const fetchGiftRequests = createAsyncThunk<
   GiftRequestsResponse,
   { gift_id?: number; property_id?: number; status?: string },
   { rejectValue: ErrorResponse }
->("gifts/fetchRequests", async ({ gift_id, property_id, status = "" }, { rejectWithValue }) => {
-  try {
-    const headers = getAuthHeaders();
-    const params: any = {};
-    if (gift_id) params.gift_id = gift_id;
-    if (property_id) params.property_id = property_id;
-    if (status) params.status = status;
+>(
+  "gifts/fetchRequests",
+  async ({ gift_id, property_id, status = "" }, { rejectWithValue }) => {
+    try {
+      const headers = getAuthHeaders();
+      const params: any = {};
+      if (gift_id) params.gift_id = gift_id;
+      if (property_id) params.property_id = property_id;
+      if (status) params.status = status;
 
-    const response = await api.get<GiftRequestsResponse>(
-      `${BASE_URL}/api/admin/gifts/requests`,
-      { headers, params }
-    );
-    return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      const response = await api.get<GiftRequestsResponse>(
+        `${BASE_URL}/api/gifts/requests`,
+        { headers, params },
+      );
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        Cookies.remove("token");
+        return rejectWithValue({
+          message: "Session expired. Please login again.",
+        });
+      }
+      return rejectWithValue({
+        message:
+          error.response?.data?.message || "Failed to fetch gift requests",
+      });
     }
-    return rejectWithValue({
-      message: error.response?.data?.message || "Failed to fetch gift requests",
-    });
-  }
-});
+  },
+);
 
 // Grant/Approve a gift request
 export const grantGiftRequest = createAsyncThunk<
@@ -549,13 +609,15 @@ export const grantGiftRequest = createAsyncThunk<
     const response = await api.post(
       `${BASE_URL}/api/admin/gifts/${giftId}/grant`,
       { request_id: requestId },
-      { headers: { ...headers, "Content-Type": "application/json" } }
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
       message: error.response?.data?.message || "Failed to grant gift request",
@@ -574,16 +636,46 @@ export const rejectGiftRequest = createAsyncThunk<
     const response = await api.post(
       `${BASE_URL}/api/admin/gifts/${giftId}/reject`,
       { request_id: requestId },
-      { headers: { ...headers, "Content-Type": "application/json" } }
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      return rejectWithValue({ message: "Session expired. Please login again." });
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
     }
     return rejectWithValue({
       message: error.response?.data?.message || "Failed to reject gift request",
     });
   }
 });
+
+// Change the state of a gift
+export const changeGiftState = createAsyncThunk<
+  { success: boolean; message: string; data: any },
+  { id: number; status: string },
+  { rejectValue: ErrorResponse }
+>("gifts/changeState", async ({ id, status }, { rejectWithValue }) => {
+  try {
+    const headers = getAuthHeaders();
+    const response = await api.put(
+      `${BASE_URL}/api/admin/change-gift-state/${id}/${status}`,
+      {},
+      { headers: { ...headers, "Content-Type": "application/json" } },
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      Cookies.remove("token");
+      return rejectWithValue({
+        message: "Session expired. Please login again.",
+      });
+    }
+    return rejectWithValue({
+      message: error.response?.data?.message || "Failed to change gift state",
+    });
+  }
+});
+

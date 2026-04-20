@@ -7,6 +7,7 @@ export interface GiftFormData {
   giftName: string;
   giftType: string; // 'land', 'house', 'standard'
   estimatedValue: number | string;
+
   totalQuantity: number | string;
   quantityPerProperty: number | string;
   remainingQuantity: number | string;
