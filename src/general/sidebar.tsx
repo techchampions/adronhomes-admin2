@@ -8,7 +8,8 @@ import {
 } from "../components/Redux/Login/login_slice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../components/Redux/store";
-import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from "./icon";
+import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9, IconGift } from "./icon";
+import { FaGift } from "react-icons/fa";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/dashboard" },
@@ -18,6 +19,7 @@ const navItems = [
   { label: "Contracts", icon: Icon7, path: "/contracts" },
     { label: "Contract Payments", icon: Icon7, path: "/contract-payments" },
   { label: "Properties", icon: Icon5, path: "/properties" },
+    { label: "  Gifts", icon: IconGift, path: "/gifts" },
   {
     label: "Client Partnership",
     icon: Icon7,
