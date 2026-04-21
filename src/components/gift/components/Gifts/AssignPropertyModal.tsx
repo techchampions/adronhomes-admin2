@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { assignGiftToProperty, bulkAssignMultipleGifts } from "../../../Redux/gift/gift_thunk";
 import { AppDispatch, RootState } from "../../../Redux/store";
-import { fetchProperties } from "../../../Redux/Properties/properties_Thunk";
 import LoadingAnimations from "../../../LoadingAnimations";
+import { fetchProperties } from "../../../Redux/Properties/properties_Thunk";
+import { selectPublishedPropertiesPagination, setPublishedPropertiesPage, setPropertiesSearch } from "../../../Redux/Properties/propertiesTable_slice";
 
 interface PropertyOption {
   id: number;
@@ -37,11 +38,11 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const [assigning, setAssigning] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedPropertyIds, setSelectedPropertyIds] = useState<number[]>([]);
 
-  // Redux
+  // Redux - Get published properties data and pagination
   const { published } = useSelector((state: RootState) => state.properties);
+  const pagination = useSelector(selectPublishedPropertiesPagination);
 
   // Transform properties
   const properties: PropertyOption[] = useMemo(() => {
@@ -49,37 +50,21 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
     return (published.data as any[]).map((prop) => ({
       id: prop.id,
       name: prop.name,
-      address: `${prop.street_address || ""}, ${prop.lga || ""}, ${prop.state || ""}`.trim(),
+      address: `${prop.street_address || ""}, ${prop.lga || ""}, ${prop.state || ""}`.replace(/^,\s*|\s*,\s*$/, "").replace(/,,\s*/g, ","),
       price: prop.price || 0,
       display_image: prop.display_image || null,
     }));
   }, [published.data]);
 
-  // Filter (client-side for instant feel, backend also called)
-  const filteredProperties = useMemo(() => {
-    if (!searchTerm.trim()) return properties;
-    const term = searchTerm.toLowerCase();
-    return properties.filter(
-      (p) =>
-        p.name.toLowerCase().includes(term) ||
-        p.address.toLowerCase().includes(term)
-    );
-  }, [properties, searchTerm]);
-
-  const paginatedProperties = useMemo(() => {
-    const itemsPerPage = 10;
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredProperties.slice(start, start + itemsPerPage);
-  }, [filteredProperties, currentPage]);
-
-  const totalPages = Math.ceil(filteredProperties.length / 10);
-  const totalItems = filteredProperties.length;
   const selectedCount = selectedPropertyIds.length;
 
   // Fetch properties when modal opens
   useEffect(() => {
     if (isOpen) {
       resetModalState();
+      // Reset to page 1 and clear search when opening
+      dispatch(setPublishedPropertiesPage({ type: "published", page: 1 }));
+      dispatch(setPropertiesSearch({ type: "published", search: "" }));
       dispatch(
         fetchProperties({
           page: 1,
@@ -94,7 +79,9 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
     if (!isOpen) return;
 
     const timer = setTimeout(() => {
-      setCurrentPage(1);
+      // Reset to page 1 when searching
+      dispatch(setPublishedPropertiesPage({ type: "published", page: 1 }));
+      dispatch(setPropertiesSearch({ type: "published", search: searchTerm }));
       dispatch(
         fetchProperties({
           page: 1,
@@ -106,20 +93,21 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
     return () => clearTimeout(timer);
   }, [searchTerm, isOpen, dispatch]);
 
-  // Pagination change
-  useEffect(() => {
-    if (!isOpen) return;
-    dispatch(
-      fetchProperties({
-        page: currentPage,
-        search: searchTerm,
-      })
-    );
-  }, [currentPage, isOpen, dispatch, searchTerm]);
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= pagination.totalPages) {
+      dispatch(setPublishedPropertiesPage({ type: "published", page }));
+      dispatch(
+        fetchProperties({
+          page: page,
+          search: searchTerm,
+        })
+      );
+    }
+  };
 
   const resetModalState = () => {
     setSearchTerm("");
-    setCurrentPage(1);
     setSelectedPropertyIds([]);
   };
 
@@ -137,10 +125,10 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
   };
 
   const toggleSelectAll = () => {
-    if (selectedPropertyIds.length === paginatedProperties.length) {
+    if (selectedPropertyIds.length === properties.length) {
       setSelectedPropertyIds([]);
     } else {
-      setSelectedPropertyIds(paginatedProperties.map((p) => p.id));
+      setSelectedPropertyIds(properties.map((p) => p.id));
     }
   };
 
@@ -176,12 +164,6 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
     }
   };
 
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -211,7 +193,7 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
             </div>
             <div>
               <p className="text-xs text-gray-500">Properties Found</p>
-              <p className="font-semibold text-lg text-gray-900">{totalItems}</p>
+              <p className="font-semibold text-lg text-gray-900">{pagination.totalItems}</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">Selected</p>
@@ -238,7 +220,7 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
               <div className="flex justify-center items-center h-64">
                 <LoadingAnimations loading={true} />
               </div>
-            ) : paginatedProperties.length > 0 ? (
+            ) : properties.length > 0 ? (
               <table className="w-full min-w-full">
                 <thead className="sticky top-0 bg-white z-10 border-b border-gray-200 shadow-sm">
                   <tr>
@@ -246,8 +228,8 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
                       <input
                         type="checkbox"
                         checked={
-                          paginatedProperties.length > 0 &&
-                          selectedPropertyIds.length === paginatedProperties.length
+                          properties.length > 0 &&
+                          selectedPropertyIds.length === properties.length
                         }
                         onChange={toggleSelectAll}
                         className="w-4 h-4 rounded border-gray-300 text-[#79B833] focus:ring-[#79B833] accent-[#79B833]"
@@ -259,7 +241,7 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {paginatedProperties.map((property) => (
+                  {properties.map((property) => (
                     <tr
                       key={property.id}
                       className="hover:bg-gray-50 transition-colors"
@@ -308,65 +290,61 @@ export const AssignPropertyModal: React.FC<AssignPropertyModalProps> = ({
           </div>
         </div>
 
-        {/* Sticky Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-8 py-6 rounded-b-3xl mt-auto shadow-[0_-4px_10px_rgb(0,0,0,0.05)] ">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            {/* Pagination Info */}
-            {totalPages > 1 && (
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <p>
-                  Page <span className="font-medium text-gray-900">{currentPage}</span> of{" "}
-                  <span className="font-medium text-gray-900">{totalPages}</span>
-                </p>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => goToPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => goToPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    Next
-                  </button>
-                </div>
+        {/* Sticky Footer with Custom Pagination */}
+        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-8 py-6 rounded-b-3xl mt-auto shadow-[0_-4px_10px_rgb(0,0,0,0.05)]">
+          {/* Custom Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <div className="flex justify-between items-center mb-4">
+              <div className="text-sm text-gray-500">
+                Page {pagination.currentPage} of {pagination.totalPages}
               </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 w-full sm:w-auto">
-              <button
-                onClick={handleClose}
-                disabled={assigning}
-                className="flex-1 sm:flex-none px-8 py-3.5 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 font-medium transition disabled:opacity-50"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={handleAssignProperties}
-                disabled={selectedCount === 0 || assigning || published.loading}
-                className={`flex-1 sm:flex-none px-8 py-3.5 rounded-2xl font-medium transition-all ${
-                  selectedCount > 0 && !assigning && !published.loading
-                    ? "bg-[#79B833] hover:bg-[#6ba52d] text-white shadow-md"
-                    : "bg-gray-300 cursor-not-allowed text-gray-500"
-                }`}
-              >
-                {assigning ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Assigning...
-                  </div>
-                ) : (
-                  `Assign to ${selectedCount} Propert${selectedCount !== 1 ? "ies" : "y"}`
-                )}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1}
+                  className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.totalPages}
+                  className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+                >
+                  Next
+                </button>
+              </div>
             </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-end gap-3">
+            <button
+              onClick={handleClose}
+              disabled={assigning}
+              className="flex-1 sm:flex-none px-8 py-3.5 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 font-medium transition disabled:opacity-50"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleAssignProperties}
+              disabled={selectedCount === 0 || assigning || published.loading}
+              className={`flex-1 sm:flex-none px-8 py-3.5 rounded-2xl font-medium transition-all ${
+                selectedCount > 0 && !assigning && !published.loading
+                  ? "bg-[#79B833] hover:bg-[#6ba52d] text-white shadow-md"
+                  : "bg-gray-300 cursor-not-allowed text-gray-500"
+              }`}
+            >
+              {assigning ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Assigning...
+                </div>
+              ) : (
+                `Assign to ${selectedCount} Propert${selectedCount !== 1 ? "ies" : "y"}`
+              )}
+            </button>
           </div>
         </div>
       </div>

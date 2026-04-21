@@ -21,7 +21,7 @@ import {
   setCurrentPage, 
   setStatusFilter 
 } from '../../../Redux/gift/gift_slice';
-import { fetchGifts, deleteGift, updateGiftStatus } from '../../../Redux/gift/gift_thunk';
+import { fetchGifts, deleteGift, changeGiftState,  } from '../../../Redux/gift/gift_thunk';
 import ConfirmationModal from '../../../Modals/delete';
 import { toast } from 'react-toastify';
 
@@ -65,7 +65,7 @@ export default function Gifts() {
   const getStatusFromTab = (tab: string): string => {
     switch (tab) {
       case "Active": return "active";
-      case "Paused": return "pending";
+      case "disabled": return "Disabled";
       // case "Inactive": return "inactive";
       default: return "";
     }
@@ -163,14 +163,14 @@ export default function Gifts() {
   // Handle status change
   const handleStatusChange = useCallback(async (id: number, newStatus: string) => {
     try {
-      await dispatch(updateGiftStatus({ id, status: newStatus })).unwrap();
+      await dispatch(changeGiftState({ id, status: newStatus })).unwrap();
       const status = getStatusFromTab(activeTab);
-      dispatch(fetchGifts({
-        page: pagination?.currentPage || 1,
-        per_page: pagination?.perPage || 20,
-        search: reduxSearch || '',
-        status: status
-      }));
+      // dispatch(fetchGifts({
+      //   page: pagination?.currentPage || 1,
+      //   per_page: pagination?.perPage || 20,
+      //   search: reduxSearch || '',
+      //   status: status
+      // }));
     } catch (err: any) {
       toast.error(err.message || "Failed to update gift status");
     }

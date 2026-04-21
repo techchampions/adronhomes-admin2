@@ -8,7 +8,7 @@ import {
   fetchGiftById, 
   updateGift, 
   deleteGift,
-  updateGiftStatus,
+  // updateGiftStatus,
   assignGiftToProperty,
   bulkAssignMultipleGifts,
   getGiftStatistics,
@@ -280,27 +280,27 @@ const giftSlice = createSlice({
         state.error = action.payload?.message || 'Failed to delete gift';
       })
 
-      // Update Gift Status
-      .addCase(updateGiftStatus.pending, (state) => {
-        state.updating = true;
-        state.error = null;
-        state.successMessage = null;
-      })
-      .addCase(updateGiftStatus.fulfilled, (state, action: PayloadAction<GiftMutationResponse>) => {
-        state.updating = false;
-        state.successMessage = action.payload.message;
-        const index = state.gifts.findIndex(gift => gift.id === action.payload.data.id);
-        if (index !== -1) {
-          state.gifts[index] = action.payload.data;
-        }
-        if (state.currentGift?.id === action.payload.data.id) {
-          state.currentGift = action.payload.data;
-        }
-      })
-      .addCase(updateGiftStatus.rejected, (state, action) => {
-        state.updating = false;
-        state.error = action.payload?.message || 'Failed to update gift status';
-      })
+      // // Update Gift Status
+      // .addCase(updateGiftStatus.pending, (state) => {
+      //   state.updating = true;
+      //   state.error = null;
+      //   state.successMessage = null;
+      // })
+      // .addCase(updateGiftStatus.fulfilled, (state, action: PayloadAction<GiftMutationResponse>) => {
+      //   state.updating = false;
+      //   state.successMessage = action.payload.message;
+      //   const index = state.gifts.findIndex(gift => gift.id === action.payload.data.id);
+      //   if (index !== -1) {
+      //     state.gifts[index] = action.payload.data;
+      //   }
+      //   if (state.currentGift?.id === action.payload.data.id) {
+      //     state.currentGift = action.payload.data;
+      //   }
+      // })
+      // .addCase(updateGiftStatus.rejected, (state, action) => {
+      //   state.updating = false;
+      //   state.error = action.payload?.message || 'Failed to update gift status';
+      // })
 
       // Change Gift State (Active/Inactive)
       .addCase(changeGiftState.pending, (state) => {

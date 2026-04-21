@@ -435,31 +435,31 @@ export const deleteGift = createAsyncThunk<
 // ============================================
 // UPDATE GIFT STATUS (Patch Request)
 // ============================================
-export const updateGiftStatus = createAsyncThunk<
-  GiftMutationResponse,
-  { id: number; status: string },
-  { rejectValue: ErrorResponse }
->("gifts/updateStatus", async ({ id, status }, { rejectWithValue }) => {
-  try {
-    const headers = getAuthHeaders();
-    const response = await api.patch<GiftMutationResponse>(
-      `${BASE_URL}/api/admin/gifts/${id}/status`,
-      { status },
-      { headers: { ...headers, "Content-Type": "application/json" } },
-    );
-    return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      Cookies.remove("token");
-      return rejectWithValue({
-        message: "Session expired. Please login again.",
-      });
-    }
-    return rejectWithValue({
-      message: error.response?.data?.message || "Failed to update gift status",
-    });
-  }
-});
+// export const updateGiftStatus = createAsyncThunk<
+//   GiftMutationResponse,
+//   { id: number; status: string },
+//   { rejectValue: ErrorResponse }
+// >("gifts/updateStatus", async ({ id, status }, { rejectWithValue }) => {
+//   try {
+//     const headers = getAuthHeaders();
+//     const response = await api.patch<GiftMutationResponse>(
+//       `${BASE_URL}/api/admin/gifts/${id}/status`,
+//       { status },
+//       { headers: { ...headers, "Content-Type": "application/json" } },
+//     );
+//     return response.data;
+//   } catch (error: any) {
+//     if (error.response?.status === 401) {
+//       Cookies.remove("token");
+//       return rejectWithValue({
+//         message: "Session expired. Please login again.",
+//       });
+//     }
+//     return rejectWithValue({
+//       message: error.response?.data?.message || "Failed to update gift status",
+//     });
+//   }
+// });
 
 // ============================================
 // ASSIGN GIFT TO PROPERTY
@@ -566,17 +566,18 @@ export const getGiftStatistics = createAsyncThunk<
 
 export const fetchGiftRequests = createAsyncThunk<
   GiftRequestsResponse,
-  { gift_id?: number; property_id?: number; status?: string },
+  { gift_id?: number; property_id?: number; status?: string,search?:string },
   { rejectValue: ErrorResponse }
 >(
   "gifts/fetchRequests",
-  async ({ gift_id, property_id, status = "" }, { rejectWithValue }) => {
+  async ({ gift_id, property_id, status = "", search }, { rejectWithValue }) => {
     try {
       const headers = getAuthHeaders();
-      const params: any = {};
+      const params: any = {search};
       if (gift_id) params.gift_id = gift_id;
       if (property_id) params.property_id = property_id;
       if (status) params.status = status;
+      if (search) params.search = search;
 
       const response = await api.get<GiftRequestsResponse>(
         `${BASE_URL}/api/gifts/requests`,
@@ -628,14 +629,14 @@ export const grantGiftRequest = createAsyncThunk<
 // Reject a gift request
 export const rejectGiftRequest = createAsyncThunk<
   { success: boolean; message: string; data: any },
-  { requestId: number; giftId: number },
+  { requestId: number; giftId: number  ; Search?:string},
   { rejectValue: ErrorResponse }
->("gifts/rejectRequest", async ({ requestId, giftId }, { rejectWithValue }) => {
+>("gifts/rejectRequest", async ({ requestId, giftId ,Search}, { rejectWithValue }) => {
   try {
     const headers = getAuthHeaders();
     const response = await api.post(
       `${BASE_URL}/api/admin/gifts/${giftId}/reject`,
-      { request_id: requestId },
+      { request_id: requestId,search:Search },
       { headers: { ...headers, "Content-Type": "application/json" } },
     );
     return response.data;
@@ -660,8 +661,9 @@ export const changeGiftState = createAsyncThunk<
 >("gifts/changeState", async ({ id, status }, { rejectWithValue }) => {
   try {
     const headers = getAuthHeaders();
-    const response = await api.put(
-      `${BASE_URL}/api/admin/change-gift-state/${id}/${status}`,
+    const response = await api.post(
+      `${BASE_URL}/api/admin/gifts/change-gift-state/${id}/${status}`,
+      // https://adron.microf10.sg-host.com/api/admin/gifts/change-gift-state/10/disabled
       {},
       { headers: { ...headers, "Content-Type": "application/json" } },
     );

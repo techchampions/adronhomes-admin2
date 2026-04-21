@@ -75,10 +75,10 @@ const GiftTable: React.FC<GiftTableProps> = ({
     switch (status?.toLowerCase()) {
       case "active":
         return "bg-green-100 text-green-800";
-      case "pending":
+      case "disable":
+        return "bg-red-100 text-red-800";
+      case "disabled":
         return "bg-yellow-100 text-yellow-800";
-      case "inactive":
-        return "bg-gray-100 text-gray-800";
       case "limited":
         return "bg-orange-100 text-orange-800";
       case "expired":
@@ -90,7 +90,7 @@ const GiftTable: React.FC<GiftTableProps> = ({
 
   const statusOptions = [
     { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
+    { value: "disabled", label: "Disable" },
   ];
 
   if (loading) {
@@ -127,7 +127,7 @@ const GiftTable: React.FC<GiftTableProps> = ({
               <th className="py-4 px-6 text-[#757575] text-xs font-[325]">Measurement Unit</th>
               <th className="py-4 px-6 text-[#757575] text-xs font-[325]">Status</th>
               <th className="py-4 pl-6 pr-4 text-[#757575] text-xs font-[325]">Actions</th>
-             </tr>
+              </tr>
           </thead>
           <tbody>
             {data.map((gift) => {
@@ -159,16 +159,16 @@ const GiftTable: React.FC<GiftTableProps> = ({
                         </span>
                       </div>
                     </div>
-                   </td>
+                    </td>
                   <td className="py-4 px-6 text-dark text-sm">
                     <span className="capitalize">{gift.giftType || 'Standard'}</span>
                     <span className="text-xs text-gray-400 block">
                       {gift.measurementUnit || 'unit'}
                     </span>
-                   </td>
+                    </td>
                   <td className="py-4 px-6 text-dark text-sm font-semibold text-[#79B833]">
                     {formatCurrency(gift.estimatedValue || 0)}
-                   </td>
+                    </td>
                   <td className="py-4 px-6 text-dark text-sm">
                     <div>
                       <span className="font-medium">{(gift.totalQuantity || 0).toLocaleString()}</span>
@@ -178,13 +178,13 @@ const GiftTable: React.FC<GiftTableProps> = ({
                         </span>
                       )}
                     </div>
-                   </td>
+                    </td>
                   <td className="py-4 px-6 text-dark text-sm">
                     {gift.quantityPerProperty || 0}
-                   </td>
+                    </td>
                   <td className="py-4 px-6 text-dark text-sm">
                     {gift.measurementUnit || 'unit'}
-                   </td>
+                    </td>
                   <td className="py-4 px-6 text-sm">
                     <div className="relative">
                       <button
@@ -198,7 +198,7 @@ const GiftTable: React.FC<GiftTableProps> = ({
                         {isUpdating ? (
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
                         ) : (
-                          <span>{gift.status === 'pending' ? 'Paused' : (gift.status?.charAt(0).toUpperCase() + gift.status?.slice(1) || 'Unknown')}</span>
+                          <span>{gift.status === 'disabled' ? 'Disabled' : (gift.status?.charAt(0).toUpperCase() + gift.status?.slice(1) || 'Unknown')}</span>
                         )}
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -222,14 +222,14 @@ const GiftTable: React.FC<GiftTableProps> = ({
                                 option.value === gift.status ? 'bg-gray-100 font-medium' : ''
                               }`}
                             >
-                              <span className={`w-2 h-2 rounded-full ${option.value === 'active' ? 'bg-green-500' : 'bg-gray-500'}`}></span>
+                              <span className={`w-2 h-2 rounded-full ${option.value === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
                               {option.label}
                             </button>
                           ))}
                         </div>
                       )}
                     </div>
-                   </td>
+                    </td>
                   <td
                     className="py-4 pl-6 pr-4 text-sm"
                     onClick={(e) => e.stopPropagation()}
@@ -245,32 +245,29 @@ const GiftTable: React.FC<GiftTableProps> = ({
                           <path d="M15 5L19 9" stroke="#4F4F4F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </button>
-                      {/* Disable/Enable button instead of Delete */}
+                      
+                      {/* Capsule button for Disable/Active */}
                       <button
-                        onClick={() => handleChangeState(gift, gift.status === 'active' ? 'inactive' : 'active')}
+                        onClick={() => handleChangeState(gift, gift.status === 'active' ? 'disabled' : 'active')}
                         disabled={isUpdating}
-                        className={`p-2 rounded-full transition-colors ${
-                          gift.status === 'active' 
-                            ? 'hover:bg-yellow-50 text-yellow-600' 
-                            : 'hover:bg-green-50 text-green-600'
+                        className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                          gift.status === 'active'
+                            ? 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-200'
+                            : 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200'
                         } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        title={gift.status === 'active' ? 'Disable Gift' : 'Enable Gift'}
+                        title={gift.status === 'active' ? 'Disable Gift' : 'Activate Gift'}
                       >
                         {isUpdating ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current mx-2"></div>
                         ) : gift.status === 'active' ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18.364 5.636L5.636 18.364M5.636 5.636l12.728 12.728" stroke="currentColor" strokeLinecap="round"/>
-                          </svg>
+                          'Disable'
                         ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 13l4 4L19 7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
+                          'Active'
                         )}
                       </button>
                     </div>
-                   </td>
-                </tr>
+                    </td>
+                 </tr>
               );
             })}
           </tbody>

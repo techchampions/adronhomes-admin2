@@ -106,7 +106,8 @@ const GiftRequestsModal: React.FC<GiftRequestsModalProps> = ({
         gift_id: giftId, 
         status: selectedTab,
         page: page,
-        per_page: pagination?.perPage || 20
+        per_page: pagination?.perPage || 20,
+        search: searchTerm,
       };
       if (propertyId) params.property_id = propertyId;
       if (searchTerm) params.search = searchTerm;
