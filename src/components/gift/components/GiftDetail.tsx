@@ -28,6 +28,8 @@ interface GiftProperty {
   status: string;
   assignedAt: string;
   pendingRequestsCount?: number;
+   quantity_per_property : number
+
 }
 
 const GiftDetail: React.FC = () => {
@@ -103,6 +105,7 @@ const GiftDetail: React.FC = () => {
           propertyName: prop.name || "Unknown Property",
           quantity: prop.total_amount || gift.quantity_per_property || 1,
           status: prop.pivot?.fulfillment_status || "pending",
+           quantity_per_property: gift.quantity_per_property,
           assignedAt:
             prop.pivot?.assigned_at ||
             prop.pivot?.created_at ||
@@ -115,40 +118,7 @@ const GiftDetail: React.FC = () => {
     }
   }, [gift]);
 
-  const handleUpdatePropertyStatus = async (
-    propertyId: number,
-    newStatus: string,
-  ) => {
-    setUpdatingStatus(propertyId);
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `/api/admin/gift-assignments/${propertyId}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: newStatus }),
-        },
-      );
-
-      if (response.ok) {
-        toast.success(`Property status updated to ${newStatus}`);
-        dispatch(fetchGiftById(parseInt(id!)));
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update status");
-      }
-    } catch (error: any) {
-      console.error("Error updating status:", error);
-      toast.error(error?.message || "Failed to update property status");
-    } finally {
-      setUpdatingStatus(null);
-    }
-  };
+ 
 
   const handleViewRequests = (property: GiftProperty) => {
     setSelectedProperty(property);
@@ -221,10 +191,8 @@ const GiftDetail: React.FC = () => {
   const displayStats = {
     totalAssigned:
       stats?.total_property_assigned || calculatedStats.totalAssigned,
-    totalFulfilled: stats?.total_fulfilled || calculatedStats.fulfilledCount,
-    totalUnfulfilled:
-      stats?.total_unfulfilled ||
-      calculatedStats.pendingCount + calculatedStats.approvedCount,
+    total_remaining: stats?.total_remaining || calculatedStats.fulfilledCount,
+    total_claimed:stats?.total_claimed,
     totalValue: stats?.total_value || calculatedStats.totalValue,
   };
 
@@ -297,13 +265,13 @@ const GiftDetail: React.FC = () => {
           change="Estimated total value"
         />
         <MatrixCard
-          title="Fulfilled"
-          value={displayStats.totalFulfilled}
+          title="Total Claimed"
+          value={displayStats.total_claimed}
           change="Successfully fulfilled"
         />
         <MatrixCard
-          title="Unfulfilled"
-          value={displayStats.totalUnfulfilled}
+          title="Total Remaining"
+          value={displayStats.total_remaining}
           change="Awaiting fulfillment"
         />
       </div>
@@ -420,9 +388,9 @@ const GiftDetail: React.FC = () => {
                   <th className="py-4 px-6 font-semibold text-[#757575] text-sm">
                     Quantity Assigned
                   </th>
-                  <th className="py-4 px-6 font-semibold text-[#757575] text-sm">
+                  {/* <th className="py-4 px-6 font-semibold text-[#757575] text-sm">
                     Status
-                  </th>
+                  </th> */}
                   <th className="py-4 px-6 font-semibold text-[#757575] text-sm">
                     Assigned Date
                   </th>
@@ -445,9 +413,9 @@ const GiftDetail: React.FC = () => {
                           {property.propertyName}
                         </td>
                         <td className="py-4 px-6 text-dark text-sm">
-                          {property.quantity} {gift.measurement_unit || "unit"}
+                          {(property?.quantity_per_property)?.toLocaleString()} {gift.measurement_unit || "unit"}
                         </td>
-                        <td className="py-4 px-6 text-sm">
+                        {/* <td className="py-4 px-6 text-sm">
                           <div className="relative">
                             <div
                               className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(property.status)}`}
@@ -477,7 +445,7 @@ const GiftDetail: React.FC = () => {
                               </div>
                             )}
                           </div>
-                        </td>
+                        </td> */}
                         <td className="py-4 px-6 text-dark text-sm">
                           {new Date(property.assignedAt).toLocaleDateString()}
                         </td>

@@ -106,7 +106,8 @@ const GiftRequestsModal: React.FC<GiftRequestsModalProps> = ({
         gift_id: giftId, 
         status: selectedTab,
         page: page,
-        per_page: pagination?.perPage || 20
+        per_page: pagination?.perPage || 20,
+        search: searchTerm,
       };
       if (propertyId) params.property_id = propertyId;
       if (searchTerm) params.search = searchTerm;
@@ -181,7 +182,7 @@ const GiftRequestsModal: React.FC<GiftRequestsModalProps> = ({
         <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[92vh] flex flex-col">
           
           {/* Header */}
-          <div className="flex items-center justify-between  px-6 py-5">
+          <div className="flex items-center justify-between  px-6 py-5 border-b  border-gray-200">
             <div>
               <h3 className="text-xl font-semibold text-gray-900">
                 Gift Requests - {giftName}
