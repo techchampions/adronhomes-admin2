@@ -83,6 +83,11 @@ import GiftFormPage from "./components/gift/giftForm/giftFormPage";
 import Gifts from "./components/gift/components/Gifts/Gifts";
 import GiftDetail from "./components/gift/components/GiftDetail";
 import EditGiftFormPage from "./components/gift/giftForm/GiftEditForm";
+import PromoForm from "./components/gift/components/promo/PromoForm";
+import Promotions from "./components/gift/components/promo/Promotions";
+import PromoFormPage from "./components/gift/components/promo/PromoFormPage";
+import PromoPage from "./components/gift/components/promo/PromoPage";
+import PromoRequestsTab from "./components/gift/components/promo/PromoRequestsTab";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
 const NotFoundRedirect = () => {
@@ -329,12 +334,18 @@ const App = () => {
                   path="/partnership-requests"
                   element={<ClientsPartnership />}
                 />
+                <Route path="/promotions" element={<Promotions />} />
+                <Route path="/promotions/promotion-requests/:id" element={<PromoRequestsTab />} />
+                <Route path="/promotions/:id" element={<PromoPage />} />
+                <Route path="/promotions/edit/:id" element={<PromoFormPage />} />
+                 <Route path="/Promotions/create" element={<PromoForm />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/transactions" element={<Transactions />} />
                 <Route path="/gift-form" element={<GiftFormPage />} />
                 <Route path="/gifts" element={<Gifts />} />
                 <Route path="/gifts/:id" element={<GiftDetail />} />
                 <Route path="/gifts/edit/:id" element={<EditGiftFormPage />} />
-
+                {/* <Route path="/promo" element={<PromoForm />} /> */}
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/payments" element={<Payment />} />
 
@@ -342,6 +353,7 @@ const App = () => {
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
+
                 <Route
                   path="/properties/property-edith/:id"
                   element={<EditProperty />}

@@ -1,4 +1,4 @@
-// PropertyTableComponent.tsx - Updated with PromoModal
+// PropertyTableComponent.tsx
 import React, { useState, useRef, useEffect } from "react";
 import Pagination from "../../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,10 +26,9 @@ import { toggleFeatured } from "../../../components/Redux/Properties/toggle_feat
 import { useNavigate, useLocation } from "react-router-dom";
 import { resetToggleLatestState } from "../../../components/Redux/Properties/toggleLatestslice";
 import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatestThunk";
-// import { PromoModal } from "../../../components/gift/PromoModal"; // Changed from GiftModal
-// import { bulkAssignMultiplePromos } from "../../../components/Redux/gift/promo/promoSlice"; // New thunk for promo assignment
-import { PromoModal } from "../../../components/gift/components/promo/PromoModal";
-import { bulkAssignMultiplePromos } from "../../../components/Redux/gift/promo/promoSlice";
+import { GiftModal } from "../../../components/gift/GiftModal";
+import { bulkAssignMultipleGifts } from "../../../components/Redux/gift/gift_thunk";
+// import { bulkAssignMultipleGifts } from "../../../Redux/gift/gift_thunk";
 
 export interface PropertyData {
   is_featured: any;
@@ -91,7 +90,7 @@ interface PropertyTableProps {
   data: PropertyData[];
   CurrentPage: any;
   activeTab: any;
-  triggerGiftMode?: number; // Keeping name for compatibility but now for promo mode
+  triggerGiftMode?: number;
 }
 
 export default function PropertyTableComponent({
@@ -111,39 +110,39 @@ export default function PropertyTableComponent({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Promo mode states (renamed from gift mode)
-  const [isPromoMode, setIsPromoMode] = useState(false);
-  const [showPromoModal, setShowPromoModal] = useState(false);
+  // Gift mode states
+  const [isGiftMode, setIsGiftMode] = useState(false);
+  const [showGiftModal, setShowGiftModal] = useState(false);
   const [propertiesWithSelection, setPropertiesWithSelection] = useState<PropertyData[]>([]);
-  const [assigningPromos, setAssigningPromos] = useState(false);
+  const [assigningGifts, setAssigningGifts] = useState(false);
 
-  // Listen for triggerGiftMode changes from parent (now triggers promo mode)
+  // Listen for triggerGiftMode changes from parent
   useEffect(() => {
     if (triggerGiftMode && triggerGiftMode > 0) {
-      setIsPromoMode(true);
+      setIsGiftMode(true);
     }
   }, [triggerGiftMode]);
 
-  // Update properties with selection state when entering promo mode
+  // Update properties with selection state when entering gift mode
   useEffect(() => {
-    if (isPromoMode) {
+    if (isGiftMode) {
       const updatedProperties = data.map(property => ({
         ...property,
         isSelected: false
       }));
       setPropertiesWithSelection(updatedProperties);
     }
-  }, [isPromoMode, data]);
+  }, [isGiftMode, data]);
 
   const navigateToPropertyDetails = (propertyId: number) => {
-    if (!isPromoMode) {
+    if (!isGiftMode) {
       const hasInfoTech = location.pathname.includes('/info-tech');
       navigate(hasInfoTech ? `/info-tech/properties/${propertyId}` : `/properties/${propertyId}`);
     }
   };
 
-  const handlePromoClick = () => {
-    setIsPromoMode(true);
+  const handleGiftClick = () => {
+    setIsGiftMode(true);
   };
 
   const handleCheckboxToggle = (propertyId: number) => {
@@ -163,61 +162,62 @@ export default function PropertyTableComponent({
     );
   };
 
-  // Updated handleAssignPromo to use bulkAssignMultiplePromos API
-  const handleAssignPromo = async (selectedPromoIds: number[]) => {
-    const selectedPropertyIds = propertiesWithSelection
-      .filter(p => p.isSelected)
-      .map(p => p.id);
+// In PropertyTableComponent.tsx, update the handleAssignGift function:
 
-    if (selectedPropertyIds.length === 0) {
-      toast.warning("No properties selected");
-      return;
-    }
+// Updated handleAssignGift to use bulkAssignMultipleGifts API
+const handleAssignGift = async (selectedGiftIds: number[]) => {
+  const selectedPropertyIds = propertiesWithSelection
+    .filter(p => p.isSelected)
+    .map(p => p.id);
 
-    if (selectedPromoIds.length === 0) {
-      toast.warning("No promotions selected");
-      return;
-    }
+  if (selectedPropertyIds.length === 0) {
+    toast.warning("No properties selected");
+    return;
+  }
 
-    setAssigningPromos(true);
+  if (selectedGiftIds.length === 0) {
+    toast.warning("No gifts selected");
+    return;
+  }
+
+  setAssigningGifts(true);
+  
+  try {
+    // Prepare payload in the expected format
+    const payload = {
+      gift_ids: selectedGiftIds,
+      property_ids: selectedPropertyIds
+    };
+
+    console.log("Assigning gifts with payload:", payload);
+
+    // Call the bulk assign API
+    await dispatch(bulkAssignMultipleGifts(payload)).unwrap();
     
-    try {
-      // Prepare payload in the expected format
-      const payload = {
-        promotion_ids: selectedPromoIds,
-        property_ids: selectedPropertyIds
-      };
-
-      console.log("Assigning promotions with payload:", payload);
-
-      // Call the bulk assign API - You'll need to create this thunk
-      await dispatch(bulkAssignMultiplePromos(payload)).unwrap();
-      
-      toast.success(
-        `${selectedPromoIds.length} promotion(s) assigned to ${selectedPropertyIds.length} property(s) successfully!`
-      );
-      
-      // Exit promo mode and refresh data
-      setIsPromoMode(false);
-      setShowPromoModal(false);
-      
-      // Refresh properties list
-      dispatch(
-        fetchProperties({
-          page: CurrentPage,
-        })
-      );
-      
-    } catch (error: any) {
-      console.error("Error assigning promotions:", error);
-      toast.error(error?.message || "Failed to assign promotions. Please try again.");
-    } finally {
-      setAssigningPromos(false);
-    }
-  };
-
-  const handleCancelPromoMode = () => {
-    setIsPromoMode(false);
+    toast.success(
+      `${selectedGiftIds.length} gift(s) assigned to ${selectedPropertyIds.length} property(s) successfully!`
+    );
+    
+    // Exit gift mode and refresh data
+    setIsGiftMode(false);
+    setShowGiftModal(false);
+    
+    // Refresh properties list
+    dispatch(
+      fetchProperties({
+        page: CurrentPage,
+      })
+    );
+    
+  } catch (error: any) {
+    console.error("Error assigning gifts:", error);
+    toast.error(error?.message || "Failed to assign gifts. Please try again.");
+  } finally {
+    setAssigningGifts(false);
+  }
+};
+  const handleCancelGiftMode = () => {
+    setIsGiftMode(false);
   };
 
   const { loading, success, error } = useSelector(
@@ -330,7 +330,7 @@ export default function PropertyTableComponent({
   };
 
   const handleRowClick = (propertyId: number) => {
-    if (!isPromoMode) {
+    if (!isGiftMode) {
       navigateToPropertyDetails(propertyId);
     }
   };
@@ -522,40 +522,40 @@ export default function PropertyTableComponent({
     setLoadingLatestPropertyId(null);
   };
 
-  const displayData = isPromoMode ? propertiesWithSelection : data;
-  const selectedCount = isPromoMode 
+  const displayData = isGiftMode ? propertiesWithSelection : data;
+  const selectedCount = isGiftMode 
     ? propertiesWithSelection.filter(p => p.isSelected).length 
     : 0;
 
   return (
     <>
-      {/* Promo Mode Banner - Updated from Gift Mode */}
-      {isPromoMode && (
+      {/* Gift Mode Banner */}
+      {isGiftMode && (
         <div className="mb-4 p-4 bg-[#79B833]/10 rounded-[20px] border border-[#79B833]/30 flex items-center justify-between">
           <div>
-            <span className="font-semibold text-[#79B833]">Promotion Mode Active</span>
+            <span className="font-semibold text-[#79B833]">Gift Mode Active</span>
             <span className="ml-2 text-gray-600">
               {selectedCount} property{selectedCount !== 1 ? 'ies' : ''} selected
             </span>
           </div>
           <div className="flex gap-3">
             <button
-              onClick={handleCancelPromoMode}
+              onClick={handleCancelGiftMode}
               className="px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
-              disabled={assigningPromos}
+              disabled={assigningGifts}
             >
               Cancel
             </button>
             <button
-              onClick={() => setShowPromoModal(true)}
-              disabled={selectedCount === 0 || assigningPromos}
+              onClick={() => setShowGiftModal(true)}
+              disabled={selectedCount === 0 || assigningGifts}
               className={`px-4 py-2 rounded-full text-white transition-colors ${
-                selectedCount > 0 && !assigningPromos
+                selectedCount > 0 && !assigningGifts
                   ? "bg-[#79B833] hover:bg-[#79B833]/80"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
-              {assigningPromos ? "Assigning..." : `Select Promotion (${selectedCount})`}
+              {assigningGifts ? "Assigning..." : `Select Gift (${selectedCount})`}
             </button>
           </div>
         </div>
@@ -566,14 +566,14 @@ export default function PropertyTableComponent({
           <table className="w-full">
             <thead>
               <tr className="text-left">
-                {isPromoMode && (
+                {isGiftMode && (
                   <th className="w-10 py-4 pr-2">
                     <input
                       type="checkbox"
                       checked={propertiesWithSelection.length > 0 && propertiesWithSelection.every(p => p.isSelected)}
                       onChange={handleSelectAll}
                       className="w-4 h-4 rounded border-gray-300 text-[#79B833] focus:ring-[#79B833] accent-[#79B833]"
-                      disabled={assigningPromos}
+                      disabled={assigningGifts}
                     />
                   </th>
                 )}
@@ -607,7 +607,7 @@ export default function PropertyTableComponent({
                     key={`property-${property.id}`}
                     className="hover:bg-gray-50 cursor-pointer"
                   >
-                    {isPromoMode && (
+                    {isGiftMode && (
                       <td className="w-10 py-4 pr-2">
                         <input
                           type="checkbox"
@@ -615,9 +615,9 @@ export default function PropertyTableComponent({
                           onChange={() => handleCheckboxToggle(property.id)}
                           onClick={(e) => e.stopPropagation()}
                           className="w-4 h-4 rounded border-gray-300 text-[#79B833] focus:ring-[#79B833] accent-[#79B833]"
-                          disabled={assigningPromos}
+                          disabled={assigningGifts}
                         />
-                       </td>
+                      </td>
                     )}
                     <td
                       className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]"
@@ -667,7 +667,7 @@ export default function PropertyTableComponent({
                           {property.name} - {property.street_address}
                         </div>
                       </div>
-                     </td>
+                    </td>
                     <td
                       className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]"
                       onClick={() => handleRowClick(property.id)}
@@ -680,7 +680,7 @@ export default function PropertyTableComponent({
                           ₦{property.price?.toLocaleString()}
                         </div>
                       </div>
-                     </td>
+                    </td>
                     <td
                       className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]"
                       onClick={() => handleRowClick(property.id)}
@@ -693,7 +693,7 @@ export default function PropertyTableComponent({
                           {getPropertyType(property.type)}
                         </div>
                       </div>
-                     </td>
+                    </td>
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -714,13 +714,13 @@ export default function PropertyTableComponent({
                             : "Available"}
                         </div>
                       </div>
-                     </td>
+                    </td>
                     <td className="w-1/6 py-4 pl-4 text-sm">
                       <div className="flex space-x-2">
                         <button
                           aria-label="Delete property"
                           onClick={() => handleDeleteClick(property)}
-                          disabled={assigningPromos}
+                          disabled={assigningGifts}
                         >
                           <img
                             src="mingcute_delete-fill.svg"
@@ -729,7 +729,7 @@ export default function PropertyTableComponent({
                           />
                         </button>
                       </div>
-                     </td>
+                    </td>
                     <td className="w-1/6 py-4 px-6 text-sm">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
@@ -738,7 +738,7 @@ export default function PropertyTableComponent({
                           checked={property.is_featured === 1}
                           onChange={() => handleToggleFeatured(property.id)}
                           disabled={
-                            (toggleLoading && loadingPropertyId === property.id) || assigningPromos
+                            (toggleLoading && loadingPropertyId === property.id) || assigningGifts
                           }
                         />
                         <div
@@ -764,7 +764,7 @@ export default function PropertyTableComponent({
                             : "Off"}
                         </span>
                       </label>
-                     </td>
+                    </td>
                     <td className="w-1/6 py-4 px-6 text-sm">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
@@ -773,7 +773,7 @@ export default function PropertyTableComponent({
                           checked={property.is_offer === 1}
                           onChange={() => handleToggleLatest(property.id)}
                           disabled={
-                            (toggleLatestLoading && loadingLatestPropertyId === property.id) || assigningPromos
+                            (toggleLatestLoading && loadingLatestPropertyId === property.id) || assigningGifts
                           }
                         />
                         <div
@@ -801,28 +801,28 @@ export default function PropertyTableComponent({
                             : "Off"}
                         </span>
                       </label>
-                     </td>
-                   </tr>
+                    </td>
+                  </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={isPromoMode ? 8 : 7} className="py-4 text-center text-gray-500">
+                  <td colSpan={isGiftMode ? 8 : 7} className="py-4 text-center text-gray-500">
                     No properties found
-                   </td>
-                 </tr>
+                  </td>
+                </tr>
               )}
             </tbody>
-           </table>
+          </table>
         </div>
       </div>
 
-      {/* Promo Modal - Updated to use PromoModal */}
-      <PromoModal
-        isOpen={showPromoModal}
-        onClose={() => setShowPromoModal(false)}
+      {/* Gift Modal - Updated to pass selected properties and handle assignment */}
+      <GiftModal
+        isOpen={showGiftModal}
+        onClose={() => setShowGiftModal(false)}
         properties={propertiesWithSelection.filter(p => p.isSelected)}
-        onAssignPromo={handleAssignPromo}
-        isLoading={assigningPromos}
+        onAssignGift={handleAssignGift}
+        isLoading={assigningGifts}
       />
 
       {/* delete property */}

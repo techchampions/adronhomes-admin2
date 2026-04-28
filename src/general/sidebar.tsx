@@ -19,7 +19,7 @@ const navItems = [
   { label: "Contracts", icon: Icon7, path: "/contracts" },
     { label: "Contract Payments", icon: Icon7, path: "/contract-payments" },
   { label: "Properties", icon: Icon5, path: "/properties" },
-    { label: "  Gifts", icon: IconGift, path: "/gifts" },
+    { label: "  Promotions", icon: IconGift, path: "/promotions" },
   {
     label: "Client Partnership",
     icon: Icon7,

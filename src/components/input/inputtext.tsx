@@ -1,7 +1,7 @@
 import { ChangeEvent } from "react";
 
 interface InputFieldProps {
-  label: string;
+  label: string |undefined;
   placeholder: string;
   value: any;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;

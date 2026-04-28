@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
   loading?: boolean;
   confirmButtonText?: string;
   cancelButtonText?: string;
+  className?: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -22,6 +23,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   loading = false,
   confirmButtonText = 'Confirm',
   cancelButtonText = 'Cancel',
+  className = '',
+  
 }) => {
   if (!isOpen) return null;
 
@@ -61,7 +64,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               disabled={loading}
               className={`lg:px-[66px] lg:py-[15px] py-2 px-3 bg-red-600 text-sm font-bold text-white rounded-[60px] ${
                 loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              } ${className}`}
             >
               {loading ? 'Processing...' : confirmButtonText}
             </button>
