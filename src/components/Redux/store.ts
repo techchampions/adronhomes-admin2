@@ -71,6 +71,10 @@ import adminImpersonateSliceReducer from "./adminimpersonate/adminimpersonatesli
 import contractPaymentsReducer from "./Contract/contract_payments_slice";
 import giftFormReducer from "./gift/giftFormSlice";
 import giftSliceReducer from "./gift/gift_slice";
+import promoReducer from "./gift/promo/promoSlice";
+import promoFormReducer from "./gift/promo/promoFormSlice";
+import promoTableReducer from "./gift/promo/promoTableSlice";
+import promoRequestsReducer from "./gift/promo/promoRequestsSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -143,7 +147,11 @@ propertyCategories:propertyCategoriesReducer,
 adminImpersonate: adminImpersonateSliceReducer,
 contractPayments: contractPaymentsReducer,
   giftForm: giftFormReducer,
-gifts: giftSliceReducer,},
+gifts: giftSliceReducer,
+ promo: promoReducer,
+promoForm: promoFormReducer,
+promoTable: promoTableReducer,
+ promoRequests: promoRequestsReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;

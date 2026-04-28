@@ -9,7 +9,7 @@ export interface GiftData {
   remainingQuantity?: number;
   claimedCount?: number;
   measurementUnit: string;
-  status: 'active' | 'disabled'
+  // status: 'active' | 'disabled'
   startDate?: string;
   endDate?: string;
   description?: string;

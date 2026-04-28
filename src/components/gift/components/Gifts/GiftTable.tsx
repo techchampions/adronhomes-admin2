@@ -78,7 +78,7 @@ const GiftTable: React.FC<GiftTableProps> = ({
       case "disable":
         return "bg-red-100 text-red-800";
       case "disabled":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-red-100 text-red-700";
       case "limited":
         return "bg-orange-100 text-orange-800";
       case "expired":
@@ -262,7 +262,7 @@ const GiftTable: React.FC<GiftTableProps> = ({
                         ) : gift.status === 'active' ? (
                           'Disable'
                         ) : (
-                          'Active'
+                          'Activate'
                         )}
                       </button>
                     </div>
