@@ -50,6 +50,7 @@ export interface SimplePromo {
 interface PromoState {
   currentPromo: PromoFormData | null;
   isEditing: boolean;
+
   isLoading: boolean;
   error: string | null;
   submitStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -58,6 +59,7 @@ interface PromoState {
   promosLoading: boolean;
   promosError: string | null;
   success: boolean;
+  singlePromoLoading: boolean;
   pagination: {
     currentPage: number;
     perPage: number;
@@ -91,6 +93,7 @@ const initialPromoData: PromoFormData = {
 };
 
 const initialState: PromoState = {
+  singlePromoLoading: false,
   currentPromo: null,
   isEditing: false,
   isLoading: false,
@@ -275,7 +278,7 @@ export const deletePromo = createAsyncThunk(
 // Bulk assign promotions to properties
 export const bulkAssignMultiplePromos = createAsyncThunk(
   'promo',
-  async (payload: { promo_id: number[]; property_ids: number[] }, { rejectWithValue }) => {
+  async (payload: { promo_ids: number[]; property_ids: number[] }, { rejectWithValue }) => {
     try {
       const response = await api.post(`${PROMO_URL}/assign-properties`, payload);
       toast.success(response.data?.message || 'Promotions assigned successfully');
@@ -535,11 +538,11 @@ const promoSlice = createSlice({
       })
       
       .addCase(fetchPromoById.pending, (state) => {
-        state.isLoading = true;
+        state.singlePromoLoading = true;
         state.error = null;
       })
       .addCase(fetchPromoById.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.singlePromoLoading = false;
         const responseData = action.payload;
         state.currentPromo = responseData.data || responseData;
         state.isEditing = true;
@@ -548,7 +551,7 @@ const promoSlice = createSlice({
         state.success = false;
       })
       .addCase(fetchPromoById.rejected, (state, action) => {
-        state.isLoading = false;
+        state.singlePromoLoading = false;
         state.error = action.payload as string;
         state.success = false;
         toast.error(action.payload as string || 'Failed to fetch promotion');
@@ -795,5 +798,7 @@ export const selectPromoSuccess = (state: { promo: PromoState }) => state.promo.
 export const selectPromosPagination = (state: { promo: PromoState }) => state.promo.pagination;
 export const selectPromosStats = (state: { promo: PromoState }) => state.promo.stats;
 export const selectPromosSearch = (state: { promo: PromoState }) => state.promo.search;
+
+export const selectSinglePromoLoading = (state: { promo: PromoState }) => state.promo.singlePromoLoading;
 
 export default promoSlice.reducer;

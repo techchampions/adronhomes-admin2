@@ -24,7 +24,8 @@ import {
   fetchPromoById, 
   deletePromo, 
   selectError,
-  togglePromoStatus  // Import togglePromoStatus
+  togglePromoStatus,  // Import togglePromoStatus
+  selectSinglePromoLoading
 } from "../../../Redux/gift/promo/promoSlice";
 import { AppDispatch } from "../../../Redux/store";
 import Header from "../../../../general/Header";
@@ -89,7 +90,7 @@ export default function PromoSinglePage() {
   const dispatch = useDispatch<AppDispatch>();
   
   const promoData = useSelector(selectCurrentPromo);
-  const isLoading = useSelector(selectIsLoading);
+  const isLoading = useSelector(selectSinglePromoLoading);
   const error = useSelector(selectError);
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
