@@ -149,7 +149,7 @@ export default function Properties() {
             <path d="M12 22V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M8 15H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          Gift
+         Add Promotion Gift
         </button>
       </div>
 

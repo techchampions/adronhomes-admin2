@@ -78,7 +78,7 @@ function PromoFormPage() {
   const handleSuccess = () => {
     console.log("Operation successful");
     setEditingPromo(null);
-    navigate("/promotions");
+    navigate(`/promotions${editingPromo ? `/${editingPromo.id}` : ""}`);
   };
 
   if (isLoading) {
