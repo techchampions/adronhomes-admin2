@@ -23,7 +23,8 @@ import {
   selectIsLoading, 
   fetchPromoById, 
   deletePromo, 
-  selectError 
+  selectError,
+  togglePromoStatus  // Import togglePromoStatus
 } from "../../../Redux/gift/promo/promoSlice";
 import { AppDispatch } from "../../../Redux/store";
 import Header from "../../../../general/Header";
@@ -77,6 +78,7 @@ interface Promotion {
   name: string;
   created_at: string;
   updated_at: string;
+  is_active: number;  // Add this field
   properties: Property[];
   tiers: Tier[];
 }
@@ -92,6 +94,7 @@ export default function PromoSinglePage() {
   
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'tiers' | 'properties'>('tiers');
+  const [togglingStatusId, setTogglingStatusId] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -116,6 +119,41 @@ export default function PromoSinglePage() {
     setDeleteModalOpen(false);
   };
   const handleBack = () => navigate('/promotions');
+
+  // Add toggle status handler
+  const handleToggleStatus = async (e: React.MouseEvent, promoItem: Promotion) => {
+    e.stopPropagation();
+    
+    // Don't allow toggling if already toggling
+    if (togglingStatusId === promoItem.id) return;
+    
+    setTogglingStatusId(promoItem.id);
+    
+    try {
+      // Dispatch the toggle action
+      await dispatch(togglePromoStatus(promoItem.id.toString())).unwrap();
+      // Refresh the promotion data to show updated status
+      if (id) {
+        await dispatch(fetchPromoById(id));
+      }
+    } catch (error) {
+      console.error('Failed to toggle status:', error);
+    } finally {
+      setTogglingStatusId(null);
+    }
+  };
+
+  // Get status badge for promotion
+  const getStatusBadge = (promoItem: Promotion) => {
+    if (promoItem.is_active === 1) {
+      return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Active</span>;
+    }
+    if (promoItem.is_active === 0) {
+      return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">Disabled</span>;
+    }
+    
+    return <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Draft</span>;
+  };
 
   // Calculate promotion status with clear explanation
   const getPromotionStatus = () => {
@@ -157,6 +195,8 @@ export default function PromoSinglePage() {
   };
 
   const status = getPromotionStatus();
+  const isActive = promo?.is_active === 1;
+  const showToggle = promo?.is_active !== undefined;
 
   if (isLoading) {
     return (
@@ -205,73 +245,106 @@ export default function PromoSinglePage() {
       <div className="min-h-screen bg-[#F6F6F8]">
         {/* Simple Sticky Header */}
         <div className="bg-white/95 backdrop-blur-sm border-b border-[#f5f5f5] sticky top-0 z-10 shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleBack}
-                className="p-2 hover:bg-[#F6F6F8] rounded-xl transition-colors"
-              >
-                <FaArrowLeft className="text-xl text-[#717171]" />
-              </button>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[#272727] tracking-tight">{promo.name}</h1>
-                <p className="text-xs text-[#8F8F8F] mt-0.5">Promotion ID: #{promo.id}</p>
-              </div>
-            </div>
+     <div className="mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+  {/* Left section - Back button and Title */}
+  <div className="flex items-center gap-3 min-w-0">
+    <button
+      onClick={handleBack}
+      className="p-2 hover:bg-[#F6F6F8] rounded-xl transition-colors flex-shrink-0"
+    >
+      <FaArrowLeft className="text-lg sm:text-xl text-[#717171]" />
+    </button>
+    <div className="min-w-0 flex-1">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#272727] tracking-tight truncate">
+        {promo.name}
+      </h1>
+      <p className="text-xs text-[#8F8F8F] mt-0.5">Promotion ID: #{promo.id}</p>
+    </div>
+  </div>
 
-            <div className="flex items-center gap-3">
-              {/* Status Badge with Explanation */}
-              <div className={`px-4 py-2 rounded-xl ${status.color} border`}>
-                <div className="flex items-center gap-2">
-                  {status.icon}
-                  <div>
-                    <p className="text-sm font-semibold text-[#272727]">{status.text}</p>
-                    <p className="text-xs text-[#717171]">{status.subtext}</p>
-                  </div>
-                </div>
-              </div>
+  {/* Right section - Actions - Wraps on mobile */}
+  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+    {/* Status Badge - Hidden on very small screens? Or keep it */}
+    <div className={`px-3 sm:px-4 py-2 rounded-xl ${status.color} border hidden sm:block`}>
+      <div className="flex items-center gap-2">
+        {status.icon}
+        <div>
+          <p className="text-sm font-semibold text-[#272727]">{status.text}</p>
+          <p className="text-xs text-[#717171] hidden md:block">{status.subtext}</p>
+        </div>
+      </div>
+    </div>
 
-              <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-[#f5f5f5] hover:border-[#79B833] rounded-xl text-sm font-medium text-[#272727] transition-all hover:shadow-md"
-              >
-                <MdEdit className="text-lg" /> Edit
-              </button>
+    {/* Compact status for mobile */}
+    <div className={`px-3 py-1.5 rounded-lg ${status.color} border sm:hidden`}>
+      <div className="flex items-center gap-1.5">
+        {status.icon}
+        <p className="text-xs font-semibold text-[#272727]">{status.text}</p>
+      </div>
+    </div>
 
-              <button
-                onClick={() => setDeleteModalOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-[#f5f5f5] hover:bg-red-50 hover:border-[#D70E0E] text-[#D70E0E] rounded-xl text-sm font-medium transition-all"
-              >
-                <MdDelete className="text-lg" /> Delete
-              </button>
-            </div>
-          </div>
+    {/* Edit Button */}
+    <button
+      onClick={handleEdit}
+      className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-white border-2 border-[#f5f5f5] hover:border-[#79B833] rounded-xl text-xs sm:text-sm font-medium text-[#272727] transition-all hover:shadow-md whitespace-nowrap"
+    >
+      <MdEdit className="text-base sm:text-lg" /> 
+      <span className="hidden sm:inline">Edit</span>
+    </button>
+
+    {/* Delete Button */}
+    <button
+      onClick={() => setDeleteModalOpen(true)}
+      className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-white border-2 border-[#f5f5f5] hover:bg-red-50 hover:border-[#D70E0E] text-[#D70E0E] rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap"
+    >
+      <MdDelete className="text-base sm:text-lg" /> 
+      <span className="hidden sm:inline">Delete</span>
+    </button>
+    
+    {/* Status Badge and Toggle Switch */}
+    <div className="flex items-center gap-2 sm:gap-3">
+      {/* Show status badge here for mobile? Already have above, so maybe hide this one */}
+      <div className="hidden lg:flex items-center gap-2">
+        {getStatusBadge(promo)}
+      </div>
+      
+      {showToggle && (
+        <div className="flex items-center gap-2">
+          {/* Show status text for mobile next to toggle */}
+          <span className={`text-xs font-medium lg:hidden ${isActive ? 'text-[#79B833]' : 'text-[#8F8F8F]'}`}>
+            {isActive ? 'Active' : 'Disabled'}
+          </span>
+          
+          <button
+            onClick={(e) => handleToggleStatus(e, promo)}
+            disabled={togglingStatusId === promo.id}
+            className={`
+              relative inline-flex h-5 sm:h-6 w-9 sm:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#79B833] focus:ring-offset-2 flex-shrink-0
+              ${isActive ? 'bg-[#79B833]' : 'bg-gray-300'}
+              ${togglingStatusId === promo.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            `}
+          >
+            <span
+              className={`
+                inline-block h-3.5 sm:h-4 w-3.5 sm:w-4 transform rounded-full bg-white transition-transform
+                ${isActive ? 'translate-x-5 sm:translate-x-6' : 'translate-x-1'}
+              `}
+            />
+            {togglingStatusId === promo.id && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-2.5 sm:h-3 w-2.5 sm:w-3 border-2 border-white border-t-transparent"></div>
+              </span>
+            )}
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
         </div>
 
-        <div className=" mx-auto px-6 py-8">
-          {/* Simple Explanation Cards for Non-Technical Users */}
+        <div className="mx-auto px-6 py-8">
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {/* What are Rewards? Card */}
-            {/* <div className="bg-[#79B833] rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <FaGift className="text-3xl" />
-                    <FaTag className="text-2xl opacity-80" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Reward Levels</h3>
-                  <p className="text-white/90 text-sm leading-relaxed">
-                    These are the rewards customers earn when they spend money in your properties. 
-                    Each level has its own rules (like "spend ₦50,000 get 10% off").
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-4xl font-bold">{promo.tiers?.length || 0}</div>
-                  <p className="text-xs text-white/80 mt-1">Active Levels</p>
-                </div>
-              </div>
-            </div> */}
-  {/* <div className="grid md:grid-cols-2 gap-6 mb-12"> */}
             <MatrixCardGreen
               title="Total Tiers"
               change="Reward tiers in this promotion"
@@ -282,46 +355,7 @@ export default function PromoSinglePage() {
               value={promo.properties?.length || 0}
               change="Properties linked to this promotion"
             />
-          {/* </div> */}
-            {/* What are Properties? Card */}
-            {/* <div className="bg-[#272727] rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <FaBuilding className="text-3xl" />
-                    <FaChartLine className="text-2xl opacity-80" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">Linked Properties</h3>
-                  <p className="text-white/80 text-sm leading-relaxed">
-                    These are the properties where this promotion is active. Customers shopping 
-                    at these properties can earn the rewards shown above.
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-4xl font-bold">{promo.properties?.length || 0}</div>
-                  <p className="text-xs text-white/70 mt-1">Active Properties</p>
-                </div>
-              </div>
-            </div> */}
           </div>
-
-          {/* How This Promotion Works - Simple Explanation */}
-          {/* <div className="bg-white rounded-2xl shadow-sm border border-[#f5f5f5] p-6 mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-[#EFFFDE] rounded-xl flex items-center justify-center">
-                <FaInfoCircle className="text-[#79B833] text-xl" />
-              </div>
-              <h2 className="text-xl font-bold text-[#272727]">How This Promotion Works</h2>
-            </div>
-            <p className="text-[#4F4F4F] leading-relaxed">
-              When customers shop at <strong className="text-[#79B833]">{promo.properties?.length || 0} property(s)</strong> linked to this promotion, 
-              they can earn <strong className="text-[#79B833]">{promo.tiers?.length || 0} different reward level(s)</strong>. 
-              Each reward level has its own spending target and reward. For example: 
-              <strong className="block mt-2 text-sm bg-[#F6F6F8] p-3 rounded-lg text-[#272727]">
-                💡 "Spend ₦50,000 and get 10% off your next purchase"
-              </strong>
-            </p>
-          </div> */}
 
           {/* Main Content Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-[#f5f5f5] overflow-hidden">
@@ -558,8 +592,6 @@ export default function PromoSinglePage() {
               )}
             </div>
           </div>
-
-        
         </div>
       </div>
     </>

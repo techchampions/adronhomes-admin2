@@ -88,6 +88,7 @@ import Promotions from "./components/gift/components/promo/Promotions";
 import PromoFormPage from "./components/gift/components/promo/PromoFormPage";
 import PromoPage from "./components/gift/components/promo/PromoPage";
 import PromoRequestsTab from "./components/gift/components/promo/PromoRequestsTab";
+import CreatePromoFormPage from "./components/gift/components/promo/createPromo";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
 const NotFoundRedirect = () => {
@@ -338,7 +339,7 @@ const App = () => {
                 <Route path="/promotions/promotion-requests/:id" element={<PromoRequestsTab />} />
                 <Route path="/promotions/:id" element={<PromoPage />} />
                 <Route path="/promotions/edit/:id" element={<PromoFormPage />} />
-                 <Route path="/Promotions/create" element={<PromoForm />} />
+                 <Route path="/Promotions/create" element={<CreatePromoFormPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/gift-form" element={<GiftFormPage />} />

@@ -184,7 +184,7 @@ export default function PropertyTableComponent({
     try {
       // Prepare payload in the expected format
       const payload = {
-        promotion_ids: selectedPromoIds,
+        promo_id: selectedPromoIds,
         property_ids: selectedPropertyIds
       };
 

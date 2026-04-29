@@ -274,10 +274,10 @@ export const deletePromo = createAsyncThunk(
 
 // Bulk assign promotions to properties
 export const bulkAssignMultiplePromos = createAsyncThunk(
-  'promo/bulkAssignMultiplePromos',
-  async (payload: { promotion_ids: number[]; property_ids: number[] }, { rejectWithValue }) => {
+  'promo',
+  async (payload: { promo_id: number[]; property_ids: number[] }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`${PROMO_URL}/bulk-assign`, payload);
+      const response = await api.post(`${PROMO_URL}/assign-properties`, payload);
       toast.success(response.data?.message || 'Promotions assigned successfully');
       return response.data;
     } catch (error: any) {
