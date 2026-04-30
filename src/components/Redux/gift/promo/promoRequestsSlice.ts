@@ -34,6 +34,15 @@ export interface PromoRequest {
   user: PromoRequestUser;
   property: PromoRequestProperty;
   reward_group: any | null;
+  
+  items: [
+    {
+      name: string;
+      qty: number;
+     item_price : number;
+      item_id: string;
+    },
+  ];
 }
 
 export interface PromoRequestsStats {

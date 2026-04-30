@@ -222,7 +222,7 @@ export const PromoModal: React.FC<PromoModalProps> = ({
       <div className="relative bg-white rounded-[30px] w-full max-w-2xl p-8 z-10 shadow-2xl">
         <h2 className="text-2xl font-bold mb-2 text-dark">Select Promotions</h2>
         <p className="text-gray-500 mb-6">
-          You have selected <span className="font-semibold text-[#79B833]">{selectedPropertiesCount}</span> property{selectedPropertiesCount !== 1 ? 'ies' : ''}
+          You have selected <span className="font-semibold text-[#79B833]">{selectedPropertiesCount}</span> {selectedPropertiesCount !== 1 ? 'properties' : 'property'}
         </p>
         
        

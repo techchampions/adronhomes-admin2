@@ -227,6 +227,26 @@ export const fetchPromoById = createAsyncThunk(
   }
 );
 
+
+export const removePropertyFromPromotion = createAsyncThunk(
+  'promo/removePropertyFromPromotion',
+  async (data: { property_id: number; promo_id: number }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`${PROMO_URL}/unlink-property`, {
+        property_id: data.property_id,
+        promo_id: data.promo_id
+      });
+      
+      if (response.data && response.data.success) {
+        return response.data;
+      }
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to unlink property from promotion');
+    }
+  }
+);
+
 // Create new promo
 export const createPromo = createAsyncThunk(
   'promo/createPromo',
@@ -756,7 +776,31 @@ const promoSlice = createSlice({
             }
           }
         }
-      });
+      })
+      .addCase(removePropertyFromPromotion.fulfilled, (state, action) => {
+  state.isLoading = false;
+  state.success = true;
+  
+  if (state.currentPromo && state.currentPromo.id) {
+    const promoId = state.currentPromo.id;
+    const propertyId = action.meta.arg.property_id;
+    
+    const promoIndex = state.promos.findIndex(p => p.id.toString() === promoId.toString());
+    if (promoIndex !== -1 && state.promos[promoIndex].properties) {
+      const oldLength = state.promos[promoIndex].properties.length;
+      state.promos[promoIndex].properties = state.promos[promoIndex].properties?.filter(
+        (prop: any) => prop.id !== propertyId && prop.property_id !== propertyId
+      );
+      
+      // Update stats if properties were removed
+      if (state.stats && oldLength > state.promos[promoIndex].properties.length) {
+        state.stats.total_properties = Math.max(0, state.stats.total_properties - 1);
+      }
+    }
+  }
+  
+  toast.success(action.payload?.message || 'Property removed from promotion successfully');
+});
   },
 });
 

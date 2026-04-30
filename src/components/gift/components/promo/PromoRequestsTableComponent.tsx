@@ -1,29 +1,42 @@
-// PromoRequestsTableComponent.tsx - Complete upgraded version
+// PromoRequestsTableComponent.tsx - Complete upgraded version with detail modal
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaCheck, FaTimes, FaUser, FaHome, FaCalendar, FaComment } from "react-icons/fa";
+import {
+  FaCheck,
+  FaTimes,
+  FaUser,
+  FaHome,
+  FaCalendar,
+  FaComment,
+  FaEnvelope,
+  FaIdCard,
+  FaMapMarker,
+  FaPhone,
+  FaBuilding,
+} from "react-icons/fa";
 import { formatDate } from "../../../../utils/formatdate";
 import ConfirmationModal from "../../../Modals/delete";
 import { AppDispatch } from "../../../Redux/store";
-import { 
-  approvePromoRequest, 
+import {
+  approvePromoRequest,
   disapprovePromoRequest,
-  selectPromoRequestsSubmitStatus
+  selectPromoRequestsSubmitStatus,
 } from "../../../Redux/gift/promo/promoRequestsSlice";
 import { toast } from "react-toastify";
 import LoadingAnimations from "../../../LoadingAnimations";
 import { ReusableTable } from "../../../Tables/Table_one";
+import { DetailModal } from "./details_modal";
 
 // ============================================
 // Types & Interfaces
 // ============================================
-interface PromoRequest {
+export interface PromoRequest {
   id: number;
   user_id: number;
   promo_id: number;
   property_id: number;
   user_note: string;
-  status: 'pending' | 'granted' | 'rejected';
+  status: "pending" | "granted" | "rejected";
   processed_at: string | null;
   created_at: string;
   updated_at: string;
@@ -39,6 +52,14 @@ interface PromoRequest {
     name: string;
     total_amount: number;
   };
+  items: [
+    {
+      name: string;
+      qty: number;
+      item_price: number;
+      item_id: string;
+    },
+  ];
 }
 
 interface PromoRequestsTableProps {
@@ -57,21 +78,20 @@ interface PromoRequestsTableContentProps {
   processingRequestId: number | null;
   onApprove: (request: PromoRequest) => void;
   onDisapprove: (request: PromoRequest) => void;
+  onRowClick: (request: PromoRequest) => void;
   activeTab?: string;
 }
 
-// ============================================
-// Helper Functions
-// ============================================
+
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case 'granted':
+    case "granted":
       return (
         <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1">
           <FaCheck className="text-xs" /> Approved
         </span>
       );
-    case 'rejected':
+    case "rejected":
       return (
         <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium flex items-center gap-1">
           <FaTimes className="text-xs" /> Disapproved
@@ -86,30 +106,29 @@ const getStatusBadge = (status: string) => {
   }
 };
 
-const getEmptyStateMessage = (activeTab: string = 'all') => {
+const getEmptyStateMessage = (activeTab: string = "all") => {
   switch (activeTab) {
-    case 'all':
-      return 'No promo requests found';
-    case 'pending':
-      return 'No pending promo requests';
-    case 'granted':
-      return 'No approved promo requests';
-    case 'rejected':
-      return 'No disapproved promo requests';
+    case "all":
+      return "No promo requests found";
+    case "pending":
+      return "No pending promo requests";
+    case "granted":
+      return "No approved promo requests";
+    case "rejected":
+      return "No disapproved promo requests";
     default:
-      return 'No gift requests found for this promotion';
+      return "No gift requests found for this promotion";
   }
 };
 
-// ============================================
-// Table Content Component
-// ============================================
-const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({ 
-  requests, 
-  processingRequestId, 
-  onApprove, 
+
+const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
+  requests,
+  processingRequestId,
+  onApprove,
   onDisapprove,
-  activeTab = 'all'
+  onRowClick,
+  activeTab = "all",
 }) => {
   if (requests.length === 0) {
     return (
@@ -121,7 +140,7 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="max-w-[0] md:min-w-0">
+      <div className="md:min-w-0">
         <table className="w-full">
           <thead>
             <tr className="text-left border-b border-gray-200">
@@ -147,9 +166,15 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
           </thead>
           <tbody>
             {requests.map((request) => (
-              <tr key={request.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <tr
+                key={request.id}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
                 {/* User Info */}
-                <td className="py-4 text-dark text-sm whitespace-nowrap pr-4">
+                <td
+                  onClick={() => onRowClick(request)}
+                  className="py-4 text-dark text-sm whitespace-nowrap pr-4"
+                >
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                       <FaUser className="text-gray-300 text-xs" />
@@ -166,7 +191,10 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                 </td>
 
                 {/* Property Info */}
-                <td className="py-4 text-dark text-sm whitespace-nowrap pr-4">
+                <td
+                  onClick={() => onRowClick(request)}
+                  className="py-4 text-dark text-sm whitespace-nowrap pr-4"
+                >
                   <div className="flex items-center gap-2">
                     <FaHome className="text-gray-400 text-xs" />
                     <div>
@@ -181,9 +209,11 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                 </td>
 
                 {/* User Note */}
-                <td className="py-4 text-dark text-sm pr-4">
+                <td
+                  onClick={() => onRowClick(request)}
+                  className="py-4 text-dark text-sm pr-4"
+                >
                   <div className="flex items-start gap-2 max-w-64">
-                    {/* <FaComment className="text-gray-400 text-xs mt-0.5" /> */}
                     <p className="text-sm text-gray-600 line-clamp-2">
                       {request.user_note || "No note provided"}
                     </p>
@@ -191,9 +221,11 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                 </td>
 
                 {/* Request Date */}
-                <td className="py-4 text-dark text-sm whitespace-nowrap pr-4">
+                <td
+                  onClick={() => onRowClick(request)}
+                  className="py-4 text-dark text-sm whitespace-nowrap pr-4"
+                >
                   <div className="flex items-center gap-2">
-                    {/* <FaCalendar className="text-gray-400 text-xs" /> */}
                     <span>{formatDate(request.created_at)}</span>
                   </div>
                 </td>
@@ -202,10 +234,9 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                 <td className="py-4 whitespace-nowrap pr-4">
                   {getStatusBadge(request.status)}
                 </td>
-
                 {/* Actions */}
                 <td className="py-4 whitespace-nowrap">
-                  {request.status === 'pending' && (
+                  {request.status === "pending" && (
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => onApprove(request)}
@@ -237,9 +268,11 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                       </button>
                     </div>
                   )}
-                  {request.status !== 'pending' && (
+                  {request.status !== "pending" && (
                     <span className="text-xs text-gray-400">
-                      {request.status === 'granted' ? 'Already approved' : 'Already disapproved'}
+                      {request.status === "granted"
+                        ? "Already approved"
+                        : "Already disapproved"}
                     </span>
                   )}
                 </td>
@@ -255,65 +288,81 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
 // ============================================
 // Main Component
 // ============================================
-export default function PromoRequestsTableComponent({ 
-  data, 
-  promoId, 
+export default function PromoRequestsTableComponent({
+  data,
+  promoId,
   onRefresh,
   loading = false,
   activeTab = "all",
   onTabChange,
   onSearch,
-  onSortChange 
+  onSortChange,
 }: PromoRequestsTableProps) {
   const dispatch = useDispatch<AppDispatch>();
   const submitStatus = useSelector(selectPromoRequestsSubmitStatus);
-  
+
   // State for modal and processing
-  const [selectedRequest, setSelectedRequest] = useState<PromoRequest | null>(null);
-  const [actionType, setActionType] = useState<'approve' | 'disapprove' | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<PromoRequest | null>(
+    null,
+  );
+  const [actionType, setActionType] = useState<"approve" | "disapprove" | null>(
+    null,
+  );
   const [modalOpen, setModalOpen] = useState(false);
-  const [processingRequestId, setProcessingRequestId] = useState<number | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [processingRequestId, setProcessingRequestId] = useState<number | null>(
+    null,
+  );
 
   // ============================================
   // Event Handlers
   // ============================================
+  const handleRowClick = (request: PromoRequest) => {
+    setSelectedRequest(request);
+    setDetailModalOpen(true);
+  };
+
   const handleApprove = (request: PromoRequest) => {
     setSelectedRequest(request);
-    setActionType('approve');
+    setActionType("approve");
     setModalOpen(true);
   };
 
   const handleDisapprove = (request: PromoRequest) => {
     setSelectedRequest(request);
-    setActionType('disapprove');
+    setActionType("disapprove");
     setModalOpen(true);
   };
 
   const handleConfirm = async () => {
     if (!selectedRequest) return;
-    
+
     setProcessingRequestId(selectedRequest.id);
-    
+
     try {
       let result;
-      if (actionType === 'approve') {
+      if (actionType === "approve") {
         result = await dispatch(approvePromoRequest(selectedRequest.id));
       } else {
         result = await dispatch(disapprovePromoRequest(selectedRequest.id));
       }
-      
+
       if (result.payload?.success) {
         setModalOpen(false);
         await onRefresh(); // Refresh the list
         setSelectedRequest(null);
         setActionType(null);
-        toast.success(`Request ${actionType === 'approve' ? 'approved' : 'disapproved'} successfully`);
+        toast.success(
+          `Request ${actionType === "approve" ? "approved" : "disapproved"} successfully`,
+        );
       } else {
-        toast.error(result.payload?.message || `Failed to ${actionType} request`);
+        toast.error(
+          result.payload?.message || `Failed to ${actionType} request`,
+        );
       }
     } catch (error) {
       toast.error(`An error occurred while processing the request`);
-      console.error('Action error:', error);
+      console.error("Action error:", error);
     } finally {
       setProcessingRequestId(null);
     }
@@ -325,28 +374,44 @@ export default function PromoRequestsTableComponent({
     setActionType(null);
   };
 
-  const isProcessing = submitStatus === 'loading' || processingRequestId !== null;
+  const handleDetailModalClose = () => {
+    setDetailModalOpen(false);
+    setSelectedRequest(null);
+  };
+
+  const isProcessing =
+    submitStatus === "loading" || processingRequestId !== null;
 
   // Define available tabs for this table
   const tabs = ["all", "pending", "granted", "rejected"];
 
-  // ============================================
-  // Render
-  // ============================================
+
   return (
     <>
+      {/* Detail Modal */}
+      <DetailModal
+        isOpen={detailModalOpen}
+        request={selectedRequest}
+        onClose={handleDetailModalClose}
+        onApprove={handleApprove}
+        onDisapprove={handleDisapprove}
+        processingRequestId={processingRequestId}
+      />
+
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={modalOpen}
-        title={actionType === 'approve' ? "Approve Request" : "Disapprove Request"}
+        title={
+          actionType === "approve" ? "Approve Request" : "Disapprove Request"
+        }
         description={`Are you sure you want to ${actionType} this gift request for ${selectedRequest?.user?.first_name} ${selectedRequest?.user?.last_name}?`}
         subjectName={selectedRequest?.property?.name || ""}
         onClose={handleModalClose}
         onConfirm={handleConfirm}
         loading={isProcessing}
-        confirmButtonText={actionType === 'approve' ? "Approve" : "Disapprove"}
+        confirmButtonText={actionType === "approve" ? "Approve" : "Disapprove"}
         cancelButtonText="Cancel"
-        className={`${actionType === 'approve' ? "bg-[#79B833]! hover:bg-[#6aa22c]!" : 'bg-red-600 hover:bg-red-700'} text-white`}
+        className={`${actionType === "approve" ? "bg-[#79B833]! hover:bg-[#6aa22c]!" : "bg-red-600 hover:bg-red-700"} text-white`}
       />
 
       {/* Reusable Table Wrapper */}
@@ -354,7 +419,7 @@ export default function PromoRequestsTableComponent({
         <ReusableTable
           tabs={tabs}
           activeTab={activeTab}
-          onTabChange={onTabChange }
+          onTabChange={onTabChange}
           searchPlaceholder="Search for promo requests..."
           onSearch={onSearch || (() => {})}
           showTabs={true}
@@ -371,6 +436,7 @@ export default function PromoRequestsTableComponent({
               processingRequestId={processingRequestId}
               onApprove={handleApprove}
               onDisapprove={handleDisapprove}
+              onRowClick={handleRowClick}
               activeTab={activeTab}
             />
           )}

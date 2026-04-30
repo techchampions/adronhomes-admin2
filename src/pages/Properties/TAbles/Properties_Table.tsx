@@ -535,7 +535,7 @@ export default function PropertyTableComponent({
           <div>
             <span className="font-semibold text-[#79B833]">Promotion Mode Active</span>
             <span className="ml-2 text-gray-600">
-              {selectedCount} property{selectedCount !== 1 ? 'ies' : ''} selected
+              {selectedCount} {selectedCount !== 1 ? 'properties' : 'property'} selected
             </span>
           </div>
           <div className="flex gap-3">

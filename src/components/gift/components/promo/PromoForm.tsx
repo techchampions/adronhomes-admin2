@@ -85,6 +85,10 @@ const PromoForm: React.FC<PromoFormProps> = ({
                 qty: Yup.number()
                   .min(1, "Quantity must be at least 1")
                   .required("Quantity is required"),
+                item_price: Yup.number()
+                  .nullable()
+                  .min(0, "item_price must be at least 0")
+                  .typeError("Must be a number"),
               })
             ).min(1, "At least one reward item is required"),
           })
@@ -131,7 +135,8 @@ const PromoForm: React.FC<PromoFormProps> = ({
             items: group.items.map(item => ({
               item_id: item.item_id || item.name,
               name: item.name,
-              qty: item.qty
+              qty: item.qty,
+              item_price: item.item_price || 0
             }))
           }))
         }))
@@ -142,7 +147,7 @@ const PromoForm: React.FC<PromoFormProps> = ({
       } else {
         // Default Redux submission
         dispatch(setLoading(true));
-        dispatch(clearPromoSuccess()); // Fixed: changed from clearGiftSuccess
+        dispatch(clearPromoSuccess());
 
         try {
           if (isEditing && editingId) {
@@ -216,7 +221,7 @@ const PromoForm: React.FC<PromoFormProps> = ({
     tiers.push({
       trigger_amount: null,
       percentage: null,
-      reward_groups: [{ logic: "AND", items: [{ item_id: "", name: "", qty: 1 }] }],
+      reward_groups: [{ logic: "AND", items: [{ item_id: "", name: "", qty: 1, item_price: 0 }] }],
     });
     formik.setFieldValue("tiers", tiers);
   }, [dispatch, formik]);
@@ -237,7 +242,7 @@ const PromoForm: React.FC<PromoFormProps> = ({
       const tiers = [...formik.values.tiers];
       tiers[tierIndex].reward_groups.push({
         logic: "AND",
-        items: [{ item_id: "", name: "", qty: 1 }],
+        items: [{ item_id: "", name: "", qty: 1, item_price: 0 }],
       });
       formik.setFieldValue("tiers", tiers);
     },
@@ -264,6 +269,7 @@ const PromoForm: React.FC<PromoFormProps> = ({
         item_id: "",
         name: "",
         qty: 1,
+        item_price: 0,
       });
       formik.setFieldValue("tiers", tiers);
     },
@@ -324,6 +330,8 @@ const PromoForm: React.FC<PromoFormProps> = ({
         item.name = value;
       } else if (field === "qty") {
         item.qty = parseInt(value) || 1;
+      } else if (field === "item_price") {
+        item.item_price = parseFloat(value) || 0;
       }
       
       formik.setFieldValue("tiers", tiers);
@@ -412,7 +420,7 @@ const PromoForm: React.FC<PromoFormProps> = ({
       </div>
 
       {/* Basic Information */}
-      <div className="bg-white rounded-[30px]  border border-gray-200 p-6">
+      <div className="bg-white rounded-[30px] border border-gray-200 p-6">
         <InputField
           label="Promotion Name"
           name="promo_name"
@@ -579,6 +587,26 @@ const PromoForm: React.FC<PromoFormProps> = ({
                           />
                         </div>
 
+                        <div className="w-32">
+                          <InputField
+                            label={itemIndex === 0 ? "item_price (₦)" : undefined}
+                            type="number"
+                            placeholder="item_price"
+                            value={item.item_price || ""}
+                            onChange={(e) =>
+                              handleUpdateItem(tierIndex, groupIndex, itemIndex, "item_price", e.target.value)
+                            }
+                            error={
+                              shouldShowError(
+                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.item_price`
+                              ) &&
+                              getFieldError(
+                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.item_price`
+                              )
+                            }
+                          />
+                        </div>
+
                         {group.items.length > 1 && (
                           <button
                             type="button"
@@ -637,7 +665,6 @@ const PromoForm: React.FC<PromoFormProps> = ({
         )}
         <button
           type="submit"
-          // disabled={isLoading || !formik.isValid || !formik.dirty}
           className="px-6 py-2 text-white bg-[#79B833] rounded-full hover:bg-[#79B833]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {isLoading ? (
