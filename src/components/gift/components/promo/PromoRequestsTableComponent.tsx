@@ -41,6 +41,11 @@ export interface PromoRequest {
   created_at: string;
   updated_at: string;
   reward_group_id: number;
+      promo: {
+                  
+                    name: string;
+                    
+                },
   user: {
     id: number;
     first_name: string;
