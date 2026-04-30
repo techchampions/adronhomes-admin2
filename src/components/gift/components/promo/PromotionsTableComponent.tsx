@@ -161,9 +161,9 @@ export default function PromotionsTableComponent() {
 
      
 
-      <div className="w-full overflow-x-auto">
-        <div className="max-w-[800px] md:min-w-0">
-          <table className="w-full">
+      <div className="w-full overflow-x-auto mb-4">
+        <div className=" w-fit md:min-w-0">
+          <table className="w-=full table-auto">
             <thead>
               <tr className="text-left border-b border-gray-200">
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">

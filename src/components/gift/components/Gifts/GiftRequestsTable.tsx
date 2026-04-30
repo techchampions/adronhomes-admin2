@@ -62,7 +62,7 @@ const GiftRequestsTableContent: React.FC<{
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="max-w-[800px] md:min-w-0">
+      <div className=" md:min-w-0">
         <table className="w-full table-auto">
           <thead>
             <tr className="text-left border-b border-gray-200">

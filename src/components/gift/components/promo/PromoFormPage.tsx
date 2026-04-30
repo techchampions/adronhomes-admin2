@@ -42,6 +42,7 @@ function PromoFormPage() {
                     item_id: item.item_id || "",
                     name: item.item_name || "",
                     qty: item.qty || 1,
+                    item_price: item.item_price || 0
                   })) || [{ item_id: "", name: "", qty: 1 }],
                 })) || [{ logic: "AND", items: [{ item_id: "", name: "", qty: 1 }] }],
               })) || [{

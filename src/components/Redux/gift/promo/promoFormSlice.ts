@@ -5,6 +5,7 @@ export interface RewardItem {
   item_id: string;
   name: string;
   qty: number;
+  item_price?: number;
 }
 
 export interface RewardGroup {
@@ -35,7 +36,7 @@ interface PromoFormState {
 // Helper functions
 const createInitialRewardGroup = (): RewardGroup => ({
   logic: 'AND',
-  items: [{ item_id: '', name: '', qty: 1 }],
+  items: [{ item_id: '', name: '', qty: 1, item_price: 0 }],
 });
 
 const createInitialTier = (): Tier => ({
@@ -94,6 +95,8 @@ const promoFormSlice = createSlice({
           item.name = value;
         } else if (field === 'qty') {
           item.qty = parseInt(value) || 1;
+        } else if (field === 'item_price') {
+          item.item_price = parseFloat(value) || 0;
         }
       } else if (groupIndex !== undefined) {
         // Update reward group logic
@@ -147,6 +150,7 @@ const promoFormSlice = createSlice({
         item_id: '',
         name: '',
         qty: 1,
+        item_price: 0,
       });
       state.isDirty = true;
     },
