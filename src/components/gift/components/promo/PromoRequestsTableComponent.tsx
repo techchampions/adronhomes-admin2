@@ -85,7 +85,7 @@ interface PromoRequestsTableContentProps {
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "granted":
+    case "approved":
       return (
         <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1">
           <FaCheck className="text-xs" /> Approved

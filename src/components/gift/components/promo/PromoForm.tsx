@@ -543,91 +543,99 @@ const PromoForm: React.FC<PromoFormProps> = ({
                   </div>
 
                   {/* Reward Items */}
-                  <div className="space-y-4">
-                    {group.items.map((item, itemIndex) => (
-                      <div key={itemIndex} className="flex gap-4 items-start">
-                        <div className="flex-1">
-                          <InputField
-                            label={itemIndex === 0 ? "Gift Name" : undefined}
-                            placeholder="Enter gift name (e.g., 50kg Bag of Rice)"
-                            value={item.name}
-                            onChange={(e) =>
-                              handleUpdateItem(tierIndex, groupIndex, itemIndex, "name", e.target.value)
-                            }
-                            error={
-                              shouldShowError(
-                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.name`
-                              ) &&
-                              getFieldError(
-                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.name`
-                              )
-                            }
-                            required
-                          />
-                        </div>
+              <div className="space-y-4">
+  {group.items.map((item, itemIndex) => (
+    <div key={itemIndex}>
+      <div className="grid grid-cols-12 gap-4 items-start">
+        {/* Gift Name - Full width on mobile, 6 cols on larger screens */}
+        <div className="col-span-12 md:col-span-6">
+          <InputField
+            label={itemIndex === 0 ? "Gift Name" : undefined}
+            placeholder="Enter gift name (e.g., 50kg Bag of Rice)"
+            value={item.name}
+            onChange={(e) =>
+              handleUpdateItem(tierIndex, groupIndex, itemIndex, "name", e.target.value)
+            }
+            error={
+              shouldShowError(
+                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.name`
+              ) &&
+              getFieldError(
+                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.name`
+              )
+            }
+            required
+          />
+        </div>
+        
+        {/* Item Price - Full width on mobile, 3 cols on larger screens */}
+        <div className="col-span-12 md:col-span-4">
+          <InputField
+            label={itemIndex === 0 ? "Item Price (₦)" : undefined}
+            type="number"
+            placeholder="Item price"
+            value={item.item_price || ""}
+            onChange={(e) =>
+              handleUpdateItem(tierIndex, groupIndex, itemIndex, "item_price", e.target.value)
+            }
+            error={
+              shouldShowError(
+                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.item_price`
+              ) &&
+              getFieldError(
+                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.item_price`
+              )
+            }
+          />
+        </div>
+        
+        {/* Quantity - Full width on mobile, 2 cols on larger screens */}
+        <div className="col-span-10 md:col-span-2">
+          <InputField
+            label={itemIndex === 0 ? "Quantity" : undefined}
+            type="number"
+            placeholder="Qty"
+            value={item.qty}
+            onChange={(e) =>
+              handleUpdateItem(tierIndex, groupIndex, itemIndex, "qty", e.target.value)
+            }
+            error={
+              shouldShowError(
+                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.qty`
+              ) &&
+              getFieldError(
+                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.qty`
+              )
+            }
+            required
+          />
+        </div>
 
-                        <div className="w-32">
-                          <InputField
-                            label={itemIndex === 0 ? "Quantity" : undefined}
-                            type="number"
-                            placeholder="Qty"
-                            value={item.qty}
-                            onChange={(e) =>
-                              handleUpdateItem(tierIndex, groupIndex, itemIndex, "qty", e.target.value)
-                            }
-                            error={
-                              shouldShowError(
-                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.qty`
-                              ) &&
-                              getFieldError(
-                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.qty`
-                              )
-                            }
-                            required
-                          />
-                        </div>
+        {/* Remove Button - Only show if more than 1 item */}
+        {group.items.length > 1 && (
+          <div className="col-span-2 md:col-span-1">
+            <button
+              type="button"
+              onClick={() => handleRemoveItem(tierIndex, groupIndex, itemIndex)}
+              className="mt-8 w-full md:w-auto text-red-600 hover:text-red-800 text-xl font-bold"
+              aria-label="Remove item"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  ))}
 
-                        <div className="w-32">
-                          <InputField
-                            label={itemIndex === 0 ? "item_price (₦)" : undefined}
-                            type="number"
-                            placeholder="item_price"
-                            value={item.item_price || ""}
-                            onChange={(e) =>
-                              handleUpdateItem(tierIndex, groupIndex, itemIndex, "item_price", e.target.value)
-                            }
-                            error={
-                              shouldShowError(
-                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.item_price`
-                              ) &&
-                              getFieldError(
-                                `tiers.${tierIndex}.reward_groups.${groupIndex}.items.${itemIndex}.item_price`
-                              )
-                            }
-                          />
-                        </div>
-
-                        {group.items.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveItem(tierIndex, groupIndex, itemIndex)}
-                            className="mt-8 text-red-600 hover:text-red-800 text-xl font-bold"
-                            aria-label="Remove item"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))}
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddItem(tierIndex, groupIndex)}
-                      className="text-sm text-[#79B833] hover:text-[#6aa82a] font-medium transition-colors"
-                    >
-                      + Add Item to this Group
-                    </button>
-                  </div>
+  <button
+    type="button"
+    onClick={() => handleAddItem(tierIndex, groupIndex)}
+    className="text-sm text-[#79B833] hover:text-[#6aa82a] font-medium transition-colors"
+  >
+    + Add Item to this Group
+  </button>
+</div>
                 </div>
               ))}
             </div>
