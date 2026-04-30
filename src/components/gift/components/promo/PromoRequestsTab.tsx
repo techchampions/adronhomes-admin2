@@ -67,8 +67,8 @@ const promoId = id || '';
        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
 
  <Header
-        title="Promotion Request(s)"
-        subtitle="Manage Requests for this Promotion"
+        title={requests.length > 0 ? `Requests for ${requests[0].promo.name}` : "Promotion Requests"}
+        subtitle={`Manage Requests for ${requests[0].promo.name} promotion`}
         // buttonText="Export"
         showSearchAndButton={false}
         // onButtonClick={openCustomersModal}

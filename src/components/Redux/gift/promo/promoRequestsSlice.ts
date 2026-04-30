@@ -34,7 +34,11 @@ export interface PromoRequest {
   user: PromoRequestUser;
   property: PromoRequestProperty;
   reward_group: any | null;
-  
+     promo: {
+                  
+                    name: string;
+                    
+                },
   items: [
     {
       name: string;

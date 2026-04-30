@@ -41,6 +41,11 @@ export interface PromoRequest {
   created_at: string;
   updated_at: string;
   reward_group_id: number;
+      promo: {
+                  
+                    name: string;
+                    
+                },
   user: {
     id: number;
     first_name: string;
@@ -85,7 +90,7 @@ interface PromoRequestsTableContentProps {
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "granted":
+    case "approved":
       return (
         <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1">
           <FaCheck className="text-xs" /> Approved

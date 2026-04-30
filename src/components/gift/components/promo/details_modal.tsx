@@ -24,7 +24,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'granted':
+      case 'approved':
         return 'bg-green-100 text-green-800 border-green-300';
       case 'rejected':
         return 'bg-red-100 text-red-800 border-red-300';
@@ -35,7 +35,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'granted':
+      case 'approved':
         return <FaCheck className="text-green-600" />;
       case 'rejected':
         return <FaTimes className="text-red-600" />;
@@ -65,7 +65,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-xl">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Request Details</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">{request.promo.name} Request Details</h2>
                 <p className="text-sm text-gray-500 mt-1">ID: #{request.id}</p>
               </div>
               <button
@@ -245,7 +245,17 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                     Request Details
                   </h3>
                 </div>
-                
+                     <div className="flex items-start gap-3">
+                    <FaComment className="text-gray-400 mt-1" />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-500">User Note</p>
+                      <div className="mt-1 p-3 bg-white rounded border border-gray-200">
+                        <p className="text-gray-700 whitespace-pre-wrap">
+                          {request.user_note || "No note provided"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                   <div className="flex items-start gap-3">
                     <FaCalendar className="text-gray-400 mt-1" />
@@ -263,22 +273,12 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3">
-                    <FaComment className="text-gray-400 mt-1" />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">User Note</p>
-                      <div className="mt-1 p-3 bg-white rounded border border-gray-200">
-                        <p className="text-gray-700 whitespace-pre-wrap">
-                          {request.user_note || "No note provided"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+             
                 </div>
               </div>
 
               {/* Promo Information */}
-              <div className="md:col-span-2 space-y-4">
+              {/* <div className="md:col-span-2 space-y-4">
                 <div className="border-b border-gray-200 pb-2">
                   <h3 className="text-lg font-semibold text-gray-800">Additional Information</h3>
                 </div>
@@ -294,7 +294,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                     <p className="font-medium">{request.reward_group_id}</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
