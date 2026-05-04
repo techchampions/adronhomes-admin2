@@ -75,6 +75,7 @@ import promoReducer from "./gift/promo/promoSlice";
 import promoFormReducer from "./gift/promo/promoFormSlice";
 import promoTableReducer from "./gift/promo/promoTableSlice";
 import promoRequestsReducer from "./gift/promo/promoRequestsSlice";
+import exportClientPartnershipReducer from "./export/exportClientPartnershipSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -151,7 +152,8 @@ gifts: giftSliceReducer,
  promo: promoReducer,
 promoForm: promoFormReducer,
 promoTable: promoTableReducer,
- promoRequests: promoRequestsReducer,},
+ promoRequests: promoRequestsReducer,
+exportClientPartnership: exportClientPartnershipReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;
