@@ -19,7 +19,7 @@ export default function ClientsPartnership() {
    const ClientPartnershipModal =   useRef<ExportModalRef>(null);
     const openClientPartnershipModal = () => {
       if (ClientPartnershipModal.current) {
-        ClientPartnershipModal.current.openModal();
+        ClientPartnershipModal.current.openModal()
       }
     };
   return (
