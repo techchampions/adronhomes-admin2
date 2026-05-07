@@ -14,7 +14,7 @@ const PropertyEnquiries = () => {
   const [page, setpage] = useState(1);
   const params = useParams();
   const id = params?.id;
-  const { data, isLoading } = useGetPropertyRequestByID(Number(id));
+  const { data, isLoading } = useGetPropertyRequestByID(Number(id),page);
   const totalPages = data?.data.last_page || 1;
   const propertyData = data?.data.data || [];
 

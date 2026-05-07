@@ -15,7 +15,7 @@ import { formatToNaira } from "../../../utils/formatcurrency";
 import { AiOutlineUpload } from "react-icons/ai";
 import { MdClose } from "react-icons/md";
 
-// Import the Redux actions and selectors
+// Import the Redux actions and selectors for countries
 import {
   fetchAllCountries,
   fetchCountryStates,
@@ -63,10 +63,15 @@ const BasicDetails = forwardRef<BasicDetailsHandles, BasicDetailsProps>(({
 }, ref) => {
   const dispatch = useDispatch<AppDispatch>();
   
-  // Get data from Redux store
+  // Get countries data from Redux store
   const countries = useSelector(selectAllCountries);
   const loading = useSelector(selectLoadingStates);
   const errors = useSelector(selectErrorStates);
+  
+  // Get property categories from Redux store
+  const { categories: propertyCategories, loading: categoriesLoading, error: categoriesError } = useSelector(
+    (state: RootState) => state.propertyCategories
+  );
 
   // Also get form data from Redux store if needed
   const createFormData = useSelector((state: RootState) => state.createProperty);
@@ -261,6 +266,11 @@ useImperativeHandle(ref, () => ({
     dispatch(fetchAllCountries());
   }, [dispatch]);
 
+  // Fetch property categories on component mount
+  useEffect(() => {
+    dispatch(fetchPropertyCategories());
+  }, [dispatch]);
+
   useEffect(() => {
     if (formik.values.country) {
       dispatch(fetchCountryStates(formik.values.country));
@@ -321,15 +331,23 @@ useImperativeHandle(ref, () => ({
 
       <EnhancedOptionInputField
         label="Category"
-        placeholder="Select category"
+        placeholder={categoriesLoading ? "Loading categories..." : "Select category"}
         name="category_id"
         value={formik.values.category_id}
         onChange={(value) => formik.setFieldValue("category_id", value)}
         options={categoryOptions}
         dropdownTitle="Categories"
         error={formik.touched.category_id && formik.errors.category_id}
-        isSearchable={false}
+        isLoading={categoriesLoading}
+        isSearchable={true}
       />
+
+      {/* Display category error if any */}
+      {categoriesError && (
+        <div className="text-red-500 text-sm mt-1">
+          Error loading categories: {categoriesError}
+        </div>
+      )}
 
       <InputField
         label="Price"

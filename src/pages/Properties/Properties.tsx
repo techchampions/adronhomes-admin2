@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+// Properties.tsx (updated)
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Header from "../../general/Header";
 import PropertyTableComponent, {
   PropertyData,
@@ -23,6 +24,9 @@ export default function Properties() {
   const { drafted, published, sold, stats, loading } = useSelector(
     (state: RootState) => state.properties
   );
+
+  // State to trigger gift mode
+  const [giftModeTrigger, setGiftModeTrigger] = useState(0);
 
   const getFilteredProperties = useCallback(
     (properties: PropertyData[], searchTerm: string) => {
@@ -91,21 +95,21 @@ export default function Properties() {
     const type = activeTab.toLowerCase() as "drafted" | "published" | "sold";
     dispatch(setPropertiesSearch({ type, search: "" }));
   }, [dispatch]);
+
   const handleSearch = useCallback((value: string) => {
     const type = activeTab.toLowerCase() as "drafted" | "published" | "sold";
     dispatch(setPropertiesSearch({ type, search: value }));
-    // setIsSearching(true);
-
-    // setTimeout(() => setIsSearching(false), 1000);
-  }, []);
+  }, [activeTab, dispatch]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setIsSearching(true);
     setTimeout(() => setIsSearching(false), 500);
-    if (activeTab==='Sold'){
-        setIsSold(true)
+    if (tab === 'Sold') {
+      setIsSold(true);
     }
+    // Reset gift mode when changing tabs
+    setGiftModeTrigger(0);
   };
 
   const getLoadingState = () => {
@@ -124,9 +128,31 @@ export default function Properties() {
 
   const currentLoading = getLoadingState();
 
+  // Function to trigger gift mode
+  const handleGiftClick = () => {
+    console.log("Gift button clicked"); // For debugging
+    setGiftModeTrigger(prev => prev + 1);
+  };
+
   return (
     <div className="mb-[52px] relative">
       <Header title="Properties" subtitle="Manage the list of properties" />
+      
+      {/* Add Gift Button */}
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-4 flex justify-end">
+        <button
+          onClick={handleGiftClick}
+          className="px-6 py-2 rounded-full bg-[#79B833] text-white hover:bg-[#79B833]/80 transition-colors flex items-center gap-2"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 12V20H4V12M12 2C9.5 2 8 3.5 8 6C8 8 9.5 9 12 10C14.5 9 16 8 16 6C16 3.5 14.5 2 12 2ZM2 7H22V12H2V7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <path d="M12 22V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M8 15H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+         Add Promotion Gift
+        </button>
+      </div>
+
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
           title="Total Properties"
@@ -135,12 +161,12 @@ export default function Properties() {
         />
         <MatrixCard
           title="Published Properties"
-          value={stats.total_published}
+          value={stats?.total_published}
           change="Includes all Published Properties"
         />
         <MatrixCard
           title="Drafted Properties"
-          value={stats.total_drafted}
+          value={stats?.total_drafted}
           change="Includes all Drafted Properties"
         />
         <MatrixCard
@@ -180,8 +206,8 @@ export default function Properties() {
             <PropertyTableComponent
               data={filteredProperties as PropertyData[]}
               CurrentPage={currentState.pagination.currentPage}
-          activeTab={activeTab} 
-           
+              activeTab={activeTab}
+              triggerGiftMode={giftModeTrigger}
             />
           )}
         </ReusableTable>

@@ -43,7 +43,7 @@ const customerSlice = createSlice({
     },
     setCustomersSearch: (state, action: PayloadAction<string>) => {
       state.search = action.payload;
-      state.pagination.currentPage = "";
+      // state.pagination.currentPage = "";
     },
   },
   extraReducers: (builder) => {

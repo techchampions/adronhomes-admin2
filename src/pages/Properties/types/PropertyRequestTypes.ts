@@ -54,6 +54,7 @@ export interface Inquiry {
   created_at: string; // ISO 8601
   updated_at: string;
   status: number; // 0 =pending, 1 =approved… (adjust to an enum when you know the mapping)
+  discovery_method: string; // e.g. "Google", "Referral", etc. (guessing based on typical CRM data)
 }
 
 /** Full API response for GET /properties/:id/requests */

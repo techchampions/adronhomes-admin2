@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   fetchPropertyData,
@@ -24,16 +24,58 @@ const PropertyDetailsPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data, loading, error } = useAppSelector(
-    (state) => state.propertyDetails
+    (state) => state.propertyDetails,
   );
   const {
     loading: publishLoading,
     success: publishSuccess,
     error: publishError,
   } = useAppSelector((state) => state.publishDraft);
-
+  const { success: Updatesuccess, error: UpdateError } = useAppSelector(
+    (state: RootState) => state.updateproperty,
+  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<Partial<Property>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [galleryPreviews, setGalleryPreviews] = useState<(string | null)[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [newDisplayImage, setNewDisplayImage] = useState<File | null>(null);
+  const [newGalleryImages, setNewGalleryImages] = useState<
+    (File | string | null)[]
+  >([]);
+  // const { isLandProperty } = useContext(PropertyContext)!;
   const isLandProperty = data?.properties?.category === "estate";
 
+  // Initialize form data and gallery previews
+  useEffect(() => {
+    if (data?.properties) {
+      const property = data.properties;
+      setFormData(property);
+      setImagePreview(property.display_image);
+      setGalleryPreviews(property.photos || []);
+      setNewGalleryImages(property.photos || []);
+    }
+  }, [data]);
+  // const navigate = useNavigate();
+  const location = useLocation();
+  // Create navigation helper functions
+  const navigateToProperties = () => {
+    const hasInfoTech = location.pathname.includes("/info-tech");
+    navigate(hasInfoTech ? "/info-tech/properties" : "/properties");
+  };
+
+  const navigateToEditProperty = (propertyId: number) => {
+    const hasInfoTech = location.pathname.includes("/info-tech");
+    navigate(
+      hasInfoTech
+        ? `/info-tech/properties/property-edith/${propertyId}`
+        : `/properties/property-edith/${propertyId}`,
+    );
+  };
+  // Fetch property data
+  // Fetch property data
   useEffect(() => {
     if (id) {
       const propertyId = parseInt(id);
@@ -41,13 +83,13 @@ const PropertyDetailsPage = () => {
         dispatch(fetchPropertyData({ id: propertyId }));
       } else {
         toast.error("Invalid property ID");
-        navigate("/properties");
+        navigateToProperties(); // Updated from navigate("/properties")
       }
     }
     return () => {
       dispatch(clearPropertyData());
     };
-  }, [id, dispatch, navigate]);
+  }, [id, dispatch]);
 
   useEffect(() => {
     if (publishSuccess) {
@@ -59,7 +101,84 @@ const PropertyDetailsPage = () => {
     if (publishError) {
       dispatch(resetPublishDraftState());
     }
-  }, [dispatch, publishSuccess, publishError, id]);
+  }, [dispatch, Updatesuccess, UpdateError]);
+
+  useEffect(() => {
+    if (Updatesuccess) {
+      dispatch(resetPropertyState());
+    }
+    if (UpdateError) {
+      dispatch(resetPropertyState());
+    }
+  }, [dispatch, Updatesuccess, UpdateError]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value, type } = e.target;
+    if (type === "checkbox") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: (e.target as HTMLInputElement).checked,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleArrayInputChange = (field: keyof Property, value: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+        setNewDisplayImage(file);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGalleryImageChange =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const newPreviews = [...galleryPreviews];
+          newPreviews[index] = reader.result as string;
+          setGalleryPreviews(newPreviews);
+
+          const newImages = [...newGalleryImages];
+          newImages[index] = file;
+          setNewGalleryImages(newImages);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
+  const triggerGalleryFileInput = (index: number) => {
+    galleryInputRefs.current[index]?.click();
+  };
+
+  const handleToggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
 
   const handlePublishToggle = async () => {
     if (!id) {
@@ -71,11 +190,166 @@ const PropertyDetailsPage = () => {
       await dispatch(publishDraft(parseInt(id))).unwrap();
       toast.success(
         `Property ${
-          data?.properties?.is_active === 1 ? "drafted" : "published"
-        } successfully!`
+          property?.is_active === 1 ? "drafted" : "published"
+        } successfully!`,
       );
     } catch (error: any) {
       toast.error(error.message || "Failed to update property status");
+    }
+  };
+
+  const validateFormData = () => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.name) errors.name = "Property name is required";
+    if (!formData.price) errors.price = "Price is required";
+    if (!formData.size) errors.size = "Size is required";
+    if (!isLandProperty) {
+      if (
+        formData.no_of_bedroom === undefined ||
+        formData.no_of_bedroom === null
+      )
+        errors.no_of_bedroom = "Bedrooms is required";
+      if (
+        formData.number_of_bathroom === undefined ||
+        formData.number_of_bathroom === null
+      )
+        errors.number_of_bathroom = "Bathrooms is required";
+      if (formData.toilets === undefined || formData.toilets === null)
+        errors.toilets = "Toilets is required";
+      if (!formData.building_condition)
+        errors.building_condition = "Building condition is required";
+      if (!formData.year_built) errors.year_built = "Year built is required";
+    }
+    if (!formData.number_of_unit)
+      errors.number_of_unit = "Total units is required";
+    if (
+      formData.unit_available === undefined ||
+      formData.unit_available === null
+    )
+      errors.unit_available = "Units available is required";
+    if (formData.unit_sold === undefined || formData.unit_sold === null)
+      errors.unit_sold = "Units sold is required";
+    if (!formData.street_address)
+      errors.street_address = "Street address is required";
+    if (!formData.state) errors.state = "State is required";
+    if (!formData.country) errors.country = "Country is required";
+    // if (!formData.lga) errors.lga = "LGA is required";
+    if (!formData.status) errors.status = "Status is required";
+    if (!formData.contact_number)
+      errors.contact_number = "Contact number is required";
+
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach((error) => toast.error(error));
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    if (!validateFormData()) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    const propertyId = id ? parseInt(id) : null;
+    if (!propertyId || !formData) {
+      toast.error("Property ID not found.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const mainFormData = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "details" || key === "photos" || key === "display_image") {
+          return;
+        }
+
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            if (typeof item === "string" || typeof item === "number") {
+              mainFormData.append(`${key}[]`, String(item));
+            }
+          });
+        } else if (
+          value !== null &&
+          value !== undefined &&
+          typeof value !== "object"
+        ) {
+          mainFormData.append(key, String(value));
+        }
+      });
+
+      if (newDisplayImage) {
+        mainFormData.append("display_image", newDisplayImage);
+      }
+
+      newGalleryImages.forEach((image, index) => {
+        if (image instanceof File) {
+          mainFormData.append(`photos[${index}]`, image);
+        }
+      });
+
+      mainFormData.append("is_discount", formData.is_discount ? "1" : "0");
+
+      if (formData.is_discount) {
+        if (formData.discount_name)
+          mainFormData.append("discount_name", formData.discount_name);
+        if (formData.discount_percentage)
+          mainFormData.append(
+            "discount_percentage",
+            String(formData.discount_percentage),
+          );
+        if (formData.discount_units)
+          mainFormData.append(
+            "discount_units",
+            String(formData.discount_units),
+          );
+        if (formData.discount_start_date)
+          mainFormData.append(
+            "discount_start_date",
+            formData.discount_start_date,
+          );
+        if (formData.discount_end_date)
+          mainFormData.append("discount_end_date", formData.discount_end_date);
+      }
+
+      await dispatch(
+        UpdateProperty({ UpdateId: propertyId, credentials: mainFormData }),
+      ).unwrap();
+
+      if (formData.details) {
+        const detailUpdates = formData.details.map((detail) => {
+          const detailFormData = {
+            property_id: String(propertyId),
+            name: detail.name,
+            value: String(detail.value),
+            type: detail.type,
+            purpose: detail.purpose,
+          };
+
+          return dispatch(
+            edit_property_detail({
+              detailId: detail.id,
+              formData: detailFormData,
+            }),
+          ).unwrap();
+        });
+
+        await Promise.all(detailUpdates);
+      }
+
+      toast.success("Property updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Update failed:", error);
+      toast.error("Failed to update property. Please check the form data.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -99,6 +373,14 @@ const PropertyDetailsPage = () => {
   const handleGoBack = () => {
     navigate(-1);
   };
+
+  const uniquePurposes = [
+    ...new Set(
+      formData.details
+        ?.map((d) => d.purpose)
+        .filter((p) => p !== undefined && p !== null) || [],
+    ),
+  ];
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
@@ -130,12 +412,41 @@ const PropertyDetailsPage = () => {
       Duplicate Property
     </button>
 
-    <button
-      onClick={() => navigate(`/properties/property-edith/${property.id}`)}
-      className="px-4 sm:px-6 py-2 bg-white text-[#79B833] font-semibold rounded-full hover:bg-gray-100 transition w-full sm:w-auto"
-    >
-      Edit Property
-    </button>
+            <div className="flex space-x-4 justify-center md:justify-end">
+              {/* <button
+                onClick={isEditing ? handleSubmit : handleToggleEdit}
+                className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditing
+                  ? "Save Changes"
+                  : "Edit Property"}
+              </button> */}
+              <button
+                onClick={() => navigateToEditProperty(property.id)} // Updated from navigate(`/properties/property-edith/${property.id}`)
+                className={`px-4 py-2 font-bold text-sm rounded-[60px] bg-[#79B833] text-white`}
+              >
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditing
+                    ? "Save Changes"
+                    : "Edit Property"}
+              </button>
+              <button
+                onClick={handlePublishToggle}
+                className="px-4 py-2 font-bold text-sm rounded-[60px] bg-[#272727] text-white"
+                disabled={publishLoading}
+              >
+                {publishLoading
+                  ? "Processing..."
+                  : property.is_active === 1
+                    ? "Add to Draft"
+                    : "Publish"}
+              </button>
+            </div>
+          </div>
 
     <button
       onClick={handlePublishToggle}
@@ -246,14 +557,181 @@ const PropertyDetailsPage = () => {
                         <p className="text-sm text-gray-600">Parking</p>
                         <p className="font-semibold">{property.parking_space || "N/A"}</p>
                       </div>
+                    )}
+                  </div> */}
+                </div>
+              </div>
+
+              {/* Features Section */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold mb-4">Features</h2>
+                {isEditing ? (
+                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <label className="text-gray-700 font-medium w-full md:w-1/3">
+                      Features:
+                    </label>
+                    <div className="w-full md:w-2/3">
+                      <textarea
+                        value={formData.features?.join(", ") || ""}
+                        //                         onChange={(e) => {
+                        //   const input = e.target.value;
+                        //   const array = input
+                        //     .split(",")
+                        //     .map((item) => item.trim())
+                        //     .filter((item) => item.length > 0); // removes empty entries
+                        //   handleArrayInputChange("features", array);
+                        // }}
+                        onChange={(e) =>
+                          handleArrayInputChange(
+                            "features",
+                            e.target.value.split("\n"),
+                          )
+                        }
+                        className="w-full bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"
+                        placeholder="Enter features separated by commas"
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Separate features with commas
+                      </p>
                     </div>
                   </>
                 )}
-                <div className="flex items-center space-x-3">
-                  <FaMapMarkerAlt className="text-[#79B833] text-xl" />
-                  <div>
-                    <p className="text-sm text-gray-600">Location</p>
-                    <p className="font-semibold">{property.state}, {property.country}</p>
+              </div>
+
+              {/* Payment Information */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold mb-4">
+                  Payment Information
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <label className="text-gray-700 font-medium w-full md:w-1/3">
+                      Initial Deposit:
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        name="initial_deposit"
+                        value={formData.initial_deposit || ""}
+                        onChange={handleInputChange}
+                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                      />
+                    ) : (
+                      <p className="text-gray-900 w-full md:w-2/3">
+                        {/* ₦{property.initial_deposit.toLocaleString() ?? '0'} */}
+                        ₦
+                        {property && property.initial_deposit != null
+                          ? property.initial_deposit.toLocaleString()
+                          : "0"}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <label className="text-gray-700 font-medium w-full md:w-1/3">
+                      Total Amount:
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        name="total_amount"
+                        // disabled
+                        value={formData.total_amount || ""}
+                        onChange={handleInputChange}
+                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                      />
+                    ) : (
+                      <p className="text-gray-900 w-full md:w-2/3">
+                        ₦
+                        {property && property.total_amount != null
+                          ? property.total_amount.toLocaleString()
+                          : "0"}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <label className="text-gray-700 font-medium w-full md:w-1/3">
+                      Payment Schedule:
+                    </label>
+                    {isEditing ? (
+                      <textarea
+                        // disabled
+                        value={formData.payment_schedule?.join("\n") || ""}
+                        onChange={(e) =>
+                          handleArrayInputChange(
+                            "payment_schedule",
+                            e.target.value.split("\n"),
+                          )
+                        }
+                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px] h-20"
+                        placeholder="Enter each payment schedule on a new line"
+                      />
+                    ) : (
+                      <ul className="w-full md:w-2/3 list-disc pl-5">
+                        {property.payment_schedule?.map(
+                          (schedule: any, index: any) => (
+                            <li key={index} className="text-gray-900">
+                              {schedule}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <label className="text-gray-700 font-medium w-full md:w-1/3">
+                      Payment Type:
+                    </label>
+                    {isEditing ? (
+                      <input
+                        // disabled
+                        type="text"
+                        name="payment_type"
+                        value={formData.payment_type || ""}
+                        onChange={handleInputChange}
+                        className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                      />
+                    ) : (
+                      <p className="text-gray-900 w-full md:w-2/3">
+                        {property.payment_type}
+                      </p>
+                    )}
+                  </div>
+                  {/* <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                  <label className="text-gray-700 font-medium w-full md:w-1/3">
+                    Fees & Charges:
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="fees_charges"
+                      value={formData.fees_charges || ""}
+                      onChange={handleInputChange}
+                      className="w-full md:w-2/3 bg-[#F5F5F5] px-[17px] py-[10px] outline-none text-[14px] rounded-[60px]"
+                    />
+                  ) : (
+                    <p className="text-gray-900 w-full md:w-2/3">
+                      {property.fees_charges || "N/A"}
+                    </p>
+                  )}
+                </div> */}
+                  {/* Discount Section */}
+                  <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-2">
+                    <label className="text-gray-700 font-medium w-full md:w-1/3">
+                      Discount:
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="checkbox"
+                        name="is_discount"
+                        checked={formData.is_discount || false}
+                        onChange={handleInputChange}
+                        className="w-full md:w-2/3 h-5 w-5 text-[#79B833] focus:ring-[#79B833] border-gray-300 rounded"
+                      />
+                    ) : (
+                      <p className="text-gray-900 w-full md:w-2/3">
+                        {property.is_discount ? "Yes" : "No"}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

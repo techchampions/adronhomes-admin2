@@ -1,4 +1,4 @@
-// src/general/TableCard.tsx (or wherever your TableCard is located)
+// src/general/TableCard.tsx
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../components/Tables/Pagination";
@@ -17,7 +17,6 @@ type ColumnConfig<T = any> = {
   width?: number;
   render?: (value: any, row: T) => React.ReactNode;
 };
-
 type TableCardProps<T = any> = {
   data: T[];
   columns: ColumnConfig<T>[];
@@ -25,14 +24,17 @@ type TableCardProps<T = any> = {
   viewAllText?: string | null;
   rowKey?: string | ((row: T) => string);
   className?: string;
-
   onViewAllClick?: () => void;
   pagination?: PaginationProps;
   onPageChange?: (page: number) => void;
+  onRowClick?: (row: T, event: React.MouseEvent) => void;
+
+  citta?: boolean;
+  headerComponent?: React.ReactNode;
 };
 
+
 const DEFAULT_COLUMN_WIDTH = 180;
-// const IMAGE_COLUMN_WIDTH = 250; // Not used in the provided snippet
 
 const TableCard = <T extends Record<string, any>>({
   data,
@@ -44,13 +46,18 @@ const TableCard = <T extends Record<string, any>>({
   onViewAllClick,
   pagination,
   onPageChange,
+  onRowClick,
+
+  citta = false,
+  headerComponent,
 }: TableCardProps<T>) => {
+
   const getRowKey = (row: T, index: number) => {
     if (typeof rowKey === "function") return rowKey(row);
     return row[rowKey] || index;
   };
   const navigate = useNavigate();
-      const location = useLocation();
+  const location = useLocation();
 
   const getWidthStyle = (width?: number) => ({
     width: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
@@ -58,24 +65,77 @@ const TableCard = <T extends Record<string, any>>({
     maxWidth: width ? `${width}px` : `${DEFAULT_COLUMN_WIDTH}px`,
   });
 
+  const handleRowClick = (row: T, event: React.MouseEvent) => {
+    // Check if the click came from a button or interactive element
+    const target = event.target as HTMLElement;
+    if (
+      target.tagName === 'BUTTON' ||
+      target.tagName === 'A' ||
+      target.closest('button') ||
+      target.closest('a')
+    ) {
+      return;
+    }
+
+    // First call custom row click handler if provided
+    if (onRowClick) {
+      onRowClick(row, event);
+      return;
+    }
+
+    // Default navigation logic for property plans
+    if (row.user_id && row.plan_id) {
+      const path = location.pathname;
+      const basePath = path.startsWith("/payments/customers")
+        ? "/payments/customers/payment"
+        : path.startsWith("/client/customers")
+        ? "/client/customers/payment"
+        : "/customers/payment";
+
+      navigate(`${basePath}/${row.user_id}/${row.plan_id}`);
+    }
+  };
+
   return (
     <div className={`bg-white p-6 rounded-[30px] ${className}`}>
-      {(title || viewAllText) && (
-        <div className="w-full flex justify-between items-center mb-6">
-          {title && <h2 className="text-xl font-[350] text-dark">{title}</h2>}
-          {viewAllText && (
-            <button
-              className="text-sm font-bold text-dark hover:text-blue-600 transition-colors"
-              onClick={onViewAllClick}
-            >
-              {viewAllText}
-            </button>
-          )}
-        </div>
+     {/* Header */}
+{(title || viewAllText || (citta && headerComponent)) && (
+  <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    
+    {/* Left side: Title + optional component */}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      {title && (
+        <h2 className="text-xl font-[350] text-dark whitespace-nowrap">
+          {title}
+        </h2>
       )}
 
+   
+    </div>
+
+    {/* Right side: View All */}
+     <div className="flex items-start gap-4 w-full sm:w-auto justify-start sm:justify-end">
+        {citta && headerComponent && (
+        <div className="flex ">
+          {headerComponent}
+        </div>
+      )}
+    {viewAllText && (
+      <button
+        className="text-sm font-bold text-dark hover:text-blue-600 transition-colors"
+        onClick={onViewAllClick}
+      >
+        {viewAllText}
+      </button>
+    )}
+     </div>
+  </div>
+)}
+
+
+
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full overflow-x-auto">
           <thead>
             <tr className="text-left text-[#757575] text-sm">
               {columns.map((column) => (
@@ -91,21 +151,11 @@ const TableCard = <T extends Record<string, any>>({
           </thead>
           <tbody>
             {data.map((row, index) => (
-    <tr
-  key={getRowKey(row, index)}
-  className="text-sm text-dark font-[325] cursor-pointer hover:bg-gray-50"
-  onClick={() => {
-    const path = location.pathname;
-    const basePath = path.startsWith("/payments/customers")
-      ? "/payments/customers/payment"
-      : path.startsWith("/client/customers")
-      ? "/client/customers/payment"
-      : "/customers/payment";
-
-    navigate(`${basePath}/${row.user_id}/${row.plan_id}`);
-  }}
->
-
+              <tr
+                key={getRowKey(row, index)}
+                className="text-sm text-dark font-[325] cursor-pointer hover:bg-gray-50"
+                onClick={(event) => handleRowClick(row, event)}
+              >
                 {columns.map((column) => {
                   const cellValue = row[column.key];
                   const cellContent = column.render
@@ -143,33 +193,6 @@ const TableCard = <T extends Record<string, any>>({
           onPageChange={onPageChange}
         />
       )}
-
-      {/* Optional: Add pagination controls here if you want them within TableCard */}
-      {/*
-      {pagination && onPageChange && pagination.totalPages > 1 && (
-        <div className="w-full mt-4 flex justify-center">
-          <div className="flex space-x-2">
-            <button
-              onClick={() => onPageChange(pagination.currentPage - 1)}
-              disabled={pagination.currentPage === 1}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span>
-              Page {pagination.currentPage} of {pagination.totalPages}
-            </span>
-            <button
-              onClick={() => onPageChange(pagination.currentPage + 1)}
-              disabled={pagination.currentPage === pagination.totalPages}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
-      */}
     </div>
   );
 };

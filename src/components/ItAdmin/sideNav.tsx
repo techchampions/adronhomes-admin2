@@ -16,6 +16,7 @@ import { RootState } from "../Redux/store";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/info-tech" },
+    { label: "Properties", icon: Icon5, path: "/info-tech/properties" },
   // { label: "Requests & Enquiries", icon: Icon7, path: "/info-tech/Requests-Enquiries" },
   { label: "Settings", icon: Icon9, path: "/info-tech/settings" },
 ];

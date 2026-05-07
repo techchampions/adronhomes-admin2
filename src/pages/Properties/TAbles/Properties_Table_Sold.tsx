@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
 import {
-  // selectPropertiesagination,
   selectPropertiesPagination,
   setDraftedPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
@@ -21,13 +20,13 @@ import { directors } from "../../../components/Redux/directors/directors_thunk";
 import OptionInputField from "../../../components/input/drop_down";
 import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
 import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { resetToggleLatestState } from "../../../components/Redux/Properties/toggleLatestslice";
 import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatestThunk";
 
 export interface PropertyData {
   is_featured: any;
-  is_offer:any
+  is_offer: any;
   id: number;
   name: string;
   display_image: string;
@@ -77,7 +76,7 @@ export interface PropertyData {
   unit_sold: any;
   property_view: any;
   property_requests: any;
-  director_id?: any | null; // Add director_id to the interface
+  director_id?: any | null;
 }
 
 interface PropertyTableProps {
@@ -90,6 +89,8 @@ export default function PropertyTableComponent2({
   CurrentPage,
 }: PropertyTableProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(
     null
@@ -97,6 +98,12 @@ export default function PropertyTableComponent2({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  // Create navigation helper function
+  const navigateToPropertyDetails = (propertyId: number) => {
+    const hasInfoTech = location.pathname.includes('/info-tech');
+    navigate(hasInfoTech ? `/info-tech/properties/${propertyId}` : `/properties/${propertyId}`);
+  };
 
   // Get the update state from Redux
   const { loading, success, error } = useSelector(
@@ -126,6 +133,7 @@ export default function PropertyTableComponent2({
         value: person.id,
       }))
     : [];
+    
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
       toast.success("Property deleted successfully!");
@@ -141,6 +149,7 @@ export default function PropertyTableComponent2({
       toast.error(deleteerror || "Failed to delete property");
     }
   }, [deletesuccess, deleteerror, dispatch, propertyToDelete]);
+  
   // Add these handler functions
   const handleDeleteClick = (property: PropertyData) => {
     setPropertyToDelete(property);
@@ -197,16 +206,15 @@ export default function PropertyTableComponent2({
         return "Residential";
       case 3:
         return "industrial";
-
       default:
         return "Commercial";
     }
   };
-  const navigate = useNavigate();
 
   const handleRowClick = (propertyId: number) => {
-    navigate(`/properties/${propertyId}`);
+    navigateToPropertyDetails(propertyId);
   };
+  
   const handleEditClick = (property: PropertyData) => {
     setEditingProperty(property);
     setImagePreview(property.display_image || null);
@@ -273,6 +281,7 @@ export default function PropertyTableComponent2({
       };
     });
   };
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -325,6 +334,7 @@ export default function PropertyTableComponent2({
       })
     );
   };
+  
   // handler for array fields
   const handleArrayInputChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -348,6 +358,7 @@ export default function PropertyTableComponent2({
   // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
+    setIsPropertyModalOpen(true);
   };
 
   const {
@@ -362,7 +373,6 @@ export default function PropertyTableComponent2({
 
   useEffect(() => {
     if (toggleSuccess) {
-      // toast.success("Featured status updated successfully!");
       dispatch(
         fetchProperties({
           page: CurrentPage,
@@ -372,7 +382,6 @@ export default function PropertyTableComponent2({
     }
 
     if (toggleError) {
-      // toast.error(toggleError);
       dispatch(resetToggleFeaturedState());
     }
   }, [toggleSuccess, toggleError, dispatch]);
@@ -383,15 +392,18 @@ export default function PropertyTableComponent2({
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
   };
+  
   const {
     loading: toggleLatestLoading,
     success: toggleLatestSuccess,
     error: toggleLatestError,
   } = useSelector((state: RootState) => state.toggleLatest);
-   const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<number | null>(
+  
+  const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<number | null>(
     null
   );
-useEffect(() => {
+  
+  useEffect(() => {
     if (toggleLatestSuccess) {
       dispatch(
         fetchProperties({
@@ -405,14 +417,16 @@ useEffect(() => {
       dispatch(resetToggleLatestState());
     }
   }, [toggleLatestSuccess, toggleLatestError, dispatch]);
-   const handleToggleLatest = async (propertyId: number) => {
+  
+  const handleToggleLatest = async (propertyId: number) => {
     setLoadingLatestPropertyId(propertyId);
     await dispatch(toggleLatest({ id: propertyId }));
     setLoadingLatestPropertyId(null);
   }
+  
   return (
     <>
-        <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto">
         <div className="min-w-[800px] md:min-w-0">
           <table className="w-full">
             <thead>
@@ -426,18 +440,13 @@ useEffect(() => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Property Type
                 </th>
-
-         
-
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
                 <th className="w-1/6 py-4 pl-4 font-normal text-[#757575] text-xs">
                   Actions
                 </th>
-               
-
-              </tr>
+               </tr>
             </thead>
             <tbody>
               {data && data.length > 0 ? (
@@ -445,7 +454,6 @@ useEffect(() => {
                   <tr
                     key={`property-${property.id}`}
                     className="hover:bg-gray-50 cursor-pointer"
-
                   >
                     <td
                       className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]"
@@ -455,7 +463,10 @@ useEffect(() => {
                         <div className="flex items-center">
                           <div
                             className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"
-                            onClick={() => handlePropertyClick(property)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePropertyClick(property);
+                            }}
                           >
                             <img
                               src={
@@ -480,6 +491,7 @@ useEffect(() => {
                               <img
                                 src={"/location.svg"}
                                 className="mr-1 shrink-0"
+                                alt="location"
                               />
                               <span className="truncate">
                                 {property.street_address}
@@ -518,7 +530,6 @@ useEffect(() => {
                         </div>
                       </div>
                     </td>
-               
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -542,7 +553,6 @@ useEffect(() => {
                     </td>
                     <td className="w-1/6 py-4 pl-4 text-sm">
                       <div className="flex space-x-2">
-                     
                         <button
                           aria-label="Delete property"
                           onClick={() => handleDeleteClick(property)}
@@ -550,17 +560,16 @@ useEffect(() => {
                           <img
                             src="mingcute_delete-fill.svg"
                             className="w-[18px] h-[18px]"
+                            alt="delete"
                           />
                         </button>
                       </div>
                     </td>
-                    
-                    
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-4 text-center text-gray-500">
+                  <td colSpan={5} className="py-4 text-center text-gray-500">
                     No properties found
                   </td>
                 </tr>
@@ -569,6 +578,7 @@ useEffect(() => {
           </table>
         </div>
       </div>
+      
       {/* delete property */}
       {isDeleteModalOpen && propertyToDelete && (
         <ConfirmationModal
@@ -581,6 +591,15 @@ useEffect(() => {
           loading={deleteloading}
           confirmButtonText="Delete Property"
           cancelButtonText="Cancel"
+        />
+      )}
+      
+      {/* Property Modal */}
+      {isPropertyModalOpen && selectedProperty && (
+        <PropertyModal
+          isOpen={isPropertyModalOpen}
+          onClose={() => setIsPropertyModalOpen(false)}
+          property={selectedProperty}
         />
       )}
       

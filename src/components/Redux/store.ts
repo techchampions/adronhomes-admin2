@@ -52,6 +52,7 @@ import publishDraftReducer from './Properties/publishpropertySlice'
 import exportPaymentsReducer from './export/exportPaymentsSlice'
 import exportCustomersReducer from './export/exportCustomersSlice'
 import countriesReducer from './country/countrythunkand slice'
+import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
 import legalDashboardSliceReducer  from './legalDashboard/legalDashboardSlice'
 import toggleLatestReducer from './Properties/toggleLatestslice'
 import exportContractsReducer from './export/exportContractSlice'
@@ -67,6 +68,20 @@ import editPropertyReducer from "./editProperty/editpropslice";
 import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
 import assignMarketerSlice from "./AssignMarketerRequest/AssignMarketerRequest";
 import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
+import erpContractsSyncReducer from "./Contract/erpContractsSync/erpContractsSyncSlice";
+import erpContractTransactionsReducer from "./Contract/erpContractTransactions/erpContractTransactionsSlice";
+import  exportPersonnelReducer  from "./export/exportPersonnelSlice";
+import profileSlicereducer from "./profileUpdate/profileSlice";
+import propertyCategoriesReducer from "./Properties/propertycategory/propertyCategorySlice";
+import adminImpersonateSliceReducer from "./adminimpersonate/adminimpersonateslice";
+import contractPaymentsReducer from "./Contract/contract_payments_slice";
+import giftFormReducer from "./gift/giftFormSlice";
+import giftSliceReducer from "./gift/gift_slice";
+import promoReducer from "./gift/promo/promoSlice";
+import promoFormReducer from "./gift/promo/promoFormSlice";
+import promoTableReducer from "./gift/promo/promoTableSlice";
+import promoRequestsReducer from "./gift/promo/promoRequestsSlice";
+import exportClientPartnershipReducer from "./export/exportClientPartnershipSlice";
 export const store = configureStore({
    middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -140,16 +155,24 @@ export const store = configureStore({
    itDashboard:itDashboardSliceReducer,
      deletepropertyDetail: deletepropertyDetailReducer,
      wallet:walletslice,
+     marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
 user_payments: userPaymentsReducers,
     passwordReset: passwordResetReducer, 
   deleteCustomer:deleteCustomerredux,
-propertyCodes:propertyCodesReducer,
-  createProperty: createPropertyReducer,
-  editProperty: editPropertyReducer,
-draftProperty:duplicateDraftFormReducer,
-assignMarketerRequest: assignMarketerSlice,
-marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
-  },
+erpContractsSync:erpContractsSyncReducer,
+erpContractTransactions:erpContractTransactionsReducer,
+exportPersonnel:exportPersonnelReducer,
+profile:profileSlicereducer,
+propertyCategories:propertyCategoriesReducer,
+adminImpersonate: adminImpersonateSliceReducer,
+contractPayments: contractPaymentsReducer,
+  giftForm: giftFormReducer,
+gifts: giftSliceReducer,
+ promo: promoReducer,
+promoForm: promoFormReducer,
+promoTable: promoTableReducer,
+ promoRequests: promoRequestsReducer,
+exportClientPartnership: exportClientPartnershipReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;

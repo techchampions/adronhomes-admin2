@@ -1,10 +1,10 @@
+// PropertyTableComponent.tsx - Updated with PromoModal
 import React, { useState, useRef, useEffect } from "react";
 import Pagination from "../../../components/Tables/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
 import {
-  // selectPropertiesagination,
   selectPropertiesPagination,
   selectPublishedPropertiesPagination,
   selectSoldPropertiesPagination,
@@ -12,7 +12,6 @@ import {
   setPublishedPropertiesPage,
   setSoldPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
-import InputField from "../../../components/input/inputtext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { resetPropertyState } from "../../../components/Redux/addProperty/addProperty_slice";
@@ -22,12 +21,15 @@ import { DeleteProperty } from "../../../components/Redux/addProperty/UpdateProp
 import ConfirmationModal from "../../../components/Modals/delete";
 import PropertyModal from "../PropertyModal";
 import { directors } from "../../../components/Redux/directors/directors_thunk";
-import OptionInputField from "../../../components/input/drop_down";
 import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
 import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { resetToggleLatestState } from "../../../components/Redux/Properties/toggleLatestslice";
 import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatestThunk";
+// import { PromoModal } from "../../../components/gift/PromoModal"; // Changed from GiftModal
+// import { bulkAssignMultiplePromos } from "../../../components/Redux/gift/promo/promoSlice"; // New thunk for promo assignment
+import { PromoModal } from "../../../components/gift/components/promo/PromoModal";
+import { bulkAssignMultiplePromos } from "../../../components/Redux/gift/promo/promoSlice";
 
 export interface PropertyData {
   is_featured: any;
@@ -81,21 +83,26 @@ export interface PropertyData {
   unit_sold: any;
   property_view: any;
   property_requests: any;
-  director_id?: any | null; // Add director_id to the interface
+  director_id?: any | null;
+  isSelected?: boolean;
 }
 
 interface PropertyTableProps {
   data: PropertyData[];
   CurrentPage: any;
   activeTab: any;
+  triggerGiftMode?: number; // Keeping name for compatibility but now for promo mode
 }
 
 export default function PropertyTableComponent({
   data,
   CurrentPage,
   activeTab,
+  triggerGiftMode,
 }: PropertyTableProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(
     null
@@ -104,7 +111,115 @@ export default function PropertyTableComponent({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Get the update state from Redux
+  // Promo mode states (renamed from gift mode)
+  const [isPromoMode, setIsPromoMode] = useState(false);
+  const [showPromoModal, setShowPromoModal] = useState(false);
+  const [propertiesWithSelection, setPropertiesWithSelection] = useState<PropertyData[]>([]);
+  const [assigningPromos, setAssigningPromos] = useState(false);
+
+  // Listen for triggerGiftMode changes from parent (now triggers promo mode)
+  useEffect(() => {
+    if (triggerGiftMode && triggerGiftMode > 0) {
+      setIsPromoMode(true);
+    }
+  }, [triggerGiftMode]);
+
+  // Update properties with selection state when entering promo mode
+  useEffect(() => {
+    if (isPromoMode) {
+      const updatedProperties = data.map(property => ({
+        ...property,
+        isSelected: false
+      }));
+      setPropertiesWithSelection(updatedProperties);
+    }
+  }, [isPromoMode, data]);
+
+  const navigateToPropertyDetails = (propertyId: number) => {
+    if (!isPromoMode) {
+      const hasInfoTech = location.pathname.includes('/info-tech');
+      navigate(hasInfoTech ? `/info-tech/properties/${propertyId}` : `/properties/${propertyId}`);
+    }
+  };
+
+  const handlePromoClick = () => {
+    setIsPromoMode(true);
+  };
+
+  const handleCheckboxToggle = (propertyId: number) => {
+    setPropertiesWithSelection(prev =>
+      prev.map(property =>
+        property.id === propertyId
+          ? { ...property, isSelected: !property.isSelected }
+          : property
+      )
+    );
+  };
+
+  const handleSelectAll = () => {
+    const allSelected = propertiesWithSelection.every(p => p.isSelected);
+    setPropertiesWithSelection(prev =>
+      prev.map(property => ({ ...property, isSelected: !allSelected }))
+    );
+  };
+
+  // Updated handleAssignPromo to use bulkAssignMultiplePromos API
+  const handleAssignPromo = async (selectedPromoIds: number[]) => {
+    const selectedPropertyIds = propertiesWithSelection
+      .filter(p => p.isSelected)
+      .map(p => p.id);
+
+    if (selectedPropertyIds.length === 0) {
+      toast.warning("No properties selected");
+      return;
+    }
+
+    if (selectedPromoIds.length === 0) {
+      toast.warning("No promotions selected");
+      return;
+    }
+
+    setAssigningPromos(true);
+    
+    try {
+      // Prepare payload in the expected format
+      const payload = {
+        promo_ids: selectedPromoIds,
+        property_ids: selectedPropertyIds
+      };
+
+      console.log("Assigning promotions with payload:", payload);
+
+      // Call the bulk assign API - You'll need to create this thunk
+      await dispatch(bulkAssignMultiplePromos(payload)).unwrap();
+      
+      toast.success(
+        `${selectedPromoIds.length} promotion(s) assigned to ${selectedPropertyIds.length} property(s) successfully!`
+      );
+      
+      // Exit promo mode and refresh data
+      setIsPromoMode(false);
+      setShowPromoModal(false);
+      
+      // Refresh properties list
+      dispatch(
+        fetchProperties({
+          page: CurrentPage,
+        })
+      );
+      
+    } catch (error: any) {
+      console.error("Error assigning promotions:", error);
+      toast.error(error?.message || "Failed to assign promotions. Please try again.");
+    } finally {
+      setAssigningPromos(false);
+    }
+  };
+
+  const handleCancelPromoMode = () => {
+    setIsPromoMode(false);
+  };
+
   const { loading, success, error } = useSelector(
     (state: RootState) => state.updateproperty
   );
@@ -118,19 +233,11 @@ export default function PropertyTableComponent({
   const [propertyToDelete, setPropertyToDelete] = useState<PropertyData | null>(
     null
   );
-  interface DropdownOption {
-    label: string;
-    value: string | number;
-  }
-const { data: directorsData, loading: directorsLoading, error: directorsError, success: directorsSuccess } = 
-  useSelector((state: RootState) => state.directors.directors);
+  
+  const {
+    data: directorDta,
+  } = useSelector((state: RootState) => state.directors);
 
-  const labels: DropdownOption[] = Array.isArray(directorsData)
-    ? directorsData.map((person) => ({
-        label: `${person.first_name} ${person.last_name}`,
-        value: person.id,
-      }))
-    : [];
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
       toast.success("Property deleted successfully!");
@@ -145,8 +252,8 @@ const { data: directorsData, loading: directorsLoading, error: directorsError, s
     if (deleteerror) {
       toast.error(deleteerror || "Failed to delete property");
     }
-  }, [deletesuccess, deleteerror, dispatch, propertyToDelete]);
-  // Add these handler functions
+  }, [deletesuccess, deleteerror, dispatch, propertyToDelete, CurrentPage]);
+  
   const handleDeleteClick = (property: PropertyData) => {
     setPropertyToDelete(property);
     setIsDeleteModalOpen(true);
@@ -170,31 +277,28 @@ const { data: directorsData, loading: directorsLoading, error: directorsError, s
     }
   };
 
+  const handlePageChange = async (page: any) => {
+    if (activeTab === "Published") {
+      await dispatch(setPublishedPropertiesPage({ type: "published", page }));
+    } else if (activeTab === "Sold") {
+      await dispatch(setSoldPropertiesPage({ type: "sold", page }));
+    } else if (activeTab === "Drafted") {
+      await dispatch(setDraftedPropertiesPage({ type: "drafted", page }));
+    }
+  };
 
-const handlePageChange = async (page: any) => {
-  // First, dispatch the correct page change based on activeTab
-  if (activeTab === "Published") {
-    await dispatch(setPublishedPropertiesPage({ type: "published", page }));
-  } else if (activeTab === "Sold") {
-    await dispatch(setSoldPropertiesPage({ type: "sold", page }));
-  } else if (activeTab === "Drafted") {
-    await dispatch(setDraftedPropertiesPage({ type: "drafted", page }));
-  }
-};
-
-// Correct the pagination selector logic
-const pagination = useSelector((state: RootState) => {
-  switch (activeTab) {
-    case "Published":
-      return selectPublishedPropertiesPagination(state);
-    case "Sold":
-      return selectSoldPropertiesPagination(state);
-    case "Drafted":
-      return selectPropertiesPagination(state); 
-    default:
-      return selectPublishedPropertiesPagination(state);
-  }
-});
+  const pagination = useSelector((state: RootState) => {
+    switch (activeTab) {
+      case "Published":
+        return selectPublishedPropertiesPagination(state);
+      case "Sold":
+        return selectSoldPropertiesPagination(state);
+      case "Drafted":
+        return selectPropertiesPagination(state); 
+      default:
+        return selectPublishedPropertiesPagination(state);
+    }
+  });
 
   useEffect(() => {
     if (success) {
@@ -210,7 +314,7 @@ const pagination = useSelector((state: RootState) => {
     if (error) {
       toast.error(error.message || "Failed to update property");
     }
-  }, [success, error, dispatch]);
+  }, [success, error, dispatch, CurrentPage]);
 
   const getPropertyType = (type: number) => {
     switch (type) {
@@ -224,11 +328,13 @@ const pagination = useSelector((state: RootState) => {
         return "Commercial";
     }
   };
-  const navigate = useNavigate();
 
   const handleRowClick = (propertyId: number) => {
-    navigate(`/properties/${propertyId}`);
+    if (!isPromoMode) {
+      navigateToPropertyDetails(propertyId);
+    }
   };
+  
   const handleEditClick = (property: PropertyData) => {
     setEditingProperty(property);
     setImagePreview(property.display_image || null);
@@ -255,17 +361,14 @@ const pagination = useSelector((state: RootState) => {
     setEditingProperty((prev) => {
       if (!prev) return null;
 
-      // Handle checkboxes (including is_discount)
       if (type === "checkbox") {
         const checked = (e.target as HTMLInputElement).checked;
         const numericValue = checked ? 1 : 0;
 
-        // Handle the mutually exclusive checkboxes
         if (name === "is_active" || name === "is_sold") {
           return {
             ...prev,
             [name]: numericValue,
-            // When one is checked (1), the other must be unchecked (0)
             ...(name === "is_active"
               ? { is_sold: numericValue === 1 ? 0 : prev.is_sold }
               : {}),
@@ -275,14 +378,12 @@ const pagination = useSelector((state: RootState) => {
           };
         }
 
-        // Handle other checkboxes (like is_discount)
         return {
           ...prev,
           [name]: numericValue,
         };
       }
 
-      // Handle other input types
       return {
         ...prev,
         [name]:
@@ -295,6 +396,7 @@ const pagination = useSelector((state: RootState) => {
       };
     });
   };
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -347,29 +449,15 @@ const pagination = useSelector((state: RootState) => {
       })
     );
   };
-  // handler for array fields
-  const handleArrayInputChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    if (!editingProperty) return;
-
-    const { name, value } = e.target;
-    const arrayValue = value.split(",").map((item) => item.trim());
-
-    setEditingProperty({
-      ...editingProperty,
-      [name]: arrayValue,
-    });
-  };
-
+  
   const [selectedProperty, setSelectedProperty] = useState<PropertyData | null>(
     null
   );
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
 
-  // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
+    setIsPropertyModalOpen(true);
   };
 
   const {
@@ -384,7 +472,6 @@ const pagination = useSelector((state: RootState) => {
 
   useEffect(() => {
     if (toggleSuccess) {
-      // toast.success("Featured status updated successfully!");
       dispatch(
         fetchProperties({
           page: CurrentPage,
@@ -394,25 +481,26 @@ const pagination = useSelector((state: RootState) => {
     }
 
     if (toggleError) {
-      // toast.error(toggleError);
       dispatch(resetToggleFeaturedState());
     }
-  }, [toggleSuccess, toggleError, dispatch]);
+  }, [toggleSuccess, toggleError, dispatch, CurrentPage]);
 
-  // Handler to toggle featured status
   const handleToggleFeatured = async (propertyId: number) => {
     setLoadingPropertyId(propertyId);
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
   };
+  
   const {
     loading: toggleLatestLoading,
     success: toggleLatestSuccess,
     error: toggleLatestError,
   } = useSelector((state: RootState) => state.toggleLatest);
+  
   const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<
     number | null
   >(null);
+  
   useEffect(() => {
     if (toggleLatestSuccess) {
       dispatch(
@@ -426,20 +514,69 @@ const pagination = useSelector((state: RootState) => {
     if (toggleLatestError) {
       dispatch(resetToggleLatestState());
     }
-  }, [toggleLatestSuccess, toggleLatestError, dispatch]);
+  }, [toggleLatestSuccess, toggleLatestError, dispatch, CurrentPage]);
+  
   const handleToggleLatest = async (propertyId: number) => {
     setLoadingLatestPropertyId(propertyId);
     await dispatch(toggleLatest({ id: propertyId }));
     setLoadingLatestPropertyId(null);
   };
 
+  const displayData = isPromoMode ? propertiesWithSelection : data;
+  const selectedCount = isPromoMode 
+    ? propertiesWithSelection.filter(p => p.isSelected).length 
+    : 0;
+
   return (
     <>
+      {/* Promo Mode Banner - Updated from Gift Mode */}
+      {isPromoMode && (
+        <div className="mb-4 p-4 bg-[#79B833]/10 rounded-[20px] border border-[#79B833]/30 flex items-center justify-between">
+          <div>
+            <span className="font-semibold text-[#79B833]">Promotion Mode Active</span>
+            <span className="ml-2 text-gray-600">
+              {selectedCount} {selectedCount !== 1 ? 'properties' : 'property'} selected
+            </span>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleCancelPromoMode}
+              className="px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50"
+              disabled={assigningPromos}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setShowPromoModal(true)}
+              disabled={selectedCount === 0 || assigningPromos}
+              className={`px-4 py-2 rounded-full text-white transition-colors ${
+                selectedCount > 0 && !assigningPromos
+                  ? "bg-[#79B833] hover:bg-[#79B833]/80"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
+            >
+              {assigningPromos ? "Assigning..." : `Select Promotion (${selectedCount})`}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="w-full overflow-x-auto">
         <div className="min-w-[800px] md:min-w-0">
           <table className="w-full">
             <thead>
               <tr className="text-left">
+                {isPromoMode && (
+                  <th className="w-10 py-4 pr-2">
+                    <input
+                      type="checkbox"
+                      checked={propertiesWithSelection.length > 0 && propertiesWithSelection.every(p => p.isSelected)}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded border-gray-300 text-[#79B833] focus:ring-[#79B833] accent-[#79B833]"
+                      disabled={assigningPromos}
+                    />
+                  </th>
+                )}
                 <th className="w-2/5 py-4 pr-6 font-normal text-[#757575] text-xs">
                   Property Name
                 </th>
@@ -449,7 +586,6 @@ const pagination = useSelector((state: RootState) => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Property Type
                 </th>
-
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
@@ -459,19 +595,30 @@ const pagination = useSelector((state: RootState) => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Featured
                 </th>
-
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Latest
                 </th>
               </tr>
             </thead>
             <tbody>
-              {data && data.length > 0 ? (
-                data.map((property) => (
+              {displayData && displayData.length > 0 ? (
+                displayData.map((property) => (
                   <tr
                     key={`property-${property.id}`}
                     className="hover:bg-gray-50 cursor-pointer"
                   >
+                    {isPromoMode && (
+                      <td className="w-10 py-4 pr-2">
+                        <input
+                          type="checkbox"
+                          checked={property.isSelected || false}
+                          onChange={() => handleCheckboxToggle(property.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-4 h-4 rounded border-gray-300 text-[#79B833] focus:ring-[#79B833] accent-[#79B833]"
+                          disabled={assigningPromos}
+                        />
+                       </td>
+                    )}
                     <td
                       className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]"
                       onClick={() => handleRowClick(property.id)}
@@ -480,7 +627,10 @@ const pagination = useSelector((state: RootState) => {
                         <div className="flex items-center">
                           <div
                             className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"
-                            onClick={() => handlePropertyClick(property)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePropertyClick(property);
+                            }}
                           >
                             <img
                               src={
@@ -505,6 +655,7 @@ const pagination = useSelector((state: RootState) => {
                               <img
                                 src={"/location.svg"}
                                 className="mr-1 shrink-0"
+                                alt="location"
                               />
                               <span className="truncate">
                                 {property.street_address}
@@ -516,7 +667,7 @@ const pagination = useSelector((state: RootState) => {
                           {property.name} - {property.street_address}
                         </div>
                       </div>
-                    </td>
+                     </td>
                     <td
                       className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]"
                       onClick={() => handleRowClick(property.id)}
@@ -529,7 +680,7 @@ const pagination = useSelector((state: RootState) => {
                           ₦{property.price?.toLocaleString()}
                         </div>
                       </div>
-                    </td>
+                     </td>
                     <td
                       className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]"
                       onClick={() => handleRowClick(property.id)}
@@ -542,8 +693,7 @@ const pagination = useSelector((state: RootState) => {
                           {getPropertyType(property.type)}
                         </div>
                       </div>
-                    </td>
-
+                     </td>
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -564,20 +714,22 @@ const pagination = useSelector((state: RootState) => {
                             : "Available"}
                         </div>
                       </div>
-                    </td>
+                     </td>
                     <td className="w-1/6 py-4 pl-4 text-sm">
                       <div className="flex space-x-2">
                         <button
                           aria-label="Delete property"
                           onClick={() => handleDeleteClick(property)}
+                          disabled={assigningPromos}
                         >
                           <img
                             src="mingcute_delete-fill.svg"
                             className="w-[18px] h-[18px]"
+                            alt="delete"
                           />
                         </button>
                       </div>
-                    </td>
+                     </td>
                     <td className="w-1/6 py-4 px-6 text-sm">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
@@ -586,7 +738,7 @@ const pagination = useSelector((state: RootState) => {
                           checked={property.is_featured === 1}
                           onChange={() => handleToggleFeatured(property.id)}
                           disabled={
-                            toggleLoading && loadingPropertyId === property.id
+                            (toggleLoading && loadingPropertyId === property.id) || assigningPromos
                           }
                         />
                         <div
@@ -612,10 +764,8 @@ const pagination = useSelector((state: RootState) => {
                             : "Off"}
                         </span>
                       </label>
-                    </td>
+                     </td>
                     <td className="w-1/6 py-4 px-6 text-sm">
-                      {" "}
-                      {/* Add this new cell */}
                       <label className="inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -623,8 +773,7 @@ const pagination = useSelector((state: RootState) => {
                           checked={property.is_offer === 1}
                           onChange={() => handleToggleLatest(property.id)}
                           disabled={
-                            toggleLatestLoading &&
-                            loadingLatestPropertyId === property.id
+                            (toggleLatestLoading && loadingLatestPropertyId === property.id) || assigningPromos
                           }
                         />
                         <div
@@ -652,20 +801,30 @@ const pagination = useSelector((state: RootState) => {
                             : "Off"}
                         </span>
                       </label>
-                    </td>
-                  </tr>
+                     </td>
+                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-4 text-center text-gray-500">
+                  <td colSpan={isPromoMode ? 8 : 7} className="py-4 text-center text-gray-500">
                     No properties found
-                  </td>
-                </tr>
+                   </td>
+                 </tr>
               )}
             </tbody>
-          </table>
+           </table>
         </div>
       </div>
+
+      {/* Promo Modal - Updated to use PromoModal */}
+      <PromoModal
+        isOpen={showPromoModal}
+        onClose={() => setShowPromoModal(false)}
+        properties={propertiesWithSelection.filter(p => p.isSelected)}
+        onAssignPromo={handleAssignPromo}
+        isLoading={assigningPromos}
+      />
+
       {/* delete property */}
       {isDeleteModalOpen && propertyToDelete && (
         <ConfirmationModal
@@ -678,6 +837,15 @@ const pagination = useSelector((state: RootState) => {
           loading={deleteloading}
           confirmButtonText="Delete Property"
           cancelButtonText="Cancel"
+        />
+      )}
+
+      {/* Property Modal */}
+      {isPropertyModalOpen && selectedProperty && (
+        <PropertyModal
+          isOpen={isPropertyModalOpen}
+          onClose={() => setIsPropertyModalOpen(false)}
+          property={selectedProperty}
         />
       )}
 
