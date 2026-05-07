@@ -62,6 +62,12 @@ import  walletslice from "./wallet/walllet_slice"
 import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
 import passwordResetReducer from "./passwordRese/passwordReset_slice"
 import deleteCustomerredux from "./customers/deletecut"
+import propertyCodesReducer from "./citta/propertyCodesSlice"
+import createPropertyReducer from "./propertyForm/createPropertySlice";
+import editPropertyReducer from "./editProperty/editpropslice";
+import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
+import assignMarketerSlice from "./AssignMarketerRequest/AssignMarketerRequest";
+import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
 import erpContractsSyncReducer from "./Contract/erpContractsSync/erpContractsSyncSlice";
 import erpContractTransactionsReducer from "./Contract/erpContractTransactions/erpContractTransactionsSlice";
 import  exportPersonnelReducer  from "./export/exportPersonnelSlice";
@@ -77,6 +83,19 @@ import promoTableReducer from "./gift/promo/promoTableSlice";
 import promoRequestsReducer from "./gift/promo/promoRequestsSlice";
 import exportClientPartnershipReducer from "./export/exportClientPartnershipSlice";
 export const store = configureStore({
+   middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: [
+          "createProperty.basicDetails.propertyFiles",
+          "editProperty.basicDetails.propertyFiles",
+        ],
+        ignoredActions: [
+          "editProperty/setEditBasicDetails",
+          "createProperty/setBasicDetails",
+        ],
+      },
+    }),
   reducer: {
     auth: authReducer,
     user: userReducer,
