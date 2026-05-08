@@ -34,7 +34,7 @@ import Notifications from "./components/Notifications/Notifications";
 import Settings from "./components/Settings/Settings";
 import CustomerSinglePage from "./pages/Customers/CustomerSinglePage";
 import CustomersPayment from "./marketer/Payment/customers_payment";
-import General from "./pages/Properties/General";
+// import General from "./pages/Properties/General";
 import { getUser } from "./components/Redux/User/user_Thunk";
 import PaymentListComponent from "./pages/Customers/PaymentStatus";
 import PaymentById from "./pages/Payment/paymentById";
@@ -70,12 +70,17 @@ import LegalContractInvoice from "./Legal/contractDetails";
 import Dashboard_It from "./components/ItAdmin/Dashboard_It";
 import InfoTechSidebar from "./components/ItAdmin/sideNav";
 import ClientsPartnership from "./pages/clients-partnership/ClientsPartnership";
-import EditProperty from "./pages/Properties/GeneralEditing";
+// import EditProperty from "./pages/Properties/GeneralEditing";
 import LoginMarketers from "./components/Login/loginForMarketers";
 import UserWallet from "./pages/UserWallet/UserWallet";
 import UserPaymentsPage from "./pages/Transactions/UserPaymentsPage";
 import SettingsCard from "./marketer/SettingsCard";
 import ResetCard from "./components/Modals/settings/changepassword";
+import EditProperty from "./pages/Properties/GeneralEdit2";
+import General from "./pages/Properties/General2";
+import DuplicateProperty from "./pages/Properties/GeneralDuplicateProperty";
+import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
+// import InfoTechSidebar from "./components/ItAdmin/sideNav";
 import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 import { clearImpersonation } from "./components/Redux/adminimpersonate/adminimpersonateslice";
 import ContractPayments from "./pages/contract/ ContractPayments";
@@ -454,6 +459,8 @@ const App = () => {
                   path="/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
                 />
+                <Route path="/properties/form" element={<General />} />
+                 <Route path="/properties/Draftform/:id" element={<DuplicateProperty />} />
 
                 <Route path="/error-500" element={<Error500 />} />
 

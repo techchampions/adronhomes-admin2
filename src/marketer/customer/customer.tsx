@@ -73,7 +73,7 @@ export default function MarketerCustomer() {
         />
       </div>
 
-      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[26px]">
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[26px] relative">
         <ReusableTable
           activeTab={activeTab}
           onTabChange={setActiveTab}

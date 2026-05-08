@@ -1,8 +1,9 @@
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { BiCheck, BiX } from "react-icons/bi";
 import { IoMdCheckmarkCircle } from "react-icons/io";
-import { PropertyContext } from "../../MyContext/MyContext";
 import OptionInputField from "../input/drop_down";
+import { useEditPropertyForm } from "../Redux/hooks/usePropertyForms";
+// import { useEditPropertyForm } from "../../../hooks/usePropertyForms"; // Adjust path as needed
 
 // The Fee interface has been updated to include an optional purpose field
 interface Fee {
@@ -23,8 +24,19 @@ export default function InfrastructureFeesModal({
   isOpen,
   onClose,
 }: InfrastructureFeesModalProps) {
+  // Use Redux hooks instead of context
+  const {
+    basicDetails,
+    setEditFees,
+    setEditNewFees,
+    setEditBasicDetails,
+    setEditLandForm,
+    setEditSpecifications,
+    metadata
+  } = useEditPropertyForm();
+  
+  const {fees}=metadata
 
-  const { formData, setFees, fees, setSpecifications, setLandForm} = useContext(PropertyContext)!;
   
   // State for the new fee inputs, including the new purpose field
   const [newFeeName, setNewFeeName] = useState<string>("");
@@ -38,31 +50,31 @@ export default function InfrastructureFeesModal({
   ];
 
   
-const mappedPurposes = Array.isArray(formData.basicDetails.purpose) && formData.basicDetails.purpose.length > 0
-  ? formData.basicDetails.purpose.map(purpose => ({
-      label: purpose,
-      value: purpose
-    }))
-  : [];
+  const mappedPurposes = Array.isArray(basicDetails.purpose) && basicDetails.purpose.length > 0
+    ? basicDetails.purpose.map(purpose => ({
+        label: purpose,
+        value: purpose
+      }))
+    : [];
 
 
   const toggleFee = (id: number) => {
-    setFees(
-      fees.map((fee) =>
+    setEditFees(
+      fees.map((fee: Fee) =>
         fee.id === id ? { ...fee, checked: !fee.checked } : fee
       )
     );
   };
 
   const removeFee = (id: number) => {
-    setFees(fees.filter((fee) => fee.id !== id));
+    setEditFees(fees.filter((fee: Fee) => fee.id !== id));
   };
 
   const addFee = () => {
     // Check all new fields before adding
     if (newFeeName && newFeeAmount && newFeetype && newFeePurpose) {
       const newFee: Fee = {
-        id: Math.max(...fees.map((f) => f.id), 0) + 1,
+        id: Math.max(...fees.map((f: Fee) => f.id), 0) + 1,
         name: newFeeName,
         type: newFeetype,
         amount: newFeeAmount.startsWith("₦")
@@ -71,7 +83,12 @@ const mappedPurposes = Array.isArray(formData.basicDetails.purpose) && formData.
         checked: true,
         purpose: newFeePurpose, 
       };
-      setFees([...fees, newFee]);
+      
+      // Add to both fees and newFees arrays
+      const updatedFees = [...fees, newFee];
+      setEditFees(updatedFees);
+      setEditNewFees(updatedFees);
+      
       // Reset all new fee input fields
       setNewFeeName("");
       setNewFeeAmount("");
@@ -101,7 +118,7 @@ const mappedPurposes = Array.isArray(formData.basicDetails.purpose) && formData.
         {/* Content */}
         <div className="p-6 space-y-4">
           {/* Existing Fees */}
-          {fees.map((fee) => (
+          {fees.map((fee: Fee) => (
             <div
               key={fee.id}
               className="flex items-center justify-between p-4 bg-[#FFFFFF] rounded-[20px] shadow"
