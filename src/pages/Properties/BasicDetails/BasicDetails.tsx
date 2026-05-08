@@ -32,6 +32,7 @@ import {
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
 import MultipleFileUploadField from "../../../components/input/multiplefile";
 import { BasicDetailsFormValues } from "../../../MyContext/MyContext";
+import { fetchPropertyCategories } from "../../../components/Redux/Properties/propertycategory/propertycategorthunk";
 
 // Import the BasicDetailsFormValues interface from types
 // import { BasicDetailsFormValues } from "../../../types/propertyTypes";

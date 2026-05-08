@@ -67,7 +67,7 @@ import createPropertyReducer from "./propertyForm/createPropertySlice";
 import editPropertyReducer from "./editProperty/editpropslice";
 import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
 import assignMarketerSlice from "./AssignMarketerRequest/AssignMarketerRequest";
-import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
+// import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
 import erpContractsSyncReducer from "./Contract/erpContractsSync/erpContractsSyncSlice";
 import erpContractTransactionsReducer from "./Contract/erpContractTransactions/erpContractTransactionsSlice";
 import  exportPersonnelReducer  from "./export/exportPersonnelSlice";
@@ -172,7 +172,11 @@ gifts: giftSliceReducer,
 promoForm: promoFormReducer,
 promoTable: promoTableReducer,
  promoRequests: promoRequestsReducer,
-exportClientPartnership: exportClientPartnershipReducer,},
+exportClientPartnership: exportClientPartnershipReducer,
+draftProperty: duplicateDraftFormReducer,
+editProperty: editPropertyReducer,
+assignMarketer: assignMarketerSlice,
+createProperty: createPropertyReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;

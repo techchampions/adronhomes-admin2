@@ -8,6 +8,7 @@ import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
 import SyncCitaModal from "./SyncCitaModal";
 import { useCreatePropertyForm } from "../components/Redux/hooks/usePropertyForms";
+import { setIsCreateLandProperty, setIsCreateLandProperty2 } from "../components/Redux/propertyForm/createPropertySlice";
 
 
 interface HeaderProps {

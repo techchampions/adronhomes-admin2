@@ -81,7 +81,7 @@ import General from "./pages/Properties/General2";
 import DuplicateProperty from "./pages/Properties/GeneralDuplicateProperty";
 import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 // import InfoTechSidebar from "./components/ItAdmin/sideNav";
-import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
+// import PersonnelMarketersDashboard from "./pages/Personnel/personnelMarketerPage";
 import { clearImpersonation } from "./components/Redux/adminimpersonate/adminimpersonateslice";
 import ContractPayments from "./pages/contract/ ContractPayments";
 import GiftFormPage from "./components/gift/giftForm/giftFormPage";
