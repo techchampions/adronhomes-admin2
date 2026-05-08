@@ -122,13 +122,15 @@ export default function PropertyTableComponent2({
   interface DropdownOption {
     label: string;
     value: string | number;
-  
-  }const { data: directorsData, loading: directorsLoading, error: directorsError, success: directorsSuccess } = 
-    useSelector((state: RootState) => state.directors.directors);
-  
+  }
+  const {
+    loading: userLoading,
+    error: userError,
+    data: directorDta,
+  } = useSelector((state: RootState) => state.directors);
 
-  const labels: DropdownOption[] = Array.isArray(directorsData)
-    ? directorsData.map((person) => ({
+  const labels: DropdownOption[] = Array.isArray(directorDta)
+    ? directorDta.map((person) => ({
         label: `${person.first_name} ${person.last_name}`,
         value: person.id,
       }))

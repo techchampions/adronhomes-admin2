@@ -48,10 +48,6 @@ const sortOptions = [
         buttonText="Export"
         onButtonClick={openCustomersModal}
       />
-
-             
-          
-   </div>
       <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
           title="Total Registered Clients"

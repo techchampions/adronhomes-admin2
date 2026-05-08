@@ -1,9 +1,9 @@
-import { useState, useRef, ChangeEvent, useEffect } from "react";
+import { useState, useContext, useRef, ChangeEvent, useEffect } from "react";
+import { PropertyContext } from "../../../MyContext/MyContext";
 import { FaCamera, FaCheck, FaPen, FaTag, FaTrash } from "react-icons/fa6";
-import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus, FaBullseye } from "react-icons/fa";
+import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus } from "react-icons/fa";
 import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
 import InfrastructureFeesModalss from "../../../components/Modals/infrastureModal2";
-import { useEditPropertyForm } from "../../../components/Redux/hooks/usePropertyForms";
 
 interface EditingState {
   title: boolean;
@@ -18,41 +18,19 @@ interface EditingState {
   address: boolean;
   discount: boolean;
   propertyUnits: boolean;
-  landSizeSection: boolean;
 }
 
 export default function PropertyListing() {
-  const {
-    basicDetails,
-    bulkDetails,
-    specifications,
-    landForm,
-    features: reduxFeatures,
-    media,
-    discount: reduxDiscount,
-    metadata,
-    LandSizeSection,
-    
-    // Redux setters
-    setEditMedia,
-    setEditBasicDetails,
-    setEditBulkDetails,
-    setEditSpecifications,
-    setEditLandForm,
-    setEditLandSizeSections,
-    setEditFeatures,
-    setEditDiscount,
-  } = useEditPropertyForm();
-
-  const {
-    isLandProperty2,
-    isBulk
-  } = metadata;
-
-  // Extract values from metadata
-  const { propertyId: editPropertyId } = metadata;
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    formData,
+    isBulk,
+    isLandProperty,
+    setMedia,
+    isLandProperty2,
+    selectedPropertyId,
+    setIsCancelInfrastructure,
+  } = useContext(PropertyContext)!;
   const [activeImage, setActiveImage] = useState<number>(0);
   const [editing, setEditing] = useState<EditingState>({
     title: false,
@@ -67,156 +45,166 @@ export default function PropertyListing() {
     address: false,
     discount: false,
     propertyUnits: false,
-    landSizeSection: false
   });
-
-  // Local editing states
-  const [editingTitle, setEditingTitle] = useState("");
-  const [editingLocation, setEditingLocation] = useState("");
-  const [editingVirtualTour, setEditingVirtualTour] = useState("");
-  const [editingSquareMeters, setEditingSquareMeters] = useState("");
-  const [editingPropertyType, setEditingPropertyType] = useState("");
-  const [editingPrice, setEditingPrice] = useState("");
-  const [editingDescription, setEditingDescription] = useState("");
-  const [editingFeatures, setEditingFeatures] = useState<string[]>([]);
-  const [editingAddress, setEditingAddress] = useState("");
-  const [editingDiscount, setEditingDiscount] = useState({
-    name: "",
-    off: "",
-    units: "",
-    from: "",
-    to: "",
-  });
-  const [editingPropertyUnits, setEditingPropertyUnits] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Local state for editing land size sections
-  const [localLandSizeSections, setLocalLandSizeSections] = useState(
-    LandSizeSection || []
-  );
 
-  // Sync local state with Redux state changes
-  useEffect(() => {
-    setLocalLandSizeSections(LandSizeSection || []);
-  }, [LandSizeSection]);
+  // State for all editable fields
+  const [propertyData, setPropertyData] = useState({
+    title: isBulk
+      ? formData.bulkDetails.propertyName
+      : formData.basicDetails.propertyName,
+    location: isBulk
+      ? formData.bulkDetails.address
+      : formData.basicDetails.address,
+    virtualTour: formData.media.tourLink,
+    squareMeters: isLandProperty
+      ? formData.landForm.propertySize
+        ? `${formData.landForm.propertySize} Sq M`
+        : ""
+      : formData.specifications.propertySize
+      ? `${formData.specifications.propertySize} Sq M`
+      : "",
+    propertyUnits: isBulk ? formData.bulkDetails.propertyUnits : "1",
+    propertyType: isBulk
+      ? formData.bulkDetails.propertyType
+      : formData.basicDetails.propertyType,
+    price: isBulk
+      ? formData.bulkDetails.price
+        ? `₦${Number(formData.bulkDetails.price).toLocaleString()}`
+        : ""
+      : formData.basicDetails.price
+      ? `₦${Number(formData.basicDetails.price).toLocaleString()}`
+      : "",
+    // overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
+    description: isLandProperty
+      ? formData.landForm.description
+      : formData.specifications.description,
+    features: formData.features.features,
+    address: isBulk
+      ? formData.bulkDetails.address
+      : formData.basicDetails.address,
+    discount: {
+      name: formData.discount.discountName,
+      off: formData.discount.discountOff,
+      units: formData.discount.unitsRequired,
+      from: formData.discount.validFrom,
+      to: formData.discount.validTo,
+    },
+    city: isBulk ? formData.bulkDetails.city : "",
+    state: isBulk ? formData.bulkDetails.state : "",
+  });
 
-  // Determine if we're in edit mode based on propertyId
-  const isEditMode = !!editPropertyId;
-
-  // Use Redux data directly
-  const getDisplayData = () => {
-    const isLandProperty = isLandProperty2;
-
-    return {
-      title: isBulk
-        ? bulkDetails.propertyName
-        : basicDetails.propertyName,
-      location: isBulk
-        ? bulkDetails.address
-        : basicDetails.address,
-      virtualTour: media.tourLink,
-      squareMeters: isLandProperty
-        ? landForm.propertySize
-          ? `${landForm.propertySize} Sq M`
-          : ""
-        : specifications.propertySize
-        ? `${specifications.propertySize} Sq M`
-        : "",
-      propertyUnits: isBulk ? bulkDetails.propertyUnits : "1",
-      propertyType: isBulk
-        ? bulkDetails.propertyType
-        : basicDetails.propertyType,
-      price: isBulk
-        ? bulkDetails.price
-          ? `₦${Number(bulkDetails.price).toLocaleString()}`
-          : ""
-        : basicDetails.price
-        ? `₦${Number(basicDetails.price).toLocaleString()}`
-        : "",
-      description: isLandProperty
-        ? landForm.description
-        : specifications.description,
-      features: reduxFeatures.features || [],
-      address: isBulk
-        ? bulkDetails.address
-        : basicDetails.address,
-      discount: {
-        name: reduxDiscount.discountName,
-        off: reduxDiscount.discountOff,
-        units: reduxDiscount.unitsRequired,
-        from: reduxDiscount.validFrom,
-        to: reduxDiscount.validTo,
-      },
-      city: isBulk ? bulkDetails.city : "",
-      state: isBulk ? bulkDetails.state : "",
-    };
-  };
-
-  const displayData = getDisplayData();
-
-  // Process images - handle both File objects and URLs
-  const images = media.images.map((file) =>
+  const [tempData, setTempData] = useState({ ...propertyData });
+  const images = formData.media.images.map((file) =>
     file instanceof File ? URL.createObjectURL(file) : file
   );
+  useEffect(() => {
+    setPropertyData({
+      title: isBulk
+        ? formData.bulkDetails.propertyName
+        : formData.basicDetails.propertyName,
+      location: isBulk
+        ? formData.bulkDetails.address
+        : formData.basicDetails.address,
+      virtualTour: formData.media.tourLink,
+      squareMeters: isLandProperty
+        ? formData.landForm.propertySize
+          ? `${formData.landForm.propertySize} Sq M`
+          : ""
+        : formData.specifications.propertySize
+        ? `${formData.specifications.propertySize} Sq M`
+        : "",
+      propertyUnits: isBulk ? formData.bulkDetails.propertyUnits : "1",
+      propertyType: isBulk
+        ? formData.bulkDetails.propertyType
+        : formData.basicDetails.propertyType,
+      price: isBulk
+        ? formData.bulkDetails.price
+          ? `₦${Number(formData.bulkDetails.price).toLocaleString()}`
+          : ""
+        : formData.basicDetails.price
+        ? `₦${Number(formData.basicDetails.price).toLocaleString()}`
+        : "",
+      // overview: isLandProperty ? formData.landForm.overview : formData.specifications.overview,
+      description: isLandProperty
+        ? formData.landForm.description
+        : formData.specifications.description,
+      features: formData.features.features,
+      address: isBulk
+        ? formData.bulkDetails.address
+        : formData.basicDetails.address,
+      discount: {
+        name: formData.discount.discountName,
+        off: formData.discount.discountOff,
+        units: formData.discount.unitsRequired,
+        from: formData.discount.validFrom,
+        to: formData.discount.validTo,
+      },
+      city: isBulk ? formData.bulkDetails.city : "",
+      state: isBulk ? formData.bulkDetails.state : "",
+    });
+
+    setTempData((prevTempData) => ({
+      ...prevTempData,
+      ...propertyData,
+    }));
+  }, [
+    isBulk,
+    isLandProperty,
+    formData.bulkDetails.propertyName,
+    formData.bulkDetails.address,
+    formData.bulkDetails.propertyUnits,
+    formData.bulkDetails.propertyType,
+    formData.bulkDetails.price,
+    formData.bulkDetails.city,
+    formData.bulkDetails.state,
+    formData.basicDetails.propertyName,
+    formData.basicDetails.address,
+    formData.basicDetails.propertyType,
+    formData.basicDetails.price,
+    formData.media.tourLink,
+    formData.media.images, // you might want to add this for images, if relevant
+    formData.landForm.propertySize,
+    formData.landForm.overview,
+    formData.landForm.description,
+    formData.specifications.propertySize,
+    formData.specifications.overview,
+    formData.specifications.description,
+    formData.features.features,
+    formData.discount.discountName,
+    formData.discount.discountOff,
+    formData.discount.unitsRequired,
+    formData.discount.validFrom,
+    formData.discount.validTo,
+  ]);
+  // // Handle image upload
+  // const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     const newImages = [...formData.media.images, ...Array.from(e.target.files)];
+  //     setMedia({
+  //       ...formData.media,
+  //       images: newImages
+  //     });
+  //   }
+  // };
+
+  // // Handle image removal
+  // const handleRemoveImage = (index: number) => {
+  //   const newImages = formData.media.images.filter((_, i) => i !== index);
+  //   setMedia({
+  //     ...formData.media,
+  //     images: newImages
+  //   });
+  // };
+
+  // Use actual images if available, otherwise use placeholders
+  // const images = formData.media.images.length > 0
+  //   ? formData.media.images.map(file => URL.createObjectURL(file))
+  //   : [];
 
   const handleEdit = (field: keyof EditingState) => {
-    // Initialize editing state with current data
-    switch (field) {
-      case 'title':
-        setEditingTitle(isBulk ? bulkDetails.propertyName : basicDetails.propertyName);
-        break;
-      case 'location':
-        setEditingLocation(isBulk ? bulkDetails.address : basicDetails.address);
-        break;
-      case 'virtualTour':
-        setEditingVirtualTour(media.tourLink);
-        break;
-      case 'squareMeters':
-        const isLandProperty = isLandProperty2;
-        const size = isLandProperty 
-          ? landForm.propertySize 
-          : specifications.propertySize;
-        setEditingSquareMeters(size ? `${size} Sq M` : "");
-        break;
-      case 'propertyType':
-        setEditingPropertyType(isBulk ? bulkDetails.propertyType : basicDetails.propertyType);
-        break;
-      case 'price':
-        const price = isBulk 
-          ? bulkDetails.price 
-          : basicDetails.price;
-        setEditingPrice(price ? `₦${Number(price).toLocaleString()}` : "");
-        break;
-      case 'description':
-        const description = isLandProperty2 
-          ? landForm.description 
-          : specifications.description;
-        setEditingDescription(description || "");
-        break;
-      case 'features':
-        setEditingFeatures([...reduxFeatures.features]);
-        break;
-      case 'address':
-        setEditingAddress(isBulk ? bulkDetails.address : basicDetails.address);
-        break;
-      case 'discount':
-        setEditingDiscount({
-          name: reduxDiscount.discountName,
-          off: reduxDiscount.discountOff,
-          units: reduxDiscount.unitsRequired,
-          from: reduxDiscount.validFrom,
-          to: reduxDiscount.validTo,
-        });
-        break;
-      case 'propertyUnits':
-        setEditingPropertyUnits(isBulk ? bulkDetails.propertyUnits : "1");
-        break;
-      case 'landSizeSection':
-        // Already handled by localLandSizeSections
-        break;
-    }
-    
+    setTempData({ ...propertyData });
     setEditing({ ...editing, [field]: true });
   };
 
@@ -224,154 +212,29 @@ export default function PropertyListing() {
     setEditing({ ...editing, [field]: false });
   };
 
-  const handleSave = (field: keyof EditingState) => {
-    switch (field) {
-      case 'title':
-        if (isBulk) {
-          setEditBulkDetails({
-            ...bulkDetails,
-            propertyName: editingTitle
-          });
-        } else {
-          setEditBasicDetails({
-            ...basicDetails,
-            propertyName: editingTitle
-          });
-        }
-        break;
-      
-      case 'location':
-      case 'address':
-        if (isBulk) {
-          setEditBulkDetails({
-            ...bulkDetails,
-            address: editingAddress
-          });
-        } else {
-          setEditBasicDetails({
-            ...basicDetails,
-            address: editingAddress
-          });
-        }
-        break;
-      
-      case 'virtualTour':
-        setEditMedia({
-          ...media,
-          tourLink: editingVirtualTour
-        });
-        break;
-      
-      case 'propertyType':
-        if (isBulk) {
-          setEditBulkDetails({
-            ...bulkDetails,
-            propertyType: editingPropertyType
-          });
-        } else {
-          setEditBasicDetails({
-            ...basicDetails,
-            propertyType: editingPropertyType
-          });
-        }
-        break;
-      
-      case 'price':
-        // Extract numeric value from formatted string
-        const priceValue = editingPrice.replace(/[^\d.]/g, '');
-        if (isBulk) {
-          setEditBulkDetails({
-            ...bulkDetails,
-            price: priceValue
-          });
-        } else {
-          setEditBasicDetails({
-            ...basicDetails,
-            price: priceValue
-          });
-        }
-        break;
-      
-      case 'description':
-        if (isLandProperty2) {
-          setEditLandForm({
-            ...landForm,
-            description: editingDescription
-          });
-        } else {
-          setEditSpecifications({
-            ...specifications,
-            description: editingDescription
-          });
-        }
-        break;
-      
-      case 'features':
-        setEditFeatures({
-          ...reduxFeatures,
-          features: editingFeatures
-        });
-        break;
-      
-      case 'discount':
-        setEditDiscount({
-          ...reduxDiscount,
-          discountName: editingDiscount.name,
-          discountOff: editingDiscount.off,
-          unitsRequired: editingDiscount.units,
-          validFrom: editingDiscount.from,
-          validTo: editingDiscount.to,
-        });
-        break;
-      
-      case 'propertyUnits':
-        if (isBulk) {
-          setEditBulkDetails({
-            ...bulkDetails,
-            propertyUnits: editingPropertyUnits
-          });
-        }
-        break;
-      
-      case 'squareMeters':
-        // Extract numeric value from string
-        const sizeValue = editingSquareMeters.replace(/[^\d.]/g, '');
-        if (isLandProperty2) {
-          setEditLandForm({
-            ...landForm,
-            propertySize: sizeValue
-          });
-        } else {
-          setEditSpecifications({
-            ...specifications,
-            propertySize: sizeValue
-          });
-        }
-        break;
-      
-      case 'landSizeSection':
-        // Already handled by save button in land size section
-        break;
-    }
-    
-    setEditing({ ...editing, [field]: false });
+  const handleSave = (field: keyof typeof propertyData) => {
+    setPropertyData({ ...propertyData, [field]: tempData[field] });
+    setEditing({ ...editing, [field as keyof EditingState]: false });
+  };
+
+  const handleChange = (field: keyof typeof propertyData, value: string) => {
+    setTempData({ ...tempData, [field]: value });
   };
 
   const handleFeatureChange = (index: number, value: string) => {
-    const updatedFeatures = [...editingFeatures];
+    const updatedFeatures = [...tempData.features];
     updatedFeatures[index] = value;
-    setEditingFeatures(updatedFeatures);
+    setTempData({ ...tempData, features: updatedFeatures });
   };
-
-  // Handle image upload - update Redux state
+  // Handle image upload - update the context directly
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newImages = [
-        ...media.images,
+        ...formData.media.images,
         ...Array.from(e.target.files),
       ];
-      setEditMedia({
-        ...media,
+      setMedia({
+        ...formData.media,
         images: newImages,
       });
     }
@@ -379,16 +242,15 @@ export default function PropertyListing() {
 
   // Handle image removal
   const handleRemoveImage = (index: number) => {
-    const newImages = media.images.filter((_, i) => i !== index);
-    setEditMedia({
-      ...media,
+    const newImages = formData.media.images.filter((_, i) => i !== index);
+    setMedia({
+      ...formData.media,
       images: newImages,
     });
   };
 
-  // For virtual tour, use the one from Redux state
-  const virtualTourLink = media.tourLink;
-
+  // For virtual tour, use the one from formData
+  const virtualTourLink = formData.media.tourLink;
   return (
     <div className="mx-auto bg-white rounded-[40px] p-6">
       <div className="flex flex-col mb-4">
@@ -397,8 +259,8 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2 w-full">
               <input
                 type="text"
-                value={editingTitle}
-                onChange={(e) => setEditingTitle(e.target.value)}
+                value={tempData.title}
+                onChange={(e) => handleChange("title", e.target.value)}
                 className="text-2xl font-bold text-gray-800 border-b border-blue-500 focus:outline-none w-full"
                 autoFocus
               />
@@ -416,7 +278,7 @@ export default function PropertyListing() {
           ) : (
             <>
               <h1 className="text-2xl font-bold text-gray-800">
-                {displayData.title}
+                {propertyData.title}
               </h1>
               <FaPen
                 className="w-5 h-5 text-[#272727] cursor-pointer"
@@ -431,8 +293,8 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2 w-full">
               <input
                 type="text"
-                value={editingLocation}
-                onChange={(e) => setEditingLocation(e.target.value)}
+                value={tempData.location}
+                onChange={(e) => handleChange("location", e.target.value)}
                 className="text-sm text-gray-600 border-b border-blue-500 focus:outline-none w-full"
                 autoFocus
               />
@@ -449,7 +311,7 @@ export default function PropertyListing() {
             </div>
           ) : (
             <>
-              <p className="text-sm">{displayData.location}</p>
+              <p className="text-sm">{propertyData.location}</p>
               <FaPen
                 className="w-4 h-4 ml-2 text-[#272727] cursor-pointer"
                 onClick={() => handleEdit("location")}
@@ -514,8 +376,8 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2 w-full">
               <input
                 type="text"
-                value={editingVirtualTour}
-                onChange={(e) => setEditingVirtualTour(e.target.value)}
+                value={virtualTourLink}
+                onChange={(e) => handleChange("virtualTour", e.target.value)}
                 className="w-full p-2 pr-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                 autoFocus
               />
@@ -534,7 +396,7 @@ export default function PropertyListing() {
             <>
               <input
                 type="text"
-                value={displayData.virtualTour}
+                value={propertyData.virtualTour}
                 className="w-full p-2 pr-8 text-sm border border-gray-300 rounded-md bg-gray-50 text-[#272727]"
                 readOnly
               />
@@ -555,8 +417,8 @@ export default function PropertyListing() {
             <div className="flex items-center gap-1">
               <input
                 type="text"
-                value={editingSquareMeters}
-                onChange={(e) => setEditingSquareMeters(e.target.value)}
+                value={tempData.squareMeters}
+                onChange={(e) => handleChange("squareMeters", e.target.value)}
                 className="text-sm w-20 border-b border-blue-500 focus:outline-none"
                 autoFocus
               />
@@ -570,7 +432,7 @@ export default function PropertyListing() {
               />
             </div>
           ) : (
-            <span className="text-sm">{displayData.squareMeters}</span>
+            <span className="text-sm">{propertyData.squareMeters}</span>
           )}
         </div>
 
@@ -582,8 +444,10 @@ export default function PropertyListing() {
               <div className="flex items-center gap-1">
                 <input
                   type="text"
-                  value={editingPropertyUnits}
-                  onChange={(e) => setEditingPropertyUnits(e.target.value)}
+                  value={tempData.propertyUnits}
+                  onChange={(e) =>
+                    handleChange("propertyUnits", e.target.value)
+                  }
                   className="text-sm w-12 border-b border-blue-500 focus:outline-none"
                   autoFocus
                 />
@@ -598,7 +462,7 @@ export default function PropertyListing() {
               </div>
             ) : (
               <>
-                <span className="text-sm">{displayData.propertyUnits}</span>
+                <span className="text-sm">{propertyData.propertyUnits}</span>
                 <FaPen
                   className="w-4 h-4 text-[#272727] cursor-pointer"
                   onClick={() => handleEdit("propertyUnits")}
@@ -613,8 +477,8 @@ export default function PropertyListing() {
             <div className="flex items-center gap-1">
               <input
                 type="text"
-                value={editingPropertyType}
-                onChange={(e) => setEditingPropertyType(e.target.value)}
+                value={tempData.propertyType}
+                onChange={(e) => handleChange("propertyType", e.target.value)}
                 className="text-sm font-medium w-16 border-b border-blue-500 focus:outline-none"
                 autoFocus
               />
@@ -630,7 +494,7 @@ export default function PropertyListing() {
           ) : (
             <>
               <span className="text-sm font-medium">
-                {displayData.propertyType}
+                {propertyData.propertyType}
               </span>
               <FaPen
                 className="w-4 h-4 text-[#272727] cursor-pointer"
@@ -648,8 +512,8 @@ export default function PropertyListing() {
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                value={editingPrice}
-                onChange={(e) => setEditingPrice(e.target.value)}
+                value={tempData.price}
+                onChange={(e) => handleChange("price", e.target.value)}
                 className="text-2xl font-bold border-b border-blue-500 focus:outline-none"
                 autoFocus
               />
@@ -664,7 +528,7 @@ export default function PropertyListing() {
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold">{displayData.price}</h2>
+              <h2 className="text-2xl font-bold">{propertyData.price}</h2>
               {isBulk && <span className="ml-2 text-sm">per unit</span>}
               <FaPen
                 className="w-4 h-4 ml-2 text-[#272727] cursor-pointer"
@@ -674,21 +538,32 @@ export default function PropertyListing() {
           )}
         </div>
       </div>
-      
-      {/* Infrastructure Fees */}
-      {(isLandProperty2) && (
-        <div className="mb-6">
-          <div className="flex flex-col justify-between mb-2">
-            <h2 className="text-lg font-semibold">Infrastructure Fees</h2>
-            <button
-              className="text-sm flex items-center gap-1 py-2 px-4 w-fit rounded-4xl bg-gray-100"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Add Fees
-            </button>
-          </div>
+      {/* Infrastructure Fees  */}
+    {(isLandProperty || isLandProperty2) && (
+  <div className="mb-6">
+    <div className="flex flex-col justify-between mb-2">
+      <h2 className="text-lg font-semibold">Infrastructure Fees</h2>
+      <button
+        className="text-sm flex items-center gap-1 py-2 px-4 w-fit rounded-4xl bg-gray-100"
+        onClick={() => setIsModalOpen(true)}
+      >
+        Add Fees
+      </button>
+    </div>
+  </div>
+)}
+
+      {/* Overview */}
+      {/* <div className="mb-6">
+        <div className="flex items-center mb-2">
+          <h2 className="text-lg font-semibold">Overview</h2>
+          <FaPen 
+            className="w-4 h-4 ml-2 text-[#272727] cursor-pointer" 
+            onClick={() => handleEdit("overview")}
+          />
         </div>
-      )}
+        */}
+      {/* </div> */}
 
       {/* Description */}
       <div className="mb-6">
@@ -702,8 +577,8 @@ export default function PropertyListing() {
         {editing.description ? (
           <div className="flex flex-col gap-2">
             <textarea
-              value={editingDescription}
-              onChange={(e) => setEditingDescription(e.target.value)}
+              value={tempData.description}
+              onChange={(e) => handleChange("description", e.target.value)}
               className="text-sm text-gray-600 border border-gray-300 rounded-md p-2 focus:outline-none focus:border-blue-500 min-h-32"
               autoFocus
             />
@@ -724,7 +599,7 @@ export default function PropertyListing() {
           </div>
         ) : (
           <p className="text-sm text-gray-600">
-            {displayData.description || "No description provided"}
+            {propertyData.description || "No description provided"}
           </p>
         )}
       </div>
@@ -740,7 +615,7 @@ export default function PropertyListing() {
         </div>
         {editing.features ? (
           <div className="flex flex-col gap-2">
-            {editingFeatures.map((feature, index) => (
+            {tempData.features.map((feature, index) => (
               <div key={index} className="flex items-center gap-2">
                 <span className="mr-2">•</span>
                 <input
@@ -768,7 +643,7 @@ export default function PropertyListing() {
           </div>
         ) : (
           <ul className="text-sm text-gray-600 space-y-1">
-            {displayData.features.map((feature: string, index: number) => (
+            {propertyData.features.map((feature, index) => (
               <li key={index} className="flex items-start">
                 <span className="mr-2">•</span>
                 <span>{feature}</span>
@@ -791,8 +666,8 @@ export default function PropertyListing() {
           <div className="flex items-center gap-2">
             <input
               type="text"
-              value={editingAddress}
-              onChange={(e) => setEditingAddress(e.target.value)}
+              value={tempData.address}
+              onChange={(e) => handleChange("address", e.target.value)}
               className="text-sm text-gray-600 border-b border-blue-500 focus:outline-none w-full"
               autoFocus
             />
@@ -806,7 +681,7 @@ export default function PropertyListing() {
             />
           </div>
         ) : (
-          <p className="text-sm text-gray-600">{displayData.address}</p>
+          <p className="text-sm text-gray-600">{propertyData.address}</p>
         )}
       </div>
 
@@ -825,11 +700,11 @@ export default function PropertyListing() {
               <span className="text-sm w-24">Name:</span>
               <input
                 type="text"
-                value={editingDiscount.name}
+                value={tempData.discount.name}
                 onChange={(e) =>
-                  setEditingDiscount({
-                    ...editingDiscount,
-                    name: e.target.value,
+                  setTempData({
+                    ...tempData,
+                    discount: { ...tempData.discount, name: e.target.value },
                   })
                 }
                 className="text-sm border-b border-blue-500 focus:outline-none flex-1"
@@ -840,11 +715,11 @@ export default function PropertyListing() {
               <span className="text-sm w-24">Discount:</span>
               <input
                 type="text"
-                value={editingDiscount.off}
+                value={tempData.discount.off}
                 onChange={(e) =>
-                  setEditingDiscount({
-                    ...editingDiscount,
-                    off: e.target.value,
+                  setTempData({
+                    ...tempData,
+                    discount: { ...tempData.discount, off: e.target.value },
                   })
                 }
                 className="text-sm border-b border-blue-500 focus:outline-none flex-1"
@@ -855,11 +730,11 @@ export default function PropertyListing() {
               <span className="text-sm w-24">Min Units:</span>
               <input
                 type="text"
-                value={editingDiscount.units}
+                value={tempData.discount.units}
                 onChange={(e) =>
-                  setEditingDiscount({
-                    ...editingDiscount,
-                    units: e.target.value,
+                  setTempData({
+                    ...tempData,
+                    discount: { ...tempData.discount, units: e.target.value },
                   })
                 }
                 className="text-sm border-b border-blue-500 focus:outline-none flex-1"
@@ -869,11 +744,11 @@ export default function PropertyListing() {
               <span className="text-sm w-24">From:</span>
               <input
                 type="date"
-                value={editingDiscount.from}
+                value={tempData.discount.from}
                 onChange={(e) =>
-                  setEditingDiscount({
-                    ...editingDiscount,
-                    from: e.target.value,
+                  setTempData({
+                    ...tempData,
+                    discount: { ...tempData.discount, from: e.target.value },
                   })
                 }
                 className="text-sm border-b border-blue-500 focus:outline-none flex-1"
@@ -883,11 +758,11 @@ export default function PropertyListing() {
               <span className="text-sm w-24">To:</span>
               <input
                 type="date"
-                value={editingDiscount.to}
+                value={tempData.discount.to}
                 onChange={(e) =>
-                  setEditingDiscount({
-                    ...editingDiscount,
-                    to: e.target.value,
+                  setTempData({
+                    ...tempData,
+                    discount: { ...tempData.discount, to: e.target.value },
                   })
                 }
                 className="text-sm border-b border-blue-500 focus:outline-none flex-1"
@@ -910,18 +785,18 @@ export default function PropertyListing() {
           </div>
         ) : (
           <div className="bg-gray-100 p-4 rounded-lg">
-            {displayData.discount.name ? (
+            {propertyData.discount.name ? (
               <>
                 <h3 className="font-medium text-gray-800">
-                  {displayData.discount.name}
+                  {propertyData.discount.name}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  {displayData.discount.off}% Off above{" "}
-                  {displayData.discount.units} units
+                  {propertyData.discount.off}% Off above{" "}
+                  {propertyData.discount.units} units
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Valid: {displayData.discount.from} to{" "}
-                  {displayData.discount.to}
+                  Valid: {propertyData.discount.from} to{" "}
+                  {propertyData.discount.to}
                 </p>
               </>
             ) : (
@@ -933,258 +808,18 @@ export default function PropertyListing() {
           </div>
         )}
       </div>
-
-      {/* Land Size Section */}
-     {
-      isLandProperty2 &&( <div className="mt-8">
-        <div className="flex items-center mb-3">
-          <h2 className="text-lg font-semibold">Land Size Sections</h2>
-          <FaPen
-            className="w-4 h-4 ml-2 text-[#272727] cursor-pointer"
-            onClick={() => handleEdit("landSizeSection")}
-          />
-        </div>
-
-        {editing.landSizeSection ? (
-          <>
-            {localLandSizeSections.map((section: any, secIndex: number) => (
-              <div
-                key={section.id}
-                className="border rounded-lg p-4 mb-4 bg-gray-50"
-              >
-                {/* --- Size --- */}
-                <div className="flex items-center gap-2 mb-3">
-                  <label className="text-sm font-medium w-24">Size (sqm)</label>
-                  <input
-                    type="text"
-                    value={section.size}
-                    onChange={(e) => {
-                      const updated = [...localLandSizeSections];
-                      updated[secIndex].size = e.target.value;
-                      setLocalLandSizeSections(updated);
-                    }}
-                    className="border rounded px-2 py-1 text-sm w-32 focus:outline-none focus:border-[#79B833]"
-                  />
-
-                  <button
-                    type="button"
-                    className="ml-auto text-red-500 text-sm hover:text-red-700"
-                    onClick={() => {
-                      const updated = localLandSizeSections.filter(
-                        (_: any, i: number) => i !== secIndex
-                      );
-                      setLocalLandSizeSections(updated);
-                    }}
-                  >
-                    Remove Section
-                  </button>
-                </div>
-
-                {/* ---- Durations ---- */}
-                <h3 className="text-sm font-semibold mb-2">Durations</h3>
-
-                {section.durations.map((d: any, dIndex: number) => (
-                  <div
-                    key={d.id}
-                    className="grid grid-cols-4 gap-2 mb-2 items-center"
-                  >
-                    {/* Duration */}
-                    <input
-                      type="text"
-                      value={d.duration}
-                      placeholder="Duration (months)"
-                      onChange={(e) => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].duration = e.target.value;
-                        setLocalLandSizeSections(updated);
-                      }}
-                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
-                    />
-
-                    {/* Price */}
-                    <input
-                      type="text"
-                      value={d.price}
-                      placeholder="Price"
-                      onChange={(e) => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].price = e.target.value;
-                        setLocalLandSizeSections(updated);
-                      }}
-                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
-                    />
-
-                    {/* Citta Link */}
-                    <input
-                      type="text"
-                      value={d.citta_id}
-                      placeholder="Citta Link"
-                      onChange={(e) => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations[dIndex].citta_id = e.target.value;
-                        setLocalLandSizeSections(updated);
-                      }}
-                      className="border rounded px-2 py-1 text-sm focus:outline-none focus:border-[#79B833]"
-                    />
-
-                    {/* Remove Duration */}
-                    <button
-                      type="button"
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => {
-                        const updated = [...localLandSizeSections];
-                        updated[secIndex].durations = updated[secIndex].durations.filter(
-                          (_: any, i: number) => i !== dIndex
-                        );
-                        setLocalLandSizeSections(updated);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-
-                {/* Add Duration Button */}
-                <button
-                  type="button"
-                  className="text-sm text-[#79B833] hover:text-[#6ba32c] mt-2 flex items-center gap-1"
-                  onClick={() => {
-                    const updated = [...localLandSizeSections];
-                    updated[secIndex].durations.push({
-                      id: Date.now(),
-                      duration: "",
-                      price: "",
-                      citta_id: "",
-                    });
-                    setLocalLandSizeSections(updated);
-                  }}
-                >
-                  <FaPlus className="w-3 h-3" />
-                  Add Duration
-                </button>
-              </div>
-            ))}
-
-            {/* Add New Land Size Section Button */}
-            <div className="flex items-center gap-3 mt-4">
-              <button
-                type="button"
-                className="px-4 py-2 bg-[#79B833] text-white rounded-md text-sm hover:bg-[#6ba32c] flex items-center gap-2"
-                onClick={() => {
-                  setLocalLandSizeSections([
-                    ...localLandSizeSections,
-                    {
-                      id: Date.now(),
-                      size: "",
-                      durations: [],
-                    },
-                  ]);
-                }}
-              >
-                <FaPlus className="w-3 h-3" />
-                Add Land Size Section
-              </button>
-
-              {/* Save and Cancel buttons for the entire section */}
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 flex items-center gap-2"
-                  onClick={() => {
-                    // Save to Redux
-                    setEditLandSizeSections(localLandSizeSections);
-                    setEditing({ ...editing, landSizeSection: false });
-                  }}
-                >
-                  <FaCheck className="w-3 h-3" />
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 flex items-center gap-2"
-                  onClick={() => {
-                    // Reset to original Redux data
-                    setLocalLandSizeSections(LandSizeSection || []);
-                    setEditing({ ...editing, landSizeSection: false });
-                  }}
-                >
-                  <FaTimes className="w-3 h-3" />
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          /* Display view mode when NOT editing */
-          <div className="space-y-4">
-            {LandSizeSection?.length > 0 ? (
-              LandSizeSection.map((section: any, secIndex: number) => (
-                <div
-                  key={section.id}
-                  className="border rounded-lg p-4 bg-gray-50"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-medium">
-                      <span className="text-gray-600">Size:</span>{" "}
-                      {section.size ? `${section.size} sqm` : "Not specified"}
-                    </h3>
-                  </div>
-
-                  {/* Display durations */}
-                  {section.durations.length > 0 ? (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-600 mb-2">Durations:</h4>
-                      {section.durations.map((duration: any, dIndex: number) => (
-                        <div key={duration.id} className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-500">Duration:</span>{" "}
-                            {duration.duration || "N/A"}
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Price:</span>{" "}
-                            {duration.price || "N/A"}
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Citta Id:</span>{" "}
-                            {duration.citta_id ? (
-                              <div
-                          
-                            className="text-gray-500"
-                            
-                              >
-                                {duration.citta_id}
-                              </div>
-                            ) : (
-                              "N/A"
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">No durations added</p>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-6 bg-gray-50 rounded-lg border">
-                <p className="text-gray-500">No land size sections added yet</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Click the edit icon to add land size sections
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>)
-     }
-{isLandProperty2 &&
-     (
-   <InfrastructureFeesModal
+      
+      {selectedPropertyId ? (
+        <InfrastructureFeesModalss
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />
-      ) }
+      ) : (
+        <InfrastructureFeesModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -6,9 +6,6 @@ import { PropertyContext } from "../MyContext/MyContext";
 import PersonnelModal from "../pages/Personnel/createPersonnelModal";
 import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
-import SyncCitaModal from "./SyncCitaModal";
-import { useCreatePropertyForm } from "../components/Redux/hooks/usePropertyForms";
-
 
 interface HeaderProps {
   title?: string;
@@ -22,7 +19,6 @@ interface HeaderProps {
   handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
   viewForm?: boolean;
-  cita?: boolean; // Add this prop
   personel?: boolean;
   onPersonelButtonClick?: () => void;
   Personnel_Text?: string;
@@ -38,7 +34,6 @@ export default function Header({
   showSearchAndButton = true,
   viewForm = false,
   handleViewPurchaseFormClick,
-  cita = false, // Default to false
   personel = false,
   onPersonelButtonClick,
   Personnel_Text = "Create Personnel",
@@ -62,7 +57,6 @@ export default function Header({
   
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
-  const [showSyncCitaModal, setShowSyncCitaModal] = useState(false); // State for Sync Cita modal
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -109,8 +103,6 @@ export default function Header({
       setIsCancelState(false);
       resetFormData();
       setIsLandProperty(false);
-      setIsCreateLandProperty(false)
-      setIsCreateLandProperty2(false)
     } else {
       // Normal state behavior
       if (isPersonnelPage) {
@@ -121,13 +113,6 @@ export default function Header({
         setShowBulkModal(true);
       }
     }
-  };
-
-  // Handle Sync Cita button click
-  const handleButtonClickcita = () => {
-    setShowSyncCitaModal(true);
-    // You might want to start the sync process here
-    // For example: startSyncProcess();
   };
 
   // Determine button text based on page and state
@@ -186,16 +171,6 @@ export default function Header({
                 </button>
               )}
 
-              {/* Sync Cita Button - Only shows when cita prop is true */}
-              {cita && (
-                <button
-                  className="text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap bg-[#79B833] hover:bg-[#6aa22c]"
-                  onClick={handleButtonClickcita}
-                >
-                  Sync With Cita
-                </button>
-              )}
-
               <button
                 className={`text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap ${
                   isCancelState || isFormPage
@@ -221,14 +196,6 @@ export default function Header({
         </div>
       </div>
 
-      {/* Sync Cita Modal */}
-      {showSyncCitaModal && (
-        <SyncCitaModal
-          isOpen={showSyncCitaModal}
-          onClose={() => setShowSyncCitaModal(false)}
-        />
-      )}
-
       {/* Modals */}
       {!isPersonnelPage && showBulkModal && (
         <BulkSelectModal
@@ -237,16 +204,12 @@ export default function Header({
             setIsLandProperty(true);
             setShowBulkModal(false);
             setIsCancelState(true);
-             setIsCreateLandProperty(true)
-              setIsCreateLandProperty2(true)
           }}
           onSelects={(isBulk) => {
             navigateToForm();
             setShowBulkModal(false);
             setIsLandProperty(false);
-             setIsCreateLandProperty(false)
             setIsCancelState(true);
-            setIsCreateLandProperty2(false)
           }}
           onClose={() => setShowBulkModal(false)}
           x={() => {

@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import MessageModal from "../components/Modals/Massaging";
 import { toast } from "react-toastify";
 import { sendMessage } from "../components/Redux/customers/send_message";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../components/Redux/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../components/Redux/store";
 import ConfirmationModal from "../components/Modals/delete";
 import { deleteUser } from "../components/Redux/customers/delete_customers";
 import { useNavigate } from "react-router-dom";
@@ -64,8 +64,6 @@ export default function ProfileCard({
   const [isOpendelete, setIsOpendelete] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedMarketerId, setSelectedMarketerId] = useState<string | number>("");
-  const [marketerNameState, setMarketerNameState] = useState(marketerName);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -146,9 +144,7 @@ export default function ProfileCard({
           </h3>
         </div>
 
-        {/* Right Column - Stats and Actions */}
         <div className="flex flex-col w-full">
-          {/* Stats Section */}
           <div className="bg-[#F5F5F5] px-4 md:px-[48px] pt-[31px] pb-[34px] flex flex-col sm:flex-row justify-between gap-4 rounded-b-[40px] rounded-t-[40px] lg:rounded-t-none lg:rounded-b-[40px] mb-[20px]">
             <div className="grid lg:grid-cols-3 gap-4 w-full">
               <div className="flex flex-col items-center max-w-full">
@@ -178,7 +174,6 @@ export default function ProfileCard({
             </div>
           </div>
 
-          {/* Customer Info and Actions */}
           <div className="w-full justify-center flex flex-col items-center text-center md:text-left">
             <div className="md:text-base text-sm font-[350] text-dark mb-2 gap-2 flex">
               <p className="text-[#767676]">Customer Code: </p>
@@ -193,7 +188,7 @@ export default function ProfileCard({
                 Marketer in charge:
               </span>
               <span className="text-dark font-[350] md:text-base text-sm truncate">
-                {marketerNameState}
+                {marketerName}
               </span>
             </div> */}
             <div className="flex flex-col sm:flex-row gap-4 mt-5">

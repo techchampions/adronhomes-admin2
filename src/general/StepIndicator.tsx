@@ -7,10 +7,9 @@ const StepIndicator = ({setCurrentStep,currentStep}:{setCurrentStep:any,currentS
   const steps = [
     { name: "Basic Details", id: 1 },
     { name: "Property Specifications", id: 2 },
-     { name: "Property Plan", id: 3 },
-    { name: "Media", id: 4 },
-    { name: "Features", id: 5 },
-    { name: "Payment Structure", id: 6 }
+    { name: "Media", id: 3 },
+    { name: "Features", id: 4 },
+    { name: "Payment Structure", id: 5 }
   ];
 
   const handleStepChange = (stepId: number) => {
