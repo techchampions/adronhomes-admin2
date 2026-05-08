@@ -21,7 +21,8 @@ export default function Customers() {
 
   useEffect(() => {
     dispatch(customer({ page: pagination.currentPage, search, filter: sort }));
-  }, [dispatch, pagination.currentPage, search,sort]);
+  }, [dispatch, pagination.currentPage, search, sort]);
+  
   useEffect(() => {
     return () => {
       dispatch(setCustomersSearch(""));
@@ -34,11 +35,12 @@ export default function Customers() {
       customersModalRef.current.openModal();
     }
   };
-const sortOptions = [
-  { value: "customer code", name: "Sort by Client Code" },
-  { value: "newest", name: "Sort by Newest" },
-  { value: "oldest", name: "Sort by Oldest" },
-];
+  
+  const sortOptions = [
+    { value: "customer code", name: "Sort by Client Code" },
+    { value: "newest", name: "Sort by Newest" },
+    { value: "oldest", name: "Sort by Oldest" },
+  ];
 
   return (
     <div className="pb-[52px] relative">
@@ -48,7 +50,8 @@ const sortOptions = [
         buttonText="Export"
         onButtonClick={openCustomersModal}
       />
-      <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
+
+      <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
           title="Total Registered Clients"
           change="includes all registered Client"
@@ -58,7 +61,7 @@ const sortOptions = [
         <MatrixCard
           title="Total Active Clients"
           value={data?.active_customer || 0}
-          change="includes all clients's on  active contracts"
+          change="includes all clients's on active contracts"
         />
         <MatrixCard
           title="Total Active Contracts"
@@ -66,15 +69,15 @@ const sortOptions = [
           change="Includes all active contracts"
         />
       </div>
+      
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
-          onSortChange={(sortOptions) => {setSort(sortOptions.value);}}
-           sortOptions={sortOptions.map((sortOptions, index) => ({
-            value: sortOptions.value,
-            name: sortOptions.name,
-
+          onSortChange={(sortOption) => {setSort(sortOption.value);}}
+          sortOptions={sortOptions.map((sortOption, index) => ({
+            value: sortOption.value,
+            name: sortOption.name,
           }))}
-            defaultSort={sortOptions.findIndex((option) => option.value === sortOptions[0].value) || 0}
+          defaultSort={sortOptions.findIndex((option) => option.value === sortOptions[0].value) || 0}
           tabs={tabs}
           sort={true}
           searchPlaceholder={"Search Clients"}
@@ -88,6 +91,7 @@ const sortOptions = [
           )}
         </ReusableTable>
       </div>
+      
       <ExportCustomersModal ref={customersModalRef} />
     </div>
   );

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { directors, ErrorResponse } from "./directors_thunk";
+import { directors, marketers, ErrorResponse } from "./directors_thunk"; // Import both thunks
 
 interface Personnel {
   id: number;
@@ -8,60 +8,106 @@ interface Personnel {
 }
 
 interface PersonnelsState {
-  data: {
-    id: number;
-    first_name: string;
-    last_name: string;
-  }[];
-  loading: boolean;
-  error: ErrorResponse | null;
-  success: boolean;
+  directors: {
+    data: Personnel[];
+    loading: boolean;
+    error: ErrorResponse | null;
+    success: boolean;
+  };
+  marketers: {
+    data: Personnel[];
+    loading: boolean;
+    error: ErrorResponse | null;
+    success: boolean;
+  };
+  currentType: 'directors' | 'marketers';
 }
-interface PersonnelsResponse {
-  success: boolean;
-  data: Personnel[];
-}
+
 const initialState: PersonnelsState = {
-  data: [],
-  loading: false,
-  error: null,
-  success: false,
+  directors: {
+    data: [],
+    loading: false,
+    error: null,
+    success: false,
+  },
+  marketers: {
+    data: [],
+    loading: false,
+    error: null,
+    success: false,
+  },
+  currentType: 'directors',
 };
 
 const personnelsSlice = createSlice({
   name: "personnels",
   initialState,
   reducers: {
-    // You can add additional reducers here if needed
     resetPersonnelsState: () => initialState,
+    setPersonnelType: (state, action: PayloadAction<'directors' | 'marketers'>) => {
+      state.currentType = action.payload;
+    },
+    resetDirectors: (state) => {
+      state.directors = initialState.directors;
+    },
+    resetMarketers: (state) => {
+      state.marketers = initialState.marketers;
+    },
   },
   extraReducers: (builder) => {
+    // Directors reducers
     builder
       .addCase(directors.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
+        state.directors.loading = true;
+        state.directors.error = null;
+        state.directors.success = false;
       })
       .addCase(
         directors.fulfilled,
-        (state, action: PayloadAction<PersonnelsResponse>) => {
-          state.loading = false;
-          state.data = action.payload.data;
-          state.success = action.payload.success;
+        (state, action: PayloadAction<{ success: boolean; data: Personnel[] }>) => {
+          state.directors.loading = false;
+          state.directors.data = action.payload.data;
+          state.directors.success = action.payload.success;
         }
       )
       .addCase(
         directors.rejected,
         (state, action: PayloadAction<ErrorResponse | undefined>) => {
-          state.loading = false;
-          state.error = action.payload || {
+          state.directors.loading = false;
+          state.directors.error = action.payload || {
             message: "An unknown error occurred",
           };
-          state.success = false;
+          state.directors.success = false;
+        }
+      );
+    
+    // Marketers reducers
+    builder
+      .addCase(marketers.pending, (state) => {
+        state.marketers.loading = true;
+        state.marketers.error = null;
+        state.marketers.success = false;
+      })
+      .addCase(
+        marketers.fulfilled,
+        (state, action: PayloadAction<{ success: boolean; data: Personnel[] }>) => {
+          state.marketers.loading = false;
+          state.marketers.data = action.payload.data;
+          state.marketers.success = action.payload.success;
+        }
+      )
+      .addCase(
+        marketers.rejected,
+        (state, action: PayloadAction<ErrorResponse | undefined>) => {
+          state.marketers.loading = false;
+          state.marketers.error = action.payload || {
+            message: "An unknown error occurred",
+          };
+          state.marketers.success = false;
         }
       );
   },
 });
 
-export const { resetPersonnelsState } = personnelsSlice.actions;
+export const { resetPersonnelsState, setPersonnelType, resetDirectors, resetMarketers } = personnelsSlice.actions;
 export default personnelsSlice.reducer;

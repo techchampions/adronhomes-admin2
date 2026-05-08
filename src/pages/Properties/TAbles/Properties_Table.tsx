@@ -234,9 +234,9 @@ export default function PropertyTableComponent({
     null
   );
   
-  const {
-    data: directorDta,
-  } = useSelector((state: RootState) => state.directors);
+  // const {
+  //   data: directorDta,
+  // } = useSelector((state: RootState) => state.directors);
 
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
