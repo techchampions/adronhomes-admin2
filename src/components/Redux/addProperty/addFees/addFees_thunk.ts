@@ -18,7 +18,6 @@ export interface add_property_detailFormData {
   name: any;
   value: any;
    type: any;
-     purpose: string;
 }
 
 
