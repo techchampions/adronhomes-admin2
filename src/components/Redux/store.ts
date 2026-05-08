@@ -176,7 +176,8 @@ exportClientPartnership: exportClientPartnershipReducer,
 draftProperty: duplicateDraftFormReducer,
 editProperty: editPropertyReducer,
 assignMarketer: assignMarketerSlice,
-createProperty: createPropertyReducer,},
+createProperty: createPropertyReducer,
+propertyCodes: propertyCodesReducer,},
 });
 
 export type AppDispatch = typeof store.dispatch;
