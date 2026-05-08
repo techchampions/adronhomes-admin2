@@ -233,7 +233,7 @@ export default function PropertyTableComponent({
   const [propertyToDelete, setPropertyToDelete] = useState<PropertyData | null>(
     null
   );
-  
+  // jbj
   const {
     data: directorDta,
   } = useSelector((state: RootState) => state.directors);
