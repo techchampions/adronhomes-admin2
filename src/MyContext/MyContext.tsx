@@ -12,6 +12,7 @@ import {
 import { add_property_detail } from "../components/Redux/addProperty/addFees/addFees_thunk";
 import { resetPropertyDetailState } from "../components/Redux/addProperty/addFees/add_property_detail_slice";
 import { useLocation, useNavigate } from "react-router-dom";
+import { LandSizeSection } from "../pages/Properties/addPropplan/planForm";
 
 export interface Fee {
   [x: string]: any;
@@ -92,7 +93,7 @@ export interface LandFormValues {
   nearbyLandmarks: string[];
 }
 
- export interface FeaturesFormValues {
+export interface FeaturesFormValues {
   features: string[];
 }
 
@@ -131,9 +132,45 @@ export interface PropertyFormData {
   display: {
     status: "draft" | "publish";
   };
+  LandSizeSection:LandSizeSection[]
+}
+export interface PropertyFormMetadata {
+  currentStep: number;
+  isLandProperty: boolean;
+  isLandProperty2: boolean;
+  isBulk: boolean;
+  isSubmitting: boolean;
+  sales: boolean;
+  propertyId?: string | null;
+  director_name: string;
+  previousPropType: string;
+  isLoaded: boolean;
+  showBulkModal: boolean;
+  showPersonnelModal: boolean;
+  isUserBulk: boolean;
+  forgotPassword: boolean;
+  isCancelState: boolean;
+  isInfrastructure: boolean;
+  option: number;
+  role?: any;
+  fees: Fee[];
+  newFees: Fee[];
+  imagePreview: string | null;
 }
 
-export interface PropertyContextType {
+
+
+export type CreatePropertyFormData = PropertyFormData & {
+  metadata: Omit<PropertyFormMetadata, 'isLoaded' | 'propertyId'> & {
+    isLoaded?: boolean;
+    propertyId?: string | null;
+  };
+};
+
+export type EditPropertyFormData = PropertyFormData & {
+  metadata: PropertyFormMetadata;
+};
+interface PropertyContextType {
   formData: PropertyFormData;
   director_name: any;
 
@@ -145,6 +182,7 @@ export interface PropertyContextType {
   setBulkDetails: (data: BulkDetailsFormValues) => void;
   setSpecifications: (data: PropertySpecificationsFormValues) => void;
   setLandForm: (data: LandFormValues) => void;
+  setLandSizeSections:(data:LandSizeSection[])=>void
   setFeatures: (data: FeaturesFormValues) => void;
   setMedia: (data: MediaFormValues) => void;
   setDiscount: (data: DiscountFormValues) => void;
@@ -199,6 +237,7 @@ interface PropertyProviderProps {
 }
 
 const initialFormData: PropertyFormData = {
+LandSizeSection: [], 
   basicDetails: {
     propertyName: "",
     propertyType: "",
@@ -395,7 +434,12 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       landForm: data,
     }));
   };
-
+const setLandSizeSections=(data:LandSizeSection[])=>{
+    setFormData((prev) => ({
+      ...prev,
+      LandSizeSection: data, 
+    }));
+}
   const setFeatures = (data: FeaturesFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -438,6 +482,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         media,
         discount,
         paymentStructure,
+        LandSizeSection
       } = formData;
 
       console.log("Submitting with displayStatus:", displayStatus);
@@ -528,6 +573,18 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       }
 
       if (isLandProperty) {
+        formData.LandSizeSection.forEach((ls, i) => {
+  formPayload.append(`land_sizes[${i}][id]`, String(ls.id));
+  formPayload.append(`land_sizes[${i}][size]`, String(ls.size));
+
+  ls.durations.forEach((d, j) => {
+    formPayload.append(`land_sizes[${i}][durations][${j}][id]`, (d.id));
+    formPayload.append(`land_sizes[${i}][durations][${j}][duration]`, (d.duration));
+    formPayload.append(`land_sizes[${i}][durations][${j}][price]`, (d.price));
+    formPayload.append(`land_sizes[${i}][durations][${j}][citta_id]`, (d.citta_id));
+  });
+});
+
         if (landForm.landSize) {
           formPayload.append("size", landForm.landSize);
         }
@@ -804,6 +861,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setBulkDetails,
         setSpecifications,
         setLandForm,
+        setLandSizeSections,
         setFeatures,
         setMedia,
         setDiscount,
