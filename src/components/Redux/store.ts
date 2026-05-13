@@ -36,41 +36,40 @@ import jobDetailsReducer from "./carreer/job_details_slice";
 import createJobReducer from "./carreer/create_job_slice";
 import editJobReducer from "./carreer/edit_job_slice";
 import deleteJobReducer from "./carreer/delete_job_slice";
-import contractsReducer from './Contract/contracts_slice';
-import userPaymentsReducer from './Payment/userPayment/ userPaymentsSlice';
-import walletTransactionsReducer from './customers/wallet_Transaction_Slice'
-import contractingReducer from './UpdateContract/UpdateContract'
-import contractDocumentsReducer from './UpdateContract/createContractDocuments'
-import contractingFormReducer from './UpdateContract/viewcontractFormDetails'
-import ViewcontractDocumentsREducer from './UpdateContract/contractDocumentsSlice'
-import allocatePropertySliceReducer from './UpdateContract/allocateProperty'
-import singlejobDetailsReducer from './carreer/Single_job_slice'
-import toggleFeaturedReducer from './Properties/toggle_featured_slice'
-import ViewApplicationReducer from './carreer/ViewApplicationSlice'
-import propertyDetailsReducer from './Properties/propertiesDetails/propetiesDetailsSlice'
-import publishDraftReducer from './Properties/publishpropertySlice'
-import exportPaymentsReducer from './export/exportPaymentsSlice'
-import exportCustomersReducer from './export/exportCustomersSlice'
-import countriesReducer from './country/countrythunkand slice'
+import contractsReducer from "./Contract/contracts_slice";
+import userPaymentsReducer from "./Payment/userPayment/ userPaymentsSlice";
+import walletTransactionsReducer from "./customers/wallet_Transaction_Slice";
+import contractingReducer from "./UpdateContract/UpdateContract";
+import contractDocumentsReducer from "./UpdateContract/createContractDocuments";
+import contractingFormReducer from "./UpdateContract/viewcontractFormDetails";
+import ViewcontractDocumentsREducer from "./UpdateContract/contractDocumentsSlice";
+import allocatePropertySliceReducer from "./UpdateContract/allocateProperty";
+import singlejobDetailsReducer from "./carreer/Single_job_slice";
+import toggleFeaturedReducer from "./Properties/toggle_featured_slice";
+import ViewApplicationReducer from "./carreer/ViewApplicationSlice";
+import propertyDetailsReducer from "./Properties/propertiesDetails/propetiesDetailsSlice";
+import publishDraftReducer from "./Properties/publishpropertySlice";
+import exportPaymentsReducer from "./export/exportPaymentsSlice";
+import exportCustomersReducer from "./export/exportCustomersSlice";
+import countriesReducer from "./country/countrythunkand slice";
 import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
-import legalDashboardSliceReducer  from './legalDashboard/legalDashboardSlice'
-import toggleLatestReducer from './Properties/toggleLatestslice'
-import exportContractsReducer from './export/exportContractSlice'
-import itDashboardSliceReducer from './info-tech/itDashboardSlice'
-import deletepropertyDetailReducer from './Properties/deleteSliceDetails'
-import  walletslice from "./wallet/walllet_slice"
-import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice"
-import passwordResetReducer from "./passwordRese/passwordReset_slice"
-import deleteCustomerredux from "./customers/deletecut"
-import propertyCodesReducer from "./citta/propertyCodesSlice"
+import legalDashboardSliceReducer from "./legalDashboard/legalDashboardSlice";
+import toggleLatestReducer from "./Properties/toggleLatestslice";
+import exportContractsReducer from "./export/exportContractSlice";
+import itDashboardSliceReducer from "./info-tech/itDashboardSlice";
+import deletepropertyDetailReducer from "./Properties/deleteSliceDetails";
+import walletslice from "./wallet/walllet_slice";
+import userPaymentsReducers from "./Properties/payment/paymentbyuser_slice";
+import passwordResetReducer from "./passwordRese/passwordReset_slice";
+import deleteCustomerredux from "./customers/deletecut";
+import propertyCodesReducer from "./citta/propertyCodesSlice";
 import createPropertyReducer from "./propertyForm/createPropertySlice";
 import editPropertyReducer from "./editProperty/editpropslice";
 import duplicateDraftFormReducer from "./draftProperty/draftPropertySlice";
 import assignMarketerSlice from "./AssignMarketerRequest/AssignMarketerRequest";
-// import marketerdashboardPersonnelSlice from "./personnel/marketer_personnel_slice";
 import erpContractsSyncReducer from "./Contract/erpContractsSync/erpContractsSyncSlice";
 import erpContractTransactionsReducer from "./Contract/erpContractTransactions/erpContractTransactionsSlice";
-import  exportPersonnelReducer  from "./export/exportPersonnelSlice";
+import exportPersonnelReducer from "./export/exportPersonnelSlice";
 import profileSlicereducer from "./profileUpdate/profileSlice";
 import propertyCategoriesReducer from "./Properties/propertycategory/propertyCategorySlice";
 import adminImpersonateSliceReducer from "./adminimpersonate/adminimpersonateslice";
@@ -82,8 +81,15 @@ import promoFormReducer from "./gift/promo/promoFormSlice";
 import promoTableReducer from "./gift/promo/promoTableSlice";
 import promoRequestsReducer from "./gift/promo/promoRequestsSlice";
 import exportClientPartnershipReducer from "./export/exportClientPartnershipSlice";
+import fetchCittaPropertyCategoriesReducer from "./citta/fetchCittaPropertyCategories";
+import fetchCittaEstatesReducer from "./citta/fetchCittaEstates";
+import fetchCittaPropertyMapReducer from "./citta/fetchCittaPropertyMap";
+import syncPropertyMapReducer from "./citta/syncPropertyMap";
+import retrievePropertyCodeReducer from "./citta/RetrievePropertyCodeState";
+// import cittaPropertyMapReducer from "./citta/cittaPropertyMapSlice";
+
 export const store = configureStore({
-   middleware: (getDefaultMiddleware) =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredPaths: [
@@ -133,51 +139,59 @@ export const store = configureStore({
     editjob: editJobReducer,
     deletejob: deleteJobReducer,
     savedPropertyUser: savedPropertyUserReducer,
-    getcontracts:contractsReducer,
-    userPayments:userPaymentsReducer,
-    walletTransactions:walletTransactionsReducer,
-    contract:contractingReducer,
-      contractForm:contractingFormReducer,
-    contractDocuments:contractDocumentsReducer,
-    ViewcontractDocuments:ViewcontractDocumentsREducer,
-    allocateProperty:allocatePropertySliceReducer,
-    singlejobDetails:singlejobDetailsReducer,
-    toggleFeatured:toggleFeaturedReducer,
-    ViewApplication:ViewApplicationReducer,
-    propertyDetails:propertyDetailsReducer,
-    publishDraft:publishDraftReducer,
+    getcontracts: contractsReducer,
+    userPayments: userPaymentsReducer,
+    walletTransactions: walletTransactionsReducer,
+    contract: contractingReducer,
+    contractForm: contractingFormReducer,
+    contractDocuments: contractDocumentsReducer,
+    ViewcontractDocuments: ViewcontractDocumentsREducer,
+    allocateProperty: allocatePropertySliceReducer,
+    singlejobDetails: singlejobDetailsReducer,
+    toggleFeatured: toggleFeaturedReducer,
+    ViewApplication: ViewApplicationReducer,
+    propertyDetails: propertyDetailsReducer,
+    publishDraft: publishDraftReducer,
     exportPayments: exportPaymentsReducer,
-  exportCustomers: exportCustomersReducer,
-  countries:countriesReducer,
-  legalDashboard:legalDashboardSliceReducer,
-   toggleLatest: toggleLatestReducer,
-   exportContracts:exportContractsReducer,
-   itDashboard:itDashboardSliceReducer,
-     deletepropertyDetail: deletepropertyDetailReducer,
-     wallet:walletslice,
-     marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
-user_payments: userPaymentsReducers,
-    passwordReset: passwordResetReducer, 
-  deleteCustomer:deleteCustomerredux,
-erpContractsSync:erpContractsSyncReducer,
-erpContractTransactions:erpContractTransactionsReducer,
-exportPersonnel:exportPersonnelReducer,
-profile:profileSlicereducer,
-propertyCategories:propertyCategoriesReducer,
-adminImpersonate: adminImpersonateSliceReducer,
-contractPayments: contractPaymentsReducer,
-  giftForm: giftFormReducer,
-gifts: giftSliceReducer,
- promo: promoReducer,
-promoForm: promoFormReducer,
-promoTable: promoTableReducer,
- promoRequests: promoRequestsReducer,
-exportClientPartnership: exportClientPartnershipReducer,
-draftProperty: duplicateDraftFormReducer,
-editProperty: editPropertyReducer,
-assignMarketer: assignMarketerSlice,
-createProperty: createPropertyReducer,
-propertyCodes: propertyCodesReducer,},
+    exportCustomers: exportCustomersReducer,
+    countries: countriesReducer,
+    legalDashboard: legalDashboardSliceReducer,
+    toggleLatest: toggleLatestReducer,
+    exportContracts: exportContractsReducer,
+    itDashboard: itDashboardSliceReducer,
+    deletepropertyDetail: deletepropertyDetailReducer,
+    wallet: walletslice,
+    marketerdashboardPersonnel: marketerdashboardPersonnelSlice,
+    user_payments: userPaymentsReducers,
+    passwordReset: passwordResetReducer,
+    deleteCustomer: deleteCustomerredux,
+    erpContractsSync: erpContractsSyncReducer,
+    erpContractTransactions: erpContractTransactionsReducer,
+    exportPersonnel: exportPersonnelReducer,
+    profile: profileSlicereducer,
+    propertyCategories: propertyCategoriesReducer,
+    adminImpersonate: adminImpersonateSliceReducer,
+    contractPayments: contractPaymentsReducer,
+    giftForm: giftFormReducer,
+    gifts: giftSliceReducer,
+    promo: promoReducer,
+    promoForm: promoFormReducer,
+    promoTable: promoTableReducer,
+    promoRequests: promoRequestsReducer,
+    exportClientPartnership: exportClientPartnershipReducer,
+    draftProperty: duplicateDraftFormReducer,
+    editProperty: editPropertyReducer,
+    assignMarketer: assignMarketerSlice,
+    createProperty: createPropertyReducer,
+    propertyCodes: propertyCodesReducer,
+    // cittaPropertyMap: cittaPropertyMapReducer,
+    syncPropertyMap: syncPropertyMapReducer,
+    retrievePropertyCode: retrievePropertyCodeReducer,
+    cittaPropertyCategories: fetchCittaPropertyCategoriesReducer,
+    cittaEstates: fetchCittaEstatesReducer,
+    cittaPropertyMap: fetchCittaPropertyMapReducer,
+    
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;

@@ -26,7 +26,6 @@ import DraftPublishModal from "./DraftPublishModal";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
 import BulkBasicDetails from "./BasicDetails/BulkBasicDetails";
-// import InfrastructureFeesModalss from "../../components/Modals/infrastureModal2";
 import MediaFORM from "./Media/MediaFORM2";
 import { add_property_detail } from "../../components/Redux/addProperty/addFees/addFees_thunk";
 import PropertyListingPage from "./addPropplan/planForm";
@@ -126,7 +125,7 @@ export default function DraftProperty() {
     ? [
         "Basic Details",
         "Property Specifications",
-        "Land Sizes & Pricing",
+        "Estate & Property Category Details",
         "Media",
         "Features",
         discountEnabled ? "Discount" : "Payment Structure",
@@ -142,36 +141,6 @@ export default function DraftProperty() {
       ];
 
   const totalSteps = isLandProperty2 ? 7 : 6;
-
-  // Fetch property data
-  //   useEffect(() => {
-  //     if (id) {
-  //       const propertyId = parseInt(id);
-  //       if (!isNaN(propertyId)) {
-  //         dispatch(fetchPropertyData({ id: propertyId }))
-  //           .unwrap()
-  //           .then((response) => {
-  //             if (response.properties) {
-  //               loadDraftPropertyData(response.properties);
-  //               setGalleryPreviews(response.properties.photos || []);
-  //               setNewGalleryImages(response.properties.photos || []);
-  //             }
-  //           })
-  //           .catch((error) => {
-  //             toast.error("Failed to load property data");
-  //             navigate("/properties");
-  //           });
-  //       } else {
-  //         toast.error("Invalid property ID");
-  //         navigate("/properties");
-  //       }
-  //     }
-
-  //     return () => {
-  //       resetDraftForm();
-  //       dispatch(clearPropertyData());
-  //     };
-  //   }, [id, dispatch, navigate, resetDraftForm, loadDraftPropertyData]);
 
   const propertyId = id;
   useEffect(() => {
@@ -193,7 +162,7 @@ export default function DraftProperty() {
     if (data?.properties) {
       const property = data?.properties;
       loadDraftPropertyData(data.properties);
-        setDraftImagePreview(property.display_image);
+      setDraftImagePreview(property.display_image);
       setGalleryPreviews(property?.photos || []);
       setNewGalleryImages(property?.photos || []);
     }
@@ -245,11 +214,16 @@ export default function DraftProperty() {
         });
       }
 
-      // Handle Land or House Specifications
-      if (isLandProperty2 && LandSizeSection && LandSizeSection.length > 0) {
+      // Handle Land Size Section
+      if (LandSizeSection.length > 0) {
         LandSizeSection.forEach((ls, i) => {
           formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
           formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+          
+          formPayload.append(`land_sizes[${i}][citta_category_id]`, String(ls.citta_category_id || ""));
+          formPayload.append(`land_sizes[${i}][citta_estate_name]`, String(ls.citta_estate_name || ""));
+          formPayload.append(`land_sizes[${i}][citta_estate_code]`, String(ls.citta_estate_code || ""));
+          formPayload.append(`land_sizes[${i}][citta_property_category]`, String(ls.citta_property_category || ""));
 
           if (ls.durations && ls.durations.length > 0) {
             ls.durations.forEach((d, j) => {
@@ -274,6 +248,7 @@ export default function DraftProperty() {
         });
       }
 
+      // Handle Land or House Specifications
       if (isLandProperty2) {
         formPayload.append("size", landForm.landSize);
         formPayload.append("shape", landForm.plotShape);
@@ -375,11 +350,11 @@ export default function DraftProperty() {
       formPayload.append("is_active", displayStatus === "draft" ? "0" : "1");
 
       // Dispatch update
-        const result = await dispatch(
-             createProperty({ credentials: formPayload })
-           ).unwrap();
+      const result = await dispatch(
+        createProperty({ credentials: formPayload })
+      ).unwrap();
 
-       const createdPropertyId = result?.data.property.id || 0;
+      const createdPropertyId = result?.data.property.id || 0;
       if (createdPropertyId) {
         const feePromises = newFees
           .filter((fee) => fee.checked)
@@ -471,59 +446,40 @@ export default function DraftProperty() {
         }
         break;
       case 3:
-        if (isLandProperty2) {
-          // Land Sizes & Pricing step
-          if (LandPlan.current) {
-            LandPlan.current.handleSubmit();
-            canProceed = LandPlan.current.isValid;
-          }
-        } else {
-          // Media step for non-land properties
-          if (mediaRef.current) {
-            mediaRef.current.handleSubmit();
-            canProceed = mediaRef.current.isValid;
-          }
+        // Property Listing Page (Land Sizes & Pricing) - For all property types
+        if (LandPlan.current) {
+          LandPlan.current.handleSubmit();
+          canProceed = LandPlan.current.isValid;
         }
         break;
       case 4:
         if (isLandProperty2) {
-          // Media step for land properties
           if (mediaRef.current) {
             mediaRef.current.handleSubmit();
             canProceed = mediaRef.current.isValid;
           }
         } else {
-          // Features step for non-land properties
-          if (featuresRef.current) {
-            featuresRef.current.handleSubmit();
-            canProceed = featuresRef.current.isValid;
+          if (mediaRef.current) {
+            mediaRef.current.handleSubmit();
+            canProceed = mediaRef.current.isValid;
           }
         }
         break;
       case 5:
         if (isLandProperty2) {
-          // Features step for land properties
           if (featuresRef.current) {
             featuresRef.current.handleSubmit();
             canProceed = featuresRef.current.isValid;
           }
         } else {
-          // Payment/Discount step for non-land properties
-          if (discountEnabled) {
-            if (discountRef.current) {
-              discountRef.current.handleSubmit();
-              canProceed = discountRef.current.isValid;
-            }
-          }
-          if (paymentStructureRef.current) {
-            paymentStructureRef.current.handleSubmit();
-            canProceed = paymentStructureRef.current.isValid && canProceed;
+          if (featuresRef.current) {
+            featuresRef.current.handleSubmit();
+            canProceed = featuresRef.current.isValid;
           }
         }
         break;
       case 6:
         if (isLandProperty2) {
-          // Payment/Discount step for land properties
           if (discountEnabled) {
             if (discountRef.current) {
               discountRef.current.handleSubmit();
@@ -535,16 +491,20 @@ export default function DraftProperty() {
             canProceed = paymentStructureRef.current.isValid && canProceed;
           }
         } else {
-          // Preview step for non-land properties
-          if (canProceed) {
-            setShowDraftPublishModal(true);
-            return;
+          if (discountEnabled) {
+            if (discountRef.current) {
+              discountRef.current.handleSubmit();
+              canProceed = discountRef.current.isValid;
+            }
+          }
+          if (paymentStructureRef.current) {
+            paymentStructureRef.current.handleSubmit();
+            canProceed = paymentStructureRef.current.isValid && canProceed;
           }
         }
         break;
-      case 7:
-        // Preview step for land properties
-        if (isLandProperty2 && canProceed) {
+      case totalSteps:
+        if (canProceed) {
           setShowDraftPublishModal(true);
           return;
         }
@@ -578,65 +538,6 @@ export default function DraftProperty() {
       navigate("/properties");
     }
   };
-
-  const handlePublishToggle = async () => {
-    if (!id) {
-      toast.error("Property ID not found");
-      return;
-    }
-    try {
-      await dispatch(publishDraft(parseInt(id))).unwrap();
-      toast.success(
-        `Property ${
-          data?.properties?.is_active === 1 ? "drafted" : "published"
-        } successfully!`
-      );
-      dispatch(fetchPropertyData({ id: parseInt(id) }));
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update property status");
-    }
-  };
-
-  // Image handling
-  //   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const file = e.target.files?.[0];
-  //     if (file) {
-  //       const reader = new FileReader();
-  //       reader.onloadend = () => {
-  //         setDraftImagePreview(reader.result as string);
-  //         setNewDisplayImage(file);
-  //         addDraftMediaImage(file);
-  //       };
-  //       reader.readAsDataURL(file);
-  //     }
-  //   };
-
-  //   const handleGalleryImageChange =
-  //     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-  //       const file = e.target.files?.[0];
-  //       if (file) {
-  //         const reader = new FileReader();
-  //         reader.onloadend = () => {
-  //           const newPreviews = [...galleryPreviews];
-  //           newPreviews[index] = reader.result as string;
-  //           setGalleryPreviews(newPreviews);
-
-  //           const newImages = [...newGalleryImages];
-  //           newImages[index] = file;
-  //           setNewGalleryImages(newImages);
-
-  //           // Update Redux media state
-  //           const updatedImages = [...media.images];
-  //           if (updatedImages.length > index) {
-  //             updatedImages[index] = file;
-  //           } else {
-  //             updatedImages.push(file);
-  //           }
-  //           setDraftMedia({ ...media, images: updatedImages });
-  //         };
-  //         reader.readAsDataURL(file);
-  //       }
-  //     };
 
   const triggerFileInput = () => fileInputRef.current?.click();
   const triggerGalleryFileInput = (index: number) =>
@@ -718,14 +619,7 @@ export default function DraftProperty() {
 
           {currentStep === 1 && (
             <div className="bg-white rounded-lg p-6">
-              {isBulk ? (
-                <></>
-              ) : // <BulkBasicDetails
-              //   ref={bulkBasicDetailsRef}
-              //   setBulkDetails={setDraftBulkDetails}
-              //   initialData={bulkDetails}
-              // />
-              isLandProperty2 ? (
+              {isLandProperty2 ? (
                 <BasicDetailsLand
                   ref={basicDetailsRef}
                   setBasicDetails={setDraftBasicDetails}
@@ -742,7 +636,6 @@ export default function DraftProperty() {
                   setBasicDetails={setDraftBasicDetails}
                   setIsLandProperty={setIsDraftLandProperty}
                   setIsLandProperty2={setIsDraftLandProperty2}
-                  //   setSales={setDraftSales}
                   initialData={basicDetails}
                   isEditMode={true}
                   previousPropType={previousPropType}
@@ -770,7 +663,6 @@ export default function DraftProperty() {
                   setDirectorName={setDraftDirectorName}
                   setPreviousPropType={setDraftPreviousPropType}
                   initialData={specifications}
-                  //   sales={sales}
                   isEditMode={true}
                   directorName={director_name}
                   previousPropType={previousPropType}
@@ -779,24 +671,21 @@ export default function DraftProperty() {
             </div>
           )}
 
-          {/* Step 3: Land Sizes & Pricing (only for land properties) */}
-          {currentStep === 3 && isLandProperty2 && (
-            <ForProperties
-              tab={stepTitles[2]}
-              children={
+          {/* Step 3: Property Listing Page (Land Sizes & Pricing) - For all property types */}
+          {currentStep === 3 && (
+           
+              
                 <PropertyListingPage
                   ref={LandPlan}
                   setLandSizeSections={setDraftLandSizeSections}
                   initialData={LandSizeSection}
                   isEditMode={true}
                 />
-              }
-            />
+          
           )}
 
-          {/* Step 3 for non-land OR Step 4 for land: Media */}
-          {((!isLandProperty2 && currentStep === 3) ||
-            (isLandProperty2 && currentStep === 4)) && (
+          {/* Step 4: Media */}
+          {currentStep === 4 && (
             <div className="bg-white rounded-lg p-6">
               <MediaFORM
                 ref={mediaRef}
@@ -819,9 +708,8 @@ export default function DraftProperty() {
             </div>
           )}
 
-          {/* Step 4 for non-land OR Step 5 for land: Features */}
-          {((!isLandProperty2 && currentStep === 4) ||
-            (isLandProperty2 && currentStep === 5)) && (
+          {/* Step 5: Features */}
+          {currentStep === 5 && (
             <div className="bg-white rounded-lg p-6">
               <FeaturesInput
                 ref={featuresRef}
@@ -832,9 +720,8 @@ export default function DraftProperty() {
             </div>
           )}
 
-          {/* Step 5 for non-land OR Step 6 for land: Payment Structure & Discount */}
-          {((!isLandProperty2 && currentStep === 5) ||
-            (isLandProperty2 && currentStep === 6)) && (
+          {/* Step 6: Payment Structure & Discount */}
+          {currentStep === 6 && (
             <div className="bg-white rounded-lg p-6 space-y-[30px]">
               <Payment_Structure
                 ref={paymentStructureRef}
@@ -889,9 +776,8 @@ export default function DraftProperty() {
             </div>
           )}
 
-          {/* Step 6 for non-land OR Step 7 for land: Preview */}
-          {((!isLandProperty2 && currentStep === 6) ||
-            (isLandProperty2 && currentStep === 7)) && (
+          {/* Step 7: Preview */}
+          {currentStep === totalSteps && (
             <div className="bg-white rounded-lg p-6">
               <p className="text-dark text-2xl font-[350] mb-[8px]">
                 Confirm Property Details
