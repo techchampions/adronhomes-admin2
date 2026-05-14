@@ -143,8 +143,8 @@ const PropertyListingPage = forwardRef<
     if (initialData?.length > 0 && estates.length > 0 && categories.length > 0) {
       setLocalLandSizeSections(initialData);
 
-      if (initialData[0]?.citta_estate_name) {
-        const estate = estates.find(e => e.pName === initialData[0].citta_estate_name);
+      if (initialData[0]?.citta_estate_code) {
+        const estate = estates.find(e => e.EstateCode === initialData[0].citta_estate_code);
         if (estate) setSelectedEstate(estate);
       }
       if (initialData[0]?.citta_category_id) {
@@ -154,17 +154,17 @@ const PropertyListingPage = forwardRef<
     }
   }, [initialData, estates, categories]);
 
-  // Fetch Property Map when estate & category are selected
+  // Fetch Property Map when estate & category are selected - USING pCode and EstateCode
   useEffect(() => {
-    if (selectedEstate?.pName && selectedCategory?.pName) {
+    if (selectedEstate?.EstateCode && selectedCategory?.pCode) {
       console.log('Fetching property map for:', {
-        estate_name: selectedEstate.pName,
-        category_name: selectedCategory.pName
+        estate_code: selectedEstate.EstateCode,
+        category_code: selectedCategory.pCode
       });
 
       dispatch(fetchCittaPropertyMap({
-        estate_name: selectedEstate.pName,
-        category_name: selectedCategory.pName,
+        estate_code: selectedEstate.EstateCode,  // Using EstateCode
+        category_code: selectedCategory.pCode,   // Using pCode
       }));
     }
   }, [selectedEstate, selectedCategory, dispatch]);
@@ -214,8 +214,8 @@ const PropertyListingPage = forwardRef<
         size,
         durations,
         citta_category_id: String(selectedCategory?.pCode || ""),
-        citta_estate_name: selectedEstate?.pName || "",
-        citta_estate_code: selectedEstate?.pCode || "",
+        citta_estate_name: selectedEstate?.EstateName || "",
+        citta_estate_code: selectedEstate?.EstateCode || "",
         citta_property_category: String(selectedCategory?.pCode || ""),
       });
     }
@@ -235,8 +235,8 @@ const PropertyListingPage = forwardRef<
   };
 
   const estateOptions = estates.map(estate => ({
-    value: estate.pCode,
-    label: `${estate.pCode} - ${estate.pName}`,
+    value: estate.EstateCode,
+    label: `${estate.EstateCode} - ${estate.EstateName}`,
     original: estate
   }));
 
@@ -265,8 +265,8 @@ const PropertyListingPage = forwardRef<
         property_id: undefined
       }],
       citta_category_id: String(selectedCategory?.pCode || ""),
-      citta_estate_name: selectedEstate?.pName || "",
-      citta_estate_code: selectedEstate?.pCode || "",
+      citta_estate_name: selectedEstate?.EstateName || "",
+      citta_estate_code: selectedEstate?.EstateCode || "",
       citta_property_category: String(selectedCategory?.pCode || ""),
     };
     setLocalLandSizeSections(prev => [...prev, newSection]);
@@ -411,6 +411,8 @@ const PropertyListingPage = forwardRef<
   return (
     <div className="">
       <div className="mx-auto">
+  <div className="flex  justify-between mb-4">
+      <p  className="Land Sizes & Pricingtext-base font-semibold text-gray-800">Link Property to Citta</p>
         <div className="flex justify-end mb-2 mt-[-10px]">
           <button
             type="button"
@@ -428,16 +430,17 @@ const PropertyListingPage = forwardRef<
             <span>Refresh Citta Data</span>
           </button>
         </div>
+  </div>
 
         <form onSubmit={formik.handleSubmit} className="space-y-8">
           {/* Estate & Category Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-gray-50 rounded-2xl border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6  rounded-2xl border border-gray-200">
             <EnhancedOptionInputField
-              label="Select Estate *"
+              label="Select Citta Estate *"
               placeholder="Choose an estate..."
-              value={selectedEstate?.pCode || ""}
+              value={selectedEstate?.EstateCode || ""}
               onChange={(value: string) => {
-                const estate = estates.find(e => e.pCode === value);
+                const estate = estates.find(e => e.EstateCode === value);
                 handleEstateChange(value, estate);
               }}
               options={estateOptions}
@@ -446,7 +449,7 @@ const PropertyListingPage = forwardRef<
             />
 
             <EnhancedOptionInputField
-              label="Property Category *"
+              label="Select Citta Property Category *"
               placeholder="Choose a category..."
               value={selectedCategory?.pCode ? String(selectedCategory.pCode) : ""}
               onChange={(value: string) => {
@@ -470,14 +473,14 @@ const PropertyListingPage = forwardRef<
 
           {/* Empty Data Notification */}
           {isDataEmpty && !showLoadingIndicator && (
-       <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-2xl border-2 border-slate-200">
-  <AlertCircle className="h-12 w-12 text-slate-500 mb-4" />
-  <h3 className="text-lg font-semibold text-slate-800 mb-2">No Data Available</h3>
-  <p className="text-slate-600 text-center max-w-md mb-4">
-    No property data found for {selectedEstate?.pName} - {selectedCategory?.pName}. 
-    Please try refreshing the data or contact support.
-  </p>
-</div>
+            <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-2xl border-2 border-slate-200">
+              <AlertCircle className="h-12 w-12 text-slate-500 mb-4" />
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">No Data Available</h3>
+              <p className="text-slate-600 text-center max-w-md mb-4">
+                No property data found for {selectedEstate?.EstateName} - {selectedCategory?.pName}. 
+                Please try refreshing the data or contact support.
+              </p>
+            </div>
           )}
 
           {/* Land Sizes Section */}
@@ -513,7 +516,6 @@ const PropertyListingPage = forwardRef<
                         isSearchable
                         isLoading={propertyMapLoading}
                         error={getErrorMessage(`landSizeSections[${sectionIndex}].size`)}
-                        disabled
                       />
                     </div>
 
@@ -532,13 +534,11 @@ const PropertyListingPage = forwardRef<
                               value={duration.duration || ""}
                               onChange={(e) => updateDuration(section.id, duration.id, "duration", e.target.value)}
                               error={getErrorMessage(`landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`)}
-                              disabled
                             />
                           </div>
 
                           <div className="flex-1">
                             <InputField
-                              disabled
                               label="Price (₦)"
                               placeholder="Enter price"
                               type="text"

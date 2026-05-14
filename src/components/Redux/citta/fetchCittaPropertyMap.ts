@@ -7,7 +7,7 @@ import api from '../middleware';
 export interface CittaPropertyMapItem {
   id: number;
   p_code: string;
-  estate_name: string;
+  estate_code: string;
   estate_map: string;
   estate_address: string;
   size: string;
@@ -38,8 +38,8 @@ export interface CittaPropertyMapState {
     perPage: number;
   };
   filters: {
-    estate_name: string;
-    category_name: string;
+    estate_code: string;
+    category_code: string;
   };
 }
 
@@ -49,23 +49,23 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // ============ ASYNC THUNK ============
 export const fetchCittaPropertyMap = createAsyncThunk<
   CittaPropertyMapResponse,
-  { estate_name?: string; category_name?: string; page?: number; per_page?: number },
+  { estate_code?: string; category_code?: string; page?: number; per_page?: number },
   { rejectValue: { message: string } }
 >(
   'cittaPropertyMap/fetchAll',
-  async ({ estate_name = '', category_name = '', page = 1, per_page = 20 }, { rejectWithValue }) => {
+  async ({ estate_code = '', category_code = ''}, { rejectWithValue }) => {
     try {
       const params: Record<string, string | number> = {
-        page,
-        per_page,
+        // page,
+        // per_page,
       };
 
-      if (estate_name?.trim()) {
-        params.estate_name = estate_name.trim();
+      if (estate_code?.trim()) {
+        params.estate_code = estate_code.trim();
       }
 
-      if (category_name?.trim()) {
-        params.category_name = category_name.trim();
+      if (category_code?.trim()) {
+        params.category_code = category_code.trim();
       }
 
       console.log('Fetching property map with params:', params);
@@ -103,8 +103,8 @@ const initialState: CittaPropertyMapState = {
     perPage: 20,
   },
   filters: {
-    estate_name: '',
-    category_name: '',
+    estate_code: '',
+    category_code: '',
   },
 };
 
@@ -120,11 +120,11 @@ const cittaPropertyMapSlice = createSlice({
       state.successMessage = null;
     },
     setPropertyMapEstateFilter: (state, action: PayloadAction<string>) => {
-      state.filters.estate_name = action.payload;
+      state.filters.estate_code = action.payload;
       state.pagination.currentPage = 1;
     },
     setPropertyMapCategoryFilter: (state, action: PayloadAction<string>) => {
-      state.filters.category_name = action.payload;
+      state.filters.category_code = action.payload;
       state.pagination.currentPage = 1;
     },
     setPropertyMapCurrentPage: (state, action: PayloadAction<number>) => {
@@ -135,14 +135,14 @@ const cittaPropertyMapSlice = createSlice({
       state.pagination.currentPage = 1;
     },
     clearPropertyMapFilters: (state) => {
-      state.filters = { estate_name: '', category_name: '' };
+      state.filters = { estate_code: '', category_code: '' };
       state.filteredProperties = state.properties;
       state.pagination.currentPage = 1;
     },
     clearPropertyMap: (state) => {
       state.properties = [];
       state.filteredProperties = [];
-      state.filters = { estate_name: '', category_name: '' };
+      state.filters = { estate_code: '', category_code: '' };
       state.error = null;
       state.successMessage = null;
       state.pagination = {

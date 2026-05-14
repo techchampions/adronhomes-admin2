@@ -5,8 +5,11 @@ import api from '../middleware';
 
 // ============ TYPES ============
 export interface CittaPropertyCategory {
+  id: number;
   pCode: string;
   pName: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CittaPropertyCategoryResponse {
@@ -37,10 +40,8 @@ export const fetchCittaPropertyCategories = createAsyncThunk<
   'cittaPropertyCategories/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-          
       const response = await api.get<CittaPropertyCategoryResponse>(
         `${BASE_URL}/api/admin/citta-property-category`,
-        
       );
       return response.data;
     } catch (error: any) {
@@ -56,8 +57,6 @@ export const fetchCittaPropertyCategories = createAsyncThunk<
     }
   }
 );
-
-
 
 // ============ INITIAL STATE ============
 const initialState: CittaPropertyCategoryState = {
@@ -87,13 +86,13 @@ const cittaPropertyCategorySlice = createSlice({
       state.categories.push(action.payload);
     },
     updatePropertyCategory: (state, action: PayloadAction<CittaPropertyCategory>) => {
-      const index = state.categories.findIndex(cat => cat.pCode === action.payload.pCode);
+      const index = state.categories.findIndex(cat => cat.id === action.payload.id);
       if (index !== -1) {
         state.categories[index] = action.payload;
       }
     },
-    removePropertyCategory: (state, action: PayloadAction<string>) => {
-      state.categories = state.categories.filter(cat => cat.pCode !== action.payload);
+    removePropertyCategory: (state, action: PayloadAction<number>) => {
+      state.categories = state.categories.filter(cat => cat.id !== action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -119,7 +118,6 @@ const cittaPropertyCategorySlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch property categories';
       })
-
   },
 });
 
@@ -154,9 +152,21 @@ export const selectPropertyCategoryDropdownOptions = (state: { cittaPropertyCate
     original: category
   }));
 
-// Get category by code
+// Formatted for dropdown using id as value
+export const selectPropertyCategoryDropdownOptionsById = (state: { cittaPropertyCategories: CittaPropertyCategoryState }) => 
+  state.cittaPropertyCategories.categories.map(category => ({
+    value: category.id,
+    label: `${category.pCode} - ${category.pName}`,
+    original: category
+  }));
+
+// Get category by pCode
 export const selectPropertyCategoryByCode = (state: { cittaPropertyCategories: CittaPropertyCategoryState }, pCode: string) => 
   state.cittaPropertyCategories.categories.find(category => category.pCode === pCode);
+
+// Get category by id
+export const selectPropertyCategoryById = (state: { cittaPropertyCategories: CittaPropertyCategoryState }, id: number) => 
+  state.cittaPropertyCategories.categories.find(category => category.id === id);
 
 // Sorted selectors
 export const selectPropertyCategoriesSortedByCode = (state: { cittaPropertyCategories: CittaPropertyCategoryState }) => 
@@ -164,5 +174,8 @@ export const selectPropertyCategoriesSortedByCode = (state: { cittaPropertyCateg
 
 export const selectPropertyCategoriesSortedByName = (state: { cittaPropertyCategories: CittaPropertyCategoryState }) => 
   [...state.cittaPropertyCategories.categories].sort((a, b) => a.pName.localeCompare(b.pName));
+
+export const selectPropertyCategoriesSortedById = (state: { cittaPropertyCategories: CittaPropertyCategoryState }) => 
+  [...state.cittaPropertyCategories.categories].sort((a, b) => a.id - b.id);
 
 export default cittaPropertyCategorySlice.reducer;

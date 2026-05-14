@@ -5,8 +5,11 @@ import api from '../middleware';
 
 // ============ TYPES ============
 export interface CittaEstate {
-  pCode: string;
-  pName: string;
+  id: number;
+  EstateCode: string;
+  EstateName: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CittaEstatesResponse {
@@ -24,9 +27,8 @@ export interface CittaEstatesState {
   error: string | null;
   successMessage: string | null;
 }
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-// ============ API CONFIGURATION ============
-// const BASE_URL = process.env.REACT_APP_API_URL || 'https://adron.microf10.sg-host.com';
 
 // ============ ASYNC THUNK ============
 export const fetchCittaEstates = createAsyncThunk<
@@ -37,10 +39,8 @@ export const fetchCittaEstates = createAsyncThunk<
   'cittaEstates/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-     
       const response = await api.get<CittaEstatesResponse>(
         `${BASE_URL}/api/admin/citta-estates`,
-
       );
       return response.data;
     } catch (error: any) {
@@ -131,16 +131,20 @@ export const selectCittaEstatesError = (state: { cittaEstates: CittaEstatesState
 export const selectCittaEstatesSuccess = (state: { cittaEstates: CittaEstatesState }) => 
   state.cittaEstates.successMessage;
 
-// Formatted for dropdown
+// Formatted for dropdown - using EstateCode and EstateName
 export const selectCittaEstatesDropdownOptions = (state: { cittaEstates: CittaEstatesState }) => 
   state.cittaEstates.estates.map(estate => ({
-    value: estate.pCode,
-    label: `${estate.pCode} - ${estate.pName}`,
+    value: estate.EstateCode,
+    label: `${estate.EstateCode} - ${estate.EstateName}`,
     original: estate
   }));
 
-// Get estate by pCode
-export const selectCittaEstateByCode = (state: { cittaEstates: CittaEstatesState }, pCode: string) => 
-  state.cittaEstates.estates.find(estate => estate.pCode === pCode);
+// Get estate by EstateCode (formerly pCode)
+export const selectCittaEstateByCode = (state: { cittaEstates: CittaEstatesState }, estateCode: string) => 
+  state.cittaEstates.estates.find(estate => estate.EstateCode === estateCode);
+
+// Get estate by id
+export const selectCittaEstateById = (state: { cittaEstates: CittaEstatesState }, id: number) => 
+  state.cittaEstates.estates.find(estate => estate.id === id);
 
 export default cittaEstatesSlice.reducer;
