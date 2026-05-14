@@ -75,6 +75,7 @@ export default function General() {
   const [discountEnabled, setDiscount] = useState(false);
   const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
   const [showInfrastructureModal, setShowInfrastructureModal] = useState(false);
+  
   // Create refs for all form components
   const basicDetailsRef = useRef<any>(null);
   const bulkBasicDetailsRef = useRef<any>(null);
@@ -101,7 +102,7 @@ export default function General() {
     ? [
         "Basic Details",
         "Property Specifications",
-        "Land Sizes & Pricing",
+        "Estate & Property Category Details",
         "Media",
         "Features",
         discountEnabled ? "Discount" : "Payment Structure",
@@ -119,7 +120,8 @@ export default function General() {
   const totalSteps = isLandProperty ? 7 : 6;
   const nextButtonText =
     currentStep === totalSteps ? "Confirm & Update" : "Next";
-    const navigate=useNavigate();
+  const navigate = useNavigate();
+
   // Custom submit function for create flow
   const submitCreateForm = async (displayStatus: "draft" | "publish") => {
     try {
@@ -205,29 +207,36 @@ export default function General() {
       /* =========================
        LAND SIZE SECTION
     ========================== */
-      if (isLandProperty && LandSizeSection?.length) {
+      if (LandSizeSection.length > 0) {
         LandSizeSection.forEach((ls, i) => {
-          formPayload.append(`land_sizes[${i}][id]`, String(ls.id));
-          formPayload.append(`land_sizes[${i}][size]`, String(ls.size));
+          formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
+          formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+          
+          formPayload.append(`land_sizes[${i}][citta_category_id]`, String(ls.citta_category_id || ""));
+          formPayload.append(`land_sizes[${i}][citta_estate_name]`, String(ls.citta_estate_name || ""));
+          formPayload.append(`land_sizes[${i}][citta_estate_code]`, String(ls.citta_estate_code || ""));
+          formPayload.append(`land_sizes[${i}][citta_property_category]`, String(ls.citta_property_category || ""));
 
-          ls.durations?.forEach((d, j) => {
-            formPayload.append(
-              `land_sizes[${i}][durations][${j}][id]`,
-              String(d.id)
-            );
-            formPayload.append(
-              `land_sizes[${i}][durations][${j}][duration]`,
-              String(d.duration)
-            );
-            formPayload.append(
-              `land_sizes[${i}][durations][${j}][price]`,
-              String(d.price)
-            );
-            formPayload.append(
-              `land_sizes[${i}][durations][${j}][citta_id]`,
-              String(d.citta_id)
-            );
-          });
+          if (ls.durations && ls.durations.length > 0) {
+            ls.durations.forEach((d, j) => {
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][id]`,
+                String(d.id || "")
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][duration]`,
+                String(d.duration || "")
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][price]`,
+                String(d.price || "")
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][citta_id]`,
+                String(d.citta_id || "")
+              );
+            });
+          }
         });
       }
 
@@ -466,15 +475,12 @@ export default function General() {
 
       if (failed === 0) {
         toast.success("Property created successfully!");
-
         resetCreateForm();
         dispatch(resetPropertyState());
         navigate("/properties");
       } else {
         toast.warning(`Property created but ${failed} fee(s) failed`);
       }
-
-     
     } catch (error: any) {
       console.error("Create failed:", error);
       toast.error(error.message || "Failed to create property");
@@ -541,7 +547,6 @@ export default function General() {
             canProceed = featuresRef.current.isValid;
           }
         }
-
         break;
       case 5:
         if (isLandProperty) {
@@ -561,9 +566,7 @@ export default function General() {
             canProceed = paymentStructureRef.current.isValid && canProceed;
           }
         }
-
         break;
-
       case 6:
         if (isLandProperty) {
           if (discountEnabled) {
@@ -582,7 +585,6 @@ export default function General() {
             return;
           }
         }
-
         break;
       case 7:
         if (isLandProperty && canProceed) {
@@ -603,7 +605,6 @@ export default function General() {
       setShowDraftPublishModal(false);
       setCreateDisplayStatus(option);
       await submitCreateForm(option);
-      //   setCreateCurrentStep(1);
     } catch (error) {
       console.error("Submission failed:", error);
       toast.error("Failed to submit property. Please try again.");
@@ -618,13 +619,10 @@ export default function General() {
     }
   };
 
-  //   const nextButtonText = currentStep === totalSteps ? "Submit" : "Next";
-
   return (
     <div className="w-full">
       <Header />
       <div className="w-full lg:pl-[38px] lg:pr-[64px] pr-[15px] pl-[15px]">
-        {/* Draft/Publish Modal */}
         <DraftPublishModal
           isOpen={showDraftPublishModal}
           onClose={() => setShowDraftPublishModal(false)}
@@ -637,8 +635,8 @@ export default function General() {
             onClose={() => setShowInfrastructureModal(false)}
           />
         )}
-        {/* )} */}
-        {currentStep === 7 ? (
+        
+        {currentStep === totalSteps ? (
           <>
             <p className="text-dark text-2xl font-[350] mb-[8px]">
               Confirm Property Details
@@ -648,14 +646,12 @@ export default function General() {
             </h1>
           </>
         ) : (
-          <>
-            <div className="w-full lg:flex justify-center hidden">
-              <StepIndicator
-                setCurrentStep={setCreateCurrentStep}
-                currentStep={currentStep}
-              />
-            </div>
-          </>
+          <div className="w-full lg:flex justify-center hidden">
+            <StepIndicator
+              setCurrentStep={setCreateCurrentStep}
+              currentStep={currentStep}
+            />
+          </div>
         )}
 
         {currentStep === 1 && (
@@ -698,31 +694,27 @@ export default function General() {
                 setDirectorName={setCreateDirectorName}
                 setPreviousPropType={setCreatePreviousPropType}
                 initialData={specifications}
-                // sales={sales}
               />
             )}
           </div>
         )}
 
-        {/* Step 3: Land Sizes & Pricing (only for land properties) */}
-        {currentStep === 3 && isLandProperty && (
-          <ForProperties
-            tab={stepTitles[2]}
-            children={
+        {/* Step 3: Property Listing Page (Land Sizes & Pricing) - For all property types */}
+        {currentStep === 3 && (
+          
               <PropertyListingPage
                 ref={LandPlan}
                 setLandSizeSections={setCreateLandSizeSections}
                 initialData={LandSizeSection}
               />
-            }
-          />
+          
         )}
 
-        {/* Step 3 for non-land OR Step 4 for land: Media */}
-        {((!isLandProperty && currentStep === 3) ||
+        {/* Step 4 for non-land OR Step 4 for land: Media - Handled by conditional rendering based on property type */}
+        {((!isLandProperty && currentStep === 4) ||
           (isLandProperty && currentStep === 4)) && (
           <ForProperties
-            tab={stepTitles[isLandProperty ? 3 : 2]}
+            tab={stepTitles[isLandProperty ? 3 : 3]}
             children={
               <MediaFORM
                 ref={mediaRef}
@@ -733,11 +725,11 @@ export default function General() {
           />
         )}
 
-        {/* Step 4 for non-land OR Step 5 for land: Features */}
-        {((!isLandProperty && currentStep === 4) ||
+        {/* Step 5 for non-land OR Step 5 for land: Features */}
+        {((!isLandProperty && currentStep === 5) ||
           (isLandProperty && currentStep === 5)) && (
           <ForProperties
-            tab={stepTitles[isLandProperty ? 4 : 3]}
+            tab={stepTitles[isLandProperty ? 4 : 4]}
             children={
               <FeaturesInput
                 ref={featuresRef}
@@ -748,12 +740,12 @@ export default function General() {
           />
         )}
 
-        {/* Step 5 for non-land OR Step 6 for land: Payment Structure & Discount */}
-        {((!isLandProperty && currentStep === 5) ||
+        {/* Step 6 for non-land OR Step 6 for land: Payment Structure & Discount */}
+        {((!isLandProperty && currentStep === 6) ||
           (isLandProperty && currentStep === 6)) && (
           <div className="space-y-[30px]">
             <ForProperties
-              tab={stepTitles[isLandProperty ? 5 : 4]}
+              tab={stepTitles[isLandProperty ? 5 : 5]}
               children={
                 <Payment_Structure
                   ref={paymentStructureRef}
@@ -811,9 +803,8 @@ export default function General() {
           </div>
         )}
 
-        {/* Step 6 for non-land OR Step 7 for land: Preview */}
-        {((!isLandProperty && currentStep === 6) ||
-          (isLandProperty && currentStep === 7)) && <PropertyListing />}
+        {/* Step 7 for non-land OR Step 7 for land: Preview */}
+        {currentStep === totalSteps && <PropertyListing />}
 
         <div className="grid grid-cols-2 mb-[69px] w-full mt-20">
           <div className="w-full justify-start flex">
