@@ -27,7 +27,14 @@ import {
   selectFilteredPropertyMapItems,
   selectPropertyMapLoading,
 } from "../../../components/Redux/citta/fetchCittaPropertyMap";
-import { RefreshCwIcon, AlertCircle } from "lucide-react";
+import {
+  fetchPromoCodes,
+  selectAllPromoCodes,
+  selectPromoCodesLoading,
+  selectFilteredPromoCodes,
+  clearPromoCodes,
+} from "../../../components/Redux/gift/promo/PromoCodelist";
+import { RefreshCwIcon, AlertCircle, TagIcon } from "lucide-react";
 import {
   selectSyncPropertyMapSuccess,
   selectSyncPropertyMapSyncing,
@@ -45,6 +52,8 @@ interface Duration {
   property_code?: string;
   property_id?: number;
   pre_filled?: boolean;
+  appliedPromoCode?: string;
+  discountedPrice?: number;
 }
 
 export interface LandSizeSection {
@@ -55,6 +64,8 @@ export interface LandSizeSection {
   citta_estate_name?: string;
   citta_estate_code?: string;
   citta_property_category?: string;
+  citta_promo_code?: string;
+  citta_promo_name?: string;
 }
 
 interface PropertyListingPageProps {
@@ -73,6 +84,13 @@ export interface PropertyListingPageRef {
   values: LandSizeSection[];
 }
 
+// Helper function
+const extractDiscountFromPromo = (pName: string): number | null => {
+  const match = pName.match(/(\d+(?:\.\d+)?)%/);
+  if (match) return parseFloat(match[1]);
+  return null;
+};
+
 const PropertyListingPage = forwardRef<
   PropertyListingPageRef,
   PropertyListingPageProps
@@ -82,11 +100,11 @@ const PropertyListingPage = forwardRef<
   const [selectedEstate, setSelectedEstate] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [availableSizes, setAvailableSizes] = useState<any[]>([]);
-  const [landSizeSections, setLocalLandSizeSections] =
-    useState<LandSizeSection[]>(initialData);
+  const [landSizeSections, setLocalLandSizeSections] = useState<LandSizeSection[]>(initialData);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isAutoPopulating, setIsAutoPopulating] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedPromoCode, setSelectedPromoCode] = useState<any>(null);
 
   // Redux selectors
   const categories = useSelector(selectAllPropertyCategories);
@@ -98,89 +116,69 @@ const PropertyListingPage = forwardRef<
   const syncSuccess = useSelector(selectSyncPropertyMapSuccess);
   const syncSyncing = useSelector(selectSyncPropertyMapSyncing);
 
+  const allPromoCodes = useSelector(selectAllPromoCodes);
+  const promoCodesLoading = useSelector(selectPromoCodesLoading);
+  const filteredPromoCodes = useSelector(selectFilteredPromoCodes);
+
+  useEffect(() => {
+ refreshAllData();
+  }, []);
+
   const refreshAllData = async () => {
     setIsRefreshing(true);
 
-    // Clear Redux data first
     dispatch(clearPropertyCategories());
     dispatch(clearCittaEstates());
     dispatch(clearPropertyMap());
+    dispatch(clearPromoCodes());
 
-    // Clear local state immediately
     setSelectedEstate(null);
     setSelectedCategory(null);
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
-    setIsAutoPopulating(false);
-    setSubmitAttempted(false);
+    setSelectedPromoCode(null);
 
     await Promise.all([
       dispatch(fetchCittaPropertyCategories()).unwrap(),
       dispatch(fetchCittaEstates()).unwrap(),
+      dispatch(fetchPromoCodes()).unwrap(),
     ]);
 
     setIsRefreshing(false);
   };
 
-  const handleSyncPropertyMap = async () => {
-    try {
-      const result = await dispatch(syncPropertyMap()).unwrap();
-      if (result.success) {
-        await refreshAllData();
-        toast.success("Property map synced and data refreshed successfully!");
-      }
-    } catch (error) {
-      console.error("Failed to sync property map:", error);
-      toast.error("Failed to sync property map. Please try again.");
-    }
-  };
-
-  // Initial load
+  // Load Edit Mode Data
   useEffect(() => {
-    refreshAllData();
-  }, []);
-
-  useEffect(() => {
-    if (syncSuccess) refreshAllData();
-  }, [syncSuccess]);
-
-  // Load edit mode data
-  useEffect(() => {
-    if (
-      initialData?.length > 0 &&
-      estates.length > 0 &&
-      categories.length > 0
-    ) {
+    if (initialData?.length > 0 && estates.length > 0 && categories.length > 0) {
       setLocalLandSizeSections(initialData);
 
       if (initialData[0]?.citta_estate_code) {
-        const estate = estates.find(
-          (e) => e.EstateCode === initialData[0].citta_estate_code,
-        );
+        const estate = estates.find((e) => e.EstateCode === initialData[0].citta_estate_code);
         if (estate) setSelectedEstate(estate);
       }
+
       if (initialData[0]?.citta_category_id) {
         const category = categories.find(
-          (c) => String(c.pCode) === String(initialData[0].citta_category_id),
+          (c) => String(c.pCode) === String(initialData[0].citta_category_id)
         );
         if (category) setSelectedCategory(category);
       }
-    }
-  }, [initialData, estates, categories]);
 
-  // Fetch Property Map when estate & category are selected
+      if (initialData[0]?.citta_promo_code) {
+        const promo = allPromoCodes.find((p) => p.pCode === initialData[0].citta_promo_code);
+        if (promo) setSelectedPromoCode(promo);
+      }
+    }
+  }, [initialData, estates, categories, allPromoCodes]);
+
+  // Fetch Property Map
   useEffect(() => {
     if (selectedEstate?.EstateCode && selectedCategory?.pCode) {
-      console.log("Fetching property map for:", {
-        estate_code: selectedEstate.EstateCode,
-        category_code: selectedCategory.pCode,
-      });
-
       dispatch(
         fetchCittaPropertyMap({
           estate_code: selectedEstate.EstateCode,
           category_code: selectedCategory.pCode,
-        }),
+        })
       );
     }
   }, [selectedEstate, selectedCategory, dispatch]);
@@ -197,7 +195,7 @@ const PropertyListingPage = forwardRef<
     }
   }, [propertyMapItems]);
 
-  // Auto-populate
+  // Auto-populate when data is available
   useEffect(() => {
     if (
       propertyMapItems?.length > 0 &&
@@ -209,33 +207,19 @@ const PropertyListingPage = forwardRef<
     ) {
       autoPopulateFromPropertyMap();
     }
-  }, [
-    propertyMapItems,
-    selectedEstate,
-    selectedCategory,
-    isRefreshing,
-    landSizeSections.length,
-    isAutoPopulating,
-  ]);
+  }, [propertyMapItems, selectedEstate, selectedCategory, isRefreshing]);
 
-  const autoPopulateFromPropertyMap = async () => {
+  const autoPopulateFromPropertyMap = () => {
     setIsAutoPopulating(true);
 
-    setLocalLandSizeSections([]);
+    const groupedBySize = propertyMapItems.reduce((acc: any, item: any) => {
+      if (!acc[item.size]) acc[item.size] = [];
+      acc[item.size].push(item);
+      return acc;
+    }, {});
 
-    const groupedBySize = propertyMapItems.reduce(
-      (acc, item) => {
-        if (!acc[item.size]) acc[item.size] = [];
-        acc[item.size].push(item);
-        return acc;
-      },
-      {} as Record<string, any[]>,
-    );
-
-    const newSections: LandSizeSection[] = [];
-
-    for (const [size, items] of Object.entries(groupedBySize)) {
-      const durations: Duration[] = items.map((item) => ({
+    const newSections: LandSizeSection[] = Object.entries(groupedBySize).map(([size, items]: any) => {
+      const durations: Duration[] = items.map((item: any) => ({
         id: Date.now() + Math.random(),
         duration: item.duration,
         price: item.trimmed_price?.toString() || "",
@@ -245,7 +229,7 @@ const PropertyListingPage = forwardRef<
         pre_filled: true,
       }));
 
-      newSections.push({
+      return {
         id: Date.now() + Math.random(),
         size,
         durations,
@@ -253,59 +237,49 @@ const PropertyListingPage = forwardRef<
         citta_estate_name: selectedEstate?.EstateName || "",
         citta_estate_code: selectedEstate?.EstateCode || "",
         citta_property_category: String(selectedCategory?.pCode || ""),
-      });
-    }
+        citta_promo_code: selectedPromoCode?.pCode || undefined,
+        citta_promo_name: selectedPromoCode?.pName || "",
+      };
+    });
 
     setLocalLandSizeSections(newSections);
     setIsAutoPopulating(false);
   };
 
-  const handleEstateChange = (value: string, estate: any) => {
-    // IMMEDIATELY reset all existing values first
-    setLocalLandSizeSections([]);
-    setAvailableSizes([]);
-    setIsAutoPopulating(false);
+  const applyPromoCodeToAllSections = (promoCode: any) => {
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) => ({
+        ...section,
+        citta_promo_code: promoCode?.pCode || undefined,
+        citta_promo_name: promoCode?.pName || "",
+      }))
+    );
 
-    // Clear property map from Redux
-    dispatch(clearPropertyMap());
+    if (promoCode) {
+      toast.success(`Promo code ${promoCode.pCode} applied to all sections`);
+    } else {
+      toast.info("Promo code removed from all sections");
+    }
+  };
 
-    // Then set the new estate
+  const handleEstateChange = (value: string) => {
+    const estate = estates.find((e) => e.EstateCode === value);
     setSelectedEstate(estate);
-
-    // Reset category as well since estate changed
     setSelectedCategory(null);
-  };
-
-  const handleCategoryChange = (value: string, category: any) => {
-    // IMMEDIATELY reset all existing values first
+    setSelectedPromoCode(null);
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
-    setIsAutoPopulating(false);
-
-    // Clear property map from Redux
     dispatch(clearPropertyMap());
-
-    // Then set the new category
-    setSelectedCategory(category);
   };
 
-  const estateOptions = estates.map((estate) => ({
-    value: estate.EstateCode,
-    label: `${estate.EstateCode} - ${estate.EstateName}`,
-    original: estate,
-  }));
-
-  const categoryOptions = categories.map((category) => ({
-    value: String(category.pCode),
-    label: `${category.pCode} - ${category.pName}`,
-    original: category,
-  }));
-
-  const sizeOptions = availableSizes.map((item) => ({
-    value: item.size,
-    label: item.size,
-    original: item,
-  }));
+  const handleCategoryChange = (value: string) => {
+    const category = categories.find((c) => String(c.pCode) === value);
+    setSelectedCategory(category);
+    setSelectedPromoCode(null);
+    setLocalLandSizeSections([]);
+    setAvailableSizes([]);
+    dispatch(clearPropertyMap());
+  };
 
   const addLandSizeSection = () => {
     const newSection: LandSizeSection = {
@@ -325,15 +299,15 @@ const PropertyListingPage = forwardRef<
       citta_estate_name: selectedEstate?.EstateName || "",
       citta_estate_code: selectedEstate?.EstateCode || "",
       citta_property_category: String(selectedCategory?.pCode || ""),
+      citta_promo_code: selectedPromoCode?.pCode || undefined,
+      citta_promo_name: selectedPromoCode?.pName || "",
     };
     setLocalLandSizeSections((prev) => [...prev, newSection]);
   };
 
   const removeLandSizeSection = (sectionId: number) => {
     if (landSizeSections.length > 1) {
-      setLocalLandSizeSections((prev) =>
-        prev.filter((s) => s.id !== sectionId),
-      );
+      setLocalLandSizeSections((prev) => prev.filter((s) => s.id !== sectionId));
     }
   };
 
@@ -355,8 +329,8 @@ const PropertyListingPage = forwardRef<
                 },
               ],
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
@@ -368,15 +342,13 @@ const PropertyListingPage = forwardRef<
               ...section,
               durations: section.durations.filter((d) => d.id !== durationId),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
   const updateLandSize = (sectionId: number, value: string) => {
-    const propertyItems = propertyMapItems.filter(
-      (item) => item.size === value,
-    );
+    const propertyItems = propertyMapItems.filter((item) => item.size === value);
 
     setLocalLandSizeSections((prev) =>
       prev.map((section) => {
@@ -394,12 +366,11 @@ const PropertyListingPage = forwardRef<
           return {
             ...section,
             size: value,
-            durations:
-              newDurations.length > 0 ? newDurations : section.durations,
+            durations: newDurations.length > 0 ? newDurations : section.durations,
           };
         }
         return section;
-      }),
+      })
     );
   };
 
@@ -407,7 +378,7 @@ const PropertyListingPage = forwardRef<
     sectionId: number,
     durationId: number,
     field: keyof Duration,
-    value: string,
+    value: string
   ) => {
     setLocalLandSizeSections((prev) =>
       prev.map((section) =>
@@ -415,24 +386,31 @@ const PropertyListingPage = forwardRef<
           ? {
               ...section,
               durations: section.durations.map((duration) =>
-                duration.id === durationId
-                  ? { ...duration, [field]: value }
-                  : duration,
+                duration.id === durationId ? { ...duration, [field]: value } : duration
               ),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
+  // Formik setup with proper synchronization
   const formik = useFormik<PropertyListingFormValues>({
     initialValues: { landSizeSections },
-    enableReinitialize: true,
     validationSchema,
+    enableReinitialize: false,
     onSubmit: (values) => {
       setLandSizeSections(values.landSizeSections);
     },
   });
+
+  // Keep formik values in sync with local state
+  useEffect(() => {
+    const currentFormikValues = formik.values.landSizeSections;
+    if (JSON.stringify(currentFormikValues) !== JSON.stringify(landSizeSections)) {
+      formik.setValues({ landSizeSections });
+    }
+  }, [landSizeSections, formik]);
 
   useImperativeHandle(ref, () => ({
     handleSubmit: async () => {
@@ -447,26 +425,55 @@ const PropertyListingPage = forwardRef<
         return false;
       }
 
+      // Ensure formik has the latest values before validation
+      await formik.setValues({ landSizeSections });
+      
+      // Validate form
       const errors = await formik.validateForm();
+      
       if (Object.keys(errors).length > 0) {
-        toast.error("Please fix the errors in the form");
+        // Log errors for debugging
+        console.log("Validation errors:", errors);
+        
+        // Show specific error message
+        const errorMessages: string[] = [];
+        if (errors.landSizeSections) {
+          if (Array.isArray(errors.landSizeSections)) {
+            errors.landSizeSections.forEach((sectionError: any, index: number) => {
+              if (sectionError?.size) errorMessages.push(`Section ${index + 1}: ${sectionError.size}`);
+              if (sectionError?.durations) {
+                if (Array.isArray(sectionError.durations)) {
+                  sectionError.durations.forEach((durationError: any, durIndex: number) => {
+                    if (durationError?.duration) errorMessages.push(`Section ${index + 1}, Duration ${durIndex + 1}: ${durationError.duration}`);
+                    if (durationError?.price) errorMessages.push(`Section ${index + 1}, Duration ${durIndex + 1}: ${durationError.price}`);
+                  });
+                }
+              }
+            });
+          }
+        }
+        
+        if (errorMessages.length > 0) {
+          toast.error(`Please fix: ${errorMessages.join(", ")}`);
+        } else {
+          toast.error("Please fix the errors in the form");
+        }
         return false;
-      } else {
-        await formik.submitForm();
-        toast.success("Land sizes saved successfully!");
-        return true;
       }
+
+      await formik.submitForm();
+      toast.success("Land sizes saved successfully!");
+      return true;
     },
     isValid: formik.isValid,
     get values() {
-      return formik.values.landSizeSections;
+      return landSizeSections;
     },
   }));
 
   const getErrorMessage = (fieldPath: string): string | undefined =>
     submitAttempted ? getIn(formik.errors, fieldPath) : undefined;
 
-  // Check if data is empty after fetching
   const isDataEmpty =
     propertyMapItems.length === 0 &&
     !propertyMapLoading &&
@@ -475,38 +482,29 @@ const PropertyListingPage = forwardRef<
     !isAutoPopulating &&
     !isRefreshing;
 
-  // Show loading indicator while fetching
   const showLoadingIndicator =
-    (propertyMapLoading || isAutoPopulating) &&
-    selectedEstate &&
-    selectedCategory;
+    (propertyMapLoading || isAutoPopulating) && selectedEstate && selectedCategory;
 
   return (
-    <div className="">
+    <div>
       <div className="mx-auto">
         <div className="flex justify-between mb-4">
-          <p className="Land Sizes & Pricingtext-base font-semibold text-gray-800">
-            Link Property to Citta
-          </p>
-          <div className="flex justify-end mb-2 mt-[-10px]">
-            <button
-              type="button"
-              onClick={handleSyncPropertyMap}
-              disabled={isRefreshing || syncSyncing}
-              className={`px-4 py-2 text-white text-sm font-medium rounded-[60px] transition-colors flex items-center gap-2 ${
-                isRefreshing || syncSyncing
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[#57713A] hover:bg-[#57713A]/80"
-              }`}
-            >
-              {isRefreshing || syncSyncing ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-              ) : (
-                <RefreshCwIcon size={16} />
-              )}
-              <span>Refresh Citta Data</span>
-            </button>
-          </div>
+          <p className="text-base font-semibold text-gray-800">Link Property to Citta</p>
+          <button
+            type="button"
+            onClick={refreshAllData}
+            disabled={isRefreshing || syncSyncing}
+            className={`px-4 py-2 text-white text-sm font-medium rounded-[60px] transition-colors flex items-center gap-2 ${
+              isRefreshing || syncSyncing ? "bg-gray-400 cursor-not-allowed" : "bg-[#57713A] hover:bg-[#57713A]/80"
+            }`}
+          >
+            {isRefreshing || syncSyncing ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+            ) : (
+              <RefreshCwIcon size={16} />
+            )}
+            <span>Refresh Citta Data</span>
+          </button>
         </div>
 
         <form onSubmit={formik.handleSubmit} className="space-y-8">
@@ -516,11 +514,12 @@ const PropertyListingPage = forwardRef<
               label="Select Citta Estate *"
               placeholder="Choose an estate..."
               value={selectedEstate?.EstateCode || ""}
-              onChange={(value: string) => {
-                const estate = estates.find((e) => e.EstateCode === value);
-                handleEstateChange(value, estate);
-              }}
-              options={estateOptions}
+              onChange={handleEstateChange}
+              options={estates.map((estate) => ({
+                value: estate.EstateCode,
+                label: `${estate.EstateCode} - ${estate.EstateName}`,
+                original: estate,
+              }))}
               isSearchable
               isLoading={estatesLoading || isRefreshing}
             />
@@ -528,45 +527,71 @@ const PropertyListingPage = forwardRef<
             <EnhancedOptionInputField
               label="Select Citta Property Category *"
               placeholder="Choose a category..."
-              value={
-                selectedCategory?.pCode ? String(selectedCategory.pCode) : ""
-              }
-              onChange={(value: string) => {
-                const category = categories.find(
-                  (c) => String(c.pCode) === value,
-                );
-                handleCategoryChange(value, category);
-              }}
-              options={categoryOptions}
+              value={selectedCategory?.pCode ? String(selectedCategory.pCode) : ""}
+              onChange={handleCategoryChange}
+              options={categories.map((category) => ({
+                value: String(category.pCode),
+                label: `${category.pCode} - ${category.pName}`,
+                original: category,
+              }))}
               isSearchable
               isLoading={categoriesLoading || isRefreshing}
             />
           </div>
 
+          {/* Promo Code Selection */}
+          {selectedEstate && selectedCategory && !showLoadingIndicator && !isDataEmpty && (
+            <div className="p-6 rounded-2xl border border-gray-200 bg-[#57713A]/40">
+              <div className="flex items-center gap-2 mb-4">
+                <TagIcon className="h-5 w-5 text-[#57713A]" />
+                <h3 className="text-lg font-semibold text-gray-800">Apply Promo Code</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Select a promo code to apply to property</p>
+
+              <EnhancedOptionInputField
+                label="Select Promo Code"
+                placeholder="Search and select a promo code..."
+                value={selectedPromoCode?.pCode || ""}
+                onChange={(value: string) => {
+                  const promoCode = allPromoCodes.find((p) => p.pCode === value);
+                  setSelectedPromoCode(promoCode);
+                  applyPromoCodeToAllSections(promoCode);
+                }}
+                options={filteredPromoCodes.map((code) => ({
+                  value: code.pCode,
+                  label: `${code.pCode} - ${code.pName}`,
+                  original: code,
+                }))}
+                isSearchable
+                isLoading={promoCodesLoading || isRefreshing}
+              />
+
+              {selectedPromoCode && (
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800">
+                    <span className="font-semibold">Active Promo:</span>{" "}
+                    {selectedPromoCode.pCode} - {extractDiscountFromPromo(selectedPromoCode.pName)}% discount
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Loading Indicator */}
           {showLoadingIndicator && (
             <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-2xl border-2 border-gray-200">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#57713A] border-t-transparent mb-4"></div>
-              <p className="text-gray-600 font-medium">
-                Loading property data...
-              </p>
-              <p className="text-gray-400 text-sm mt-1">
-                Fetching available land sizes and pricing
-              </p>
+              <p className="text-gray-600 font-medium">Loading property data...</p>
             </div>
           )}
 
-          {/* Empty Data Notification */}
+          {/* Empty Data */}
           {isDataEmpty && !showLoadingIndicator && (
             <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-2xl border-2 border-slate-200">
               <AlertCircle className="h-12 w-12 text-slate-500 mb-4" />
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                No Data Available
-              </h3>
-              <p className="text-slate-600 text-center max-w-md mb-4">
-                No property data found for {selectedEstate?.EstateName} -{" "}
-                {selectedCategory?.pName}. Please try refreshing the data or
-                contact support.
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">No Data Available</h3>
+              <p className="text-slate-600 text-center max-w-md">
+                No property data found for the selected estate and category.
               </p>
             </div>
           )}
@@ -574,11 +599,7 @@ const PropertyListingPage = forwardRef<
           {/* Land Sizes Section */}
           {!showLoadingIndicator && !isDataEmpty && (
             <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-base font-semibold text-gray-800">
-                  Land Sizes & Pricing
-                </h2>
-              </div>
+              <h2 className="text-base font-semibold text-gray-800 mb-6">Land Sizes & Pricing</h2>
 
               <div className="space-y-8">
                 {landSizeSections.map((section, sectionIndex) => (
@@ -590,21 +611,9 @@ const PropertyListingPage = forwardRef<
                       <button
                         type="button"
                         onClick={() => removeLandSizeSection(section.id)}
-                        className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                        className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
                       >
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
+                        ✕
                       </button>
                     )}
 
@@ -612,27 +621,20 @@ const PropertyListingPage = forwardRef<
                       <EnhancedOptionInputField
                         label="Land Size *"
                         placeholder="Select land size..."
-                        name={`landSizeSections[${sectionIndex}].size`}
                         value={section.size || ""}
-                        onChange={(value: string) =>
-                          updateLandSize(section.id, value)
-                        }
-                        options={sizeOptions}
+                        onChange={(value: string) => updateLandSize(section.id, value)}
+                        options={availableSizes.map((item) => ({
+                          value: item.size,
+                          label: item.size,
+                          original: item,
+                        }))}
                         isSearchable
                         isLoading={propertyMapLoading}
-                        error={getErrorMessage(
-                          `landSizeSections[${sectionIndex}].size`,
-                        )}
+                        error={getErrorMessage(`landSizeSections[${sectionIndex}].size`)}
                       />
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-md font-medium text-gray-700">
-                          Duration & Pricing
-                        </h3>
-                      </div>
-
                       {section.durations.map((duration, durationIndex) => (
                         <div
                           key={duration.id}
@@ -641,51 +643,32 @@ const PropertyListingPage = forwardRef<
                           <div className="flex-1">
                             <InputField
                               label="Duration (months)"
-                              placeholder="Enter duration"
                               type="number"
                               value={duration.duration || ""}
-                              onChange={(e) =>
-                                updateDuration(
-                                  section.id,
-                                  duration.id,
-                                  "duration",
-                                  e.target.value,
-                                )
-                              }
+                              onChange={(e) => updateDuration(section.id, duration.id, "duration", e.target.value)}
                               error={getErrorMessage(
-                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`,
-                              )}
-                            />
+                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`
+                              )} placeholder={""}                            />
                           </div>
 
                           <div className="flex-1">
                             <InputField
                               label="Price (₦)"
-                              placeholder="Enter price"
                               type="text"
-                              value={formatToNaira(duration.price || "")}
+                              value={duration.discountedPrice
+                                ? formatToNaira(duration.discountedPrice)
+                                : formatToNaira(duration.price || "")}
                               onChange={(e) => {
-                                const raw = e.target.value.replace(
-                                  /[^0-9]/g,
-                                  "",
-                                );
-                                updateDuration(
-                                  section.id,
-                                  duration.id,
-                                  "price",
-                                  raw,
-                                );
-                              }}
+                                const raw = e.target.value.replace(/[^0-9]/g, "");
+                                updateDuration(section.id, duration.id, "price", raw);
+                              } }
                               error={getErrorMessage(
-                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
-                              )}
-                            />
+                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`
+                              )} placeholder={""}                            />
                           </div>
 
                           <div className="flex-1">
-                            <label className="block text-sm mb-1">
-                              Citta Property Code
-                            </label>
+                            <label className="block text-sm mb-1">Citta Property Code</label>
                             <input
                               type="text"
                               readOnly
@@ -697,49 +680,21 @@ const PropertyListingPage = forwardRef<
                           {section.durations.length > 1 && (
                             <button
                               type="button"
-                              onClick={() =>
-                                removeDurationFromSection(
-                                  section.id,
-                                  duration.id,
-                                )
-                              }
-                              className="h-10 px-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-[60px] flex items-center justify-center flex-shrink-0"
+                              onClick={() => removeDurationFromSection(section.id, duration.id)}
+                              className="text-red-500 hover:text-red-700"
                             >
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
+                              ✕
                             </button>
                           )}
                         </div>
                       ))}
+
+                      
                     </div>
                   </div>
                 ))}
 
-                {landSizeSections.length === 0 &&
-                  !isAutoPopulating &&
-                  !isRefreshing &&
-                  !propertyMapLoading &&
-                  selectedEstate &&
-                  selectedCategory &&
-                  propertyMapItems.length === 0 && (
-                    <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
-                      <p className="text-gray-500">
-                        Select an estate and category above to load available
-                        land sizes
-                      </p>
-                    </div>
-                  )}
+             
               </div>
             </div>
           )}

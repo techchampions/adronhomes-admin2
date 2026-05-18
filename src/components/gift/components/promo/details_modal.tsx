@@ -1,13 +1,14 @@
-import { FaCheck, FaTimes, FaCalendar, FaUser, FaIdCard, FaEnvelope, FaBuilding, FaHome, FaMapMarker, FaComment, FaBox, FaMoneyBillWave, FaTag } from "react-icons/fa";
+// details_modal.tsx
+import { FaCheck, FaTimes, FaCalendar, FaUser, FaIdCard, FaEnvelope, FaBuilding, FaHome, FaMapMarker, FaComment, FaBox, FaMoneyBillWave, FaTag, FaClock } from "react-icons/fa";
 import { formatDate } from "../../../../utils/formatdate";
 import { PromoRequest } from "./PromoRequestsTableComponent";
-// import { PromoRequest } from "../../../Redux/gift/promo/promoRequestsSlice";
 
 interface DetailModalProps {
   isOpen: boolean;
   request: PromoRequest | null;
   onClose: () => void;
   onApprove?: (request: PromoRequest) => void;
+  onSetPickupDate?: (request: PromoRequest) => void;
   onDisapprove?: (request: PromoRequest) => void;
   processingRequestId?: number | null;
 }
@@ -17,6 +18,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
   request, 
   onClose, 
   onApprove, 
+  onSetPickupDate,
   onDisapprove,
   processingRequestId 
 }) => {
@@ -26,8 +28,10 @@ export const DetailModal: React.FC<DetailModalProps> = ({
     switch (status) {
       case 'approved':
         return 'bg-green-100 text-green-800 border-green-300';
-      case 'rejected':
+      case 'disapproved':
         return 'bg-red-100 text-red-800 border-red-300';
+      case 'picked':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
       default:
         return 'bg-yellow-100 text-yellow-800 border-yellow-300';
     }
@@ -37,8 +41,10 @@ export const DetailModal: React.FC<DetailModalProps> = ({
     switch (status) {
       case 'approved':
         return <FaCheck className="text-green-600" />;
-      case 'rejected':
+      case 'disapproved':
         return <FaTimes className="text-red-600" />;
+      case 'picked':
+        return <FaClock className="text-blue-600" />;
       default:
         return <FaCalendar className="text-yellow-600" />;
     }
@@ -46,8 +52,8 @@ export const DetailModal: React.FC<DetailModalProps> = ({
 
   // Calculate total items value
   const calculateTotalItemsValue = () => {
-    if (!request.items ) return 0;
-    return request.items.reduce((sum, item) => sum + (item.item_price || 0), 0);
+    if (!request.items) return 0;
+    return request.items.reduce((sum, item) => sum + ((item.item_price || 0) * (item.qty || 1)), 0);
   };
 
   return (
@@ -88,6 +94,11 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                   {request.processed_at && (
                     <p className="text-sm opacity-75">
                       Processed on: {formatDate(request.processed_at)}
+                    </p>
+                  )}
+                  {request.pickup_date && (
+                    <p className="text-sm opacity-75 mt-1">
+                      Pickup Date: {formatDate(request.pickup_date)}
                     </p>
                   )}
                 </div>
@@ -158,7 +169,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <FaBuilding className="text-gray-400 mt-1" />
+                    <FaMoneyBillWave className="text-gray-400 mt-1" />
                     <div>
                       <p className="text-sm text-gray-500">Total Amount</p>
                       <p className="font-medium text-lg text-green-600">
@@ -213,7 +224,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                               </td>
                               <td className="px-4 py-3">
                                 <span className="font-semibold text-green-600">
-                                  ₦{item.item_price?.toLocaleString()}
+                                  ₦{(item.item_price * item.qty)?.toLocaleString()}
                                 </span>
                               </td>
                             </tr>
@@ -223,15 +234,15 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                           <tr>
                             <td colSpan={3} className="px-4 py-3 text-right font-semibold text-gray-900">
                               Total Value:
-                            </td>
+                             </td>
                             <td className="px-4 py-3">
                               <span className="font-bold text-lg text-green-600">
                                 ₦{calculateTotalItemsValue().toLocaleString()}
                               </span>
-                            </td>
+                             </td>
                           </tr>
                         </tfoot>
-                      </table>
+                       </table>
                     </div>
                   </div>
                 </div>
@@ -245,17 +256,19 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                     Request Details
                   </h3>
                 </div>
-                     <div className="flex items-start gap-3">
-                    <FaComment className="text-gray-400 mt-1" />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-500">User Note</p>
-                      <div className="mt-1 p-3 bg-white rounded border border-gray-200">
-                        <p className="text-gray-700 whitespace-pre-wrap">
-                          {request.user_note || "No note provided"}
-                        </p>
-                      </div>
+                
+                <div className="flex items-start gap-3">
+                  <FaComment className="text-gray-400 mt-1" />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500">User Note</p>
+                    <div className="mt-1 p-3 bg-white rounded border border-gray-200">
+                      <p className="text-gray-700 whitespace-pre-wrap">
+                        {request.user_note || "No note provided"}
+                      </p>
                     </div>
                   </div>
+                </div>
+                
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                   <div className="flex items-start gap-3">
                     <FaCalendar className="text-gray-400 mt-1" />
@@ -273,55 +286,65 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                     </div>
                   </div>
                   
-             
+                  {request.pickup_date && (
+                    <div className="flex items-start gap-3">
+                      <FaClock className="text-gray-400 mt-1" />
+                      <div>
+                        <p className="text-sm text-gray-500">Pickup Date & Time</p>
+                        <p className="font-medium text-blue-600">{formatDate(request.pickup_date)}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* Promo Information */}
-              {/* <div className="md:col-span-2 space-y-4">
-                <div className="border-b border-gray-200 pb-2">
-                  <h3 className="text-lg font-semibold text-gray-800">Additional Information</h3>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm text-gray-500">Promo ID</p>
-                    <p className="font-medium">{request.promo_id}</p>
-                  </div>
-                  
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm text-gray-500">Reward Group ID</p>
-                    <p className="font-medium">{request.reward_group_id}</p>
-                  </div>
-                </div>
-              </div> */}
             </div>
           </div>
 
           {/* Footer Actions */}
-          {request.status === 'pending' && onApprove && onDisapprove && (
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-xl flex justify-end gap-3">
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-xl flex justify-end gap-3">
+            {request.status === 'pending' && onApprove && onDisapprove && (
+              <>
+                <button
+                  onClick={() => {
+                    onDisapprove(request);
+                    onClose();
+                  }}
+                  disabled={processingRequestId === request.id}
+                  className="px-4 py-2 bg-red-500 text-white rounded-[30px] font-medium hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {processingRequestId === request.id ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <FaTimes />
+                      Disapprove
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    onApprove(request);
+                    onClose();
+                  }}
+                  disabled={processingRequestId === request.id}
+                  className="px-4 py-2 bg-[#79B833] hover:bg-[#6aa22c] text-white rounded-[30px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {processingRequestId === request.id ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <FaCalendar />
+                      Approve & Schedule Pickup
+                    </>
+                  )}
+                </button>
+              </>
+            )}
+            
+            {request.status === 'approved' && !request.pickup_date && onSetPickupDate && (
               <button
-                onClick={(e) => {
-                  onDisapprove(request);
-                  onClose();
-                }}
-                disabled={processingRequestId === request.id}
-                className="px-4 py-2 bg-red-500 text-white rounded-[30px] font-medium hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {processingRequestId === request.id ? (
-                  <>Processing...</>
-                ) : (
-                  <>
-                    <FaTimes />
-                    Disapprove
-                  </>
-                )}
-              </button>
-              <button
-                onClick={(e) => {
-                  onApprove(request);
-                  e.stopPropagation();
+                onClick={() => {
+                  onSetPickupDate(request);
                   onClose();
                 }}
                 disabled={processingRequestId === request.id}
@@ -331,13 +354,22 @@ export const DetailModal: React.FC<DetailModalProps> = ({
                   <>Processing...</>
                 ) : (
                   <>
-                    <FaCheck />
-                    Approve
+                    <FaCalendar />
+                    Set Pickup Date
                   </>
                 )}
               </button>
-            </div>
-          )}
+            )}
+            
+            {(request.status === 'disapproved' || request.status === 'picked' || (request.status === 'approved' && request.pickup_date)) && (
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-[30px] font-medium transition-colors"
+              >
+                Close
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
