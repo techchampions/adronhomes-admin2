@@ -217,8 +217,8 @@ export default function EditProperty() {
         });
       }
 
-      // Handle Land Size Section
-    if (LandSizeSection.length > 0) {
+    // Handle Land Size Section
+if (LandSizeSection.length > 0) {
   LandSizeSection.forEach((ls, i) => {
     formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
     formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
@@ -227,16 +227,14 @@ export default function EditProperty() {
     formPayload.append(`land_sizes[${i}][citta_estate_name]`, String(ls.citta_estate_name || ""));
     formPayload.append(`land_sizes[${i}][citta_estate_code]`, String(ls.citta_estate_code || ""));
     formPayload.append(`land_sizes[${i}][citta_property_category]`, String(ls.citta_property_category || ""));
-
-    // ✅ Added Promo Code Fields
-    formPayload.append(
-      `land_sizes[${i}][citta_promo_code]`, 
-      String(ls.citta_promo_code || "")
-    );
-    formPayload.append(
-      `land_sizes[${i}][citta_promo_name]`, 
-      String(ls.citta_promo_name || "")
-    );
+    
+    // Add termination code fields
+    formPayload.append(`land_sizes[${i}][citta_termination_code]`, String(ls.citta_termination_code || ""));
+    formPayload.append(`land_sizes[${i}][citta_termination_name]`, String(ls.citta_termination_name || ""));
+    
+    // Add promo code fields
+    formPayload.append(`land_sizes[${i}][citta_promo_code]`, String(ls.citta_promo_code || ""));
+    formPayload.append(`land_sizes[${i}][citta_promo_name]`, String(ls.citta_promo_name || ""));
 
     if (ls.durations && ls.durations.length > 0) {
       ls.durations.forEach((d, j) => {
@@ -256,10 +254,32 @@ export default function EditProperty() {
           `land_sizes[${i}][durations][${j}][citta_id]`,
           String(d.citta_id || "")
         );
-
-        // Optional: You can also send discounted price and applied promo if needed later
-        // formPayload.append(`land_sizes[${i}][durations][${j}][discounted_price]`, String(d.discountedPrice || ""));
-        // formPayload.append(`land_sizes[${i}][durations][${j}][applied_promo_code]`, String(d.appliedPromoCode || ""));
+        
+        // Add discount-related fields for durations
+        if (d.discountedPrice) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][discounted_price]`,
+            String(d.discountedPrice)
+          );
+        }
+        if (d.appliedPromoCode) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][applied_promo_code]`,
+            String(d.appliedPromoCode)
+          );
+        }
+        if (d.appliedTerminationCode) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][applied_termination_code]`,
+            String(d.appliedTerminationCode)
+          );
+        }
+        if (d.terminationDiscountedPrice) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][termination_discounted_price]`,
+            String(d.terminationDiscountedPrice)
+          );
+        }
       });
     }
   });
@@ -709,7 +729,7 @@ export default function EditProperty() {
             <div className="bg-white rounded-lg p-6">
               <MediaFORM
                 ref={mediaRef}
-                imagePreview={imagePreview}
+                imagePreview={ImagePreview}
                 setImagePreview={setEditImagePreview}
                 newDisplayImage={newDisplayImage}
                 setNewDisplayImage={setNewDisplayImage}

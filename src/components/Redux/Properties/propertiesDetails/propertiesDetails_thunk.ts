@@ -36,6 +36,8 @@ interface LandSize {
   citta_property_category?: string;
   citta_promo_code?: string;
   citta_promo_name?: string;
+  citta_termination_code?: string;
+  citta_termination_name?: string;
 }
 // Define the main interface containing land sizes and total amount
 // interface LandTransaction {

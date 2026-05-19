@@ -102,6 +102,7 @@ export interface MediaFormValues {
   videoLink: string;
   mapUrl: string;
   images: (File | string)[];
+  display_image?: string | File;
 }
 
 export interface DiscountFormValues {
