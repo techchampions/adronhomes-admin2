@@ -87,7 +87,7 @@ import fetchCittaPropertyMapReducer from "./citta/fetchCittaPropertyMap";
 import syncPropertyMapReducer from "./citta/syncPropertyMap";
 import retrievePropertyCodeReducer from "./citta/RetrievePropertyCodeState";
 // import cittaPropertyMapReducer from "./citta/cittaPropertyMapSlice";
-
+import promoTableReducerlistReducer from "./gift/promo/PromoCodelist";
 export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -190,6 +190,7 @@ export const store = configureStore({
     cittaPropertyCategories: fetchCittaPropertyCategoriesReducer,
     cittaEstates: fetchCittaEstatesReducer,
     cittaPropertyMap: fetchCittaPropertyMapReducer,
+    promoCodes: promoTableReducerlistReducer,
     
   },
 });

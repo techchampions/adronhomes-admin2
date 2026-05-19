@@ -294,19 +294,29 @@ const editPropertySlice = createSlice({
         feesCharges: property.fees_charges || "",
       };
 
-      state.LandSizeSection =
-        property.land_sizes?.map((ls: any) => ({
-          id: ls.id?.toString() || "",
-          size: ls.size?.toString() || "",
-          durations:
-            ls.durations?.map((d: any) => ({
-              id: d.id?.toString() || "",
-              duration: d.duration?.toString() || "",
-              price: d.price?.toString() || "",
-              citta_id: d.citta_id || "",
-              is_active: d.is_active || true,
-            })) || [],
-        })) || [];
+    state.LandSizeSection =
+  property.land_sizes?.map((ls: any) => ({
+    id: ls.id?.toString() || "",
+    size: ls.size?.toString() || "",
+    durations: ls.durations?.map((d: any) => ({
+      id: d.id?.toString() || "",
+      duration: d.duration?.toString() || "",
+      price: d.price?.toString() || "",
+      citta_id: d.citta_id || "",
+      property_code: d.property_code || "",
+      property_id: d.property_id || undefined,
+      pre_filled: d.pre_filled || false,
+      appliedPromoCode: d.appliedPromoCode || "",
+      discountedPrice: d.discountedPrice || undefined,
+      is_active: d.is_active || true,
+    })) || [],
+    citta_category_id: ls.citta_category_id?.toString() || "",
+    citta_estate_name: ls.citta_estate_name || "",
+    citta_estate_code: ls.citta_estate_code || "",
+    citta_property_category: ls.citta_property_category?.toString() || "",
+    citta_promo_code: ls.citta_promo_code || "",
+    citta_promo_name: ls.citta_promo_name || "",
+  })) || [];
 
       state.display.status = property.is_active ? "publish" : "draft";
 

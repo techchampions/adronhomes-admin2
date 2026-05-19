@@ -30,8 +30,13 @@ interface LandSize {
   id: number;
   size: string; // Size of the land (e.g., "450")
   durations: Duration[]; // Array of durations
+  citta_category_id?: string;
+  citta_estate_name?: string;
+  citta_estate_code?: string;
+  citta_property_category?: string;
+  citta_promo_code?: string;
+  citta_promo_name?: string;
 }
-
 // Define the main interface containing land sizes and total amount
 // interface LandTransaction {
 //   land_sizes: LandSize[];

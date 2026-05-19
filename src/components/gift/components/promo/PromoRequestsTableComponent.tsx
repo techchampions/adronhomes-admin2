@@ -1,4 +1,4 @@
-// PromoRequestsTableComponent.tsx - Complete upgraded version with detail modal
+// PromoRequestsTableComponent.tsx - Complete upgraded version with separate approval and pickup date flows
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,6 +13,7 @@ import {
   FaMapMarker,
   FaPhone,
   FaBuilding,
+  FaClock,
 } from "react-icons/fa";
 import { formatDate } from "../../../../utils/formatdate";
 import ConfirmationModal from "../../../Modals/delete";
@@ -21,11 +22,13 @@ import {
   approvePromoRequest,
   disapprovePromoRequest,
   selectPromoRequestsSubmitStatus,
+  setPromoRequestPickupDate,
 } from "../../../Redux/gift/promo/promoRequestsSlice";
 import { toast } from "react-toastify";
 import LoadingAnimations from "../../../LoadingAnimations";
 import { ReusableTable } from "../../../Tables/Table_one";
 import { DetailModal } from "./details_modal";
+import { PickupDateModal } from "./PickupDateModal";
 
 // ============================================
 // Types & Interfaces
@@ -36,16 +39,15 @@ export interface PromoRequest {
   promo_id: number;
   property_id: number;
   user_note: string;
-  status: "pending" | "granted" | "rejected";
+  status: "pending" | "approved" | "disapproved" | "picked";
   processed_at: string | null;
   created_at: string;
   updated_at: string;
   reward_group_id: number;
-      promo: {
-                  
-                    name: string;
-                    
-                },
+  pickup_date?: string | null;
+  promo: {
+    name: string;
+  };
   user: {
     id: number;
     first_name: string;
@@ -83,10 +85,10 @@ interface PromoRequestsTableContentProps {
   processingRequestId: number | null;
   onApprove: (request: PromoRequest) => void;
   onDisapprove: (request: PromoRequest) => void;
+  onSetPickupDate: (request: PromoRequest) => void;
   onRowClick: (request: PromoRequest) => void;
   activeTab?: string;
 }
-
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -96,10 +98,16 @@ const getStatusBadge = (status: string) => {
           <FaCheck className="text-xs" /> Approved
         </span>
       );
-    case "rejected":
+    case "disapproved":
       return (
         <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium flex items-center gap-1">
           <FaTimes className="text-xs" /> Disapproved
+        </span>
+      );
+    case "picked":
+      return (
+        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium flex items-center gap-1">
+          <FaClock className="text-xs" /> Picked Up
         </span>
       );
     default:
@@ -117,21 +125,21 @@ const getEmptyStateMessage = (activeTab: string = "all") => {
       return "No promo requests found";
     case "pending":
       return "No pending promo requests";
-    case "granted":
+    case "approved":
       return "No approved promo requests";
-    case "rejected":
+    case "disapproved":
       return "No disapproved promo requests";
     default:
       return "No gift requests found for this promotion";
   }
 };
 
-
 const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
   requests,
   processingRequestId,
   onApprove,
   onDisapprove,
+  onSetPickupDate,
   onRowClick,
   activeTab = "all",
 }) => {
@@ -160,6 +168,9 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
               </th>
               <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
                 Request Date
+              </th>
+              <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
+                Pickup Date
               </th>
               <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[60px] whitespace-nowrap">
                 Status
@@ -235,10 +246,26 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                   </div>
                 </td>
 
+                {/* Pickup Date */}
+                <td
+                  onClick={() => onRowClick(request)}
+                  className="py-4 text-dark text-sm whitespace-nowrap pr-4"
+                >
+                  {request.pickup_date ? (
+                    <div className="flex items-center gap-2">
+                      <FaCalendar className="text-gray-400 text-xs" />
+                      <span>{formatDate(request.pickup_date)}</span>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 text-xs">Not set</span>
+                  )}
+                </td>
+
                 {/* Status */}
                 <td className="py-4 whitespace-nowrap pr-4">
                   {getStatusBadge(request.status)}
                 </td>
+
                 {/* Actions */}
                 <td className="py-4 whitespace-nowrap">
                   {request.status === "pending" && (
@@ -246,7 +273,7 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                       <button
                         onClick={() => onApprove(request)}
                         disabled={processingRequestId === request.id}
-                        className="px-3 py-1.5 bg-[#79B833]! hover:bg-[#6aa22c] text-white rounded-full text-xs font-mediumtransition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-1.5 bg-[#79B833] hover:bg-[#6aa22c] text-white rounded-full text-xs font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {processingRequestId === request.id ? (
                           <>Processing...</>
@@ -273,11 +300,41 @@ const PromoRequestsTableContent: React.FC<PromoRequestsTableContentProps> = ({
                       </button>
                     </div>
                   )}
-                  {request.status !== "pending" && (
+
+                  {request.status === "approved" && !request.pickup_date && (
+                    <button
+                      onClick={() => onSetPickupDate(request)}
+                      disabled={processingRequestId === request.id}
+                      className="px-3 py-1.5 bg-[#79B833] hover:bg-[#6aa22c] text-white rounded-full text-xs font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {processingRequestId === request.id ? (
+                        <>Processing...</>
+                      ) : (
+                        <>
+                          <FaCalendar className="text-xs" />
+                          Set Pickup Date
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {request.status === "approved" && request.pickup_date && (
+                    <span className="text-xs text-green-600 flex items-center gap-1">
+                      <FaCheck className="text-xs" />
+                      Pickup Scheduled
+                    </span>
+                  )}
+
+                  {request.status === "disapproved" && (
                     <span className="text-xs text-gray-400">
-                      {request.status === "granted"
-                        ? "Already approved"
-                        : "Already disapproved"}
+                      Already disapproved
+                    </span>
+                  )}
+
+                  {request.status === "picked" && (
+                    <span className="text-xs text-blue-600 flex items-center gap-1">
+                      <FaClock className="text-xs" />
+                      Completed
                     </span>
                   )}
                 </td>
@@ -310,14 +367,19 @@ export default function PromoRequestsTableComponent({
   const [selectedRequest, setSelectedRequest] = useState<PromoRequest | null>(
     null,
   );
-  const [actionType, setActionType] = useState<"approve" | "disapprove" | null>(
-    null,
-  );
-  const [modalOpen, setModalOpen] = useState(false);
+  const [actionType, setActionType] = useState<
+    "approve" | "disapprove" | "setPickup" | null
+  >(null);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [processingRequestId, setProcessingRequestId] = useState<number | null>(
     null,
   );
+
+  // State for pickup date modal
+  const [pickupModalOpen, setPickupModalOpen] = useState(false);
+  const [selectedForPickup, setSelectedForPickup] =
+    useState<PromoRequest | null>(null);
 
   // ============================================
   // Event Handlers
@@ -327,54 +389,110 @@ export default function PromoRequestsTableComponent({
     setDetailModalOpen(true);
   };
 
-  const handleApprove = (request: PromoRequest) => {
+  // Show confirmation modal for approval
+  const handleApproveClick = (request: PromoRequest) => {
     setSelectedRequest(request);
     setActionType("approve");
-    setModalOpen(true);
+    setConfirmationModalOpen(true);
   };
 
-  const handleDisapprove = (request: PromoRequest) => {
+  // Show confirmation modal for disapproval
+  const handleDisapproveClick = (request: PromoRequest) => {
     setSelectedRequest(request);
     setActionType("disapprove");
-    setModalOpen(true);
+    setConfirmationModalOpen(true);
   };
 
-  const handleConfirm = async () => {
+  // Handle approval confirmation
+  const handleApproveConfirm = async () => {
     if (!selectedRequest) return;
 
     setProcessingRequestId(selectedRequest.id);
 
     try {
-      let result;
-      if (actionType === "approve") {
-        result = await dispatch(approvePromoRequest(selectedRequest.id));
-      } else {
-        result = await dispatch(disapprovePromoRequest(selectedRequest.id));
-      }
+      const result = await dispatch(approvePromoRequest(selectedRequest.id));
 
       if (result.payload?.success) {
-        setModalOpen(false);
+        setConfirmationModalOpen(false);
         await onRefresh(); // Refresh the list
+        toast.success(`Request approved successfully! Please set pickup date.`);
         setSelectedRequest(null);
         setActionType(null);
-        toast.success(
-          `Request ${actionType === "approve" ? "approved" : "disapproved"} successfully`,
-        );
       } else {
-        toast.error(
-          result.payload?.message || `Failed to ${actionType} request`,
-        );
+        toast.error(result.payload?.message || "Failed to approve request");
       }
     } catch (error) {
-      toast.error(`An error occurred while processing the request`);
-      console.error("Action error:", error);
+      toast.error("An error occurred while approving the request");
+      console.error("Approval error:", error);
+    } finally {
+      setProcessingRequestId(null);
+    }
+  };
+
+  // Handle disapproval confirmation
+  const handleDisapproveConfirm = async () => {
+    if (!selectedRequest) return;
+
+    setProcessingRequestId(selectedRequest.id);
+
+    try {
+      const result = await dispatch(disapprovePromoRequest(selectedRequest.id));
+
+      if (result.payload?.success) {
+        setConfirmationModalOpen(false);
+        await onRefresh(); // Refresh the list
+        toast.success(`Request disapproved successfully`);
+        setSelectedRequest(null);
+        setActionType(null);
+      } else {
+        toast.error(result.payload?.message || "Failed to disapprove request");
+      }
+    } catch (error) {
+      toast.error("An error occurred while disapproving the request");
+      console.error("Disapproval error:", error);
+    } finally {
+      setProcessingRequestId(null);
+    }
+  };
+
+  // Open pickup date modal for approved requests
+  const handleSetPickupDateClick = (request: PromoRequest) => {
+    setSelectedForPickup(request);
+    setPickupModalOpen(true);
+  };
+
+  // Handle pickup date confirmation
+  const handlePickupDateConfirm = async (pickupDate: string) => {
+    if (!selectedForPickup) return;
+
+    setProcessingRequestId(selectedForPickup.id);
+
+    try {
+      const result = await dispatch(
+        setPromoRequestPickupDate({
+          id: selectedForPickup.id,
+          pickup_date: pickupDate,
+        }),
+      );
+
+      if (result.payload?.success) {
+        setPickupModalOpen(false);
+        setSelectedForPickup(null);
+        await onRefresh();
+        toast.success("Pickup date scheduled successfully!");
+      } else {
+        toast.error(result.payload?.message || "Failed to set pickup date");
+      }
+    } catch (error) {
+      toast.error("An error occurred while setting pickup date");
+      console.error("Pickup date error:", error);
     } finally {
       setProcessingRequestId(null);
     }
   };
 
   const handleModalClose = () => {
-    setModalOpen(false);
+    setConfirmationModalOpen(false);
     setSelectedRequest(null);
     setActionType(null);
   };
@@ -388,8 +506,7 @@ export default function PromoRequestsTableComponent({
     submitStatus === "loading" || processingRequestId !== null;
 
   // Define available tabs for this table
-  const tabs = ["all", "pending", "granted", "rejected"];
-
+  const tabs = ["all", "pending", "approved", "disapproved"];
 
   return (
     <>
@@ -398,25 +515,57 @@ export default function PromoRequestsTableComponent({
         isOpen={detailModalOpen}
         request={selectedRequest}
         onClose={handleDetailModalClose}
-        onApprove={handleApprove}
-        onDisapprove={handleDisapprove}
+        onApprove={handleApproveClick}
+        onSetPickupDate={handleSetPickupDateClick}
+        onDisapprove={handleDisapproveClick}
         processingRequestId={processingRequestId}
       />
 
-      {/* Confirmation Modal */}
+      {/* Confirmation Modal for Approve/Disapprove */}
       <ConfirmationModal
-        isOpen={modalOpen}
+        isOpen={confirmationModalOpen}
         title={
           actionType === "approve" ? "Approve Request" : "Disapprove Request"
         }
-        description={`Are you sure you want to ${actionType} this gift request for ${selectedRequest?.user?.first_name} ${selectedRequest?.user?.last_name}?`}
+        description={
+          actionType === "approve"
+            ? `Are you sure you want to approve this gift request for ${selectedRequest?.user?.first_name} ${selectedRequest?.user?.last_name}? After approval, you'll need to set a pickup date.`
+            : `Are you sure you want to disapprove this gift request for ${selectedRequest?.user?.first_name} ${selectedRequest?.user?.last_name}?`
+        }
         subjectName={selectedRequest?.property?.name || ""}
         onClose={handleModalClose}
-        onConfirm={handleConfirm}
+        onConfirm={
+          actionType === "approve"
+            ? handleApproveConfirm
+            : handleDisapproveConfirm
+        }
         loading={isProcessing}
         confirmButtonText={actionType === "approve" ? "Approve" : "Disapprove"}
         cancelButtonText="Cancel"
-        className={`${actionType === "approve" ? "bg-[#79B833]! hover:bg-[#6aa22c]!" : "bg-red-600 hover:bg-red-700"} text-white`}
+        className={
+          actionType === "approve"
+            ? "bg-[#79B833]! hover:bg-[#6aa22c] text-white"
+            : "bg-red-600 hover:bg-red-700 text-white"
+        }
+      />
+
+      {/* Pickup Date Modal - Only for approved requests */}
+      <PickupDateModal
+        isOpen={pickupModalOpen}
+        requestId={selectedForPickup?.id || null}
+        userName={
+          selectedForPickup
+            ? `${selectedForPickup.user.first_name} ${selectedForPickup.user.last_name}`
+            : ""
+        }
+        propertyName={selectedForPickup?.property?.name || ""}
+        isForApproved={true}
+        onClose={() => {
+          setPickupModalOpen(false);
+          setSelectedForPickup(null);
+        }}
+        onConfirm={handlePickupDateConfirm}
+        loading={isProcessing}
       />
 
       {/* Reusable Table Wrapper */}
@@ -439,8 +588,9 @@ export default function PromoRequestsTableComponent({
             <PromoRequestsTableContent
               requests={data}
               processingRequestId={processingRequestId}
-              onApprove={handleApprove}
-              onDisapprove={handleDisapprove}
+              onApprove={handleApproveClick}
+              onDisapprove={handleDisapproveClick}
+              onSetPickupDate={handleSetPickupDateClick}
               onRowClick={handleRowClick}
               activeTab={activeTab}
             />

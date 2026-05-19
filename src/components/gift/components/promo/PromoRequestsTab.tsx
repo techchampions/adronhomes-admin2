@@ -7,7 +7,8 @@ import {
   selectPromoRequestsStats, 
   selectPromoRequestsLoading,
   selectPromoRequestsPagination,
-  setPromoRequestsPage
+  setPromoRequestsPage,
+  selectPromoRequestsPromo
 } from "../../../Redux/gift/promo/promoRequestsSlice";
 import { AppDispatch } from "../../../Redux/store";
 import PromoRequestsTableComponent from "./PromoRequestsTableComponent";
@@ -28,6 +29,7 @@ export default function PromoRequestsTab() {
   const stats = useSelector(selectPromoRequestsStats);
   const isLoading = useSelector(selectPromoRequestsLoading);
   const pagination = useSelector(selectPromoRequestsPagination);
+  const promo = useSelector(selectPromoRequestsPromo);
   const [searchTerm, setSearchTerm] = useState<string>('');
  const {id}= useParams<{id:string}>()
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -67,8 +69,8 @@ const promoId = id || '';
        <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
 
  <Header
-        title={requests.length > 0 ? `Requests for ${requests[0].promo.name}` : "Promotion Requests"}
-        subtitle={`Manage Requests for ${requests[0].promo.name} promotion`}
+        title={ promo ? `Promo Requests for ${promo.name}` : 'Promo Requests'}
+        subtitle={ promo ? `Promo: ${promo.name} (ID: ${promo.id})` : 'Promo Requests'}
         // buttonText="Export"
         showSearchAndButton={false}
         // onButtonClick={openCustomersModal}
