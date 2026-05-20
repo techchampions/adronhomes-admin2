@@ -1014,7 +1014,7 @@ const PropertyListingPage = forwardRef<
           )}
         </form>
       </div>
-    </div>
+    // </div>
   );
 });
 
