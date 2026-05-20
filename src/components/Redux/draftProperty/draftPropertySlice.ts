@@ -316,6 +316,8 @@ const draftPropertySlice = createSlice({
     citta_property_category: ls.citta_property_category?.toString() || "",
     citta_promo_code: ls.citta_promo_code || "",
     citta_promo_name: ls.citta_promo_name || "",
+    citta_termination_code: ls.citta_termination_code || "",
+    citta_termination_name: ls.citta_termination_name || "",
   })) || [];
 
       state.display.status = property.is_active ? "publish" : "draft";

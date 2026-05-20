@@ -147,7 +147,7 @@ const validationSchema = Yup.object({
       }
 
       // Handle gallery images previews (skip first image which is display image)
-      const galleryImages = images.slice(1);
+      const galleryImages = images
       const galleryImagePreviews = galleryImages.map(image => {
         if (typeof image === 'string') {
           return image;
@@ -230,7 +230,7 @@ const validationSchema = Yup.object({
           }
           
           // Update Formik's images array
-          const formikIndex = index! + 1;
+          const formikIndex = index!
           const currentImages = [...formikRef.current.values.images];
           
           if (formikIndex < currentImages.length) {
@@ -288,7 +288,7 @@ const validationSchema = Yup.object({
     // Update Formik's images array
     const currentImages = formikRef.current?.values.images || [];
     const updatedImages = [...currentImages];
-    updatedImages.splice(index + 1, 1);
+updatedImages.splice(index, 1);
     formikRef.current?.setFieldValue('images', updatedImages);
   };
 
@@ -308,7 +308,7 @@ const validationSchema = Yup.object({
     if (galleryImages) {
       galleryImages.forEach((img, index) => {
         if (img && index < galleryImages.length - 1) { // Skip null placeholders
-          finalImages[index + 1] = img;
+    finalImages[index] = img;      
         }
       });
     }
