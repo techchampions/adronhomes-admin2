@@ -390,11 +390,11 @@ const PropertyListingPage = forwardRef<
     );
     setLocalLandSizeSections(updatedSections);
 
-    if (promoCode) {
-      toast.success(`Promo code ${promoCode.pCode} applied to all sections`);
-    } else {
-      toast.info("Promo code removed from all sections");
-    }
+    // if (promoCode) {
+    //   toast.success(`Promo code ${promoCode.pCode} applied to all sections`);
+    // } else {
+    //   toast.info("Promo code removed from all sections");
+    // }
   };
 
   const applyTerminationCodeToAllSections = (terminationCode: any) => {
@@ -405,13 +405,13 @@ const PropertyListingPage = forwardRef<
     );
     setLocalLandSizeSections(updatedSections);
 
-    if (terminationCode) {
-      toast.success(
-        `Termination code ${terminationCode.pCode} (${terminationCode.pName}% off) applied to all sections`,
-      );
-    } else {
-      toast.info("Termination code removed from all sections");
-    }
+    // if (terminationCode) {
+    //   toast.success(
+    //     `Termination code ${terminationCode.pCode} (${terminationCode.pName}% off) applied to all sections`,
+    //   );
+    // } else {
+    //   toast.info("Termination code removed from all sections");
+    // }
   };
 
   const handleEstateChange = (value: string) => {
