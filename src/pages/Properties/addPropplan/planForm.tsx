@@ -131,8 +131,7 @@ const PropertyListingPage = forwardRef<
   const [selectedEstate, setSelectedEstate] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [availableSizes, setAvailableSizes] = useState<any[]>([]);
-  const [landSizeSections, setLocalLandSizeSections] =
-    useState<LandSizeSection[]>(initialData);
+  const [landSizeSections, setLocalLandSizeSections] = useState<LandSizeSection[]>(initialData);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isAutoPopulating, setIsAutoPopulating] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -198,15 +197,13 @@ const PropertyListingPage = forwardRef<
       setLocalLandSizeSections(initialData);
 
       if (initialData[0]?.citta_estate_code) {
-        const estate = estates.find(
-          (e) => e.EstateCode === initialData[0].citta_estate_code,
-        );
+        const estate = estates.find(e => e.EstateCode === initialData[0].citta_estate_code);
         if (estate) setSelectedEstate(estate);
       }
 
       if (initialData[0]?.citta_category_id) {
         const category = categories.find(
-          (c) => String(c.pCode) === String(initialData[0].citta_category_id),
+          (c) => String(c.pCode) === String(initialData[0].citta_category_id)
         );
         if (category) setSelectedCategory(category);
       }
@@ -463,9 +460,7 @@ const PropertyListingPage = forwardRef<
 
   const removeLandSizeSection = (sectionId: number) => {
     if (landSizeSections.length > 1) {
-      setLocalLandSizeSections((prev) =>
-        prev.filter((s) => s.id !== sectionId),
-      );
+      setLocalLandSizeSections((prev) => prev.filter((s) => s.id !== sectionId));
     }
   };
 
@@ -487,8 +482,8 @@ const PropertyListingPage = forwardRef<
                 },
               ],
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
@@ -500,8 +495,8 @@ const PropertyListingPage = forwardRef<
               ...section,
               durations: section.durations.filter((d) => d.id !== durationId),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
@@ -554,12 +549,11 @@ const PropertyListingPage = forwardRef<
           return {
             ...section,
             size: value,
-            durations:
-              newDurations.length > 0 ? newDurations : section.durations,
+            durations: newDurations.length > 0 ? newDurations : section.durations,
           };
         }
         return section;
-      }),
+      })
     );
   };
 
@@ -567,7 +561,7 @@ const PropertyListingPage = forwardRef<
     sectionId: number,
     durationId: number,
     field: keyof Duration,
-    value: string,
+    value: string
   ) => {
     setLocalLandSizeSections((prev) =>
       prev.map((section) =>
@@ -575,13 +569,11 @@ const PropertyListingPage = forwardRef<
           ? {
               ...section,
               durations: section.durations.map((duration) =>
-                duration.id === durationId
-                  ? { ...duration, [field]: value }
-                  : duration,
+                duration.id === durationId ? { ...duration, [field]: value } : duration
               ),
             }
-          : section,
-      ),
+          : section
+      )
     );
   };
 
@@ -689,9 +681,7 @@ const PropertyListingPage = forwardRef<
     !isRefreshing;
 
   const showLoadingIndicator =
-    (propertyMapLoading || isAutoPopulating) &&
-    selectedEstate &&
-    selectedCategory;
+    (propertyMapLoading || isAutoPopulating) && selectedEstate && selectedCategory;
 
   return (
     <div>
@@ -718,10 +708,11 @@ const PropertyListingPage = forwardRef<
             <span>Refresh Citta Data</span>
           </button>
         </div>
+  </div>
 
         <form onSubmit={formik.handleSubmit} className="space-y-8">
           {/* Estate & Category Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6  rounded-2xl border border-gray-200">
             <EnhancedOptionInputField
               label="Select Citta Estate *"
               placeholder="Choose an estate..."
@@ -953,19 +944,13 @@ const PropertyListingPage = forwardRef<
                             <InputField
                               label="Original Price (₦)"
                               type="text"
-                              value={formatToNaira(duration.price || "")}
+                              value={duration.discountedPrice
+                                ? formatToNaira(duration.discountedPrice)
+                                : formatToNaira(duration.price || "")}
                               onChange={(e) => {
-                                const raw = e.target.value.replace(
-                                  /[^0-9]/g,
-                                  "",
-                                );
-                                updateDuration(
-                                  section.id,
-                                  duration.id,
-                                  "price",
-                                  raw,
-                                );
-                              }}
+                                const raw = e.target.value.replace(/[^0-9]/g, "");
+                                updateDuration(section.id, duration.id, "price", raw);
+                              } }
                               error={getErrorMessage(
                                 `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
                               )}
@@ -992,9 +977,7 @@ const PropertyListingPage = forwardRef<
                           </div>
 
                           <div className="flex-1">
-                            <label className="block text-sm mb-1">
-                              Citta Property Code
-                            </label>
+                            <label className="block text-sm mb-1">Citta Property Code</label>
                             <input
                               type="text"
                               readOnly
@@ -1019,6 +1002,8 @@ const PropertyListingPage = forwardRef<
                           )}
                         </div>
                       ))}
+
+                      
                     </div>
                   </div>
                 ))}
