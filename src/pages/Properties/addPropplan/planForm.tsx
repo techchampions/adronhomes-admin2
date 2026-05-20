@@ -392,6 +392,8 @@ const PropertyListingPage = forwardRef<
     // } else {
     //   toast.info("Promo code removed from all sections");
     // }
+
+    
   };
 
   const applyTerminationCodeToAllSections = (terminationCode: any) => {
