@@ -11,7 +11,7 @@ export const validationSchema = Yup.object({
   landSizeSections: Yup.array()
     .of(
       Yup.object({
-        size: Yup.number()
+        size: Yup.string()
           .typeError("Land size must be a number")
           .min(1)
           .required("Land size is required"),

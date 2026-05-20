@@ -140,7 +140,7 @@ export default function DraftProperty() {
         "Preview",
       ];
 
-  const totalSteps = isLandProperty2 ? 7 : 6;
+  const totalSteps = isLandProperty2 ? 7 : 7;
 
   const propertyId = id;
   useEffect(() => {
@@ -215,39 +215,52 @@ export default function DraftProperty() {
       }
 
       // Handle Land Size Section
-      if (LandSizeSection.length > 0) {
-        LandSizeSection.forEach((ls, i) => {
-          formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
-          formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
-          
-          formPayload.append(`land_sizes[${i}][citta_category_id]`, String(ls.citta_category_id || ""));
-          formPayload.append(`land_sizes[${i}][citta_estate_name]`, String(ls.citta_estate_name || ""));
-          formPayload.append(`land_sizes[${i}][citta_estate_code]`, String(ls.citta_estate_code || ""));
-          formPayload.append(`land_sizes[${i}][citta_property_category]`, String(ls.citta_property_category || ""));
+    if (LandSizeSection.length > 0) {
+  LandSizeSection.forEach((ls, i) => {
+    formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
+    formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+    
+    formPayload.append(`land_sizes[${i}][citta_category_id]`, String(ls.citta_category_id || ""));
+    formPayload.append(`land_sizes[${i}][citta_estate_name]`, String(ls.citta_estate_name || ""));
+    formPayload.append(`land_sizes[${i}][citta_estate_code]`, String(ls.citta_estate_code || ""));
+    formPayload.append(`land_sizes[${i}][citta_property_category]`, String(ls.citta_property_category || ""));
 
-          if (ls.durations && ls.durations.length > 0) {
-            ls.durations.forEach((d, j) => {
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][id]`,
-                String(d.id || "")
-              );
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][duration]`,
-                String(d.duration || "")
-              );
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][price]`,
-                String(d.price || "")
-              );
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][citta_id]`,
-                String(d.citta_id || "")
-              );
-            });
-          }
-        });
-      }
+    // ✅ Added Promo Code Fields
+    formPayload.append(
+      `land_sizes[${i}][citta_promo_code]`, 
+      String(ls.citta_promo_code || "")
+    );
+    formPayload.append(
+      `land_sizes[${i}][citta_promo_name]`, 
+      String(ls.citta_promo_name || "")
+    );
 
+    if (ls.durations && ls.durations.length > 0) {
+      ls.durations.forEach((d, j) => {
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][id]`,
+          String(d.id || "")
+        );
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][duration]`,
+          String(d.duration || "")
+        );
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][price]`,
+          String(d.price || "")
+        );
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][citta_id]`,
+          String(d.citta_id || "")
+        );
+
+        // Optional: You can also send discounted price and applied promo if needed later
+        // formPayload.append(`land_sizes[${i}][durations][${j}][discounted_price]`, String(d.discountedPrice || ""));
+        // formPayload.append(`land_sizes[${i}][durations][${j}][applied_promo_code]`, String(d.appliedPromoCode || ""));
+      });
+    }
+  });
+}
       // Handle Land or House Specifications
       if (isLandProperty2) {
         formPayload.append("size", landForm.landSize);
