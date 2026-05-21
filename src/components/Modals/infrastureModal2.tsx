@@ -1,12 +1,13 @@
 import { ChangeEvent, useState } from "react";
-import { BiX } from "react-icons/bi";
+import { BiCheck, BiX } from "react-icons/bi";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import OptionInputField from "../input/drop_down";
+import { useEditPropertyForm } from "../Redux/hooks/usePropertyForms";
 import { useDispatch } from "react-redux";
 import { removePropertyDetail } from "../Redux/Properties/deleteSliceDetails";
 import { AppDispatch } from "../Redux/store";
-import { useCreatePropertyForm } from "../Redux/hooks/usePropertyForms"; // Changed to useCreatePropertyForm
 
+// The Fee interface has been updated to include an optional purpose field and isNew flag
 interface Fee {
   id: number;
   name: string;
@@ -14,7 +15,7 @@ interface Fee {
   checked: boolean;
   type: string;
   purpose?: string;
-  isNew?: boolean; // Added to track new fees
+  isNew?: boolean;
 }
 
 interface InfrastructureFeesModalProps {
@@ -66,26 +67,27 @@ const ConfirmationModal = ({
   );
 };
 
-export default function InfrastructureFeesModalss({
+export default function InfrastructureFeesModal({
   isOpen,
   onClose,
 }: InfrastructureFeesModalProps) {
-  // Use create property form hook instead of context
+  // Use Redux hooks instead of context
   const {
     basicDetails,
-    setCreateFees,
-    setCreateNewFees,
-    // fees: reduxFees,
-    // newFees: reduxNewFees,
+    setEditFees,
+    setEditNewFees,
+    setEditBasicDetails,
+    setEditLandForm,
+    setEditSpecifications,
     metadata
-  } = useCreatePropertyForm();
+  } = useEditPropertyForm();
   
-
-  const {fees,newFees}=metadata
-
+  const { fees } = metadata;
   
   const useAppDispatch = () => useDispatch<AppDispatch>();
   const dispatch = useAppDispatch();
+  
+  // State for the new fee inputs, including the new purpose field
   const [newFeeName, setNewFeeName] = useState<string>("");
   const [newFeetype, setNewFeetype] = useState<string>("");
   const [newFeeAmount, setNewFeeAmount] = useState<string>("");
@@ -99,18 +101,18 @@ export default function InfrastructureFeesModalss({
     { value: "others", label: "others" },
   ];
 
-  const mappedPurposes =
-    Array.isArray(basicDetails.purpose) &&
-    basicDetails.purpose.length > 0
-      ? basicDetails.purpose.map((purpose) => ({
-          label: purpose,
-          value: purpose,
-        }))
-      : [];
+  const mappedPurposes = Array.isArray(basicDetails?.purpose) && basicDetails.purpose.length > 0
+    ? basicDetails.purpose.map(purpose => ({
+        label: purpose,
+        value: purpose
+      }))
+    : [];
 
   const toggleFee = (id: number) => {
-    setCreateFees(
-      fees.map((fee: Fee) => (fee.id === id ? { ...fee, checked: !fee.checked } : fee))
+    setEditFees(
+      fees.map((fee: Fee) =>
+        fee.id === id ? { ...fee, checked: !fee.checked } : fee
+      )
     );
   };
 
@@ -122,53 +124,54 @@ export default function InfrastructureFeesModalss({
   const handleRemove = async () => {
     if (feeToRemove === null) return;
     
-    // Find the fee to be removed
-    const feeToDelete = fees.find(fee => fee.id === feeToRemove);
+    const feeToDelete = fees.find((fee: Fee) => fee.id === feeToRemove);
     
     // If it's a new fee (not in database), just remove it locally
     if (feeToDelete?.isNew) {
       const updatedFees = fees.filter((fee: Fee) => fee.id !== feeToRemove);
-      setCreateFees(updatedFees);
-      // Also remove from newFees if it exists there
-      if (newFees.length > 0) {
-        setCreateNewFees(newFees.filter((fee: Fee) => fee.id !== feeToRemove));
-      }
+      setEditFees(updatedFees);
+      setEditNewFees(updatedFees);
       setShowConfirmation(false);
       setFeeToRemove(null);
       return;
     }
     
-    // If it's an existing fee, call the API (for edit flows, not create)
+    // If it's an existing fee, delete from server
     setRemoveLoading(true);
     try {
       await dispatch(removePropertyDetail(feeToRemove.toString())).unwrap();
       const updatedFees = fees.filter((fee: Fee) => fee.id !== feeToRemove);
-      setCreateFees(updatedFees);
+      setEditFees(updatedFees);
       setShowConfirmation(false);
       setFeeToRemove(null);
     } catch (error) {
-      console.error("Failed to remove property/fee:", error);
+      console.error("Failed to remove fee from server:", error);
     } finally {
       setRemoveLoading(false);
     }
   };
 
   const addFee = () => {
+    // Check all new fields before adding
     if (newFeeName && newFeeAmount && newFeetype && newFeePurpose) {
       const newFee: Fee = {
         id: Math.max(...fees.map((f: Fee) => f.id), 0) + 1,
         name: newFeeName,
         type: newFeetype,
-        amount: newFeeAmount.startsWith("₦") ? newFeeAmount : `₦${newFeeAmount}`,
+        amount: newFeeAmount.startsWith("₦")
+          ? newFeeAmount
+          : `₦${newFeeAmount}`,
         checked: true,
         purpose: newFeePurpose,
         isNew: true,
       };
       
+      // Add to both fees and newFees arrays
       const updatedFees = [...fees, newFee];
-      setCreateFees(updatedFees);
-      setCreateNewFees([...newFees, newFee]);
+      setEditFees(updatedFees);
+      setEditNewFees(updatedFees);
       
+      // Reset all new fee input fields
       setNewFeeName("");
       setNewFeeAmount("");
       setNewFeetype("");
@@ -182,6 +185,7 @@ export default function InfrastructureFeesModalss({
     <>
       <div className="fixed inset-0 bg-[#00000033] bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-[40px] w-full max-w-5xl mx-auto shadow-2xl overflow-y-auto max-h-[690px]">
+          {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <h2 className="text-xl font-semibold text-gray-900">
               Allocation Fees
@@ -193,56 +197,63 @@ export default function InfrastructureFeesModalss({
               <BiX size={20} className="text-gray-500" />
             </button>
           </div>
+
+          {/* Content */}
           <div className="p-6 space-y-4">
-            {fees.map((fee: Fee) => (
-              <div
-                key={fee.id}
-                className="flex items-center justify-between p-4 bg-[#FFFFFF] rounded-[20px] shadow"
-              >
-                <div className="flex items-start space-x-3">
-                  <button
-                    onClick={() => {
-                      toggleFee(fee.id);
-                    }}
-                  >
-                    {fee.checked && (
-                      <IoMdCheckmarkCircle size={20} color="#272727" />
-                    )}
-                  </button>
-                  <div>
-                    <div className="font-[325] text-gray-900 text-sm">
-                      {fee.name}
-                    </div>
-                    <div className="text-base font-semibold text-gray-900">
-                      {fee.amount}
-                    </div>
-                    {fee.type && (
-                      <div className="text-xs text-gray-500">
-                        Type:{" "}
-                        {typeOptions.find((t) => t.value === fee.type)?.label ||
-                          fee.type}
-                      </div>
-                    )}
-                    {fee.purpose && (
-                      <div className="text-xs text-gray-500">
-                        Purpose: {fee.purpose}
-                      </div>
-                    )}
-                    {fee.isNew && (
-                      <div className="text-xs text-green-500 font-semibold">
-                        New (Not saved yet)
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => confirmRemoveFee(fee.id)}
-                  className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-                >
-                  <BiX size={16} className="text-gray-400" />
-                </button>
+            {/* Existing Fees */}
+            {fees.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No fees added yet. Add your first allocation fee below.
               </div>
-            ))}
+            ) : (
+              fees.map((fee: Fee) => (
+                <div
+                  key={fee.id}
+                  className="flex items-center justify-between p-4 bg-[#FFFFFF] rounded-[20px] shadow"
+                >
+                  <div className="flex items-start space-x-3">
+                    <button onClick={() => toggleFee(fee.id)}>
+                      {fee.checked && (
+                        <IoMdCheckmarkCircle size={20} color="#272727" />
+                      )}
+                    </button>
+                    <div>
+                      <div className="font-[325] text-gray-900 text-sm">
+                        {fee.name}
+                      </div>
+                      <div className="text-base font-semibold text-gray-900">
+                        {fee.amount}
+                      </div>
+                      {fee.type && (
+                        <div className="text-xs text-gray-500">
+                          Type:{" "}
+                          {typeOptions.find((t) => t.value === fee.type)?.label ||
+                            fee.type}
+                        </div>
+                      )}
+                      {fee.purpose && ( 
+                        <div className="text-xs text-gray-500">
+                          Purpose: {fee.purpose}
+                        </div>
+                      )}
+                      {fee.isNew && (
+                        <div className="text-xs text-green-500 font-semibold">
+                          New (Not saved yet)
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => confirmRemoveFee(fee.id)}
+                    className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                  >
+                    <BiX size={16} className="text-gray-400" />
+                  </button>
+                </div>
+              ))
+            )}
+
+            {/* Add Infrastructure Section */}
             <div className="pt-4">
               <h3 className="block text-[#4F4F4F] font-[350] text-[14px] mb-6">
                 Add Allocation
@@ -282,6 +293,7 @@ export default function InfrastructureFeesModalss({
                     />
                   </div>
                 </div>
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <OptionInputField
                     label="Type"
@@ -292,6 +304,7 @@ export default function InfrastructureFeesModalss({
                     options={typeOptions}
                     dropdownTitle="Fee Types"
                   />
+                  
                   <OptionInputField
                     label="Purpose"
                     placeholder="Select a purpose"
@@ -302,6 +315,7 @@ export default function InfrastructureFeesModalss({
                     dropdownTitle="Purpose Options"
                   />
                 </div>
+
                 <button
                   onClick={addFee}
                   disabled={!newFeeName || !newFeeAmount || !newFeetype || !newFeePurpose}
@@ -312,6 +326,8 @@ export default function InfrastructureFeesModalss({
               </div>
             </div>
           </div>
+
+          {/* Footer */}
           <div className="p-6 border-t border-gray-100 w-full justify-end flex">
             <button
               onClick={onClose}
@@ -322,6 +338,7 @@ export default function InfrastructureFeesModalss({
           </div>
         </div>
       </div>
+
       <ConfirmationModal
         isOpen={showConfirmation}
         onClose={() => {
@@ -329,8 +346,8 @@ export default function InfrastructureFeesModalss({
           setFeeToRemove(null);
         }}
         onConfirm={handleRemove}
-        title="Remove Property"
-        message="Are you sure you want to remove this property? This action will delete the record permanently."
+        title="Remove Fee"
+        message="Are you sure you want to remove this fee? This action will delete it permanently from the server."
         loading={removeLoading}
       />
     </>

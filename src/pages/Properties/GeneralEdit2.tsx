@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../components/Redux/hook";
@@ -31,7 +31,9 @@ import { add_property_detail } from "../../components/Redux/addProperty/addFees/
 import PropertyListingPage from "./addPropplan/planForm";
 import ForProperties from "../../components/Tables/forProperties";
 import { setIsEditLandProperty } from "../../components/Redux/editProperty/editpropslice";
-import InfrastructureFeesModal from "../../components/Modals/InfrastructureFeesModal";
+
+import { PropertyContext } from "../../MyContext/MyContext";
+import InfrastructureFeesModalss from "../../components/Modals/infrastureModal2";
 
 export default function EditProperty() {
   const { id } = useParams<{ id: string }>();
@@ -84,7 +86,7 @@ export default function EditProperty() {
     newFees,
     director_name,
     previousPropType,
-    imagePreview,
+    // imagePreview,
     isLoaded,
     propertyId: editPropertyId,
   } = metadata;
@@ -92,6 +94,10 @@ export default function EditProperty() {
   const { data, loading, error } = useAppSelector(
     (state) => state.propertyDetails
   );
+  const {
+    imagePreview,
+    setImagePreview
+  }= useContext(PropertyContext)!;
 
   const [discountEnabled, setDiscounted] = useState(
     discount.discountName !== ""
@@ -105,9 +111,9 @@ export default function EditProperty() {
   const [newGalleryImages, setNewGalleryImages] = useState<
     (File | string | null)[]
   >([]);
-  const [ImagePreview, setImagePreview] = useState<(File | string | null)>(
+  // const [ImagePreview, setImagePreview] = useState<(File | string | null)>(
     
-  );
+  // );
 
   // Create refs
   const basicDetailsRef = useRef<any>(null);
@@ -650,12 +656,12 @@ if (LandSizeSection.length > 0) {
             isSubmitting={isSubmitting}
           />
 
-          {isLandProperty2 && (
-            <InfrastructureFeesModal
+          {/* {isLandProperty2 && (
+            <InfrastructureFeesModalss
               isOpen={showInfrastructureModal}
               onClose={() => setShowInfrastructureModal(false)}
             />
-          )}
+          )} */}
 
           {currentStep === 1 && (
             <div className="bg-white rounded-lg p-6">
@@ -729,7 +735,7 @@ if (LandSizeSection.length > 0) {
             <div className="bg-white rounded-lg p-6">
               <MediaFORM
                 ref={mediaRef}
-                imagePreview={ImagePreview}
+                imagePreview={imagePreview}
                 setImagePreview={setEditImagePreview}
                 newDisplayImage={newDisplayImage}
                 setNewDisplayImage={setNewDisplayImage}
@@ -801,7 +807,7 @@ if (LandSizeSection.length > 0) {
                   Add Discount
                 </p>
               )}
-              {isLandProperty2 && (
+              {/* {isLandProperty2 && (
                 <p
                   className={`text-dark font-bold text-sm text-center cursor-pointer ${
                     isSubmitting ? "opacity-50 cursor-not-allowed" : ""
@@ -812,7 +818,7 @@ if (LandSizeSection.length > 0) {
                 >
                   Manage Infrastructure Fees
                 </p>
-              )}
+              )} */}
             </div>
           )}
 

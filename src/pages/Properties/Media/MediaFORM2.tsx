@@ -1,4 +1,10 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
@@ -16,6 +22,7 @@ interface MediaFormValues {
   videoLink: string;
   mapUrl: string;
   images: (File | string)[];
+  display_image: string | File | undefined;
 }
 
 interface MediaFORMProps {
@@ -23,7 +30,7 @@ interface MediaFORMProps {
   setMedia: (data: MediaFormValues) => void;
   initialData?: MediaFormValues;
   isEditMode?: boolean;
-  
+
   // Edit mode props (optional for create mode)
   imagePreview?: any | null;
   setImagePreview?: (preview: string | null) => void;
@@ -44,7 +51,7 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
     setMedia,
     initialData,
     isEditMode = false,
-    
+
     // Edit mode specific props
     imagePreview: externalImagePreview,
     setImagePreview: externalSetImagePreview,
@@ -63,62 +70,76 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
   // Create refs for create mode
   const createFileInputRef = useRef<HTMLInputElement>(null);
   const createGalleryInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
   // Use external refs if provided, otherwise use create mode refs
   const fileInputRef = externalFileInputRef || createFileInputRef;
   const galleryInputRefs = externalGalleryInputRefs || createGalleryInputRefs;
-  
+
   // Local state for create mode
-  const [localImagePreview, setLocalImagePreview] = useState<string | null>(null);
-  const [localGalleryPreviews, setLocalGalleryPreviews] = useState<(string | null)[]>([]);
-  const [localNewDisplayImage, setLocalNewDisplayImage] = useState<File | null>(null);
-  const [localNewGalleryImages, setLocalNewGalleryImages] = useState<(File | string | null)[]>([]);
-  
+  const [localImagePreview, setLocalImagePreview] = useState<string | null>(
+    null,
+  );
+  const [localGalleryPreviews, setLocalGalleryPreviews] = useState<
+    (string | null)[]
+  >([]);
+  const [localNewDisplayImage, setLocalNewDisplayImage] = useState<File | null>(
+    null,
+  );
+  const [localNewGalleryImages, setLocalNewGalleryImages] = useState<
+    (File | string | null)[]
+  >([]);
+
   // Use external state if provided, otherwise use local state
   const imagePreview = isEditMode ? externalImagePreview : localImagePreview;
-  const setImagePreview = isEditMode ? externalSetImagePreview : setLocalImagePreview;
-  const galleryPreviews = isEditMode ? externalGalleryPreviews : localGalleryPreviews;
-  const setGalleryPreviews = isEditMode ? externalSetGalleryPreviews : setLocalGalleryPreviews;
-  
+  const setImagePreview = isEditMode
+    ? externalSetImagePreview
+    : setLocalImagePreview;
+  const galleryPreviews = isEditMode
+    ? externalGalleryPreviews
+    : localGalleryPreviews;
+  const setGalleryPreviews = isEditMode
+    ? externalSetGalleryPreviews
+    : setLocalGalleryPreviews;
+
   const [initialValues, setInitialValues] = useState<MediaFormValues>({
-    tourLink: '',
-    videoLink: '',
-    mapUrl: '',
+    tourLink: "",
+    videoLink: "",
+    mapUrl: "",
     images: [],
+    display_image: "",
   });
 
-const validationSchema = Yup.object({
-  images: Yup.array()
-    .required("Display image is required")
-    .test(
-      "display-image-required",
-      "Display image is required",
-      (images) => {
-        if (!images) return false;
-        const displayImage = images[0];
-        return displayImage instanceof File || typeof displayImage === "string";
-      }
-    ),
-});
-
+  // Updated validation schema - display_image is now a separate field
+  const validationSchema = Yup.object({
+    display_image: Yup.mixed()
+      .required("Display image is required")
+      .test("display-image-required", "Display image is required", (value) => {
+        return value instanceof File || typeof value === "string";
+      }),
+    images: Yup.array(),
+    tourLink: Yup.string(),
+    videoLink: Yup.string(),
+    mapUrl: Yup.string(),
+  });
 
   const formikRef = useRef<any>(null);
 
   useEffect(() => {
     if (initialData) {
       setInitialValues({
-        tourLink: initialData.tourLink || '',
-        videoLink: initialData.videoLink || '',
-        mapUrl: initialData.mapUrl || '',
+        tourLink: initialData.tourLink || "",
+        videoLink: initialData.videoLink || "",
+        mapUrl: initialData.mapUrl || "",
         images: initialData.images || [],
+        display_image: initialData.display_image || "",
       });
 
       const images = initialData.images || [];
-      
+      const displayImage = initialData.display_image;
+
       // Handle display image preview
-      const displayImage = images[0];
       if (displayImage) {
-        if (typeof displayImage === 'string') {
+        if (typeof displayImage === "string") {
           if (setImagePreview) {
             setImagePreview(displayImage);
           } else {
@@ -131,12 +152,6 @@ const validationSchema = Yup.object({
           } else {
             setLocalImagePreview(preview);
           }
-        } else {
-          if (setImagePreview) {
-            setImagePreview(null);
-          } else {
-            setLocalImagePreview(null);
-          }
         }
       } else {
         if (setImagePreview) {
@@ -146,10 +161,9 @@ const validationSchema = Yup.object({
         }
       }
 
-      // Handle gallery images previews (skip first image which is display image)
-      const galleryImages = images
-      const galleryImagePreviews = galleryImages.map(image => {
-        if (typeof image === 'string') {
+      // Handle gallery images previews
+      const galleryImagePreviews = images.map((image) => {
+        if (typeof image === "string") {
           return image;
         } else if (image instanceof File) {
           return URL.createObjectURL(image);
@@ -172,15 +186,24 @@ const validationSchema = Yup.object({
         formikRef.current.handleSubmit();
       }
     },
-  get isValid() {
-    return !!formikRef.current?.values.images?.[0];
-  },
+    get isValid() {
+      // Check if formik is valid and display_image exists
+      const displayImage = formikRef.current?.values.display_image;
+      const isValid = !!(
+        displayImage instanceof File || typeof displayImage === "string"
+      );
+      return isValid && formikRef.current?.isValid;
+    },
   }));
 
-  const handleImageChange = (files: File[], isDisplayImage: boolean, index?: number) => {
+  const handleImageChange = (
+    files: File[],
+    isDisplayImage: boolean,
+    index?: number,
+  ) => {
     if (files.length > 0) {
       const file = files[0];
-      const reader = new FileReader();``
+      const reader = new FileReader();
       reader.onloadend = () => {
         if (isDisplayImage) {
           // Update image preview
@@ -189,16 +212,19 @@ const validationSchema = Yup.object({
           } else {
             setLocalImagePreview(reader.result as string);
           }
-          
+
           // Update display image
           if (setNewDisplayImage) {
             setNewDisplayImage(file);
           } else {
             setLocalNewDisplayImage(file);
           }
+
+          // Update Formik's display_image field
+          formikRef.current?.setFieldValue("display_image", file);
           
-          // Update Formik's images array
-          formikRef.current?.setFieldValue('images', [file, ...formikRef.current.values.images.slice(1)]);
+          // Trigger validation for display_image
+          formikRef.current?.validateField("display_image");
         } else {
           // Update gallery preview
           const newPreviews = [...(galleryPreviews || [])];
@@ -208,7 +234,7 @@ const validationSchema = Yup.object({
           } else {
             setLocalGalleryPreviews(newPreviews);
           }
-          
+
           // Update gallery images
           if (setNewGalleryImages) {
             const currentGalleryImages = newGalleryImages || [];
@@ -228,18 +254,15 @@ const validationSchema = Yup.object({
             }
             setLocalNewGalleryImages(updatedLocalGalleryImages);
           }
-          
+
           // Update Formik's images array
-          const formikIndex = index!
           const currentImages = [...formikRef.current.values.images];
-          
-          if (formikIndex < currentImages.length) {
-            currentImages[formikIndex] = file;
+          if (index! < currentImages.length) {
+            currentImages[index!] = file;
           } else {
             currentImages.push(file);
           }
-          
-          formikRef.current?.setFieldValue('images', currentImages);
+          formikRef.current?.setFieldValue("images", currentImages);
         }
       };
       reader.readAsDataURL(file);
@@ -254,7 +277,7 @@ const validationSchema = Yup.object({
       const newPreviews = [...localGalleryPreviews, null];
       setLocalGalleryPreviews(newPreviews);
     }
-    
+
     if (setNewGalleryImages) {
       const newImages = [...(newGalleryImages || []), null];
       setNewGalleryImages(newImages);
@@ -288,34 +311,33 @@ const validationSchema = Yup.object({
     // Update Formik's images array
     const currentImages = formikRef.current?.values.images || [];
     const updatedImages = [...currentImages];
-updatedImages.splice(index, 1);
-    formikRef.current?.setFieldValue('images', updatedImages);
+    updatedImages.splice(index, 1);
+    formikRef.current?.setFieldValue("images", updatedImages);
   };
 
   const handleSubmitForm = (values: MediaFormValues) => {
-    // Combine form values with image files
-    const finalImages = [...values.images];
-    
-    // Ensure display image is at index 0
+    // Prepare final data structure
+    let finalDisplayImage: File | string | undefined = values.display_image;
+
+    // Use new display image if available
     if (isEditMode && setNewDisplayImage && newDisplayImage) {
-      finalImages[0] = newDisplayImage;
+      finalDisplayImage = newDisplayImage;
     } else if (!isEditMode && localNewDisplayImage) {
-      finalImages[0] = localNewDisplayImage;
+      finalDisplayImage = localNewDisplayImage;
     }
-    
-    // Add gallery images
+
+    // Get gallery images
     const galleryImages = isEditMode ? newGalleryImages : localNewGalleryImages;
-    if (galleryImages) {
-      galleryImages.forEach((img, index) => {
-        if (img && index < galleryImages.length - 1) { // Skip null placeholders
-    finalImages[index] = img;      
-        }
-      });
-    }
-    
+    const finalGalleryImages =
+      (galleryImages?.filter((img) => img !== null && img !== undefined) as (
+        | File
+        | string
+      )[]) || [];
+
     setMedia({
       ...values,
-      images: finalImages.filter(img => img !== null) as (File | string)[],
+      display_image: finalDisplayImage,
+      images: finalGalleryImages,
     });
   };
 
@@ -342,12 +364,17 @@ updatedImages.splice(index, 1);
       validationSchema={validationSchema}
       enableReinitialize={true}
       onSubmit={handleSubmitForm}
+      validateOnMount={true}
+      validateOnChange={true}
+      validateOnBlur={true}
     >
-      {({ values, handleChange, touched, errors, setFieldValue }) => (
+      {({ values, handleChange, touched, errors, setFieldValue, validateForm }) => (
         <Form className="max-w-xl">
           {/* Display Image Upload */}
           <div className="mb-8 p-6 border rounded-lg bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Display Image</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Display Image
+            </h2>
             <p className="text-sm text-gray-600 mb-4">
               This will be the main image shown for your property.
             </p>
@@ -367,36 +394,50 @@ updatedImages.splice(index, 1);
                   onClick={triggerFileInput}
                   className="bg-white text-gray-800 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors"
                 >
-                  {imagePreview ? 'Change Image' : 'Upload Image'}
+                  {imagePreview ? "Change Image" : "Upload Image"}
                 </button>
               </div>
             </div>
             <input
               type="file"
               ref={fileInputRef}
-              onChange={(e) => handleImageChange(Array.from(e.target.files || []), true)}
+              onChange={(e) =>
+                handleImageChange(Array.from(e.target.files || []), true)
+              }
               className="hidden"
               accept="image/*"
             />
-            {touched.images && errors.images && (
+            {touched.display_image && errors.display_image && (
               <p className="text-red-500 text-sm mt-2 flex items-center">
                 <FaCircleExclamation className="mr-1" />
-                {errors.images}
+                {errors.display_image as string}
+              </p>
+            )}
+            {/* Show error even if not touched for better UX */}
+            {!touched.display_image && errors.display_image && (
+              <p className="text-red-500 text-sm mt-2 flex items-center">
+                <FaCircleExclamation className="mr-1" />
+                {errors.display_image as string}
               </p>
             )}
           </div>
-          
+
           <hr className="my-8" />
 
           {/* Gallery Images Upload */}
           <div className="mb-8 p-6 border rounded-lg bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Gallery Images</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Gallery Images
+            </h2>
             <p className="text-sm text-gray-600 mb-4">
               Upload additional images for your property gallery.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {(galleryPreviews || []).map((preview, index) => (
-                <div key={index} className="relative w-full aspect-square border-2 border-dashed border-gray-300 rounded-lg group overflow-hidden">
+                <div
+                  key={index}
+                  className="relative w-full aspect-square border-2 border-dashed border-gray-300 rounded-lg group overflow-hidden"
+                >
                   {preview ? (
                     <img
                       src={preview}
@@ -426,8 +467,16 @@ updatedImages.splice(index, 1);
                   </div>
                   <input
                     type="file"
-                    ref={el => {galleryInputRefs.current[index] = el}}
-                    onChange={(e) => handleImageChange(Array.from(e.target.files || []), false, index)}
+                    ref={(el) => {
+                      galleryInputRefs.current[index] = el;
+                    }}
+                    onChange={(e) =>
+                      handleImageChange(
+                        Array.from(e.target.files || []),
+                        false,
+                        index,
+                      )
+                    }
                     className="hidden"
                     accept="image/*"
                   />
@@ -444,10 +493,12 @@ updatedImages.splice(index, 1);
           </div>
 
           <hr className="my-8" />
-          
+
           {/* Virtual Tour Link */}
           <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Virtual Tour</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Virtual Tour
+            </h2>
             <p className="text-sm text-gray-600 mb-4">
               Provide a link to a virtual tour of the property.
             </p>
@@ -458,16 +509,21 @@ updatedImages.splice(index, 1);
               value={values.tourLink}
               onChange={handleChange}
               error={
-                touched.tourLink && errors.tourLink ? errors.tourLink : undefined
+                touched.tourLink && errors.tourLink
+                  ? errors.tourLink
+                  : undefined
               }
             />
           </div>
 
           {/* Video Link */}
           <div className="mt-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Video Link</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Video Link
+            </h2>
             <p className="text-sm text-gray-600 mb-4">
-              Alternatively, you can provide a link to a hosted video (YouTube, Vimeo, etc.).
+              Alternatively, you can provide a link to a hosted video (YouTube,
+              Vimeo, etc.).
             </p>
             <InputField
               label="Video URL"
@@ -476,14 +532,18 @@ updatedImages.splice(index, 1);
               value={values.videoLink}
               onChange={handleChange}
               error={
-                touched.videoLink && errors.videoLink ? errors.videoLink : undefined
+                touched.videoLink && errors.videoLink
+                  ? errors.videoLink
+                  : undefined
               }
             />
           </div>
 
           {/* Map URL */}
           <div className="mt-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Map Location</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              Map Location
+            </h2>
             <p className="text-sm text-gray-600 mb-4">
               Provide a Google Maps link to the property location.
             </p>
