@@ -102,7 +102,7 @@ export interface MediaFormValues {
   videoLink: string;
   mapUrl: string;
   images: (File | string)[];
-  display_image?: string | File;
+  display_image: string | File | undefined
 }
 
 export interface DiscountFormValues {
@@ -312,6 +312,7 @@ LandSizeSection: [],
     tourLink: "",
     videoLink: "",
     images: [],
+    display_image: '',
   },
   discount: {
     discountName: "",

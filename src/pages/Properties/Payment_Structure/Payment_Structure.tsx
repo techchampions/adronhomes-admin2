@@ -8,9 +8,11 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import OptionInputField from "../../../components/input/drop_down";
 import InputField from "../../../components/input/inputtext";
-import InfrastructureFeesModal from "../../../components/Modals/infrastureModal2";
-import InfrastructureFeesModalss from "../../../components/Modals/InfrastructureFeesModal";
+// import InfrastructureFeesModal from "../../../components/Modals/infrastureModal2";
+// import InfrastructureFeesModalss from "../../../components/Modals/InfrastructureFeesModal";
 import { PaymentStructureFormValues } from "../../../MyContext/MyContext";
+import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
+import InfrastructureFeesModalss from "../../../components/Modals/infrastureModal2";
 // import { PaymentStructureFormValues } from "../../../types/propertyTypes";
 
 interface PaymentStructureHandles {
@@ -44,6 +46,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
   onOpenInfrastructureModal
 }, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
 
   const paymentTypeOptions = [
@@ -148,10 +151,10 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
   };
 
   const handleOpenInfrastructureModal = () => {
-    setIsModalOpen(true);
-    if (onOpenInfrastructureModal) {
-      onOpenInfrastructureModal();
-    }
+  isEditMode? setIsModalOpen2(true): setIsModalOpen(true);
+    // if (onOpenInfrastructureModal) {
+    //   onOpenInfrastructureModal();
+    // }
   };
 
   return (
@@ -245,7 +248,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
       </form>
 
       {/* Infrastructure Fees Modal Trigger for Land Properties */}
-      {isLandProperty || !isEditMode && (
+      {isLandProperty  && (
         <div
           className="pt-5"
           onClick={(e) => {
@@ -263,13 +266,15 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
           </button>
 
           {/* Conditionally render the appropriate modal based on edit mode */}
-          {isModalOpen && isEditMode ? (
-            <InfrastructureFeesModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-            />
-          ) : (
+          { isModalOpen2 && isEditMode && (
             <InfrastructureFeesModalss
+              isOpen={isModalOpen2}
+              onClose={() => setIsModalOpen2(false)}
+            />
+          ) }
+          
+          {isModalOpen && (
+            <InfrastructureFeesModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
             />
