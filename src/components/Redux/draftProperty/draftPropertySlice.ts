@@ -96,6 +96,7 @@ const initialState: EditPropertyFormData = {
     tourLink: "",
     videoLink: "",
     images: [],
+    display_image: '',
   },
   discount: {
     discountName: "",
@@ -270,6 +271,7 @@ const draftPropertySlice = createSlice({
         tourLink: property.virtual_tour || "",
         videoLink: property.video_link || "",
         images: property.photos || [],
+        display_image: property.display_image || "",
       };
 
       state.discount = {

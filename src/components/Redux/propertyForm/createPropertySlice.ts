@@ -95,6 +95,7 @@ const initialState: CreatePropertyFormData = {
     tourLink: "",
     videoLink: "",
     images: [],
+    display_image: undefined,
   },
   discount: {
     discountName: "",
