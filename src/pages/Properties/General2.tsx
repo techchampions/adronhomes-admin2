@@ -213,22 +213,20 @@ export default function General() {
     ========================== */
 // Handle Land Size Section
 if (LandSizeSection.length > 0) {
+  // Submit standalone fields (only once, outside the loop)
+  formPayload.append("citta_termination_code", String(LandSizeSection[0].citta_termination_code || ""));
+  formPayload.append("citta_termination_name", String(LandSizeSection[0].citta_termination_name || ""));
+  formPayload.append("citta_promo_code", String(LandSizeSection[0].citta_promo_code || ""));
+  formPayload.append("citta_promo_name", String(LandSizeSection[0].citta_promo_name || ""));
+  formPayload.append("citta_estate_name", String(LandSizeSection[0].citta_estate_name || ""));
+  formPayload.append("citta_estate_code", String(LandSizeSection[0].citta_estate_code || ""));
+  formPayload.append("citta_property_category", String(LandSizeSection[0].citta_property_category || ""));
+  formPayload.append("citta_category_id", String(LandSizeSection[0].citta_category_id || ""));
+
+  // Now loop through land sizes for the array data
   LandSizeSection.forEach((ls, i) => {
     formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
     formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
-    
-    formPayload.append(`land_sizes[${i}][citta_category_id]`, String(ls.citta_category_id || ""));
-    formPayload.append(`land_sizes[${i}][citta_estate_name]`, String(ls.citta_estate_name || ""));
-    formPayload.append(`land_sizes[${i}][citta_estate_code]`, String(ls.citta_estate_code || ""));
-    formPayload.append(`land_sizes[${i}][citta_property_category]`, String(ls.citta_property_category || ""));
-    
-    // Add termination code fields
-    formPayload.append(`land_sizes[${i}][citta_termination_code]`, String(ls.citta_termination_code || ""));
-    formPayload.append(`land_sizes[${i}][citta_termination_name]`, String(ls.citta_termination_name || ""));
-    
-    // Add promo code fields
-    formPayload.append(`land_sizes[${i}][citta_promo_code]`, String(ls.citta_promo_code || ""));
-    formPayload.append(`land_sizes[${i}][]`, String(ls.citta_promo_name || ""));
 
     if (ls.durations && ls.durations.length > 0) {
       ls.durations.forEach((d, j) => {
