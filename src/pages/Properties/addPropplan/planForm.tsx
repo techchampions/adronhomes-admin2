@@ -77,7 +77,7 @@ export interface LandSizeSection {
   citta_category_id?: string;
   citta_estate_name?: string;
   citta_estate_code?: string;
-  citta_property_category?: string;
+  citta_property_category?: string; 
   citta_promo_code?: string;
   citta_promo_name?: string;
   citta_termination_code?: string;
@@ -201,9 +201,9 @@ const PropertyListingPage = forwardRef<
         if (estate) setSelectedEstate(estate);
       }
 
-      if (initialData[0]?.citta_category_id) {
+      if (initialData[0]?.citta_property_category) {
         const category = categories.find(
-          (c) => String(c.pCode) === String(initialData[0].citta_category_id)
+          (c) => c.pName === initialData[0].citta_property_category
         );
         if (category) setSelectedCategory(category);
       }
@@ -366,7 +366,7 @@ const PropertyListingPage = forwardRef<
           citta_category_id: String(selectedCategory?.pCode || ""),
           citta_estate_name: selectedEstate?.EstateName || "",
           citta_estate_code: selectedEstate?.EstateCode || "",
-          citta_property_category: String(selectedCategory?.pCode || ""),
+          citta_property_category: selectedCategory?.pName || "", // Changed to store name instead of code
           citta_promo_code: selectedPromoCode?.pCode || undefined,
           citta_promo_name: selectedPromoCode?.pName || "",
           citta_termination_code: selectedTerminationCode?.pCode || undefined,
@@ -392,8 +392,6 @@ const PropertyListingPage = forwardRef<
     // } else {
     //   toast.info("Promo code removed from all sections");
     // }
-
-    
   };
 
   const applyTerminationCodeToAllSections = (terminationCode: any) => {
@@ -451,7 +449,7 @@ const PropertyListingPage = forwardRef<
       citta_category_id: String(selectedCategory?.pCode || ""),
       citta_estate_name: selectedEstate?.EstateName || "",
       citta_estate_code: selectedEstate?.EstateCode || "",
-      citta_property_category: String(selectedCategory?.pCode || ""),
+      citta_property_category: selectedCategory?.pName || "", // Changed to store name instead of code
       citta_promo_code: selectedPromoCode?.pCode || undefined,
       citta_promo_name: selectedPromoCode?.pName || "",
       citta_termination_code: selectedTerminationCode?.pCode || undefined,
@@ -710,311 +708,303 @@ const PropertyListingPage = forwardRef<
             <span>Refresh Citta Data</span>
           </button>
         </div>
-  </div>
-
-        <form onSubmit={formik.handleSubmit} className="space-y-8">
-          {/* Estate & Category Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6  rounded-2xl border border-gray-200">
-            <EnhancedOptionInputField
-              label="Select Citta Estate *"
-              placeholder="Choose an estate..."
-              value={selectedEstate?.EstateCode || ""}
-              onChange={handleEstateChange}
-              options={estates.map((estate) => ({
-                value: estate.EstateCode,
-                label: `${estate.EstateCode} - ${estate.EstateName}`,
-                original: estate,
-              }))}
-              isSearchable
-              isLoading={estatesLoading || isRefreshing}
-            />
-
-            <EnhancedOptionInputField
-              label="Select Citta Property Category *"
-              placeholder="Choose a category..."
-              value={
-                selectedCategory?.pCode ? String(selectedCategory.pCode) : ""
-              }
-              onChange={handleCategoryChange}
-              options={categories.map((category) => ({
-                value: String(category.pCode),
-                label: `${category.pCode} - ${category.pName}`,
-                original: category,
-              }))}
-              isSearchable
-              isLoading={categoriesLoading || isRefreshing}
-            />
-          </div>
-
-          {/* Promo Code & Termination Code Selection */}
-          {selectedEstate &&
-            selectedCategory &&
-            !showLoadingIndicator &&
-            !isDataEmpty && (
-              <div className="space-y-6">
-                {/* Promo Code Section */}
-                <div className="p-6 rounded-2xl border border-gray-200 bg-[#57713A]/40">
-                  <div className="flex items-center gap-2 mb-4">
-                    <TagIcon className="h-5 w-5 text-[#57713A]" />
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Apply Promo Code
-                    </h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Select a promo code to apply to property
-                  </p>
-
-                  <EnhancedOptionInputField
-                    label="Select Promo Code"
-                    placeholder="Search and select a promo code..."
-                    value={selectedPromoCode?.pCode || ""}
-                    onChange={(value: string) => {
-                      const promoCode = allPromoCodes.find(
-                        (p) => p.pCode === value,
-                      );
-                      setSelectedPromoCode(promoCode);
-                      applyPromoCodeToAllSections(promoCode);
-                    }}
-                    options={filteredPromoCodes.map((code) => ({
-                      value: code.pCode,
-                      label: `${code.pCode} - ${code.pName}`,
-                      original: code,
-                    }))}
-                    isSearchable
-                    isLoading={promoCodesLoading || isRefreshing}
-                  />
-
-                  {selectedPromoCode && (
-                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm text-green-800">
-                        <span className="font-semibold">Active Promo:</span>{" "}
-                        {selectedPromoCode.pCode} -{" "}
-                        {extractDiscountFromPromo(selectedPromoCode.pName)}%
-                        discount
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Termination Code Section */}
-                <div className="p-6 rounded-2xl border border-gray-200 bg-orange-50/30">
-                  <div className="flex items-center gap-2 mb-4">
-                    <AlertTriangleIcon className="h-5 w-5 text-orange-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Apply Termination Code
-                    </h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Select a termination code to apply discount
-                  </p>
-
-                  <EnhancedOptionInputField
-                    label="Select Termination Code"
-                    placeholder="Search and select a termination code..."
-                    value={selectedTerminationCode?.pCode || ""}
-                    onChange={(value: string) => {
-                      const terminationCode = allTerminationCodes.find(
-                        (t) => t.pCode === value,
-                      );
-                      setSelectedTerminationCode(terminationCode);
-                      applyTerminationCodeToAllSections(terminationCode);
-                    }}
-                    options={filteredTerminationCodes.map((code) => ({
-                      value: code.pCode,
-                      label: `${code.pCode} - ${code.pName}% off`,
-                      original: code,
-                    }))}
-                    isSearchable
-                    isLoading={terminationCodesLoading || isRefreshing}
-                  />
-
-                  {selectedTerminationCode && (
-                    <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                      <p className="text-sm text-orange-800">
-                        <span className="font-semibold">
-                          Active Termination Code:
-                        </span>{" "}
-                        {selectedTerminationCode.pCode} -{" "}
-                        {selectedTerminationCode.pName}% discount
-                      </p>
-                      <p className="text-xs text-orange-600 mt-1">
-                        This discount will be applied before the promo code
-                        discount
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-          {/* Loading Indicator */}
-          {showLoadingIndicator && (
-            <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-2xl border-2 border-gray-200">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#57713A] border-t-transparent mb-4"></div>
-              <p className="text-gray-600 font-medium">
-                Loading property data...
-              </p>
-            </div>
-          )}
-
-          {/* Empty Data */}
-          {isDataEmpty && !showLoadingIndicator && (
-            <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-2xl border-2 border-slate-200">
-              <AlertCircle className="h-12 w-12 text-slate-500 mb-4" />
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                No Data Available
-              </h3>
-              <p className="text-slate-600 text-center max-w-md">
-                No property data found for the selected estate and category.
-              </p>
-            </div>
-          )}
-
-          {/* Land Sizes Section */}
-          {!showLoadingIndicator && !isDataEmpty && (
-            <div>
-              <h2 className="text-base font-semibold text-gray-800 mb-6">
-                Land Sizes & Pricing
-              </h2>
-
-              <div className="space-y-8">
-                {landSizeSections.map((section, sectionIndex) => (
-                  <div
-                    key={section.id}
-                    className="border border-gray-200 rounded-2xl p-6 relative bg-gray-50/50"
-                  >
-                    {landSizeSections.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeLandSizeSection(section.id)}
-                        className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
-                      >
-                        ✕
-                      </button>
-                    )}
-
-                    <div className="mb-6">
-                      <EnhancedOptionInputField
-                        label="Land Size *"
-                        placeholder="Select land size..."
-                        value={section.size || ""}
-                        onChange={(value: string) =>
-                          updateLandSize(section.id, value)
-                        }
-                        options={availableSizes.map((item) => ({
-                          value: item.size,
-                          label: item.size,
-                          original: item,
-                        }))}
-                        isSearchable
-                        isLoading={propertyMapLoading}
-                        error={getErrorMessage(
-                          `landSizeSections[${sectionIndex}].size`,
-                        )}
-                        disabled
-                      />
-                    </div>
-
-                    <div className="space-y-4">
-                      {section.durations.map((duration, durationIndex) => (
-                        <div
-                          key={duration.id}
-                          className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl"
-                        >
-                          <div className="flex-1">
-                            <InputField
-                              label="Duration (months)"
-                              type="number"
-                              value={duration.duration || ""}
-                              onChange={(e) =>
-                                updateDuration(
-                                  section.id,
-                                  duration.id,
-                                  "duration",
-                                  e.target.value,
-                                )
-                              }
-                              error={getErrorMessage(
-                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`,
-                              )}
-                              placeholder={""}
-                              disabled
-                            />
-                          </div>
-
-                          <div className="flex-1">
-                            <InputField
-                              label="Original Price (₦)"
-                              type="text"
-                              value={duration.discountedPrice
-                                ? formatToNaira(duration.discountedPrice)
-                                : formatToNaira(duration.price || "")}
-                              onChange={(e) => {
-                                const raw = e.target.value.replace(/[^0-9]/g, "");
-                                updateDuration(section.id, duration.id, "price", raw);
-                              } }
-                              error={getErrorMessage(
-                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
-                              )}
-                              disabled
-                              placeholder={""}
-                            />
-                          </div>
-
-                          <div className="flex-1">
-                            <InputField
-                              label="Final Price (₦)"
-                              type="text"
-                              value={
-                                duration.discountedPrice
-                                  ? formatToNaira(duration.discountedPrice)
-                                  : formatToNaira(duration.price || "")
-                              }
-                              onChange={() => {}} // Empty onChange handler for read-only field
-                              // readOnly
-                              // className="bg-gray-100 cursor-not-allowed"
-                              placeholder={""}
-                              disabled
-                            />
-                          </div>
-
-                          <div className="flex-1">
-                            <label className="block text-sm mb-1">Citta Property Code</label>
-                            <input
-                              type="text"
-                              readOnly
-                              value={duration.citta_id || ""}
-                              className="w-full px-3 py-2 rounded-full bg-gray-100 cursor-not-allowed"
-                            />
-                          </div>
-
-                          {section.durations.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                removeDurationFromSection(
-                                  section.id,
-                                  duration.id,
-                                )
-                              }
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </div>
-                      ))}
-
-                      
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </form>
       </div>
-    // </div>
+
+      <form onSubmit={formik.handleSubmit} className="space-y-8">
+        {/* Estate & Category Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl border border-gray-200">
+          <EnhancedOptionInputField
+            label="Select Citta Estate *"
+            placeholder="Choose an estate..."
+            value={selectedEstate?.EstateCode || ""}
+            onChange={handleEstateChange}
+            options={estates.map((estate) => ({
+              value: estate.EstateCode,
+              label: `${estate.EstateCode} - ${estate.EstateName}`,
+              original: estate,
+            }))}
+            isSearchable
+            isLoading={estatesLoading || isRefreshing}
+          />
+
+          <EnhancedOptionInputField
+            label="Select Citta Property Category *"
+            placeholder="Choose a category..."
+            value={
+              selectedCategory?.pCode ? String(selectedCategory.pCode) : ""
+            }
+            onChange={handleCategoryChange}
+            options={categories.map((category) => ({
+              value: String(category.pCode),
+              label: `${category.pCode} - ${category.pName}`,
+              original: category,
+            }))}
+            isSearchable
+            isLoading={categoriesLoading || isRefreshing}
+          />
+        </div>
+
+        {/* Promo Code & Termination Code Selection */}
+        {selectedEstate &&
+          selectedCategory &&
+          !showLoadingIndicator &&
+          !isDataEmpty && (
+            <div className="space-y-6">
+              {/* Promo Code Section */}
+              <div className="p-6 rounded-2xl border border-gray-200 bg-[#57713A]/40">
+                <div className="flex items-center gap-2 mb-4">
+                  <TagIcon className="h-5 w-5 text-[#57713A]" />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Apply Promo Code
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Select a promo code to apply to property
+                </p>
+
+                <EnhancedOptionInputField
+                  label="Select Promo Code"
+                  placeholder="Search and select a promo code..."
+                  value={selectedPromoCode?.pCode || ""}
+                  onChange={(value: string) => {
+                    const promoCode = allPromoCodes.find(
+                      (p) => p.pCode === value,
+                    );
+                    setSelectedPromoCode(promoCode);
+                    applyPromoCodeToAllSections(promoCode);
+                  }}
+                  options={filteredPromoCodes.map((code) => ({
+                    value: code.pCode,
+                    label: `${code.pCode} - ${code.pName}`,
+                    original: code,
+                  }))}
+                  isSearchable
+                  isLoading={promoCodesLoading || isRefreshing}
+                />
+
+                {selectedPromoCode && (
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <span className="font-semibold">Active Promo:</span>{" "}
+                      {selectedPromoCode.pCode} -{" "}
+                      {extractDiscountFromPromo(selectedPromoCode.pName)}%
+                      discount
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Termination Code Section */}
+              <div className="p-6 rounded-2xl border border-gray-200 bg-orange-50/30">
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangleIcon className="h-5 w-5 text-orange-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Apply Termination Code
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Select a termination code to apply discount
+                </p>
+
+                <EnhancedOptionInputField
+                  label="Select Termination Code"
+                  placeholder="Search and select a termination code..."
+                  value={selectedTerminationCode?.pCode || ""}
+                  onChange={(value: string) => {
+                    const terminationCode = allTerminationCodes.find(
+                      (t) => t.pCode === value,
+                    );
+                    setSelectedTerminationCode(terminationCode);
+                    applyTerminationCodeToAllSections(terminationCode);
+                  }}
+                  options={filteredTerminationCodes.map((code) => ({
+                    value: code.pCode,
+                    label: `${code.pCode} - ${code.pName}% off`,
+                    original: code,
+                  }))}
+                  isSearchable
+                  isLoading={terminationCodesLoading || isRefreshing}
+                />
+
+                {selectedTerminationCode && (
+                  <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="text-sm text-orange-800">
+                      <span className="font-semibold">
+                        Active Termination Code:
+                      </span>{" "}
+                      {selectedTerminationCode.pCode} -{" "}
+                      {selectedTerminationCode.pName}% discount
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">
+                      This discount will be applied before the promo code
+                      discount
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+        {/* Loading Indicator */}
+        {showLoadingIndicator && (
+          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-2xl border-2 border-gray-200">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#57713A] border-t-transparent mb-4"></div>
+            <p className="text-gray-600 font-medium">
+              Loading property data...
+            </p>
+          </div>
+        )}
+
+        {/* Empty Data */}
+        {isDataEmpty && !showLoadingIndicator && (
+          <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-2xl border-2 border-slate-200">
+            <AlertCircle className="h-12 w-12 text-slate-500 mb-4" />
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">
+              No Data Available
+            </h3>
+            <p className="text-slate-600 text-center max-w-md">
+              No property data found for the selected estate and category.
+            </p>
+          </div>
+        )}
+
+        {/* Land Sizes Section */}
+        {!showLoadingIndicator && !isDataEmpty && (
+          <div>
+            <h2 className="text-base font-semibold text-gray-800 mb-6">
+              Land Sizes & Pricing
+            </h2>
+
+            <div className="space-y-8">
+              {landSizeSections.map((section, sectionIndex) => (
+                <div
+                  key={section.id}
+                  className="border border-gray-200 rounded-2xl p-6 relative bg-gray-50/50"
+                >
+                  {landSizeSections.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeLandSizeSection(section.id)}
+                      className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  )}
+
+                  <div className="mb-6">
+                    <EnhancedOptionInputField
+                      label="Land Size *"
+                      placeholder="Select land size..."
+                      value={section.size || ""}
+                      onChange={(value: string) =>
+                        updateLandSize(section.id, value)
+                      }
+                      options={availableSizes.map((item) => ({
+                        value: item.size,
+                        label: item.size,
+                        original: item,
+                      }))}
+                      isSearchable
+                      isLoading={propertyMapLoading}
+                      error={getErrorMessage(
+                        `landSizeSections[${sectionIndex}].size`,
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    {section.durations.map((duration, durationIndex) => (
+                      <div
+                        key={duration.id}
+                        className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl"
+                      >
+                        <div className="flex-1">
+                          <InputField
+                            label="Duration (months)"
+                            type="number"
+                            value={duration.duration || ""}
+                            onChange={(e) =>
+                              updateDuration(
+                                section.id,
+                                duration.id,
+                                "duration",
+                                e.target.value,
+                              )
+                            }
+                            error={getErrorMessage(
+                              `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`,
+                            )}
+                            placeholder={""}
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <InputField
+                            label="Original Price (₦)"
+                            type="text"
+                            value={duration.discountedPrice
+                              ? formatToNaira(duration.discountedPrice)
+                              : formatToNaira(duration.price || "")}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/[^0-9]/g, "");
+                              updateDuration(section.id, duration.id, "price", raw);
+                            }}
+                            error={getErrorMessage(
+                              `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
+                            )}
+                            placeholder={""}
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <InputField
+                            label="Final Price (₦)"
+                            type="text"
+                            value={
+                              duration.discountedPrice
+                                ? formatToNaira(duration.discountedPrice)
+                                : formatToNaira(duration.price || "")
+                            }
+                            onChange={() => {}}
+                            placeholder={""}
+                            disabled
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <label className="block text-sm mb-1">Citta Property Code</label>
+                          <input
+                            type="text"
+                            readOnly
+                            value={duration.citta_id || ""}
+                            className="w-full px-3 py-2 rounded-full bg-gray-100 cursor-not-allowed"
+                          />
+                        </div>
+
+                        {section.durations.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeDurationFromSection(
+                                section.id,
+                                duration.id,
+                              )
+                            }
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
   );
 });
 
