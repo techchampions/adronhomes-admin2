@@ -89,6 +89,7 @@ import retrievePropertyCodeReducer from "./citta/RetrievePropertyCodeState";
 // import cittaPropertyMapReducer from "./citta/cittaPropertyMapSlice";
 import promoTableReducerlistReducer from "./gift/promo/PromoCodelist";
 import fetchTerminationCodesReducer from "./gift/promo/fetchTerminationCodes";
+import subscriberSlice from "./subscriberSlice/subscriberSlice";
 export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -193,6 +194,7 @@ export const store = configureStore({
     cittaPropertyMap: fetchCittaPropertyMapReducer,
     promoCodes: promoTableReducerlistReducer,
     terminationCodes: fetchTerminationCodesReducer,
+    subscriber: subscriberSlice,
     
   },
 });

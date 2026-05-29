@@ -57,7 +57,10 @@ export interface Marketer {
 }
 
 export interface Contract {
+  
   id: number;
+  prospect_id: number | null;
+  payment_id: number | null;
   property_id: number;
   user_id: number;
   property_type: number;
