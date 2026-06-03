@@ -321,7 +321,9 @@ const editPropertySlice = createSlice({
   citta_promo_code: property.citta_promo_code || "",
   citta_promo_name: property.citta_promo_name || "",
   citta_termination_code: property.citta_termination_code || "",
-  citta_termination_name: property.citta_termination_name || "",
+     citta_termination_name: property.citta_termination_name || "",
+     citta_contract_type: property.citta_contract_type || "",
+      citta_contract_type_name: property.citta_contract_type_name || "",
 })) || [];
       state.display.status = property.is_active ? "publish" : "draft";
 

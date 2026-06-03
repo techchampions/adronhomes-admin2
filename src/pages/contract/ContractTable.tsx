@@ -367,7 +367,7 @@ export default function ContractsTableComponent({
                           aria-label="Create subscriber"
                           disabled={
                             (subscriberLoading && isSubscribing) ||
-                            contract?.prospect_id === null
+                            contract?.prospect_id !== null
                           }
                         >
                           {subscriberLoading && isSubscribing

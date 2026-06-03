@@ -92,15 +92,12 @@ export default function EditProperty() {
   } = metadata;
 
   const { data, loading, error } = useAppSelector(
-    (state) => state.propertyDetails
+    (state) => state.propertyDetails,
   );
-  const {
-    imagePreview,
-    setImagePreview
-  }= useContext(PropertyContext)!;
+  const { imagePreview, setImagePreview } = useContext(PropertyContext)!;
 
   const [discountEnabled, setDiscounted] = useState(
-    discount.discountName !== ""
+    discount.discountName !== "",
   );
   const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
   const [showInfrastructureModal, setShowInfrastructureModal] = useState(false);
@@ -112,7 +109,7 @@ export default function EditProperty() {
     (File | string | null)[]
   >([]);
   // const [ImagePreview, setImagePreview] = useState<(File | string | null)>(
-    
+
   // );
 
   // Create refs
@@ -199,7 +196,7 @@ export default function EditProperty() {
         formPayload.append("category", "bulk");
         formPayload.append(
           "initial_deposit",
-          basicDetails.initialDeposit || "0"
+          basicDetails.initialDeposit || "0",
         );
       } else {
         formPayload.append("name", basicDetails.propertyName);
@@ -207,7 +204,7 @@ export default function EditProperty() {
         formPayload.append("price", basicDetails.price);
         formPayload.append(
           "initial_deposit",
-          basicDetails.initialDeposit || "0"
+          basicDetails.initialDeposit || "0",
         );
         formPayload.append("country", basicDetails.country);
         formPayload.append("state", basicDetails.state);
@@ -223,70 +220,101 @@ export default function EditProperty() {
         });
       }
 
-if (LandSizeSection.length > 0) {
-  // Submit standalone fields (only once, outside the loop)
-  formPayload.append("citta_termination_code", String(LandSizeSection[0].citta_termination_code || ""));
-  formPayload.append("citta_termination_name", String(LandSizeSection[0].citta_termination_name || ""));
-  formPayload.append("citta_promo_code", String(LandSizeSection[0].citta_promo_code || ""));
-  formPayload.append("citta_promo_name", String(LandSizeSection[0].citta_promo_name || ""));
-  formPayload.append("citta_estate_name", String(LandSizeSection[0].citta_estate_name || ""));
-  formPayload.append("citta_estate_code", String(LandSizeSection[0].citta_estate_code || ""));
-  formPayload.append("citta_property_category", String(LandSizeSection[0].citta_property_category || ""));
-  formPayload.append("citta_category_id", String(LandSizeSection[0].citta_category_id || ""));
+      if (LandSizeSection.length > 0) {
+        // Submit standalone fields (only once, outside the loop)
+        formPayload.append(
+          "citta_termination_code",
+          String(LandSizeSection[0].citta_termination_code || ""),
+        );
+        formPayload.append(
+          "citta_termination_name",
+          String(LandSizeSection[0].citta_termination_name || ""),
+        );
+        formPayload.append(
+          "citta_promo_code",
+          String(LandSizeSection[0].citta_promo_code || ""),
+        );
+        formPayload.append(
+          "citta_promo_name",
+          String(LandSizeSection[0].citta_promo_name || ""),
+        );
+        formPayload.append(
+          "citta_estate_name",
+          String(LandSizeSection[0].citta_estate_name || ""),
+        );
+        formPayload.append(
+          "citta_estate_code",
+          String(LandSizeSection[0].citta_estate_code || ""),
+        );
+        formPayload.append(
+          "citta_property_category",
+          String(LandSizeSection[0].citta_property_category || ""),
+        );
+        formPayload.append(
+          "citta_category_id",
+          String(LandSizeSection[0].citta_category_id || ""),
+        );
+        formPayload.append(
+          "citta_contract_type",
+          String(LandSizeSection[0].citta_contract_type || ""),
+        );
+        formPayload.append(
+          "citta_contract_type_name",
+          String(LandSizeSection[0].citta_contract_type_name || ""),
+        );
+        // Now loop through land sizes for the array data
+        LandSizeSection.forEach((ls, i) => {
+          formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
+          formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
 
-  // Now loop through land sizes for the array data
-  LandSizeSection.forEach((ls, i) => {
-    formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
-    formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+          if (ls.durations && ls.durations.length > 0) {
+            ls.durations.forEach((d, j) => {
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][id]`,
+                String(d.id || ""),
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][duration]`,
+                String(d.duration || ""),
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][price]`,
+                String(d.price || ""),
+              );
+              formPayload.append(
+                `land_sizes[${i}][durations][${j}][citta_id]`,
+                String(d.citta_id || ""),
+              );
 
-    if (ls.durations && ls.durations.length > 0) {
-      ls.durations.forEach((d, j) => {
-        formPayload.append(
-          `land_sizes[${i}][durations][${j}][id]`,
-          String(d.id || "")
-        );
-        formPayload.append(
-          `land_sizes[${i}][durations][${j}][duration]`,
-          String(d.duration || "")
-        );
-        formPayload.append(
-          `land_sizes[${i}][durations][${j}][price]`,
-          String(d.price || "")
-        );
-        formPayload.append(
-          `land_sizes[${i}][durations][${j}][citta_id]`,
-          String(d.citta_id || "")
-        );
-        
-        // Add discount-related fields for durations
-        if (d.discountedPrice) {
-          formPayload.append(
-            `land_sizes[${i}][durations][${j}][discounted_price]`,
-            String(d.discountedPrice)
-          );
-        }
-        if (d.appliedPromoCode) {
-          formPayload.append(
-            `land_sizes[${i}][durations][${j}][applied_promo_code]`,
-            String(d.appliedPromoCode)
-          );
-        }
-        if (d.appliedTerminationCode) {
-          formPayload.append(
-            `land_sizes[${i}][durations][${j}][applied_termination_code]`,
-            String(d.appliedTerminationCode)
-          );
-        }
-        if (d.terminationDiscountedPrice) {
-          formPayload.append(
-            `land_sizes[${i}][durations][${j}][termination_discounted_price]`,
-            String(d.terminationDiscountedPrice)
-          );
-        }
-      });
-    }
-  });
-}
+              // Add discount-related fields for durations
+              if (d.discountedPrice) {
+                formPayload.append(
+                  `land_sizes[${i}][durations][${j}][discounted_price]`,
+                  String(d.discountedPrice),
+                );
+              }
+              if (d.appliedPromoCode) {
+                formPayload.append(
+                  `land_sizes[${i}][durations][${j}][applied_promo_code]`,
+                  String(d.appliedPromoCode),
+                );
+              }
+              if (d.appliedTerminationCode) {
+                formPayload.append(
+                  `land_sizes[${i}][durations][${j}][applied_termination_code]`,
+                  String(d.appliedTerminationCode),
+                );
+              }
+              if (d.terminationDiscountedPrice) {
+                formPayload.append(
+                  `land_sizes[${i}][durations][${j}][termination_discounted_price]`,
+                  String(d.terminationDiscountedPrice),
+                );
+              }
+            });
+          }
+        });
+      }
 
       // Handle Land or House Specifications
       if (isLandProperty2) {
@@ -296,12 +324,12 @@ if (LandSizeSection.length > 0) {
         formPayload.append("category", "estate");
         formPayload.append(
           "nearby_landmarks",
-          landForm.nearbyLandmarks.join(", ")
+          landForm.nearbyLandmarks.join(", "),
         );
         formPayload.append("road_access", landForm.roadAccess.join(", "));
         formPayload.append(
           "title_document_type",
-          landForm.titleDocumentType.join(", ")
+          landForm.titleDocumentType.join(", "),
         );
         formPayload.append("description", landForm.description);
         formPayload.append("number_of_unit", landForm.unitsAvailable);
@@ -323,19 +351,19 @@ if (LandSizeSection.length > 0) {
         formPayload.append("director_id", specifications.director_id);
         formPayload.append(
           "nearby_landmarks",
-          specifications.nearbyLandmarks.join(", ")
+          specifications.nearbyLandmarks.join(", "),
         );
         formPayload.append("rent_duration", specifications.rentDuration);
         formPayload.append(
           "building_condition",
-          specifications.buildingCondition
+          specifications.buildingCondition,
         );
         formPayload.append("whatsapp_link", specifications.whatsAppLink);
         formPayload.append("contact_number", specifications.contactNumber);
         formPayload.append("property_agreement", specifications.documents);
         formPayload.append(
           "title_document_type",
-          specifications.titleDocumentTypeProp.join(", ")
+          specifications.titleDocumentTypeProp.join(", "),
         );
       }
 
@@ -363,7 +391,7 @@ if (LandSizeSection.length > 0) {
       formPayload.append("payment_type", paymentStructure.paymentType);
       formPayload.append(
         "property_duration_limit",
-        paymentStructure.paymentDuration
+        paymentStructure.paymentDuration,
       );
       paymentStructure.paymentSchedule.forEach((schedule, index) => {
         formPayload.append(`payment_schedule[${index}]`, schedule);
@@ -394,7 +422,7 @@ if (LandSizeSection.length > 0) {
         UpdateProperty({
           UpdateId: parseInt(id!),
           credentials: formPayload,
-        })
+        }),
       ).unwrap();
 
       // Handle Fees
@@ -418,28 +446,28 @@ if (LandSizeSection.length > 0) {
                 console.error(`Failed to add fee ${feeDetail.name}:`, error);
                 toast.error(`Failed to add fee ${feeDetail.name}`);
                 throw error;
-              })
+              }),
           );
 
         const feeResults = await Promise.allSettled(feePromises);
 
         const successfulFees = feeResults.filter(
-          (r) => r.status === "fulfilled"
+          (r) => r.status === "fulfilled",
         ).length;
         const failedFees = feeResults.filter(
-          (r) => r.status === "rejected"
+          (r) => r.status === "rejected",
         ).length;
 
         if (failedFees === 0) {
           toast.success("Property and all fees updated successfully!");
         } else {
           toast.warning(
-            `Property updated, but ${failedFees} fee(s) failed to add.`
+            `Property updated, but ${failedFees} fee(s) failed to add.`,
           );
         }
       } else {
         toast.error(
-          "Property updated but couldn't add fees - missing property ID."
+          "Property updated but couldn't add fees - missing property ID.",
         );
       }
 
@@ -716,15 +744,12 @@ if (LandSizeSection.length > 0) {
 
           {/* Step 3: Property Listing Page (Land Sizes & Pricing) - For all property types */}
           {currentStep === 3 && (
-           
-                <PropertyListingPage
-                  ref={LandPlan}
-                  setLandSizeSections={setEditLandSizeSections}
-                  initialData={LandSizeSection}
-                  isEditMode={true}
-                />
-              
-            
+            <PropertyListingPage
+              ref={LandPlan}
+              setLandSizeSections={setEditLandSizeSections}
+              initialData={LandSizeSection}
+              isEditMode={true}
+            />
           )}
 
           {/* Step 4: Media */}

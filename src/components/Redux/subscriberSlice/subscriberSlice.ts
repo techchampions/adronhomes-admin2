@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 import { RootState } from '../store';
+import api from '../middleware';
 
 // Types
 export interface CreateSubscriberPayload {
@@ -42,10 +43,13 @@ export const createSubscriber = createAsyncThunk<
   'subscriber/createSubscriber',
   async ({ payment_id, plan_id }, { rejectWithValue }) => {
     try {
-      const response = await axios.post<CreateSubscriberResponse>('/api/subscriber', {
-        payment_id,
-        plan_id
-      });
+      const response = await api.post<CreateSubscriberResponse>(
+        "/api/admin/citta/post-subscriber",
+        {
+          payment_id,
+          plan_id,
+        },
+      );
       
       return response.data;
     } catch (error) {

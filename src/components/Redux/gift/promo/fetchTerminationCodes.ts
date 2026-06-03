@@ -44,7 +44,7 @@ export const fetchTerminationCodes = createAsyncThunk<
       console.log('Fetching termination codes...');
 
       const response = await api.get<TerminationCodeResponse>(
-        `${BASE_URL}/api/admin/citta/termination-codes`
+        `${BASE_URL}/api/citta/termination-codes`
       );
 
       console.log('Termination codes response:', response.data);

@@ -52,6 +52,13 @@ import {
   selectSyncPropertyMapSyncing,
   syncPropertyMap,
 } from "../../../components/Redux/citta/syncPropertyMap";
+import {
+  fetchCittaContractTypes,
+  selectAllCittaContractTypes,
+  selectCittaContractTypesLoading,
+  selectCittaContractTypesDropdownOptions,
+  clearCittaContractTypes,
+} from "../../../components/Redux/citta/CittaContractType";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "../../../components/Redux/hook";
 
@@ -77,11 +84,13 @@ export interface LandSizeSection {
   citta_category_id?: string;
   citta_estate_name?: string;
   citta_estate_code?: string;
-  citta_property_category?: string; 
+  citta_property_category?: string;
   citta_promo_code?: string;
   citta_promo_name?: string;
   citta_termination_code?: string;
   citta_termination_name?: string;
+  citta_contract_type?: string; // Added contract type field
+  citta_contract_type_name?: string; // Added contract type name
 }
 
 interface PropertyListingPageProps {
@@ -130,8 +139,10 @@ const PropertyListingPage = forwardRef<
 
   const [selectedEstate, setSelectedEstate] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedContractType, setSelectedContractType] = useState<any>(null); // Standalone contract type
   const [availableSizes, setAvailableSizes] = useState<any[]>([]);
-  const [landSizeSections, setLocalLandSizeSections] = useState<LandSizeSection[]>(initialData);
+  const [landSizeSections, setLocalLandSizeSections] =
+    useState<LandSizeSection[]>(initialData);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isAutoPopulating, setIsAutoPopulating] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -144,6 +155,11 @@ const PropertyListingPage = forwardRef<
   const categoriesLoading = useSelector(selectPropertyCategoriesLoading);
   const estates = useSelector(selectAllCittaEstates);
   const estatesLoading = useSelector(selectCittaEstatesLoading);
+  const contractTypes = useSelector(selectAllCittaContractTypes);
+  const contractTypesLoading = useSelector(selectCittaContractTypesLoading);
+  const contractTypesDropdownOptions = useSelector(
+    selectCittaContractTypesDropdownOptions,
+  );
   const propertyMapItems = useSelector(selectFilteredPropertyMapItems);
   const propertyMapLoading = useSelector(selectPropertyMapLoading);
   const syncSuccess = useSelector(selectSyncPropertyMapSuccess);
@@ -169,9 +185,11 @@ const PropertyListingPage = forwardRef<
     dispatch(clearPropertyMap());
     dispatch(clearPromoCodes());
     dispatch(clearTerminationCodes());
+    dispatch(clearCittaContractTypes());
 
     setSelectedEstate(null);
     setSelectedCategory(null);
+    setSelectedContractType(null); // Reset contract type
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     setSelectedPromoCode(null);
@@ -180,6 +198,7 @@ const PropertyListingPage = forwardRef<
     await Promise.all([
       dispatch(fetchCittaPropertyCategories()).unwrap(),
       dispatch(fetchCittaEstates()).unwrap(),
+      dispatch(fetchCittaContractTypes()).unwrap(), // Fetch contract types independently
       dispatch(fetchPromoCodes()).unwrap(),
       dispatch(fetchTerminationCodes()).unwrap(),
     ]);
@@ -192,20 +211,31 @@ const PropertyListingPage = forwardRef<
     if (
       initialData?.length > 0 &&
       estates.length > 0 &&
-      categories.length > 0
+      categories.length > 0 &&
+      contractTypes.length > 0
     ) {
       setLocalLandSizeSections(initialData);
 
       if (initialData[0]?.citta_estate_code) {
-        const estate = estates.find(e => e.EstateCode === initialData[0].citta_estate_code);
+        const estate = estates.find(
+          (e) => e.EstateCode === initialData[0].citta_estate_code,
+        );
         if (estate) setSelectedEstate(estate);
       }
 
       if (initialData[0]?.citta_property_category) {
         const category = categories.find(
-          (c) => c.pName === initialData[0].citta_property_category
+          (c) => c.pName === initialData[0].citta_property_category,
         );
         if (category) setSelectedCategory(category);
+      }
+
+      // Load saved contract type
+      if (initialData[0]?.citta_contract_type) {
+        const contractType = contractTypes.find(
+          (c) => c.code === initialData[0].citta_contract_type,
+        );
+        if (contractType) setSelectedContractType(contractType);
       }
 
       if (initialData[0]?.citta_promo_code) {
@@ -222,15 +252,23 @@ const PropertyListingPage = forwardRef<
         if (termination) setSelectedTerminationCode(termination);
       }
     }
-  }, [initialData, estates, categories, allPromoCodes, allTerminationCodes]);
+  }, [
+    initialData,
+    estates,
+    categories,
+    contractTypes,
+    allPromoCodes,
+    allTerminationCodes,
+  ]);
 
-  // Fetch Property Map
+  // Fetch Property Map - Contract type is independent, not required for fetching
   useEffect(() => {
     if (selectedEstate?.EstateCode && selectedCategory?.pCode) {
       dispatch(
         fetchCittaPropertyMap({
           estate_code: selectedEstate.EstateCode,
           category_code: selectedCategory.pCode,
+          // contract_type is NOT passed to API since it's standalone
         }),
       );
     }
@@ -366,11 +404,13 @@ const PropertyListingPage = forwardRef<
           citta_category_id: String(selectedCategory?.pCode || ""),
           citta_estate_name: selectedEstate?.EstateName || "",
           citta_estate_code: selectedEstate?.EstateCode || "",
-          citta_property_category: selectedCategory?.pName || "", // Changed to store name instead of code
+          citta_property_category: selectedCategory?.pName || "",
           citta_promo_code: selectedPromoCode?.pCode || undefined,
           citta_promo_name: selectedPromoCode?.pName || "",
           citta_termination_code: selectedTerminationCode?.pCode || undefined,
           citta_termination_name: selectedTerminationCode?.pName || "",
+          citta_contract_type: selectedContractType?.code || "", // Add selected contract type to all sections
+          citta_contract_type_name: selectedContractType?.name || "", // Add contract type name
         };
       },
     );
@@ -386,12 +426,6 @@ const PropertyListingPage = forwardRef<
       selectedTerminationCode,
     );
     setLocalLandSizeSections(updatedSections);
-
-    // if (promoCode) {
-    //   toast.success(`Promo code ${promoCode.pCode} applied to all sections`);
-    // } else {
-    //   toast.info("Promo code removed from all sections");
-    // }
   };
 
   const applyTerminationCodeToAllSections = (terminationCode: any) => {
@@ -401,14 +435,6 @@ const PropertyListingPage = forwardRef<
       terminationCode,
     );
     setLocalLandSizeSections(updatedSections);
-
-    // if (terminationCode) {
-    //   toast.success(
-    //     `Termination code ${terminationCode.pCode} (${terminationCode.pName}% off) applied to all sections`,
-    //   );
-    // } else {
-    //   toast.info("Termination code removed from all sections");
-    // }
   };
 
   const handleEstateChange = (value: string) => {
@@ -417,6 +443,7 @@ const PropertyListingPage = forwardRef<
     setSelectedCategory(null);
     setSelectedPromoCode(null);
     setSelectedTerminationCode(null);
+    // Don't reset contract type - it's standalone
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     dispatch(clearPropertyMap());
@@ -427,9 +454,25 @@ const PropertyListingPage = forwardRef<
     setSelectedCategory(category);
     setSelectedPromoCode(null);
     setSelectedTerminationCode(null);
+    // Don't reset contract type - it's standalone
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     dispatch(clearPropertyMap());
+  };
+
+  const handleContractTypeChange = (value: string) => {
+    const contractType = contractTypes.find((c) => c.code === value);
+    setSelectedContractType(contractType);
+
+    // Update all existing sections with the new contract type
+    if (landSizeSections.length > 0) {
+      const updatedSections = landSizeSections.map((section) => ({
+        ...section,
+        citta_contract_type: contractType?.code || "",
+        citta_contract_type_name: contractType?.name || "",
+      }));
+      setLocalLandSizeSections(updatedSections);
+    }
   };
 
   const addLandSizeSection = () => {
@@ -449,18 +492,22 @@ const PropertyListingPage = forwardRef<
       citta_category_id: String(selectedCategory?.pCode || ""),
       citta_estate_name: selectedEstate?.EstateName || "",
       citta_estate_code: selectedEstate?.EstateCode || "",
-      citta_property_category: selectedCategory?.pName || "", // Changed to store name instead of code
+      citta_property_category: selectedCategory?.pName || "",
       citta_promo_code: selectedPromoCode?.pCode || undefined,
       citta_promo_name: selectedPromoCode?.pName || "",
       citta_termination_code: selectedTerminationCode?.pCode || undefined,
       citta_termination_name: selectedTerminationCode?.pName || "",
+      citta_contract_type: selectedContractType?.code || "", // Add current contract type
+      citta_contract_type_name: selectedContractType?.name || "", // Add contract type name
     };
     setLocalLandSizeSections((prev) => [...prev, newSection]);
   };
 
   const removeLandSizeSection = (sectionId: number) => {
     if (landSizeSections.length > 1) {
-      setLocalLandSizeSections((prev) => prev.filter((s) => s.id !== sectionId));
+      setLocalLandSizeSections((prev) =>
+        prev.filter((s) => s.id !== sectionId),
+      );
     }
   };
 
@@ -482,8 +529,8 @@ const PropertyListingPage = forwardRef<
                 },
               ],
             }
-          : section
-      )
+          : section,
+      ),
     );
   };
 
@@ -495,8 +542,8 @@ const PropertyListingPage = forwardRef<
               ...section,
               durations: section.durations.filter((d) => d.id !== durationId),
             }
-          : section
-      )
+          : section,
+      ),
     );
   };
 
@@ -549,11 +596,12 @@ const PropertyListingPage = forwardRef<
           return {
             ...section,
             size: value,
-            durations: newDurations.length > 0 ? newDurations : section.durations,
+            durations:
+              newDurations.length > 0 ? newDurations : section.durations,
           };
         }
         return section;
-      })
+      }),
     );
   };
 
@@ -561,7 +609,7 @@ const PropertyListingPage = forwardRef<
     sectionId: number,
     durationId: number,
     field: keyof Duration,
-    value: string
+    value: string,
   ) => {
     setLocalLandSizeSections((prev) =>
       prev.map((section) =>
@@ -569,11 +617,13 @@ const PropertyListingPage = forwardRef<
           ? {
               ...section,
               durations: section.durations.map((duration) =>
-                duration.id === durationId ? { ...duration, [field]: value } : duration
+                duration.id === durationId
+                  ? { ...duration, [field]: value }
+                  : duration,
               ),
             }
-          : section
-      )
+          : section,
+      ),
     );
   };
 
@@ -609,6 +659,11 @@ const PropertyListingPage = forwardRef<
         toast.warning("Please select a property category");
         return false;
       }
+      // Contract type is optional - don't require it
+      // if (!selectedContractType) {
+      //   toast.warning("Please select a contract type");
+      //   return false;
+      // }
 
       // Ensure formik has the latest values before validation
       await formik.setValues({ landSizeSections });
@@ -681,7 +736,9 @@ const PropertyListingPage = forwardRef<
     !isRefreshing;
 
   const showLoadingIndicator =
-    (propertyMapLoading || isAutoPopulating) && selectedEstate && selectedCategory;
+    (propertyMapLoading || isAutoPopulating) &&
+    selectedEstate &&
+    selectedCategory;
 
   return (
     <div>
@@ -741,6 +798,20 @@ const PropertyListingPage = forwardRef<
             }))}
             isSearchable
             isLoading={categoriesLoading || isRefreshing}
+          />
+        </div>
+
+        {/* Standalone Contract Type Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 p-6 rounded-2xl border border-gray-200">
+          <EnhancedOptionInputField
+            label="Select Contract Type (Optional)"
+            placeholder="Choose a contract type..."
+            value={selectedContractType?.code || ""}
+            onChange={handleContractTypeChange}
+            options={contractTypesDropdownOptions}
+            isSearchable
+            isLoading={contractTypesLoading || isRefreshing}
+            // helperText="Contract type is independent and will be applied to all property sections"
           />
         </div>
 
@@ -912,6 +983,17 @@ const PropertyListingPage = forwardRef<
                     />
                   </div>
 
+                  {/* Display contract type info if selected */}
+                  {selectedContractType && (
+                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <span className="font-semibold">Contract Type:</span>{" "}
+                        {selectedContractType.code} -{" "}
+                        {selectedContractType.name}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-4">
                     {section.durations.map((duration, durationIndex) => (
                       <div
@@ -942,12 +1024,19 @@ const PropertyListingPage = forwardRef<
                           <InputField
                             label="Original Price (₦)"
                             type="text"
-                            value={duration.discountedPrice
-                              ? formatToNaira(duration.discountedPrice)
-                              : formatToNaira(duration.price || "")}
+                            value={
+                              duration.discountedPrice
+                                ? formatToNaira(duration.discountedPrice)
+                                : formatToNaira(duration.price || "")
+                            }
                             onChange={(e) => {
                               const raw = e.target.value.replace(/[^0-9]/g, "");
-                              updateDuration(section.id, duration.id, "price", raw);
+                              updateDuration(
+                                section.id,
+                                duration.id,
+                                "price",
+                                raw,
+                              );
                             }}
                             error={getErrorMessage(
                               `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
@@ -972,7 +1061,9 @@ const PropertyListingPage = forwardRef<
                         </div>
 
                         <div className="flex-1">
-                          <label className="block text-sm mb-1">Citta Property Code</label>
+                          <label className="block text-sm mb-1">
+                            Citta Property Code
+                          </label>
                           <input
                             type="text"
                             readOnly
@@ -985,10 +1076,7 @@ const PropertyListingPage = forwardRef<
                           <button
                             type="button"
                             onClick={() =>
-                              removeDurationFromSection(
-                                section.id,
-                                duration.id,
-                              )
+                              removeDurationFromSection(section.id, duration.id)
                             }
                             className="text-red-500 hover:text-red-700"
                           >
