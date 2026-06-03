@@ -45,7 +45,7 @@ export const fetchPromoCodes = createAsyncThunk<
       console.log('Fetching promo codes...');
 
       const response = await api.get<PromoCodeResponse>(
-        `${BASE_URL}/api/admin/citta/promo-codes`
+        `${BASE_URL}/api/citta/promo-codes`
       );
 
       console.log('Promo codes response:', response.data);

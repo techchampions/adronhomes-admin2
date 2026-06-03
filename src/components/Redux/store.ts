@@ -90,6 +90,11 @@ import retrievePropertyCodeReducer from "./citta/RetrievePropertyCodeState";
 import promoTableReducerlistReducer from "./gift/promo/PromoCodelist";
 import fetchTerminationCodesReducer from "./gift/promo/fetchTerminationCodes";
 import subscriberSlice from "./subscriberSlice/subscriberSlice";
+import contractDocumentsSlice from "./ContractDocument/contractDocumentsSlice";
+import fetchCittaContractTypesReducer from "./citta/CittaContractType";
+
+
+
 export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -195,7 +200,9 @@ export const store = configureStore({
     promoCodes: promoTableReducerlistReducer,
     terminationCodes: fetchTerminationCodesReducer,
     subscriber: subscriberSlice,
-    
+    contractDocumentsUpload: contractDocumentsSlice,
+    contractDocumentsfile: contractDocumentsSlice,
+    cittaContractTypes: fetchCittaContractTypesReducer,
   },
 });
 

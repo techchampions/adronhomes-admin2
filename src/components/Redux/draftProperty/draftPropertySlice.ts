@@ -320,6 +320,8 @@ const draftPropertySlice = createSlice({
     citta_promo_name: ls.citta_promo_name || "",
     citta_termination_code: ls.citta_termination_code || "",
     citta_termination_name: ls.citta_termination_name || "",
+    citta_contract_type: ls.citta_contract_type || "",
+    citta_contract_type_name: ls.citta_contract_type_name || "",
   })) || [];
 
       state.display.status = property.is_active ? "publish" : "draft";

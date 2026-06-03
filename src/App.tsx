@@ -94,6 +94,8 @@ import PromoFormPage from "./components/gift/components/promo/PromoFormPage";
 import PromoPage from "./components/gift/components/promo/PromoPage";
 import PromoRequestsTab from "./components/gift/components/promo/PromoRequestsTab";
 import CreatePromoFormPage from "./components/gift/components/promo/createPromo";
+import ParentComponent from "./pages/contract/newImplementationContracts/ParentComponent";
+import ContractDocumentsPage from "./pages/contract/newImplementationContracts/ContractDocumentsPage";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
 const NotFoundRedirect = () => {
@@ -359,7 +361,9 @@ const App = () => {
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
-
+                  {/* <Route path="/ParentComponent" element={<ParentComponent />} /> */}
+                    <Route path="/contract-documents/:planId" element={<ContractDocumentsPage planId={596} />} />
+                
                 <Route
                   path="/properties/property-edith/:id"
                   element={<EditProperty />}

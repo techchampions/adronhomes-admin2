@@ -222,7 +222,13 @@ if (LandSizeSection.length > 0) {
   formPayload.append("citta_estate_code", String(LandSizeSection[0].citta_estate_code || ""));
   formPayload.append("citta_property_category", String(LandSizeSection[0].citta_property_category || ""));
   formPayload.append("citta_category_id", String(LandSizeSection[0].citta_category_id || ""));
-
+  formPayload.append(
+    "citta_contract_type",
+    String(LandSizeSection[0].citta_contract_type || ""),
+  );  formPayload.append(
+    "citta_contract_type_name",
+    String(LandSizeSection[0].citta_contract_type_name || ""),
+  );
   // Now loop through land sizes for the array data
   LandSizeSection.forEach((ls, i) => {
     formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
