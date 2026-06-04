@@ -139,7 +139,7 @@ const PropertyListingPage = forwardRef<
 
   const [selectedEstate, setSelectedEstate] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [selectedContractType, setSelectedContractType] = useState<any>(null); // Standalone contract type
+  // Removed standalone selectedContractType - now each section has its own
   const [availableSizes, setAvailableSizes] = useState<any[]>([]);
   const [landSizeSections, setLocalLandSizeSections] =
     useState<LandSizeSection[]>(initialData);
@@ -189,7 +189,6 @@ const PropertyListingPage = forwardRef<
 
     setSelectedEstate(null);
     setSelectedCategory(null);
-    setSelectedContractType(null); // Reset contract type
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     setSelectedPromoCode(null);
@@ -230,14 +229,6 @@ const PropertyListingPage = forwardRef<
         if (category) setSelectedCategory(category);
       }
 
-      // Load saved contract type
-      if (initialData[0]?.citta_contract_type) {
-        const contractType = contractTypes.find(
-          (c) => c.code === initialData[0].citta_contract_type,
-        );
-        if (contractType) setSelectedContractType(contractType);
-      }
-
       if (initialData[0]?.citta_promo_code) {
         const promo = allPromoCodes.find(
           (p) => p.pCode === initialData[0].citta_promo_code,
@@ -261,14 +252,13 @@ const PropertyListingPage = forwardRef<
     allTerminationCodes,
   ]);
 
-  // Fetch Property Map - Contract type is independent, not required for fetching
+  // Fetch Property Map
   useEffect(() => {
     if (selectedEstate?.EstateCode && selectedCategory?.pCode) {
       dispatch(
         fetchCittaPropertyMap({
           estate_code: selectedEstate.EstateCode,
           category_code: selectedCategory.pCode,
-          // contract_type is NOT passed to API since it's standalone
         }),
       );
     }
@@ -409,8 +399,9 @@ const PropertyListingPage = forwardRef<
           citta_promo_name: selectedPromoCode?.pName || "",
           citta_termination_code: selectedTerminationCode?.pCode || undefined,
           citta_termination_name: selectedTerminationCode?.pName || "",
-          citta_contract_type: selectedContractType?.code || "", // Add selected contract type to all sections
-          citta_contract_type_name: selectedContractType?.name || "", // Add contract type name
+          // No default contract type - each section will have its own selection
+          citta_contract_type: "",
+          citta_contract_type_name: "",
         };
       },
     );
@@ -443,7 +434,6 @@ const PropertyListingPage = forwardRef<
     setSelectedCategory(null);
     setSelectedPromoCode(null);
     setSelectedTerminationCode(null);
-    // Don't reset contract type - it's standalone
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     dispatch(clearPropertyMap());
@@ -454,25 +444,29 @@ const PropertyListingPage = forwardRef<
     setSelectedCategory(category);
     setSelectedPromoCode(null);
     setSelectedTerminationCode(null);
-    // Don't reset contract type - it's standalone
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     dispatch(clearPropertyMap());
   };
 
-  const handleContractTypeChange = (value: string) => {
-    const contractType = contractTypes.find((c) => c.code === value);
-    setSelectedContractType(contractType);
+  // New function to handle contract type change for a specific section
+  const handleSectionContractTypeChange = (
+    sectionId: number,
+    contractTypeCode: string,
+  ) => {
+    const contractType = contractTypes.find((c) => c.code === contractTypeCode);
 
-    // Update all existing sections with the new contract type
-    if (landSizeSections.length > 0) {
-      const updatedSections = landSizeSections.map((section) => ({
-        ...section,
-        citta_contract_type: contractType?.code || "",
-        citta_contract_type_name: contractType?.name || "",
-      }));
-      setLocalLandSizeSections(updatedSections);
-    }
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              citta_contract_type: contractType?.code || "",
+              citta_contract_type_name: contractType?.name || "",
+            }
+          : section,
+      ),
+    );
   };
 
   const addLandSizeSection = () => {
@@ -497,8 +491,9 @@ const PropertyListingPage = forwardRef<
       citta_promo_name: selectedPromoCode?.pName || "",
       citta_termination_code: selectedTerminationCode?.pCode || undefined,
       citta_termination_name: selectedTerminationCode?.pName || "",
-      citta_contract_type: selectedContractType?.code || "", // Add current contract type
-      citta_contract_type_name: selectedContractType?.name || "", // Add contract type name
+      // No default contract type - user will select per section
+      citta_contract_type: "",
+      citta_contract_type_name: "",
     };
     setLocalLandSizeSections((prev) => [...prev, newSection]);
   };
@@ -659,11 +654,6 @@ const PropertyListingPage = forwardRef<
         toast.warning("Please select a property category");
         return false;
       }
-      // Contract type is optional - don't require it
-      // if (!selectedContractType) {
-      //   toast.warning("Please select a contract type");
-      //   return false;
-      // }
 
       // Ensure formik has the latest values before validation
       await formik.setValues({ landSizeSections });
@@ -801,20 +791,6 @@ const PropertyListingPage = forwardRef<
           />
         </div>
 
-        {/* Standalone Contract Type Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 p-6 rounded-2xl border border-gray-200">
-          <EnhancedOptionInputField
-            label="Select Contract Type (Optional)"
-            placeholder="Choose a contract type..."
-            value={selectedContractType?.code || ""}
-            onChange={handleContractTypeChange}
-            options={contractTypesDropdownOptions}
-            isSearchable
-            isLoading={contractTypesLoading || isRefreshing}
-            // helperText="Contract type is independent and will be applied to all property sections"
-          />
-        </div>
-
         {/* Promo Code & Termination Code Selection */}
         {selectedEstate &&
           selectedCategory &&
@@ -942,9 +918,18 @@ const PropertyListingPage = forwardRef<
         {/* Land Sizes Section */}
         {!showLoadingIndicator && !isDataEmpty && (
           <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-6">
-              Land Sizes & Pricing
-            </h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-base font-semibold text-gray-800">
+                Land Sizes & Pricing
+              </h2>
+              <button
+                type="button"
+                onClick={addLandSizeSection}
+                className="px-4 py-2 bg-[#57713A] text-white rounded-lg text-sm hover:bg-[#57713A]/80"
+              >
+                + Add Land Size
+              </button>
+            </div>
 
             <div className="space-y-8">
               {landSizeSections.map((section, sectionIndex) => (
@@ -962,7 +947,7 @@ const PropertyListingPage = forwardRef<
                     </button>
                   )}
 
-                  <div className="mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <EnhancedOptionInputField
                       label="Land Size *"
                       placeholder="Select land size..."
@@ -981,26 +966,28 @@ const PropertyListingPage = forwardRef<
                         `landSizeSections[${sectionIndex}].size`,
                       )}
                     />
-                  </div>
 
-                  {/* Display contract type info if selected */}
-                  {selectedContractType && (
-                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm text-blue-800">
-                        <span className="font-semibold">Contract Type:</span>{" "}
-                        {selectedContractType.code} -{" "}
-                        {selectedContractType.name}
-                      </p>
-                    </div>
-                  )}
+                    {/* Contract Type selection - now beside each land size */}
+                    <EnhancedOptionInputField
+                      label="Select Contract Type (Optional)"
+                      placeholder="Choose a contract type..."
+                      value={section.citta_contract_type || ""}
+                      onChange={(value: string) =>
+                        handleSectionContractTypeChange(section.id, value)
+                      }
+                      options={contractTypesDropdownOptions}
+                      isSearchable
+                      isLoading={contractTypesLoading || isRefreshing}
+                    />
+                  </div>
 
                   <div className="space-y-4">
                     {section.durations.map((duration, durationIndex) => (
                       <div
                         key={duration.id}
-                        className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl"
+                        className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl flex-wrap md:flex-nowrap"
                       >
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-[150px]">
                           <InputField
                             label="Duration (months)"
                             type="number"
@@ -1020,7 +1007,7 @@ const PropertyListingPage = forwardRef<
                           />
                         </div>
 
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-[150px]">
                           <InputField
                             label="Original Price (₦)"
                             type="text"
@@ -1045,7 +1032,7 @@ const PropertyListingPage = forwardRef<
                           />
                         </div>
 
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-[150px]">
                           <InputField
                             label="Final Price (₦)"
                             type="text"
@@ -1060,7 +1047,7 @@ const PropertyListingPage = forwardRef<
                           />
                         </div>
 
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-[180px]">
                           <label className="block text-sm mb-1">
                             Citta Property Code
                           </label>
@@ -1078,7 +1065,7 @@ const PropertyListingPage = forwardRef<
                             onClick={() =>
                               removeDurationFromSection(section.id, duration.id)
                             }
-                            className="text-red-500 hover:text-red-700"
+                            className="text-red-500 hover:text-red-700 p-2"
                           >
                             ✕
                           </button>
@@ -1086,6 +1073,14 @@ const PropertyListingPage = forwardRef<
                       </div>
                     ))}
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => addDurationToSection(section.id)}
+                    className="mt-4 text-sm text-[#57713A] hover:text-[#57713A]/80 font-medium"
+                  >
+                    + Add Duration
+                  </button>
                 </div>
               ))}
             </div>

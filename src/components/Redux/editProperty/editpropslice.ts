@@ -297,34 +297,37 @@ const editPropertySlice = createSlice({
       };
 
     state.LandSizeSection =
-   property.land_sizes?.map((ls: any) => ({
-  id: ls.id?.toString() || "",
-  size: ls.size?.toString() || "",
-  durations: ls.durations?.map((d: any) => ({
-    id: d.id?.toString() || "",
-    duration: d.duration?.toString() || "",
-    price: d.price?.toString() || "",
-    citta_id: d.citta_id || "",
-    property_code: d.property_code || "",
-    property_id: d.property_id || undefined,
-    pre_filled: d.pre_filled || false,
-    appliedPromoCode: d.appliedPromoCode || "",
-    discountedPrice: d.discountedPrice || undefined,
-    is_active: d.is_active || true,
-    appliedTerminationCode: d.appliedTerminationCode || "",
-    terminationDiscountedPrice: d.terminationDiscountedPrice || undefined,
-  })) || [],
-  citta_category_id: property.citta_category_id?.toString() || "",
-  citta_estate_name: property.citta_estate_name || "",
-  citta_estate_code: property.citta_estate_code || "",
-  citta_property_category: property.citta_property_category?.toString() || "",
-  citta_promo_code: property.citta_promo_code || "",
-  citta_promo_name: property.citta_promo_name || "",
-  citta_termination_code: property.citta_termination_code || "",
-     citta_termination_name: property.citta_termination_name || "",
-     citta_contract_type: property.citta_contract_type || "",
-      citta_contract_type_name: property.citta_contract_type_name || "",
-})) || [];
+      property.land_sizes?.map((ls: any) => ({
+        id: ls.id?.toString() || "",
+        size: ls.size?.toString() || "",
+        citta_contract_type: ls.contract_type_code || "",
+        citta_contract_type_name: ls.contract_type_name || "",
+        durations:
+          ls.durations?.map((d: any) => ({
+            id: d.id?.toString() || "",
+            duration: d.duration?.toString() || "",
+            price: d.price?.toString() || "",
+            citta_id: d.citta_id || "",
+            property_code: d.property_code || "",
+            property_id: d.property_id || undefined,
+            pre_filled: d.pre_filled || false,
+            appliedPromoCode: d.appliedPromoCode || "",
+            discountedPrice: d.discountedPrice || undefined,
+            is_active: d.is_active || true,
+            appliedTerminationCode: d.appliedTerminationCode || "",
+            terminationDiscountedPrice:
+              d.terminationDiscountedPrice || undefined,
+          })) || [],
+        citta_category_id: property.citta_category_id?.toString() || "",
+        citta_estate_name: property.citta_estate_name || "",
+        citta_estate_code: property.citta_estate_code || "",
+        citta_property_category:
+          property.citta_property_category?.toString() || "",
+        citta_promo_code: property.citta_promo_code || "",
+        citta_promo_name: property.citta_promo_name || "",
+        citta_termination_code: property.citta_termination_code || "",
+        citta_termination_name: property.citta_termination_name || "",
+      })) || [];
       state.display.status = property.is_active ? "publish" : "draft";
 
       // Update metadata

@@ -44,7 +44,7 @@ export const createSubscriber = createAsyncThunk<
   async ({ payment_id, plan_id }, { rejectWithValue }) => {
     try {
       const response = await api.post<CreateSubscriberResponse>(
-        "/api/admin/citta/post-subscriber",
+        "/api/citta/post-subscriber",
         {
           payment_id,
           plan_id,

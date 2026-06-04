@@ -143,7 +143,7 @@ export const selectCittaContractTypesDropdownOptions = (state: {
 }) =>
   state.cittaContractTypes.contractTypes.map((contractType) => ({
     value: contractType.code,
-    label: `${contractType.code} - ${contractType.name}`,
+    label: `${contractType.name}`,
     original: contractType,
   }));
 
