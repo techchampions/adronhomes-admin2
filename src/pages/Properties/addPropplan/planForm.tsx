@@ -189,7 +189,6 @@ const PropertyListingPage = forwardRef<
 
     setSelectedEstate(null);
     setSelectedCategory(null);
-    setSelectedContractType(null); // Reset contract type
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     setSelectedPromoCode(null);
@@ -230,14 +229,6 @@ const PropertyListingPage = forwardRef<
         if (category) setSelectedCategory(category);
       }
 
-      // Load saved contract type
-      if (initialData[0]?.citta_contract_type) {
-        const contractType = contractTypes.find(
-          (c) => c.code === initialData[0].citta_contract_type,
-        );
-        if (contractType) setSelectedContractType(contractType);
-      }
-
       if (initialData[0]?.citta_promo_code) {
         const promo = allPromoCodes.find(
           (p) => p.pCode === initialData[0].citta_promo_code,
@@ -268,7 +259,6 @@ const PropertyListingPage = forwardRef<
         fetchCittaPropertyMap({
           estate_code: selectedEstate.EstateCode,
           category_code: selectedCategory.pCode,
-          // contract_type is NOT passed to API since it's standalone
         }),
       );
     }
@@ -444,7 +434,6 @@ const PropertyListingPage = forwardRef<
     setSelectedCategory(null);
     setSelectedPromoCode(null);
     setSelectedTerminationCode(null);
-    // Don't reset contract type - it's standalone
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     dispatch(clearPropertyMap());
@@ -455,7 +444,6 @@ const PropertyListingPage = forwardRef<
     setSelectedCategory(category);
     setSelectedPromoCode(null);
     setSelectedTerminationCode(null);
-    // Don't reset contract type - it's standalone
     setLocalLandSizeSections([]);
     setAvailableSizes([]);
     dispatch(clearPropertyMap());
@@ -666,11 +654,6 @@ const PropertyListingPage = forwardRef<
         toast.warning("Please select a property category");
         return false;
       }
-      // Contract type is optional - don't require it
-      // if (!selectedContractType) {
-      //   toast.warning("Please select a contract type");
-      //   return false;
-      // }
 
       // Ensure formik has the latest values before validation
       await formik.setValues({ landSizeSections });
@@ -805,20 +788,6 @@ const PropertyListingPage = forwardRef<
             }))}
             isSearchable
             isLoading={categoriesLoading || isRefreshing}
-          />
-        </div>
-
-        {/* Standalone Contract Type Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 p-6 rounded-2xl border border-gray-200">
-          <EnhancedOptionInputField
-            label="Select Contract Type (Optional)"
-            placeholder="Choose a contract type..."
-            value={selectedContractType?.code || ""}
-            onChange={handleContractTypeChange}
-            options={contractTypesDropdownOptions}
-            isSearchable
-            isLoading={contractTypesLoading || isRefreshing}
-            // helperText="Contract type is independent and will be applied to all property sections"
           />
         </div>
 
@@ -1011,17 +980,6 @@ const PropertyListingPage = forwardRef<
                       isLoading={contractTypesLoading || isRefreshing}
                     />
                   </div>
-
-                  {/* Display contract type info if selected */}
-                  {selectedContractType && (
-                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-sm text-blue-800">
-                        <span className="font-semibold">Contract Type:</span>{" "}
-                        {selectedContractType.code} -{" "}
-                        {selectedContractType.name}
-                      </p>
-                    </div>
-                  )}
 
                   <div className="space-y-4">
                     {section.durations.map((duration, durationIndex) => (
