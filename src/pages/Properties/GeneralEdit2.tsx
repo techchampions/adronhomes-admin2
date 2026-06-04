@@ -92,7 +92,7 @@ export default function EditProperty() {
   } = metadata;
 
   const { data, loading, error } = useAppSelector(
-    (state) => state.propertyDetails
+    (state) => state.propertyDetails,
   );
   // const {
   //   // imagePreview,
@@ -100,7 +100,7 @@ export default function EditProperty() {
   // }= useContext(PropertyContext)!;
 
   const [discountEnabled, setDiscounted] = useState(
-    discount.discountName !== ""
+    discount.discountName !== "",
   );
   const [showDraftPublishModal, setShowDraftPublishModal] = useState(false);
   const [showInfrastructureModal, setShowInfrastructureModal] = useState(false);
@@ -112,7 +112,7 @@ export default function EditProperty() {
     (File | string | null)[]
   >([]);
   // const [ImagePreview, setImagePreview] = useState<(File | string | null)>(
-    
+
   // );
 
   // Create refs
@@ -199,7 +199,7 @@ export default function EditProperty() {
         formPayload.append("category", "bulk");
         formPayload.append(
           "initial_deposit",
-          basicDetails.initialDeposit || "0"
+          basicDetails.initialDeposit || "0",
         );
       } else {
         formPayload.append("name", basicDetails.propertyName);
@@ -207,7 +207,7 @@ export default function EditProperty() {
         formPayload.append("price", basicDetails.price);
         formPayload.append(
           "initial_deposit",
-          basicDetails.initialDeposit || "0"
+          basicDetails.initialDeposit || "0",
         );
         formPayload.append("country", basicDetails.country);
         formPayload.append("state", basicDetails.state);
@@ -335,12 +335,12 @@ if (LandSizeSection.length > 0) {
         formPayload.append("category", "estate");
         formPayload.append(
           "nearby_landmarks",
-          landForm.nearbyLandmarks.join(", ")
+          landForm.nearbyLandmarks.join(", "),
         );
         formPayload.append("road_access", landForm.roadAccess.join(", "));
         formPayload.append(
           "title_document_type",
-          landForm.titleDocumentType.join(", ")
+          landForm.titleDocumentType.join(", "),
         );
         formPayload.append("description", landForm.description);
         formPayload.append("number_of_unit", landForm.unitsAvailable);
@@ -362,19 +362,19 @@ if (LandSizeSection.length > 0) {
         formPayload.append("director_id", specifications.director_id);
         formPayload.append(
           "nearby_landmarks",
-          specifications.nearbyLandmarks.join(", ")
+          specifications.nearbyLandmarks.join(", "),
         );
         formPayload.append("rent_duration", specifications.rentDuration);
         formPayload.append(
           "building_condition",
-          specifications.buildingCondition
+          specifications.buildingCondition,
         );
         formPayload.append("whatsapp_link", specifications.whatsAppLink);
         formPayload.append("contact_number", specifications.contactNumber);
         formPayload.append("property_agreement", specifications.documents);
         formPayload.append(
           "title_document_type",
-          specifications.titleDocumentTypeProp.join(", ")
+          specifications.titleDocumentTypeProp.join(", "),
         );
       }
 
@@ -402,7 +402,7 @@ if (LandSizeSection.length > 0) {
       formPayload.append("payment_type", paymentStructure.paymentType);
       formPayload.append(
         "property_duration_limit",
-        paymentStructure.paymentDuration
+        paymentStructure.paymentDuration,
       );
       paymentStructure.paymentSchedule.forEach((schedule, index) => {
         formPayload.append(`payment_schedule[${index}]`, schedule);
@@ -433,7 +433,7 @@ if (LandSizeSection.length > 0) {
         UpdateProperty({
           UpdateId: parseInt(id!),
           credentials: formPayload,
-        })
+        }),
       ).unwrap();
 
       // Handle Fees
@@ -457,28 +457,28 @@ if (LandSizeSection.length > 0) {
                 console.error(`Failed to add fee ${feeDetail.name}:`, error);
                 toast.error(`Failed to add fee ${feeDetail.name}`);
                 throw error;
-              })
+              }),
           );
 
         const feeResults = await Promise.allSettled(feePromises);
 
         const successfulFees = feeResults.filter(
-          (r) => r.status === "fulfilled"
+          (r) => r.status === "fulfilled",
         ).length;
         const failedFees = feeResults.filter(
-          (r) => r.status === "rejected"
+          (r) => r.status === "rejected",
         ).length;
 
         if (failedFees === 0) {
           toast.success("Property and all fees updated successfully!");
         } else {
           toast.warning(
-            `Property updated, but ${failedFees} fee(s) failed to add.`
+            `Property updated, but ${failedFees} fee(s) failed to add.`,
           );
         }
       } else {
         toast.error(
-          "Property updated but couldn't add fees - missing property ID."
+          "Property updated but couldn't add fees - missing property ID.",
         );
       }
 
