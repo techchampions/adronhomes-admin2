@@ -86,7 +86,7 @@ export default function EditProperty() {
     newFees,
     director_name,
     previousPropType,
-    // imagePreview,
+    imagePreview,
     isLoaded,
     propertyId: editPropertyId,
   } = metadata;
@@ -94,7 +94,10 @@ export default function EditProperty() {
   const { data, loading, error } = useAppSelector(
     (state) => state.propertyDetails,
   );
-  const { imagePreview, setImagePreview } = useContext(PropertyContext)!;
+  // const {
+  //   // imagePreview,
+  //   // setImagePreview
+  // }= useContext(PropertyContext)!;
 
   const [discountEnabled, setDiscounted] = useState(
     discount.discountName !== "",
@@ -168,7 +171,7 @@ export default function EditProperty() {
       const property = data?.properties;
       loadEditPropertyData(data.properties);
       setEditImagePreview(property.display_image || null);
-      setImagePreview(property.display_image);
+      // setImagePreview(property.display_image);
       setGalleryPreviews(property?.photos || []);
       setNewGalleryImages(property?.photos || []);
     }
@@ -220,101 +223,109 @@ export default function EditProperty() {
         });
       }
 
-      if (LandSizeSection.length > 0) {
-        // Submit standalone fields (only once, outside the loop)
-        formPayload.append(
-          "citta_termination_code",
-          String(LandSizeSection[0].citta_termination_code || ""),
-        );
-        formPayload.append(
-          "citta_termination_name",
-          String(LandSizeSection[0].citta_termination_name || ""),
-        );
-        formPayload.append(
-          "citta_promo_code",
-          String(LandSizeSection[0].citta_promo_code || ""),
-        );
-        formPayload.append(
-          "citta_promo_name",
-          String(LandSizeSection[0].citta_promo_name || ""),
-        );
-        formPayload.append(
-          "citta_estate_name",
-          String(LandSizeSection[0].citta_estate_name || ""),
-        );
-        formPayload.append(
-          "citta_estate_code",
-          String(LandSizeSection[0].citta_estate_code || ""),
-        );
-        formPayload.append(
-          "citta_property_category",
-          String(LandSizeSection[0].citta_property_category || ""),
-        );
-        formPayload.append(
-          "citta_category_id",
-          String(LandSizeSection[0].citta_category_id || ""),
-        );
-        formPayload.append(
-          "citta_contract_type",
-          String(LandSizeSection[0].citta_contract_type || ""),
-        );
-        formPayload.append(
-          "citta_contract_type_name",
-          String(LandSizeSection[0].citta_contract_type_name || ""),
-        );
-        // Now loop through land sizes for the array data
-        LandSizeSection.forEach((ls, i) => {
-          formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
-          formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+if (LandSizeSection.length > 0) {
+  // Submit standalone fields (only once, outside the loop)
+  formPayload.append(
+    "citta_termination_code",
+    String(LandSizeSection[0].citta_termination_code || ""),
+  );
+  formPayload.append(
+    "citta_termination_name",
+    String(LandSizeSection[0].citta_termination_name || ""),
+  );
+  formPayload.append(
+    "citta_promo_code",
+    String(LandSizeSection[0].citta_promo_code || ""),
+  );
+  formPayload.append(
+    "citta_promo_name",
+    String(LandSizeSection[0].citta_promo_name || ""),
+  );
+  formPayload.append(
+    "citta_estate_name",
+    String(LandSizeSection[0].citta_estate_name || ""),
+  );
+  formPayload.append(
+    "citta_estate_code",
+    String(LandSizeSection[0].citta_estate_code || ""),
+  );
+  formPayload.append(
+    "citta_property_category",
+    String(LandSizeSection[0].citta_property_category || ""),
+  );
+  formPayload.append(
+    "citta_category_id",
+    String(LandSizeSection[0].citta_category_id || ""),
+  );
 
-          if (ls.durations && ls.durations.length > 0) {
-            ls.durations.forEach((d, j) => {
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][id]`,
-                String(d.id || ""),
-              );
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][duration]`,
-                String(d.duration || ""),
-              );
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][price]`,
-                String(d.price || ""),
-              );
-              formPayload.append(
-                `land_sizes[${i}][durations][${j}][citta_id]`,
-                String(d.citta_id || ""),
-              );
+  // NOTE: contract_type fields are NOT standalone - they belong to each land size section
+  // Remove these lines:
+  // formPayload.append("contract_type_code", String(LandSizeSection[0].citta_contract_type || ""));
+  // formPayload.append("citta_contract_type", String(LandSizeSection[0].citta_contract_type_name || ""));
 
-              // Add discount-related fields for durations
-              if (d.discountedPrice) {
-                formPayload.append(
-                  `land_sizes[${i}][durations][${j}][discounted_price]`,
-                  String(d.discountedPrice),
-                );
-              }
-              if (d.appliedPromoCode) {
-                formPayload.append(
-                  `land_sizes[${i}][durations][${j}][applied_promo_code]`,
-                  String(d.appliedPromoCode),
-                );
-              }
-              if (d.appliedTerminationCode) {
-                formPayload.append(
-                  `land_sizes[${i}][durations][${j}][applied_termination_code]`,
-                  String(d.appliedTerminationCode),
-                );
-              }
-              if (d.terminationDiscountedPrice) {
-                formPayload.append(
-                  `land_sizes[${i}][durations][${j}][termination_discounted_price]`,
-                  String(d.terminationDiscountedPrice),
-                );
-              }
-            });
-          }
-        });
-      }
+  // Now loop through land sizes for the array data
+  LandSizeSection.forEach((ls, i) => {
+    formPayload.append(`land_sizes[${i}][id]`, String(ls.id || ""));
+    formPayload.append(`land_sizes[${i}][size]`, String(ls.size || ""));
+
+    // Contract type fields belong to EACH individual land size section
+    formPayload.append(
+      `land_sizes[${i}][contract_type_code]`,
+      String(ls.citta_contract_type || ""),
+    );
+    formPayload.append(
+      `land_sizes[${i}][contract_type_name]`,
+      String(ls.citta_contract_type_name || ""),
+    );
+
+    if (ls.durations && ls.durations.length > 0) {
+      ls.durations.forEach((d, j) => {
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][id]`,
+          String(d.id || ""),
+        );
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][duration]`,
+          String(d.duration || ""),
+        );
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][price]`,
+          String(d.price || ""),
+        );
+        formPayload.append(
+          `land_sizes[${i}][durations][${j}][citta_id]`,
+          String(d.citta_id || ""),
+        );
+
+        // Add discount-related fields for durations
+        if (d.discountedPrice) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][discounted_price]`,
+            String(d.discountedPrice),
+          );
+        }
+        if (d.appliedPromoCode) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][applied_promo_code]`,
+            String(d.appliedPromoCode),
+          );
+        }
+        if (d.appliedTerminationCode) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][applied_termination_code]`,
+            String(d.appliedTerminationCode),
+          );
+        }
+        if (d.terminationDiscountedPrice) {
+          formPayload.append(
+            `land_sizes[${i}][durations][${j}][termination_discounted_price]`,
+            String(d.terminationDiscountedPrice),
+          );
+        }
+      });
+    }
+  });
+} 
 
       // Handle Land or House Specifications
       if (isLandProperty2) {
