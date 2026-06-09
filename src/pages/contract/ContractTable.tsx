@@ -147,15 +147,15 @@ export default function ContractsTableComponent({
     // You'll need to determine the payment_id and plan_id from your contract data
     // This is an example - adjust based on your actual data structure
     const paymentId = contract.id; // or contract.payment_id if available
-    const planId = contract.payment_id || 1; // example mapping
+    const planId = contract.payment_id 
 
     setSubscribingContractId(contract.id);
 
     try {
       const result = await dispatch(
         createSubscriber({
-          payment_id: paymentId,
-          plan_id: planId,
+          payment_id: planId,
+          plan_id: paymentId,
         }),
       ).unwrap();
 
