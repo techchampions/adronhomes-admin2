@@ -281,7 +281,7 @@ const ContractDocumentsForm = forwardRef<
       }
 
       return availableDocs.map((doc) => ({
-        value: doc.id.toString(),
+        value: doc.id,
         label: `${doc.document_name} ${doc.is_approved ? "(Approved)" : "(Pending)"}`,
       }));
     }, [getAvailableDocuments]);

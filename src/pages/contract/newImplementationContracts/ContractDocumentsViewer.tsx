@@ -1,19 +1,28 @@
 // components/ContractDocumentsViewer.tsx
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '../../../components/Redux/store';
-import { 
-  fetchContractDocuments, 
-  downloadContractDocument,
+import React, { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../../components/Redux/store";
+import {
+  fetchContractDocuments,
   selectContractOfSale,
   selectAllocationDocument,
   selectContractDocumentsList,
   selectIsLoading,
   clearError,
   clearSuccess,
-} from '../../../components/Redux/ContractDocument/contractDocumentsSlice';
-import { FaDownload, FaFilePdf, FaCheckCircle, FaTimesCircle, FaEye, FaFileWord, FaFileImage, FaRegFile, FaSync } from 'react-icons/fa';
-import { MdClose } from 'react-icons/md';
+} from "../../../components/Redux/ContractDocument/contractDocumentsSlice";
+import {
+  FaDownload,
+  FaFilePdf,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaEye,
+  FaFileWord,
+  FaFileImage,
+  FaRegFile,
+  FaSync,
+} from "react-icons/fa";
+import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
 
 interface ContractDocumentsViewerProps {
@@ -33,20 +42,129 @@ interface Document {
   document_file?: any | string;
 }
 
-const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({ 
-  planId, 
-  refreshTrigger = 0 
+// Cache for downloaded file blobs
+const fileBlobCache = new Map<number, { blob: Blob; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
+  planId,
+  refreshTrigger = 0,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const contractOfSale = useSelector(selectContractOfSale);
   const allocationDocument = useSelector(selectAllocationDocument);
   const documentsList = useSelector(selectContractDocumentsList);
   const isLoading = useSelector(selectIsLoading);
-  
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+    null,
+  );
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Helper function to get the correct file URL
+  const getFileUrl = (document: Document | null | undefined): string | null => {
+    if (!document) return null;
+
+    let fileUrl = document.download_link || document.document_file;
+    if (!fileUrl) return null;
+
+    if (typeof fileUrl === "string") {
+      if (
+        fileUrl.includes("localhost:8000") ||
+        fileUrl.includes("127.0.0.1:8000")
+      ) {
+        fileUrl = fileUrl.replace(
+          "http://localhost:8000",
+          "https://adron.microf10.sg-host.com",
+        );
+        fileUrl = fileUrl.replace(
+          "http://127.0.0.1:8000",
+          "https://adron.microf10.sg-host.com",
+        );
+      }
+    }
+
+    return fileUrl;
+  };
+
+  // Download from blob (no server request)
+  const downloadFromBlob = (blob: Blob, fileName: string) => {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Optimized download with caching
+  const handleDownload = async (document: Document, documentName: string) => {
+    if (downloadingId === document.id) return;
+
+    setDownloadingId(document.id);
+
+    try {
+      // Check cache first
+      const cached = fileBlobCache.get(document.id);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        console.log("Using cached blob for:", documentName);
+        downloadFromBlob(cached.blob, document.document_name || documentName);
+        toast.success(`${documentName} downloaded from cache!`);
+        setDownloadingId(null);
+        return;
+      }
+
+      // If not in cache, fetch from server
+      const fileUrl = getFileUrl(document);
+      if (!fileUrl) {
+        toast.error(`Download link not available for ${documentName}`);
+        setDownloadingId(null);
+        return;
+      }
+
+      const loadingToast = toast.loading(`Downloading ${documentName}...`);
+
+      const response = await fetch(fileUrl);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const blob = await response.blob();
+
+      // Cache the blob for future downloads
+      fileBlobCache.set(document.id, { blob, timestamp: Date.now() });
+
+      downloadFromBlob(blob, document.document_name || documentName);
+
+      toast.dismiss(loadingToast);
+      toast.success(`${documentName} downloaded successfully!`);
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error(`Failed to download ${documentName}`);
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  const handlePreview = async (document: Document) => {
+    setSelectedDocument(document);
+    const fileUrl = getFileUrl(document);
+
+    if (fileUrl) {
+      setPreviewUrl(fileUrl);
+    } else {
+      toast.error("Preview not available for this document");
+      setPreviewUrl(null);
+    }
+  };
+
+  const closePreview = () => {
+    setSelectedDocument(null);
+    setPreviewUrl(null);
+  };
 
   // Fetch documents when planId or refreshTrigger changes
   useEffect(() => {
@@ -54,7 +172,7 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
       console.log("Viewer: Fetching documents for planId:", planId);
       dispatch(fetchContractDocuments(planId));
     }
-    
+
     // Cleanup on unmount
     return () => {
       dispatch(clearError());
@@ -65,17 +183,21 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
   // Debug effect to log when documents are updated
   useEffect(() => {
     console.log("Viewer: Documents updated:", {
-      contractOfSale: contractOfSale ? {
-        id: contractOfSale.id,
-        name: contractOfSale.document_name,
-        approved: contractOfSale.is_approved
-      } : null,
-      allocationDocument: allocationDocument ? {
-        id: allocationDocument.id,
-        name: allocationDocument.document_name,
-        approved: allocationDocument.is_approved
-      } : null,
-      documentsListCount: documentsList?.length || 0
+      contractOfSale: contractOfSale
+        ? {
+            id: contractOfSale.id,
+            name: contractOfSale.document_name,
+            approved: contractOfSale.is_approved,
+          }
+        : null,
+      allocationDocument: allocationDocument
+        ? {
+            id: allocationDocument.id,
+            name: allocationDocument.document_name,
+            approved: allocationDocument.is_approved,
+          }
+        : null,
+      documentsListCount: documentsList?.length || 0,
     });
   }, [contractOfSale, allocationDocument, documentsList]);
 
@@ -83,84 +205,32 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
     setIsRefreshing(true);
     await dispatch(fetchContractDocuments(planId));
     setIsRefreshing(false);
-    toast.success('Documents refreshed successfully');
+    toast.success("Documents refreshed successfully");
   };
 
   const getFileIcon = (documentName: string) => {
-    const extension = documentName?.split('.').pop()?.toLowerCase();
-    
-    if (extension === 'pdf') return <FaFilePdf size={40} className="text-red-500" />;
-    if (extension === 'doc' || extension === 'docx') return <FaFileWord size={40} className="text-blue-500" />;
-    if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') return <FaFileImage size={40} className="text-green-500" />;
+    const extension = documentName?.split(".").pop()?.toLowerCase();
+
+    if (extension === "pdf")
+      return <FaFilePdf size={40} className="text-red-500" />;
+    if (extension === "doc" || extension === "docx")
+      return <FaFileWord size={40} className="text-blue-500" />;
+    if (extension === "jpg" || extension === "jpeg" || extension === "png")
+      return <FaFileImage size={40} className="text-green-500" />;
     return <FaRegFile size={40} className="text-gray-400" />;
   };
 
   const getSmallFileIcon = (documentName: string) => {
-    const extension = documentName?.split('.').pop()?.toLowerCase();
-    
-    if (extension === 'pdf') return <FaFilePdf size={20} className="text-red-500" />;
-    if (extension === 'doc' || extension === 'docx') return <FaFileWord size={20} className="text-blue-500" />;
-    if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') return <FaFileImage size={20} className="text-green-500" />;
+    const extension = documentName?.split(".").pop()?.toLowerCase();
+
+    if (extension === "pdf")
+      return <FaFilePdf size={20} className="text-red-500" />;
+    if (extension === "doc" || extension === "docx")
+      return <FaFileWord size={20} className="text-blue-500" />;
+    if (extension === "jpg" || extension === "jpeg" || extension === "png")
+      return <FaFileImage size={20} className="text-green-500" />;
     return <FaRegFile size={20} className="text-gray-400" />;
   };
-
-  const handleDownload = async (documentId: number, documentName: string) => {
-    if (downloadingId === documentId) return;
-    
-    setDownloadingId(documentId);
-    // const toastId = toast.loading(`Downloading ${documentName}...`);
-    
-    try {
-      await dispatch(downloadContractDocument(documentId)).unwrap();
-      toast.success(`${documentName} downloaded successfully!`);
-    } catch (error) {
-      toast.error(`Failed to download ${documentName}`);
-    } finally {
-      setDownloadingId(null);
-    }
-  };
-
-  const handlePreview = async (document: Document) => {
-    setSelectedDocument(document);
-    
-    if (document.download_link || document.document_file) {
-      let previewLink = document.download_link || document.document_file || '';
-      if (previewLink.includes('localhost:8000') || previewLink.includes('127.0.0.1:8000')) {
-        previewLink = previewLink.replace('http://localhost:8000', 'https://adron.microf10.sg-host.com');
-        previewLink = previewLink.replace('http://127.0.0.1:8000', 'https://adron.microf10.sg-host.com');
-      }
-      setPreviewUrl(previewLink);
-    } else {
-      toast.error('Preview not available for this document');
-      setPreviewUrl(null);
-    }
-  };
-
-  const closePreview = () => {
-    setSelectedDocument(null);
-    setPreviewUrl(null);
-  };
-
-    //  const handlePreview = (document: any) => {
-    //    setSelectedDocument(document);
-    //    if (document.download_link || document.document_file) {
-    //      let previewLink = document.download_link || document.document_file;
-    //      if (
-    //        previewLink.includes("localhost:8000") ||
-    //        previewLink.includes("127.0.0.1:8000")
-    //      ) {
-    //        previewLink = previewLink.replace(
-    //          "http://localhost:8000",
-    //          "https://adron.microf10.sg-host.com",
-    //        );
-    //        previewLink = previewLink.replace(
-    //          "http://127.0.0.1:8000",
-    //          "https://adron.microf10.sg-host.com",
-    //        );
-    //      }
-    //      setPreviewUrl(previewLink);
-    //    }
-    //  };
 
   const getStatusBadge = (isApproved: boolean | number | undefined) => {
     const approved = isApproved === true || isApproved === 1;
@@ -178,19 +248,25 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch {
-      return 'Invalid date';
+      return "Invalid date";
     }
   };
 
-  const DocumentCard = ({ document, title }: { document: Document | null | undefined; title: string }) => {
+  const DocumentCard = ({
+    document,
+    title,
+  }: {
+    document: Document | null | undefined;
+    title: string;
+  }) => {
     if (!document) {
       return (
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
@@ -200,11 +276,15 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
           <div className="p-8 text-center">
             <div className="text-4xl mb-2">📄</div>
             <p className="text-gray-500">No {title} document available</p>
-            <p className="text-xs text-gray-400 mt-1">Generate or upload to create</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Generate or upload to create
+            </p>
           </div>
         </div>
       );
     }
+
+    const hasFileUrl = !!getFileUrl(document);
 
     return (
       <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
@@ -215,7 +295,9 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
           <div className="flex items-center gap-3">
             {getFileIcon(document.document_name)}
             <div className="flex-1">
-              <p className="font-medium text-gray-800 line-clamp-2">{document.document_name}</p>
+              <p className="font-medium text-gray-800 line-clamp-2">
+                {document.document_name}
+              </p>
               <p className="text-xs text-gray-500 mt-1">
                 ID: {document.id} | Plan: {document.plan_id}
               </p>
@@ -226,11 +308,11 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
               )}
             </div>
           </div>
-          
+
           <div className="flex justify-between items-center pt-2">
             {getStatusBadge(document.is_approved)}
             <div className="flex gap-2">
-              {document.download_link && (
+              {hasFileUrl && (
                 <button
                   onClick={() => handlePreview(document)}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -239,14 +321,23 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                   <FaEye size={16} />
                 </button>
               )}
-              <button
-                onClick={() => handleDownload(document.id, document.document_name)}
-                disabled={downloadingId === document.id}
-                className="p-2 text-[#79B833] hover:bg-[#79B833]/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Download"
-              >
-                <FaDownload size={16} className={downloadingId === document.id ? 'animate-pulse' : ''} />
-              </button>
+              {hasFileUrl && (
+                <button
+                  onClick={() =>
+                    handleDownload(document, document.document_name)
+                  }
+                  disabled={downloadingId === document.id}
+                  className="p-2 text-[#79B833] hover:bg-[#79B833]/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Download"
+                >
+                  <FaDownload
+                    size={16}
+                    className={
+                      downloadingId === document.id ? "animate-pulse" : ""
+                    }
+                  />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -254,7 +345,15 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
     );
   };
 
-  const OtherDocumentCard = ({ doc, index }: { doc: Document; index: number }) => {
+  const OtherDocumentCard = ({
+    doc,
+    index,
+  }: {
+    doc: Document;
+    index: number;
+  }) => {
+    const hasFileUrl = !!getFileUrl(doc);
+
     return (
       <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-3">
         <div className="flex items-center gap-3">
@@ -274,7 +373,7 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
             </div>
           </div>
           <div className="flex gap-1">
-            {doc.document_file && (
+            {hasFileUrl && (
               <button
                 onClick={() => handlePreview(doc)}
                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -283,29 +382,32 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                 <FaEye size={14} />
               </button>
             )}
-            <button
-              onClick={() => handleDownload(doc.id, doc.document_name)}
-              disabled={downloadingId === doc.id}
-              className="p-1.5 text-[#79B833] hover:bg-[#79B833]/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Download"
-            >
-              <FaDownload
-                size={14}
-                className={downloadingId === doc.id ? "animate-pulse" : ""}
-              />
-            </button>
+            {hasFileUrl && (
+              <button
+                onClick={() => handleDownload(doc, doc.document_name)}
+                disabled={downloadingId === doc.id}
+                className="p-1.5 text-[#79B833] hover:bg-[#79B833]/10 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Download"
+              >
+                <FaDownload
+                  size={14}
+                  className={downloadingId === doc.id ? "animate-pulse" : ""}
+                />
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   };
 
-  const hasDocuments = contractOfSale || allocationDocument || (documentsList && documentsList.length > 0);
+  const hasDocuments =
+    contractOfSale ||
+    allocationDocument ||
+    (documentsList && documentsList.length > 0);
 
   return (
     <>
-      {/* <Toaster position="top-right" /> */}
-      
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
@@ -317,14 +419,17 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
             disabled={isRefreshing}
             className="flex items-center gap-2 px-3 py-1 text-sm text-[#79B833] hover:text-[#68a32b] transition-colors disabled:opacity-50"
           >
-            <FaSync className={isRefreshing ? 'animate-spin' : ''} />
+            <FaSync className={isRefreshing ? "animate-spin" : ""} />
             Refresh
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DocumentCard document={contractOfSale} title="Contract of Sale" />
-          <DocumentCard document={allocationDocument} title="Provisional Letter of Allocation" />
+          <DocumentCard
+            document={allocationDocument}
+            title="Provisional Letter of Allocation"
+          />
         </div>
 
         {documentsList && documentsList.length > 0 && (
@@ -335,12 +440,17 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                 Other Documents
               </h3>
               <span className="text-sm text-gray-500 bg-white px-2 py-1 rounded-full">
-                {documentsList.length} document{documentsList.length !== 1 ? 's' : ''}
+                {documentsList.length} document
+                {documentsList.length !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {documentsList.map((doc, index) => (
-                <OtherDocumentCard key={doc.id || index} doc={doc} index={index} />
+                <OtherDocumentCard
+                  key={doc.id || index}
+                  doc={doc}
+                  index={index}
+                />
               ))}
             </div>
           </div>
@@ -357,7 +467,9 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
           <div className="text-center py-12 bg-gray-50 rounded-xl">
             <div className="text-5xl mb-3">📄</div>
             <p className="text-gray-500">No documents found for this plan</p>
-            <p className="text-sm text-gray-400 mt-1">Generate or upload documents to see them here</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Generate or upload documents to see them here
+            </p>
           </div>
         )}
 
@@ -369,7 +481,9 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                 <div className="flex items-center gap-3">
                   {getSmallFileIcon(selectedDocument.document_name)}
                   <div>
-                    <h3 className="font-semibold text-gray-800">{selectedDocument.document_name}</h3>
+                    <h3 className="font-semibold text-gray-800">
+                      {selectedDocument.document_name}
+                    </h3>
                     <p className="text-xs text-gray-500 mt-1">
                       {getStatusBadge(selectedDocument.is_approved)}
                     </p>
@@ -383,7 +497,7 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                 </button>
               </div>
               <div className="flex-1 overflow-auto p-4 bg-gray-100">
-                {previewUrl.endsWith('.pdf') ? (
+                {previewUrl.endsWith(".pdf") ? (
                   <iframe
                     src={previewUrl}
                     title={selectedDocument.document_name}
@@ -391,17 +505,24 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                     frameBorder="0"
                   />
                 ) : previewUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                  <img 
-                    src={previewUrl} 
+                  <img
+                    src={previewUrl}
                     alt={selectedDocument.document_name}
                     className="max-w-full h-auto mx-auto rounded-lg shadow-lg"
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full min-h-[400px]">
                     {getFileIcon(selectedDocument.document_name)}
-                    <p className="mt-4 text-gray-500">Preview not available for this file type</p>
+                    <p className="mt-4 text-gray-500">
+                      Preview not available for this file type
+                    </p>
                     <button
-                      onClick={() => handleDownload(selectedDocument.id, selectedDocument.document_name)}
+                      onClick={() =>
+                        handleDownload(
+                          selectedDocument,
+                          selectedDocument.document_name,
+                        )
+                      }
                       className="mt-4 px-4 py-2 bg-[#79B833] text-white rounded-lg hover:bg-[#68a32b] transition-colors flex items-center gap-2"
                     >
                       <FaDownload size={14} />
@@ -418,11 +539,23 @@ const ContractDocumentsViewer: React.FC<ContractDocumentsViewerProps> = ({
                   Close
                 </button>
                 <button
-                  onClick={() => handleDownload(selectedDocument.id, selectedDocument.document_name)}
+                  onClick={() =>
+                    handleDownload(
+                      selectedDocument,
+                      selectedDocument.document_name,
+                    )
+                  }
                   disabled={downloadingId === selectedDocument.id}
                   className="px-4 py-2 bg-[#79B833] text-white rounded-[30px] hover:bg-[#68a32b] transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
-                  <FaDownload size={14} className={downloadingId === selectedDocument.id ? 'animate-pulse' : ''} />
+                  <FaDownload
+                    size={14}
+                    className={
+                      downloadingId === selectedDocument.id
+                        ? "animate-pulse"
+                        : ""
+                    }
+                  />
                   Download
                 </button>
               </div>
