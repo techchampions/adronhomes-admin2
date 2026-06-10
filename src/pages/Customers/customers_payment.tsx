@@ -304,13 +304,12 @@ useEffect(() => {
           history={true}
           buttonText={"Upload Document"}
           onButtonClick={() => setShowModal(true)}
-          showSearchAndButton={   false}
+          showSearchAndButton={false}
           handleViewPurchaseFormClick={() => setShowContractModal(true)}
         />
       </div>
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
-
-        {<PropertyBadge status={isChecked?'ALLOCATED':"PENDING"}/>}
+        {<PropertyBadge status={isChecked ? "ALLOCATED" : "PENDING"} />}
         {/* {hasContractDocuments && (
           <div className="flex items-center  mb-6">
       
@@ -354,7 +353,9 @@ useEffect(() => {
           name2={contract?.contract_subscriber_name_2}
           marketer={contract?.contract_main_marketer ?? "N/A"}
           businestype={contract?.contract_business_type ?? "N/A"}
-          jointType={contract?.contract_business_type === "Joint"} unique_contract_id={contract?.unique_contract_id  ?? "N/A"}       />
+          jointType={contract?.contract_business_type === "Joint"}
+          unique_contract_id={contract?.unique_contract_id ?? "N/A"}
+        />
         {/* {hasContractDocuments && ( */}
         {/* <div className="relative">
             <div
@@ -418,7 +419,7 @@ useEffect(() => {
             name: planProperties.property?.name || "Property",
             address: `${planProperties.property?.lga}, ${planProperties.property?.state}`,
             image: planProperties.property?.display_image || "/land.svg",
-            size: planProperties.property?.size || "N/A",
+            size: planProperties.purchased_property_size || "N/A",
             features: planProperties.property?.features || [],
             type: getPropertyType(planProperties.property_type),
           }}
@@ -529,7 +530,7 @@ useEffect(() => {
                                   month: "short",
                                   day: "numeric",
                                   year: "numeric",
-                                }
+                                },
                               )}
                             </button>
                           )}

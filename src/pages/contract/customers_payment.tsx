@@ -372,7 +372,6 @@ export default function ContractInvoice() {
       {/* Document Action Buttons */}
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-6">
         <div className="flex gap-4 flex-wrap">
-       
           <button
             onClick={handleManageDocuments}
             className="px-6 py-2 bg-[#79B833] text-white rounded-[30px] hover:bg-[#68a32b] transition-colors flex items-center gap-2"
@@ -471,7 +470,7 @@ export default function ContractInvoice() {
             name: planProperties.property?.name || "Property",
             address: `${planProperties.property?.lga}, ${planProperties.property?.state}`,
             image: planProperties.property?.display_image || "/land.svg",
-            size: planProperties.property?.size || "N/A",
+            size: planProperties.purchased_property_size || "N/A",
             features: planProperties.property?.features || [],
             type: getPropertyType(planProperties.property_type),
           }}
@@ -685,9 +684,9 @@ export default function ContractInvoice() {
           <div className="fixed inset-0 bg-black/10 bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-[30px] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky z-40 top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-                  <h1 className="text-2xl font-bold mb-6">
-                    Contract Documents Manager
-                  </h1>
+                <h1 className="text-2xl font-bold mb-6">
+                  Contract Documents Manager
+                </h1>
                 <button
                   onClick={() => setShowContractForm(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -697,8 +696,6 @@ export default function ContractInvoice() {
               </div>
               <div className="p-6">
                 <div>
-                
-
                   <ContractDocumentsForm
                     ref={formRef}
                     planId={plan_id}
@@ -709,22 +706,21 @@ export default function ContractInvoice() {
                 </div>
                 <div className="mt-6 w-full sticky bottom-0 bg-white p-4 ">
                   <div className="mt-6 flex gap-4 w-[60%] justify-end ml-auto">
-                   <button
-            onClick={handleFormSubmit}
-            disabled={isSubmitting}
-            className="bg-[#79B833] border-2 rounded-[30px] w-full text-white text-base font-semibold border-[#79B833] disabled:opacity-50 disabled:cursor-not-allowed py-2 px-6 transition duration-300"
-          >
-            {isSubmitting ? "Processing..." : "Submit"}
-          </button>
+                    <button
+                      onClick={handleFormSubmit}
+                      disabled={isSubmitting}
+                      className="bg-[#79B833] border-2 rounded-[30px] w-full text-white text-base font-semibold border-[#79B833] disabled:opacity-50 disabled:cursor-not-allowed py-2 px-6 transition duration-300"
+                    >
+                      {isSubmitting ? "Processing..." : "Submit"}
+                    </button>
 
-          {/* <button
+                    {/* <button
             onClick={() => formRef.current?.resetForm()}
             disabled={isSubmitting}
             className="w-full text-[#79B833] border-2 rounded-[30px] border-[#79B833] bg-transparent text-base font-semibold py-2 px-6 transition duration-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Reset
           </button> */}
-                    
                   </div>
                 </div>
               </div>
