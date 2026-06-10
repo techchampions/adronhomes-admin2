@@ -47,6 +47,7 @@ interface PaymentPlan {
   paid_other_amount: number;
   id: number;
   payment_percentage: number;
+  purchased_property_size: string;
   repayment_schedule: string;
   next_payment_date: string;
   total_amount: number;
@@ -54,7 +55,7 @@ interface PaymentPlan {
   remaining_balance: number;
   status: number;
   monthly_duration: string;
-  number_of_unit:any
+  number_of_unit: any;
 }
 
 interface PaymentData {
