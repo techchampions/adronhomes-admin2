@@ -3,6 +3,7 @@ import React, {
   useState,
   forwardRef,
   useEffect,
+  useRef,
 } from "react";
 import InputField from "../../../components/input/inputtext";
 import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
@@ -89,8 +90,8 @@ export interface LandSizeSection {
   citta_promo_name?: string;
   citta_termination_code?: string;
   citta_termination_name?: string;
-  citta_contract_type?: string; // Added contract type field
-  citta_contract_type_name?: string; // Added contract type name
+  citta_contract_type?: string;
+  citta_contract_type_name?: string;
 }
 
 interface PropertyListingPageProps {
@@ -117,7 +118,6 @@ const extractDiscountFromPromo = (pName: string): number | null => {
 };
 
 const extractDiscountFromTermination = (pName: string): number | null => {
-  // Termination codes might have different format, e.g., "30.00" meaning 30% off
   const match = pName.match(/(\d+(?:\.\d+)?)/);
   if (match) return parseFloat(match[1]);
   return null;
@@ -128,7 +128,8 @@ const calculateDiscountedPrice = (
   discountPercent: number | null,
 ): number => {
   if (!discountPercent) return originalPrice;
-  return originalPrice * (1 - discountPercent / 100);
+  const discounted = originalPrice * (1 - discountPercent / 100);
+  return Math.round(discounted);
 };
 
 const PropertyListingPage = forwardRef<
@@ -139,7 +140,6 @@ const PropertyListingPage = forwardRef<
 
   const [selectedEstate, setSelectedEstate] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  // Removed standalone selectedContractType - now each section has its own
   const [availableSizes, setAvailableSizes] = useState<any[]>([]);
   const [landSizeSections, setLocalLandSizeSections] =
     useState<LandSizeSection[]>(initialData);
@@ -149,6 +149,27 @@ const PropertyListingPage = forwardRef<
   const [selectedPromoCode, setSelectedPromoCode] = useState<any>(null);
   const [selectedTerminationCode, setSelectedTerminationCode] =
     useState<any>(null);
+
+  // Sequential ID counters
+  const nextSectionIdRef = useRef(1);
+  const nextDurationIdRef = useRef(1);
+
+  const getNextSectionId = () => {
+    const id = nextSectionIdRef.current;
+    nextSectionIdRef.current++;
+    return id;
+  };
+
+  const getNextDurationId = () => {
+    const id = nextDurationIdRef.current;
+    nextDurationIdRef.current++;
+    return id;
+  };
+
+  const resetIds = () => {
+    nextSectionIdRef.current = 1;
+    nextDurationIdRef.current = 1;
+  };
 
   // Redux selectors
   const categories = useSelector(selectAllPropertyCategories);
@@ -180,6 +201,8 @@ const PropertyListingPage = forwardRef<
   const refreshAllData = async () => {
     setIsRefreshing(true);
 
+    resetIds();
+
     dispatch(clearPropertyCategories());
     dispatch(clearCittaEstates());
     dispatch(clearPropertyMap());
@@ -197,7 +220,7 @@ const PropertyListingPage = forwardRef<
     await Promise.all([
       dispatch(fetchCittaPropertyCategories()).unwrap(),
       dispatch(fetchCittaEstates()).unwrap(),
-      dispatch(fetchCittaContractTypes()).unwrap(), // Fetch contract types independently
+      dispatch(fetchCittaContractTypes()).unwrap(),
       dispatch(fetchPromoCodes()).unwrap(),
       dispatch(fetchTerminationCodes()).unwrap(),
     ]);
@@ -214,6 +237,19 @@ const PropertyListingPage = forwardRef<
       contractTypes.length > 0
     ) {
       setLocalLandSizeSections(initialData);
+
+      // Set max IDs from existing data to continue sequentially
+      const maxSectionId = Math.max(
+        ...initialData.map((section) => section.id),
+        0,
+      );
+      nextSectionIdRef.current = maxSectionId + 1;
+
+      const maxDurationId = Math.max(
+        ...initialData.flatMap((section) => section.durations.map((d) => d.id)),
+        0,
+      );
+      nextDurationIdRef.current = maxDurationId + 1;
 
       if (initialData[0]?.citta_estate_code) {
         const estate = estates.find(
@@ -310,7 +346,6 @@ const PropertyListingPage = forwardRef<
         const originalPrice = parseFloat(duration.price);
         let finalPrice = originalPrice;
 
-        // Apply termination discount first (if any)
         if (terminationDiscount) {
           finalPrice = calculateDiscountedPrice(
             finalPrice,
@@ -318,7 +353,6 @@ const PropertyListingPage = forwardRef<
           );
         }
 
-        // Then apply promo discount on top (if any)
         if (promoDiscount) {
           finalPrice = calculateDiscountedPrice(finalPrice, promoDiscount);
         }
@@ -370,7 +404,7 @@ const PropertyListingPage = forwardRef<
           }
 
           return {
-            id: Date.now() + Math.random(),
+            id: getNextDurationId(),
             duration: item.duration,
             price: item.trimmed_price?.toString() || "",
             citta_id: item.property_code || "",
@@ -388,7 +422,7 @@ const PropertyListingPage = forwardRef<
         });
 
         return {
-          id: Date.now() + Math.random(),
+          id: getNextSectionId(),
           size,
           durations,
           citta_category_id: String(selectedCategory?.pCode || ""),
@@ -399,7 +433,6 @@ const PropertyListingPage = forwardRef<
           citta_promo_name: selectedPromoCode?.pName || "",
           citta_termination_code: selectedTerminationCode?.pCode || undefined,
           citta_termination_name: selectedTerminationCode?.pName || "",
-          // No default contract type - each section will have its own selection
           citta_contract_type: "",
           citta_contract_type_name: "",
         };
@@ -449,7 +482,6 @@ const PropertyListingPage = forwardRef<
     dispatch(clearPropertyMap());
   };
 
-  // New function to handle contract type change for a specific section
   const handleSectionContractTypeChange = (
     sectionId: number,
     contractTypeCode: string,
@@ -471,11 +503,11 @@ const PropertyListingPage = forwardRef<
 
   const addLandSizeSection = () => {
     const newSection: LandSizeSection = {
-      id: Date.now(),
+      id: getNextSectionId(),
       size: "",
       durations: [
         {
-          id: Date.now() + 1,
+          id: getNextDurationId(),
           duration: "",
           price: "",
           citta_id: "",
@@ -491,7 +523,6 @@ const PropertyListingPage = forwardRef<
       citta_promo_name: selectedPromoCode?.pName || "",
       citta_termination_code: selectedTerminationCode?.pCode || undefined,
       citta_termination_name: selectedTerminationCode?.pName || "",
-      // No default contract type - user will select per section
       citta_contract_type: "",
       citta_contract_type_name: "",
     };
@@ -515,7 +546,7 @@ const PropertyListingPage = forwardRef<
               durations: [
                 ...section.durations,
                 {
-                  id: Date.now(),
+                  id: getNextDurationId(),
                   duration: "",
                   price: "",
                   citta_id: "",
@@ -571,7 +602,7 @@ const PropertyListingPage = forwardRef<
             }
 
             return {
-              id: Date.now() + Math.random(),
+              id: getNextDurationId(),
               duration: item.duration,
               price: item.trimmed_price?.toString() || "",
               citta_id: item.property_code || "",
@@ -655,17 +686,13 @@ const PropertyListingPage = forwardRef<
         return false;
       }
 
-      // Ensure formik has the latest values before validation
       await formik.setValues({ landSizeSections });
 
-      // Validate form
       const errors = await formik.validateForm();
 
       if (Object.keys(errors).length > 0) {
-        // Log errors for debugging
         console.log("Validation errors:", errors);
 
-        // Show specific error message
         const errorMessages: string[] = [];
         if (errors.landSizeSections) {
           if (Array.isArray(errors.landSizeSections)) {
@@ -922,13 +949,13 @@ const PropertyListingPage = forwardRef<
               <h2 className="text-base font-semibold text-gray-800">
                 Land Sizes & Pricing
               </h2>
-              <button
+              {/* <button
                 type="button"
                 onClick={addLandSizeSection}
                 className="px-4 py-2 bg-[#57713A] text-white rounded-lg text-sm hover:bg-[#57713A]/80"
               >
                 + Add Land Size
-              </button>
+              </button> */}
             </div>
 
             <div className="space-y-8">
@@ -967,7 +994,6 @@ const PropertyListingPage = forwardRef<
                       )}
                     />
 
-                    {/* Contract Type selection - now beside each land size */}
                     <EnhancedOptionInputField
                       label="Select Contract Type (Optional)"
                       placeholder="Choose a contract type..."
@@ -1074,13 +1100,13 @@ const PropertyListingPage = forwardRef<
                     ))}
                   </div>
 
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => addDurationToSection(section.id)}
                     className="mt-4 text-sm text-[#57713A] hover:text-[#57713A]/80 font-medium"
                   >
                     + Add Duration
-                  </button>
+                  </button> */}
                 </div>
               ))}
             </div>

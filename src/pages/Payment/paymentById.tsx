@@ -162,13 +162,20 @@ export default function PaymentById() {
           paymentId2={payment.id}
           paymentId={payment.reference}
           amount={formatCurrency(payment.amount_paid)}
-          bankName={payment.payment_type === 'Virtual Wallet' ? payment.payment_type : payment.bank_name || "N/A"}
+          bankName={
+            payment.payment_type === "Virtual Wallet"
+              ? payment.payment_type
+              : payment.bank_name || "N/A"
+          }
           date={formatDate(payment.created_at)}
           receiptImage={payment.proof_of_payment || ""}
           fullReciept={payment.proof_of_payment || "/fullreciept.svg"}
           handleHistory={() => setIsPaymentListOpen(true)}
           id={Number(paymentId)}
-          wallet={payment.payment_type === 'Virtual Wallet' ||payment.payment_type === 'Paystack'  }
+          wallet={
+            payment.payment_type === "Virtual Wallet" ||
+            payment.payment_type === "Paystack"
+          }
         />
 
         {payment.property && payment.plan && (
@@ -181,33 +188,38 @@ export default function PaymentById() {
               paidAmount={formatCurrency(payment.plan.total_amount)}
               paymentSchedule={payment.plan.repayment_schedule}
               progressPercentage={calculateProgressPercentage()}
-              duration={`${payment.plan.monthly_duration ?? 'One Time Payment'}`}
+              duration={`${payment.plan.monthly_duration ?? "One Time Payment"}`}
               nextPaymentDate={formatDate(payment.plan.next_payment_date)}
               dueDate={formatDate(payment.plan.next_payment_date)}
               property={{
                 name: payment.property.name,
                 address: payment.property.street_address,
                 image: payment.property.display_image || "/land.svg",
-                size: payment.property.size,
+                size: payment.plan.purchased_property_size || "N/A",
                 features: payment.property.features,
                 type: getPropertyType(payment.property.type),
               }}
-              infrastructure={payment.plan.infrastructure_amount > 0
-                ? {
-                  percentage: payment.plan.infrastructure_percentage,
-                  amount: payment.plan.infrastructure_amount,
-                  remainingBalance: payment.plan.remaining_infrastructure_balance,
-                  paidAmount: payment.plan.paid_infrastructure_amount,
-                }
-                : undefined}
-              other={payment.plan.other_amount > 0
-                ? {
-                  percentage: payment.plan.other_percentage,
-                  amount: payment.plan.other_amount,
-                  remainingBalance: payment.plan.remaining_other_balance,
-                  paidAmount: payment.plan.paid_other_amount,
-                }
-                : undefined}
+              infrastructure={
+                payment.plan.infrastructure_amount > 0
+                  ? {
+                      percentage: payment.plan.infrastructure_percentage,
+                      amount: payment.plan.infrastructure_amount,
+                      remainingBalance:
+                        payment.plan.remaining_infrastructure_balance,
+                      paidAmount: payment.plan.paid_infrastructure_amount,
+                    }
+                  : undefined
+              }
+              other={
+                payment.plan.other_amount > 0
+                  ? {
+                      percentage: payment.plan.other_percentage,
+                      amount: payment.plan.other_amount,
+                      remainingBalance: payment.plan.remaining_other_balance,
+                      paidAmount: payment.plan.paid_other_amount,
+                    }
+                  : undefined
+              }
               number_of_unit={payment.plan.number_of_unit}
             />
           </div>
