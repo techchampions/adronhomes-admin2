@@ -257,9 +257,38 @@ const AuthGuard = () => {
   const token = Cookies.get("token");
   const location = useLocation();
 
+  // Get user role from cookie
+  const getUserRole = (): number | null => {
+    try {
+      const userStr = Cookies.get("user");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        return user?.role || null;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   if (!token) {
+    const userRole = getUserRole();
+
+    // Marketers (role 2) go to marketer login
+    if (userRole === 2) {
+      // Keep the user cookie for marketers
+      return (
+        <Navigate to="/login-marketer" state={{ from: location }} replace />
+      );
+    }
+
+    // Clear user cookie for non-marketers
+    Cookies.remove("user");
+
+    // Everyone else goes to admin login
     return <Navigate to="/" state={{ from: location }} replace />;
   }
+
   return <Outlet />;
 };
 
