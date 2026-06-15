@@ -15,7 +15,7 @@ import { PropertyContext } from "../../MyContext/MyContext";
 import { resetOtpPasswordState } from "../Redux/resetPassword/resetPassword_slice";
 import { resetOtpState } from "../Redux/resetPassword/sendOtp_slice";
 import { FormField, PasswordFormField } from "./logininput";
-
+import Cookies from "js-cookie";
 // Role-to-route mapping
 const roleRoutes: Record<number, string> = {
   1: "/dashboard",
@@ -31,7 +31,7 @@ const roleRoutes: Record<number, string> = {
 export default function Login() {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, token, success, message, error } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
   const {
     loading: userLoading,
@@ -84,6 +84,7 @@ export default function Login() {
   }, [token, dispatch]);
 
   // Handle redirection based on user role or error
+  // In your Login component, update the useEffect that handles userSuccess
   useEffect(() => {
     if (userError) {
       navigate("/");
@@ -91,6 +92,9 @@ export default function Login() {
     }
 
     if (userSuccess && user?.role) {
+      // Store user role in cookie for AuthGuard
+      Cookies.set("user", JSON.stringify({ role: user.role }), { expires: 1 });
+
       const route = roleRoutes[user.role] || "/";
       navigate(route, { replace: true });
     }
