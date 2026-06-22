@@ -96,6 +96,8 @@ import PromoRequestsTab from "./components/gift/components/promo/PromoRequestsTa
 import CreatePromoFormPage from "./components/gift/components/promo/createPromo";
 import ParentComponent from "./pages/contract/newImplementationContracts/ParentComponent";
 import ContractDocumentsPage from "./pages/contract/newImplementationContracts/ContractDocumentsPage";
+import CommunityDashboard from "./CommunityDashboard/CommunityDashboardtwo/CommunityDashboard";
+// import CommunityDashboard from "./CommunityDashboard/CommunityDashboard";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
 const NotFoundRedirect = () => {
@@ -362,6 +364,38 @@ const App = () => {
             <Routes>
               {/* Public Route */}
               <Route path="/" element={<Login />} />
+              <Route
+                path="/estate"
+                element={<CommunityDashboard initialSection="overview" />}
+              />
+              <Route
+                path="/estate/chat"
+                element={<CommunityDashboard initialSection="community" />}
+              />
+              <Route
+                path="/estate/messages"
+                element={<CommunityDashboard initialSection="messages" />}
+              />
+              <Route
+                path="/estate/payments"
+                element={<CommunityDashboard initialSection="payments" />}
+              />
+              <Route
+                path="/estate/utilities"
+                element={<CommunityDashboard initialSection="utilities" />}
+              />
+              <Route
+                path="/estate/access"
+                element={<CommunityDashboard initialSection="access" />}
+              />
+              <Route
+                path="/estate/maintenance"
+                element={<CommunityDashboard initialSection="maintenance" />}
+              />
+              <Route
+                path="/estate/documents"
+                element={<CommunityDashboard initialSection="documents" />}
+              />
               <Route path="/login-marketer" element={<LoginMarketers />} />
 
               {/* Protected Routes */}
@@ -372,10 +406,19 @@ const App = () => {
                   element={<ClientsPartnership />}
                 />
                 <Route path="/promotions" element={<Promotions />} />
-                <Route path="/promotions/promotion-requests/:id" element={<PromoRequestsTab />} />
+                <Route
+                  path="/promotions/promotion-requests/:id"
+                  element={<PromoRequestsTab />}
+                />
                 <Route path="/promotions/:id" element={<PromoPage />} />
-                <Route path="/promotions/edit/:id" element={<PromoFormPage />} />
-                 <Route path="/Promotions/create" element={<CreatePromoFormPage />} />
+                <Route
+                  path="/promotions/edit/:id"
+                  element={<PromoFormPage />}
+                />
+                <Route
+                  path="/Promotions/create"
+                  element={<CreatePromoFormPage />}
+                />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/gift-form" element={<GiftFormPage />} />
@@ -390,9 +433,12 @@ const App = () => {
                   path="/payment/status/:paymentId"
                   element={<PaymentById />}
                 />
-                  {/* <Route path="/ParentComponent" element={<ParentComponent />} /> */}
-                    <Route path="/contract-documents/:planId" element={<ContractDocumentsPage planId={596} />} />
-                
+                {/* <Route path="/ParentComponent" element={<ParentComponent />} /> */}
+                <Route
+                  path="/contract-documents/:planId"
+                  element={<ContractDocumentsPage planId={596} />}
+                />
+
                 <Route
                   path="/properties/property-edith/:id"
                   element={<EditProperty />}
@@ -493,7 +539,10 @@ const App = () => {
                   element={<Customers_payment />}
                 />
                 <Route path="/properties/form" element={<General />} />
-                 <Route path="/properties/Draftform/:id" element={<DuplicateProperty />} />
+                <Route
+                  path="/properties/Draftform/:id"
+                  element={<DuplicateProperty />}
+                />
 
                 <Route path="/error-500" element={<Error500 />} />
 
