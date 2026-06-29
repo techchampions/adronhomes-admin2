@@ -92,6 +92,7 @@ import fetchTerminationCodesReducer from "./gift/promo/fetchTerminationCodes";
 import subscriberSlice from "./subscriberSlice/subscriberSlice";
 import contractDocumentsSlice from "./ContractDocument/contractDocumentsSlice";
 import fetchCittaContractTypesReducer from "./citta/CittaContractType";
+import estateReducer from "./estate/estateSlice";
 
 
 
@@ -203,6 +204,7 @@ export const store = configureStore({
     contractDocumentsUpload: contractDocumentsSlice,
     contractDocumentsfile: contractDocumentsSlice,
     cittaContractTypes: fetchCittaContractTypesReducer,
+    estate: estateReducer,
   },
 });
 

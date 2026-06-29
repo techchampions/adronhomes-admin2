@@ -97,6 +97,9 @@ import CreatePromoFormPage from "./components/gift/components/promo/createPromo"
 import ParentComponent from "./pages/contract/newImplementationContracts/ParentComponent";
 import ContractDocumentsPage from "./pages/contract/newImplementationContracts/ContractDocumentsPage";
 import CommunityDashboard from "./CommunityDashboard/CommunityDashboardtwo/CommunityDashboard";
+import Estate from "./pages/Estate/Estate";
+import EstateUsers from "./pages/Estate/EstateUsers";
+import SingleUserEstate from "./pages/Estate/SingleUserEstate";
 // import CommunityDashboard from "./CommunityDashboard/CommunityDashboard";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
@@ -420,6 +423,12 @@ const App = () => {
                   element={<CreatePromoFormPage />}
                 />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/estates" element={<Estate />} />
+                <Route path="/estates/:estateId/users" element={<EstateUsers />} />
+                <Route
+                  path="/estates/:estateId/users/:userId"
+                  element={<SingleUserEstate />}
+                />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/gift-form" element={<GiftFormPage />} />
                 <Route path="/gifts" element={<Gifts />} />
