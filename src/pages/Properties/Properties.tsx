@@ -1,5 +1,4 @@
-// Properties.tsx (updated)
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Header from "../../general/Header";
 import PropertyTableComponent, {
   PropertyData,
@@ -13,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProperties } from "../../components/Redux/Properties/properties_Thunk";
 import { setPropertiesSearch } from "../../components/Redux/Properties/propertiesTable_slice";
 import PropertyTableComponent2 from "./TAbles/Properties_Table_Sold";
+import AssignPropertyBenefitsModal from "./AssignPropertyBenefitsModal";
 
 const tabs = ["Published", "Sold", "Drafted"];
 
@@ -20,13 +20,11 @@ export default function Properties() {
   const [activeTab, setActiveTab] = useState("Published");
   const [isSearching, setIsSearching] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const [isSold, setIsSold] = useState<Boolean>(true);
   const { drafted, published, sold, stats, loading } = useSelector(
     (state: RootState) => state.properties
   );
 
-  // State to trigger gift mode
-  const [giftModeTrigger, setGiftModeTrigger] = useState(0);
+  const [showAssignPromoModal, setShowAssignPromoModal] = useState(false);
 
   const getFilteredProperties = useCallback(
     (properties: PropertyData[], searchTerm: string) => {
@@ -105,11 +103,6 @@ export default function Properties() {
     setActiveTab(tab);
     setIsSearching(true);
     setTimeout(() => setIsSearching(false), 500);
-    if (tab === 'Sold') {
-      setIsSold(true);
-    }
-    // Reset gift mode when changing tabs
-    setGiftModeTrigger(0);
   };
 
   const getLoadingState = () => {
@@ -128,20 +121,26 @@ export default function Properties() {
 
   const currentLoading = getLoadingState();
 
-  // Function to trigger gift mode
-  const handleGiftClick = () => {
-    console.log("Gift button clicked"); // For debugging
-    setGiftModeTrigger(prev => prev + 1);
+  const handleOpenAssignBenefitModal = () => {
+    setShowAssignPromoModal(true);
+  };
+
+  const refreshCurrentProperties = () => {
+    dispatch(
+      fetchProperties({
+        page: currentState.pagination.currentPage,
+        search: currentState.search,
+      }),
+    );
   };
 
   return (
     <div className="mb-[52px] relative">
       <Header title="Properties" subtitle="Manage the list of properties" />
       
-      {/* Add Gift Button */}
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-4 flex justify-end">
         <button
-          onClick={handleGiftClick}
+          onClick={handleOpenAssignBenefitModal}
           className="px-6 py-2 rounded-full bg-[#79B833] text-white hover:bg-[#79B833]/80 transition-colors flex items-center gap-2"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -149,7 +148,7 @@ export default function Properties() {
             <path d="M12 22V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M8 15H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-         Add Promotion Gift
+         Assign Promotion
         </button>
       </div>
 
@@ -207,11 +206,18 @@ export default function Properties() {
               data={filteredProperties as PropertyData[]}
               CurrentPage={currentState.pagination.currentPage}
               activeTab={activeTab}
-              triggerGiftMode={giftModeTrigger}
             />
           )}
         </ReusableTable>
       </div>
+
+      <AssignPropertyBenefitsModal
+        isOpen={showAssignPromoModal}
+        onClose={() => setShowAssignPromoModal(false)}
+        properties={filteredProperties as PropertyData[]}
+        currentPage={currentState.pagination.currentPage}
+        onAssigned={refreshCurrentProperties}
+      />
     </div>
   );
 }

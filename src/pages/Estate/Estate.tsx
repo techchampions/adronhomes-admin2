@@ -15,6 +15,7 @@ import {
 } from "../../components/Redux/estate/estateSlice";
 import { fetchAllEstates } from "../../components/Redux/estate/estateThunk";
 import EstateTable from "./EstateTable";
+import AddEstateModal from "./AddEstateModal";
 
 export default function Estate() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,6 +25,7 @@ export default function Estate() {
   const error = useSelector(selectAllEstatesError);
   const pagination = useSelector(selectAllEstatesPagination);
   const [search, setSearch] = useState("");
+  const [showAddEstateModal, setShowAddEstateModal] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllEstates({ page: pagination.currentPage }));
@@ -45,7 +47,8 @@ export default function Estate() {
       <Header
         title="Estates"
         subtitle="Manage estates, residents, maintenance and security activity"
-        showSearchAndButton={false}
+        buttonText="Add Estate Community"
+        onButtonClick={() => setShowAddEstateModal(true)}
       />
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
@@ -97,6 +100,12 @@ export default function Estate() {
           )}
         </ReusableTable>
       </div>
+
+      <AddEstateModal
+        isOpen={showAddEstateModal}
+        onClose={() => setShowAddEstateModal(false)}
+        onCreated={() => dispatch(fetchAllEstates({ page: pagination.currentPage }))}
+      />
     </div>
   );
 }
