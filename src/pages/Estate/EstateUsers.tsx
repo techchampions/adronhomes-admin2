@@ -31,6 +31,7 @@ import {
 } from "../../components/Redux/estate/estateThunk";
 import EstateUsersTable from "./EstateUsersTable";
 import { formatDate } from "../../utils/formatdate";
+import AddEstateClientsModal from "./AddEstateClientsModal";
 
 export default function EstateUsers() {
   const dispatch = useDispatch<AppDispatch>();
@@ -51,6 +52,7 @@ export default function EstateUsers() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("Residents");
   const [communityMessage, setCommunityMessage] = useState("");
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [openedGroupUnreadCount, setOpenedGroupUnreadCount] = useState(0);
   const [markedCommunityChannels, setMarkedCommunityChannels] = useState<
     string[]
@@ -426,7 +428,8 @@ export default function EstateUsers() {
         title={estateInfo?.estate_name || "Estate Users"}
         subtitle="View clients attached to this estate"
         history={true}
-        showSearchAndButton={false}
+        buttonText="Add Client to Estate"
+        onButtonClick={() => setShowAddClientModal(true)}
       />
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
@@ -492,6 +495,22 @@ export default function EstateUsers() {
           )}
         </ReusableTable>
       </div>
+
+      <AddEstateClientsModal
+        isOpen={showAddClientModal}
+        onClose={() => setShowAddClientModal(false)}
+        estateId={numericEstateId}
+        propertySlug={estateInfo?.property_slug}
+        estateName={estateInfo?.estate_name}
+        onAssigned={() =>
+          dispatch(
+            fetchEstateUsers({
+              estateId: numericEstateId,
+              page: pagination.currentPage,
+            }),
+          )
+        }
+      />
     </div>
   );
 }

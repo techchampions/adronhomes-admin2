@@ -48,6 +48,7 @@ interface EstateState {
     data: EstateUser[];
     estateInfo: {
       id: number;
+      property_id?: number;
       estate_name: string;
       property_slug: string;
       is_operating: number;

@@ -12,6 +12,7 @@ export interface ErrorResponse {
 
 export interface Estate {
   id: number;
+  property_id?: number;
   estate_name: string;
   property_slug: string;
   total_member: number;
@@ -87,6 +88,7 @@ export interface EstateUsersResponse {
   data: {
     estate_info: {
       id: number;
+      property_id?: number;
       estate_name: string;
       property_slug: string;
       is_operating: number;
@@ -223,7 +225,151 @@ export interface SendCommunityMessageResponse {
   };
 }
 
+export interface CreateEstateCommunityResponse {
+  success: Estate;
+  message: string;
+}
+
+export interface AssignEstateUsersResponse {
+  success: boolean;
+  message: string;
+  data: {
+    estate_id: number;
+    estate_name: string;
+    summary: {
+      total_processed: number;
+      added: number;
+      failed: number;
+    };
+    details: Record<string, string>;
+  };
+}
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export const createEstateCommunity = createAsyncThunk<
+  CreateEstateCommunityResponse,
+  { propertyId: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/createEstateCommunity",
+  async ({ propertyId }, { rejectWithValue }) => {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      return rejectWithValue({
+        message: "No authentication token found. Please login again.",
+      });
+    }
+
+    const formData = new FormData();
+    formData.append("property_id", String(propertyId));
+
+    try {
+      const response = await api.post<CreateEstateCommunityResponse>(
+        `${BASE_URL}/api/admin/estates/create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.status === 401) {
+        Cookies.remove("token");
+      }
+
+      if (axiosError.response) {
+        return rejectWithValue({
+          message:
+            axiosError.response.data.message ||
+            "Failed to create estate community",
+          errors: axiosError.response.data.errors,
+        });
+      } else if (axiosError.request) {
+        return rejectWithValue({
+          message:
+            "No response from server. Please check your network connection.",
+        });
+      }
+
+      return rejectWithValue({
+        message: "An unexpected error occurred. Please try again.",
+      });
+    }
+  },
+);
+
+export const assignUsersToEstate = createAsyncThunk<
+  AssignEstateUsersResponse,
+  { estateId: number; propertySlug?: string; emails: string[] },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/assignUsersToEstate",
+  async ({ estateId, propertySlug, emails }, { rejectWithValue }) => {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      return rejectWithValue({
+        message: "No authentication token found. Please login again.",
+      });
+    }
+
+    const payload = {
+      estate_id: estateId,
+      ...(propertySlug && { property_slug: propertySlug }),
+      users: emails,
+    };
+
+    try {
+      const response = await api.post<AssignEstateUsersResponse>(
+        `${BASE_URL}/api/admin/estates/assign-users`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.status === 401) {
+        Cookies.remove("token");
+      }
+
+      if (axiosError.response) {
+        return rejectWithValue({
+          message:
+            axiosError.response.data.message ||
+            "Failed to add clients to estate",
+          errors: axiosError.response.data.errors,
+        });
+      } else if (axiosError.request) {
+        return rejectWithValue({
+          message:
+            "No response from server. Please check your network connection.",
+        });
+      }
+
+      return rejectWithValue({
+        message: "An unexpected error occurred. Please try again.",
+      });
+    }
+  },
+);
 
 // Fetch all estates with metrics
 export const fetchAllEstates = createAsyncThunk<
