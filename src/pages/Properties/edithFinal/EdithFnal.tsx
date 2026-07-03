@@ -3,7 +3,10 @@ import { FaCamera, FaCheck, FaPen, FaTag, FaTrash } from "react-icons/fa6";
 import { FaHome, FaMapMarkerAlt, FaTimes, FaPlus, FaBullseye } from "react-icons/fa";
 import InfrastructureFeesModal from "../../../components/Modals/InfrastructureFeesModal";
 import InfrastructureFeesModalss from "../../../components/Modals/infrastureModal2";
-import { useEditPropertyForm } from "../../../components/Redux/hooks/usePropertyForms";
+import {
+  useDraftPropertyForm,
+  useEditPropertyForm,
+} from "../../../components/Redux/hooks/usePropertyForms";
 
 interface EditingState {
   title: boolean;
@@ -21,7 +24,15 @@ interface EditingState {
   landSizeSection: boolean;
 }
 
-export default function PropertyListing() {
+interface PropertyListingProps {
+  mode?: "edit" | "draft";
+}
+
+export default function PropertyListing({ mode = "edit" }: PropertyListingProps) {
+  const editForm = useEditPropertyForm();
+  const draftForm = useDraftPropertyForm();
+  const form = mode === "draft" ? draftForm : editForm;
+
   const {
     basicDetails,
     bulkDetails,
@@ -33,16 +44,32 @@ export default function PropertyListing() {
     metadata,
     LandSizeSection,
     
-    // Redux setters
-    setEditMedia,
-    setEditBasicDetails,
-    setEditBulkDetails,
-    setEditSpecifications,
-    setEditLandForm,
-    setEditLandSizeSections,
-    setEditFeatures,
-    setEditDiscount,
-  } = useEditPropertyForm();
+  } = form;
+
+  const setMedia =
+    mode === "draft" ? draftForm.setDraftMedia : editForm.setEditMedia;
+  const setBasicDetails =
+    mode === "draft"
+      ? draftForm.setDraftBasicDetails
+      : editForm.setEditBasicDetails;
+  const setBulkDetails =
+    mode === "draft"
+      ? draftForm.setDraftBulkDetails
+      : editForm.setEditBulkDetails;
+  const setSpecifications =
+    mode === "draft"
+      ? draftForm.setDraftSpecifications
+      : editForm.setEditSpecifications;
+  const setLandForm =
+    mode === "draft" ? draftForm.setDraftLandForm : editForm.setEditLandForm;
+  const setLandSizeSections =
+    mode === "draft"
+      ? draftForm.setDraftLandSizeSections
+      : editForm.setEditLandSizeSections;
+  const setFeatures =
+    mode === "draft" ? draftForm.setDraftFeatures : editForm.setEditFeatures;
+  const setDiscount =
+    mode === "draft" ? draftForm.setDraftDiscount : editForm.setEditDiscount;
 
   const {
     isLandProperty2,
@@ -155,10 +182,18 @@ export default function PropertyListing() {
 
   const displayData = getDisplayData();
 
+  const displayImagePreview =
+    media.display_image instanceof File
+      ? URL.createObjectURL(media.display_image)
+      : media.display_image || null;
+
   // Process images - handle both File objects and URLs
-  const images = media.images.map((file) =>
+  const galleryImages = media.images.map((file) =>
     file instanceof File ? URL.createObjectURL(file) : file
   );
+  const images = [displayImagePreview, ...galleryImages].filter(
+    Boolean,
+  ) as string[];
 
   const handleEdit = (field: keyof EditingState) => {
     // Initialize editing state with current data
@@ -228,12 +263,12 @@ export default function PropertyListing() {
     switch (field) {
       case 'title':
         if (isBulk) {
-          setEditBulkDetails({
+          setBulkDetails({
             ...bulkDetails,
             propertyName: editingTitle
           });
         } else {
-          setEditBasicDetails({
+          setBasicDetails({
             ...basicDetails,
             propertyName: editingTitle
           });
@@ -243,12 +278,12 @@ export default function PropertyListing() {
       case 'location':
       case 'address':
         if (isBulk) {
-          setEditBulkDetails({
+          setBulkDetails({
             ...bulkDetails,
             address: editingAddress
           });
         } else {
-          setEditBasicDetails({
+          setBasicDetails({
             ...basicDetails,
             address: editingAddress
           });
@@ -256,7 +291,7 @@ export default function PropertyListing() {
         break;
       
       case 'virtualTour':
-        setEditMedia({
+        setMedia({
           ...media,
           tourLink: editingVirtualTour
         });
@@ -264,12 +299,12 @@ export default function PropertyListing() {
       
       case 'propertyType':
         if (isBulk) {
-          setEditBulkDetails({
+          setBulkDetails({
             ...bulkDetails,
             propertyType: editingPropertyType
           });
         } else {
-          setEditBasicDetails({
+          setBasicDetails({
             ...basicDetails,
             propertyType: editingPropertyType
           });
@@ -280,12 +315,12 @@ export default function PropertyListing() {
         // Extract numeric value from formatted string
         const priceValue = editingPrice.replace(/[^\d.]/g, '');
         if (isBulk) {
-          setEditBulkDetails({
+          setBulkDetails({
             ...bulkDetails,
             price: priceValue
           });
         } else {
-          setEditBasicDetails({
+          setBasicDetails({
             ...basicDetails,
             price: priceValue
           });
@@ -294,12 +329,12 @@ export default function PropertyListing() {
       
       case 'description':
         if (isLandProperty2) {
-          setEditLandForm({
+          setLandForm({
             ...landForm,
             description: editingDescription
           });
         } else {
-          setEditSpecifications({
+          setSpecifications({
             ...specifications,
             description: editingDescription
           });
@@ -307,14 +342,14 @@ export default function PropertyListing() {
         break;
       
       case 'features':
-        setEditFeatures({
+        setFeatures({
           ...reduxFeatures,
           features: editingFeatures
         });
         break;
       
       case 'discount':
-        setEditDiscount({
+        setDiscount({
           ...reduxDiscount,
           discountName: editingDiscount.name,
           discountOff: editingDiscount.off,
@@ -326,7 +361,7 @@ export default function PropertyListing() {
       
       case 'propertyUnits':
         if (isBulk) {
-          setEditBulkDetails({
+          setBulkDetails({
             ...bulkDetails,
             propertyUnits: editingPropertyUnits
           });
@@ -337,12 +372,12 @@ export default function PropertyListing() {
         // Extract numeric value from string
         const sizeValue = editingSquareMeters.replace(/[^\d.]/g, '');
         if (isLandProperty2) {
-          setEditLandForm({
+          setLandForm({
             ...landForm,
             propertySize: sizeValue
           });
         } else {
-          setEditSpecifications({
+          setSpecifications({
             ...specifications,
             propertySize: sizeValue
           });
@@ -370,7 +405,7 @@ export default function PropertyListing() {
         ...media.images,
         ...Array.from(e.target.files),
       ];
-      setEditMedia({
+      setMedia({
         ...media,
         images: newImages,
       });
@@ -379,8 +414,17 @@ export default function PropertyListing() {
 
   // Handle image removal
   const handleRemoveImage = (index: number) => {
-    const newImages = media.images.filter((_, i) => i !== index);
-    setEditMedia({
+    if (index === 0 && displayImagePreview) {
+      setMedia({
+        ...media,
+        display_image: "",
+      });
+      return;
+    }
+
+    const galleryIndex = displayImagePreview ? index - 1 : index;
+    const newImages = media.images.filter((_, i) => i !== galleryIndex);
+    setMedia({
       ...media,
       images: newImages,
     });
@@ -1092,7 +1136,7 @@ export default function PropertyListing() {
                   className="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 flex items-center gap-2"
                   onClick={() => {
                     // Save to Redux
-                    setEditLandSizeSections(localLandSizeSections);
+                    setLandSizeSections(localLandSizeSections);
                     setEditing({ ...editing, landSizeSection: false });
                   }}
                 >

@@ -312,6 +312,11 @@ const draftPropertySlice = createSlice({
             property_code: d.property_code || "",
             property_id: d.property_id || undefined,
             pre_filled: d.pre_filled || false,
+            originalPrice:
+              d.originalPrice ||
+              d.original_price ||
+              d.citta_original_price ||
+              undefined,
             appliedPromoCode: d.appliedPromoCode || "",
             discountedPrice: d.discountedPrice || undefined,
             is_active: d.is_active || true,

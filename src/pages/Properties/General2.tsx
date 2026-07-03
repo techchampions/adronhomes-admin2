@@ -455,11 +455,14 @@ if (LandSizeSection.length > 0) {
       /* =========================
        MEDIA
     ========================== */
+      if (media.display_image instanceof File) {
+        formPayload.append("display_image", media.display_image);
+      }
+
       if (Array.isArray(media.images)) {
         media.images.forEach((img, i) => {
           if (img instanceof File) {
             formPayload.append(`photos[${i}]`, img);
-            if (i === 0) formPayload.append("display_image", img);
           }
         });
       }
