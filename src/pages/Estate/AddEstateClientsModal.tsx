@@ -43,16 +43,19 @@ const boundaryPattern = new RegExp(
 );
 
 const parseEmails = (value: string) => {
-  const normalisedValue = value
-    .replace(boundaryPattern, ".$1 ")
-    .replace(/[;,]+/g, " ");
-  const matches = normalisedValue.match(
-    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,
-  );
+  // Normalize line breaks to spaces
+  const normalized = value
+    .replace(/[\r\n]+/g, " ") // Convert newlines to spaces
+    .replace(/\s+/g, " ") // Convert multiple spaces/tabs to single space
+    .trim();
 
-  return Array.from(
-    new Set((matches || []).map((email) => email.toLowerCase())),
-  );
+  // Split by spaces and filter for valid emails
+  const emails = normalized
+    .split(" ")
+    .filter((part) => part.length > 0)
+    .filter((part) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(part));
+
+  return Array.from(new Set(emails.map((email) => email.toLowerCase())));
 };
 
 export default function AddEstateClientsModal({
@@ -127,7 +130,8 @@ export default function AddEstateClientsModal({
           <div>
             <h2 className="font-[350] text-2xl text-dark">Add Client</h2>
             <p className="font-[325] text-sm text-[#767676] mt-1">
-              Paste customer emails to add them to {estateName || "this estate"}.
+              Paste customer emails to add them to {estateName || "this estate"}
+              .
             </p>
           </div>
           <button
@@ -152,7 +156,6 @@ export default function AddEstateClientsModal({
               {estateName || `Estate ${estateId}`}
             </p>
           </div>
-          
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 md:px-8 py-6">
@@ -160,13 +163,12 @@ export default function AddEstateClientsModal({
             <section className="border border-gray-200 rounded-3xl p-5">
               <h3 className="font-[350] text-lg text-dark">Paste Emails</h3>
               <p className="font-[325] text-xs text-[#767676] mt-1 mb-4">
-                Commas, spaces, tabs, new lines, and back-to-back emails are
-                supported.
+                Paste customer emails, emails must be separated by spaces or new lines.
               </p>
               <textarea
                 value={emailPaste}
                 onChange={(event) => setEmailPaste(event.target.value)}
-                placeholder="israel.akinsola2@adronhomes.comcaleb.oluwatimilehin1@adronhomes.com"
+                placeholder="Paste customer emails here..."
                 disabled={assigning}
                 className="w-full min-h-[330px] rounded-2xl bg-[#F6F6F8] p-4 text-sm outline-none resize-none disabled:opacity-60"
               />

@@ -384,11 +384,11 @@ if (LandSizeSection.length > 0) {
       });
 
       // Append Media
-      const displayImage = media.images[0];
+      const displayImage = media.display_image;
       if (displayImage instanceof File) {
         formPayload.append("display_image", displayImage);
       }
-      media.images.slice(1).forEach((image, index) => {
+      media.images.forEach((image, index) => {
         if (image instanceof File) {
           formPayload.append(`photos[${index}]`, image);
         }

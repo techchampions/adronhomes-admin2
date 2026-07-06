@@ -75,7 +75,8 @@ interface Duration {
   appliedPromoCode?: string;
   discountedPrice?: number;
   appliedTerminationCode?: string;
-  terminationDiscountedPrice?: number;
+  terminationDiscountedPrice?: number; // For metadata only
+  originalPrice?: number; // Store original price for reference
 }
 
 export interface LandSizeSection {
@@ -117,19 +118,24 @@ const extractDiscountFromPromo = (pName: string): number | null => {
   return null;
 };
 
-const extractDiscountFromTermination = (pName: string): number | null => {
-  const match = pName.match(/(\d+(?:\.\d+)?)/);
-  if (match) return parseFloat(match[1]);
-  return null;
+// Calculate price with promo discount only
+const calculatePriceWithPromo = (
+  originalPrice: number,
+  promoDiscount: number | null,
+): number => {
+  if (!promoDiscount) return originalPrice;
+  const discounted = originalPrice * (1 - promoDiscount / 100);
+  return Math.round(discounted);
 };
 
-const calculateDiscountedPrice = (
-  originalPrice: number,
-  discountPercent: number | null,
-): number => {
-  if (!discountPercent) return originalPrice;
-  const discounted = originalPrice * (1 - discountPercent / 100);
-  return Math.round(discounted);
+const parseNumericPrice = (value: any): number => {
+  const parsed = parseFloat(String(value ?? "").replace(/[^0-9.]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getDurationOriginalPrice = (duration: Duration): number => {
+  const storedOriginal = parseNumericPrice(duration.originalPrice);
+  return storedOriginal > 0 ? storedOriginal : parseNumericPrice(duration.price);
 };
 
 const PropertyListingPage = forwardRef<
@@ -312,6 +318,54 @@ const PropertyListingPage = forwardRef<
     }
   }, [propertyMapItems]);
 
+  useEffect(() => {
+    if (!propertyMapItems?.length || !landSizeSections.length) return;
+
+    setLocalLandSizeSections((prevSections) => {
+      let changed = false;
+
+      const updatedSections = prevSections.map((section) => ({
+        ...section,
+        durations: section.durations.map((duration) => {
+          const matchingCittaItem = propertyMapItems.find((item: any) => {
+            const samePropertyCode =
+              item.property_code &&
+              (item.property_code === duration.property_code ||
+                item.property_code === duration.citta_id);
+            const samePropertyId =
+              item.id &&
+              duration.property_id &&
+              String(item.id) === String(duration.property_id);
+            const sameSizeAndDuration =
+              String(item.size) === String(section.size) &&
+              String(item.duration) === String(duration.duration);
+
+            return samePropertyCode || samePropertyId || sameSizeAndDuration;
+          });
+
+          const cittaOriginalPrice = parseNumericPrice(
+            matchingCittaItem?.trimmed_price,
+          );
+
+          if (
+            cittaOriginalPrice > 0 &&
+            parseNumericPrice(duration.originalPrice) !== cittaOriginalPrice
+          ) {
+            changed = true;
+            return {
+              ...duration,
+              originalPrice: cittaOriginalPrice,
+            };
+          }
+
+          return duration;
+        }),
+      }));
+
+      return changed ? updatedSections : prevSections;
+    });
+  }, [landSizeSections.length, propertyMapItems]);
+
   // Auto-populate when data is available
   useEffect(() => {
     if (
@@ -326,15 +380,13 @@ const PropertyListingPage = forwardRef<
     }
   }, [propertyMapItems, selectedEstate, selectedCategory, isRefreshing]);
 
-  const applyDiscountsToDurations = (
+  // Apply promo code only - termination is just metadata
+  const applyPromoToDurations = (
     sections: LandSizeSection[],
     promoCode: any,
     terminationCode: any,
   ): LandSizeSection[] => {
     const promoDiscount = extractDiscountFromPromo(promoCode?.pName || "");
-    const terminationDiscount = extractDiscountFromTermination(
-      terminationCode?.pName || "",
-    );
 
     return sections.map((section) => ({
       ...section,
@@ -343,29 +395,21 @@ const PropertyListingPage = forwardRef<
       citta_termination_code: terminationCode?.pCode || undefined,
       citta_termination_name: terminationCode?.pName || "",
       durations: section.durations.map((duration) => {
-        const originalPrice = parseFloat(duration.price);
-        let finalPrice = originalPrice;
-
-        if (terminationDiscount) {
-          finalPrice = calculateDiscountedPrice(
-            finalPrice,
-            terminationDiscount,
-          );
-        }
-
-        if (promoDiscount) {
-          finalPrice = calculateDiscountedPrice(finalPrice, promoDiscount);
-        }
+        const originalPrice = getDurationOriginalPrice(duration);
+        // Calculate price with promo discount only
+        const finalPrice = calculatePriceWithPromo(
+          originalPrice,
+          promoDiscount,
+        );
 
         return {
           ...duration,
-          discountedPrice:
-            promoDiscount || terminationDiscount ? finalPrice : undefined,
+          price: finalPrice.toString(),
+          originalPrice: originalPrice,
+          discountedPrice: finalPrice, // Same as price since termination doesn't affect display
           appliedPromoCode: promoCode?.pCode,
           appliedTerminationCode: terminationCode?.pCode,
-          terminationDiscountedPrice: terminationDiscount
-            ? finalPrice
-            : undefined,
+          terminationDiscountedPrice: undefined, // No display calculation
         };
       }),
     }));
@@ -380,44 +424,33 @@ const PropertyListingPage = forwardRef<
       return acc;
     }, {});
 
+    const promoDiscount = extractDiscountFromPromo(
+      selectedPromoCode?.pName || "",
+    );
+
     const newSections: LandSizeSection[] = Object.entries(groupedBySize).map(
       ([size, items]: any) => {
         const durations: Duration[] = items.map((item: any) => {
-          const originalPrice = parseFloat(item.trimmed_price);
-          let finalPrice = originalPrice;
-
-          const promoDiscount = extractDiscountFromPromo(
-            selectedPromoCode?.pName || "",
+          const originalPrice = parseNumericPrice(item.trimmed_price);
+          // Calculate price with promo discount only
+          const finalPrice = calculatePriceWithPromo(
+            originalPrice,
+            promoDiscount,
           );
-          const terminationDiscount = extractDiscountFromTermination(
-            selectedTerminationCode?.pName || "",
-          );
-
-          if (terminationDiscount) {
-            finalPrice = calculateDiscountedPrice(
-              finalPrice,
-              terminationDiscount,
-            );
-          }
-          if (promoDiscount) {
-            finalPrice = calculateDiscountedPrice(finalPrice, promoDiscount);
-          }
 
           return {
             id: getNextDurationId(),
             duration: item.duration,
-            price: item.trimmed_price?.toString() || "",
+            price: finalPrice.toString(),
             citta_id: item.property_code || "",
             property_code: item.property_code || "",
             property_id: item.id,
             pre_filled: true,
-            discountedPrice:
-              promoDiscount || terminationDiscount ? finalPrice : undefined,
+            originalPrice: originalPrice,
+            discountedPrice: finalPrice,
             appliedPromoCode: selectedPromoCode?.pCode,
             appliedTerminationCode: selectedTerminationCode?.pCode,
-            terminationDiscountedPrice: terminationDiscount
-              ? finalPrice
-              : undefined,
+            terminationDiscountedPrice: undefined,
           };
         });
 
@@ -444,7 +477,7 @@ const PropertyListingPage = forwardRef<
   };
 
   const applyPromoCodeToAllSections = (promoCode: any) => {
-    const updatedSections = applyDiscountsToDurations(
+    const updatedSections = applyPromoToDurations(
       landSizeSections,
       promoCode,
       selectedTerminationCode,
@@ -453,11 +486,17 @@ const PropertyListingPage = forwardRef<
   };
 
   const applyTerminationCodeToAllSections = (terminationCode: any) => {
-    const updatedSections = applyDiscountsToDurations(
-      landSizeSections,
-      selectedPromoCode,
-      terminationCode,
-    );
+    // Just update metadata, no price calculation changes
+    const updatedSections = landSizeSections.map((section) => ({
+      ...section,
+      citta_termination_code: terminationCode?.pCode || undefined,
+      citta_termination_name: terminationCode?.pName || "",
+      durations: section.durations.map((duration) => ({
+        ...duration,
+        appliedTerminationCode: terminationCode?.pCode,
+        terminationDiscountedPrice: undefined,
+      })),
+    }));
     setLocalLandSizeSections(updatedSections);
   };
 
@@ -573,6 +612,7 @@ const PropertyListingPage = forwardRef<
     );
   };
 
+  // When selecting a land size, apply promo discount only
   const updateLandSize = (sectionId: number, value: string) => {
     const propertyItems = propertyMapItems.filter(
       (item) => item.size === value,
@@ -580,42 +620,30 @@ const PropertyListingPage = forwardRef<
     const promoDiscount = extractDiscountFromPromo(
       selectedPromoCode?.pName || "",
     );
-    const terminationDiscount = extractDiscountFromTermination(
-      selectedTerminationCode?.pName || "",
-    );
 
     setLocalLandSizeSections((prev) =>
       prev.map((section) => {
         if (section.id === sectionId) {
           const newDurations = propertyItems.map((item) => {
-            const originalPrice = item.trimmed_price;
-            let finalPrice = originalPrice;
-
-            if (terminationDiscount) {
-              finalPrice = calculateDiscountedPrice(
-                finalPrice,
-                terminationDiscount,
-              );
-            }
-            if (promoDiscount) {
-              finalPrice = calculateDiscountedPrice(finalPrice, promoDiscount);
-            }
+            const originalPrice = parseNumericPrice(item.trimmed_price);
+            const finalPrice = calculatePriceWithPromo(
+              originalPrice,
+              promoDiscount,
+            );
 
             return {
               id: getNextDurationId(),
               duration: item.duration,
-              price: item.trimmed_price?.toString() || "",
+              price: finalPrice.toString(),
               citta_id: item.property_code || "",
               property_code: item.property_code || "",
               property_id: item.id,
               pre_filled: true,
-              discountedPrice:
-                promoDiscount || terminationDiscount ? finalPrice : undefined,
+              originalPrice: originalPrice,
+              discountedPrice: finalPrice,
               appliedPromoCode: selectedPromoCode?.pCode,
               appliedTerminationCode: selectedTerminationCode?.pCode,
-              terminationDiscountedPrice: terminationDiscount
-                ? finalPrice
-                : undefined,
+              terminationDiscountedPrice: undefined,
             };
           });
 
@@ -833,7 +861,7 @@ const PropertyListingPage = forwardRef<
                   </h3>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Select a promo code to apply to property
+                  Select a promo code to apply discount to the price
                 </p>
 
                 <EnhancedOptionInputField
@@ -862,7 +890,7 @@ const PropertyListingPage = forwardRef<
                       <span className="font-semibold">Active Promo:</span>{" "}
                       {selectedPromoCode.pCode} -{" "}
                       {extractDiscountFromPromo(selectedPromoCode.pName)}%
-                      discount
+                      discount applied
                     </p>
                   </div>
                 )}
@@ -877,7 +905,8 @@ const PropertyListingPage = forwardRef<
                   </h3>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Select a termination code to apply discount
+                  Select a termination code for reference only (does not affect
+                  price)
                 </p>
 
                 <EnhancedOptionInputField
@@ -893,7 +922,7 @@ const PropertyListingPage = forwardRef<
                   }}
                   options={filteredTerminationCodes.map((code) => ({
                     value: code.pCode,
-                    label: `${code.pCode} - ${code.pName}% off`,
+                    label: `${code.pCode} - ${code.pName}`,
                     original: code,
                   }))}
                   isSearchable
@@ -904,14 +933,13 @@ const PropertyListingPage = forwardRef<
                   <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                     <p className="text-sm text-orange-800">
                       <span className="font-semibold">
-                        Active Termination Code:
+                        Selected Termination Code:
                       </span>{" "}
                       {selectedTerminationCode.pCode} -{" "}
-                      {selectedTerminationCode.pName}% discount
+                      {selectedTerminationCode.pName}
                     </p>
                     <p className="text-xs text-orange-600 mt-1">
-                      This discount will be applied before the promo code
-                      discount
+                      This is for reference only and does not affect the price
                     </p>
                   </div>
                 )}
@@ -949,13 +977,6 @@ const PropertyListingPage = forwardRef<
               <h2 className="text-base font-semibold text-gray-800">
                 Land Sizes & Pricing
               </h2>
-              {/* <button
-                type="button"
-                onClick={addLandSizeSection}
-                className="px-4 py-2 bg-[#57713A] text-white rounded-lg text-sm hover:bg-[#57713A]/80"
-              >
-                + Add Land Size
-              </button> */}
             </div>
 
             <div className="space-y-8">
@@ -987,6 +1008,7 @@ const PropertyListingPage = forwardRef<
                         label: item.size,
                         original: item,
                       }))}
+                      disabled
                       isSearchable
                       isLoading={propertyMapLoading}
                       error={getErrorMessage(
@@ -1008,105 +1030,110 @@ const PropertyListingPage = forwardRef<
                   </div>
 
                   <div className="space-y-4">
-                    {section.durations.map((duration, durationIndex) => (
-                      <div
-                        key={duration.id}
-                        className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl flex-wrap md:flex-nowrap"
-                      >
-                        <div className="flex-1 min-w-[150px]">
-                          <InputField
-                            label="Duration (months)"
-                            type="number"
-                            value={duration.duration || ""}
-                            onChange={(e) =>
-                              updateDuration(
-                                section.id,
-                                duration.id,
-                                "duration",
-                                e.target.value,
-                              )
-                            }
-                            error={getErrorMessage(
-                              `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`,
+                    {section.durations.map((duration, durationIndex) => {
+                      const hasPromoDiscount =
+                        duration.appliedPromoCode &&
+                        duration.price !== duration.originalPrice?.toString();
+
+                      return (
+                        <div
+                          key={duration.id}
+                          className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl flex-wrap md:flex-nowrap"
+                        >
+                          <div className="flex-1 min-w-[150px]">
+                            <InputField
+                              label="Duration (months)"
+                              type="number"
+                              value={duration.duration || ""}
+                              onChange={(e) =>
+                                updateDuration(
+                                  section.id,
+                                  duration.id,
+                                  "duration",
+                                  e.target.value,
+                                )
+                              }
+                              disabled
+                              error={getErrorMessage(
+                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`,
+                              )}
+                              placeholder={""}
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-[150px]">
+                            <InputField
+                              label="Original Price (₦)"
+                              type="text"
+                              value={formatToNaira(
+                                duration.originalPrice || duration.price || "",
+                              )}
+                              onChange={() => {}}
+                              placeholder={""}
+                              disabled
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-[150px]">
+                            <InputField
+                              label="Final Price (₦)"
+                              type="text"
+                              value={formatToNaira(duration.price || "")}
+                              onChange={(e) => {
+                                const raw = e.target.value.replace(
+                                  /[^0-9]/g,
+                                  "",
+                                );
+                                updateDuration(
+                                  section.id,
+                                  duration.id,
+                                  "price",
+                                  raw,
+                                );
+                              }}
+                              disabled
+                              error={getErrorMessage(
+                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
+                              )}
+                              placeholder={""}
+                            />
+                            {hasPromoDiscount && (
+                              <span className="text-xs text-green-600">
+                                ✓ Promo discount applied
+                              </span>
                             )}
-                            placeholder={""}
-                          />
-                        </div>
+                          </div>
 
-                        <div className="flex-1 min-w-[150px]">
-                          <InputField
-                            label="Original Price (₦)"
-                            type="text"
-                            value={
-                              duration.discountedPrice
-                                ? formatToNaira(duration.discountedPrice)
-                                : formatToNaira(duration.price || "")
-                            }
-                            onChange={(e) => {
-                              const raw = e.target.value.replace(/[^0-9]/g, "");
-                              updateDuration(
-                                section.id,
-                                duration.id,
-                                "price",
-                                raw,
-                              );
-                            }}
-                            error={getErrorMessage(
-                              `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
-                            )}
-                            placeholder={""}
-                          />
-                        </div>
+                          <div className="flex-1 min-w-[180px]">
+                            <label className="block text-sm mb-1">
+                              Citta Property Code
+                            </label>
+                            <input
+                              type="text"
+                              readOnly
+                              value={duration.citta_id || ""}
+                              className="w-full px-3 py-2 rounded-full bg-gray-100 cursor-not-allowed"
+                            />
+                          </div>
 
-                        <div className="flex-1 min-w-[150px]">
-                          <InputField
-                            label="Final Price (₦)"
-                            type="text"
-                            value={
-                              duration.discountedPrice
-                                ? formatToNaira(duration.discountedPrice)
-                                : formatToNaira(duration.price || "")
-                            }
-                            onChange={() => {}}
-                            placeholder={""}
-                            disabled
-                          />
+                          {section.durations.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeDurationFromSection(
+                                  section.id,
+                                  duration.id,
+                                )
+                              }
+                              className="text-red-500 hover:text-red-700 p-2"
+                            >
+                              ✕
+                            </button>
+                          )}
                         </div>
-
-                        <div className="flex-1 min-w-[180px]">
-                          <label className="block text-sm mb-1">
-                            Citta Property Code
-                          </label>
-                          <input
-                            type="text"
-                            readOnly
-                            value={duration.citta_id || ""}
-                            className="w-full px-3 py-2 rounded-full bg-gray-100 cursor-not-allowed"
-                          />
-                        </div>
-
-                        {section.durations.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              removeDurationFromSection(section.id, duration.id)
-                            }
-                            className="text-red-500 hover:text-red-700 p-2"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
-
-                  {/* <button
-                    type="button"
-                    onClick={() => addDurationToSection(section.id)}
-                    className="mt-4 text-sm text-[#57713A] hover:text-[#57713A]/80 font-medium"
-                  >
-                    + Add Duration
-                  </button> */}
                 </div>
               ))}
             </div>

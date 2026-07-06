@@ -114,7 +114,10 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
     display_image: Yup.mixed()
       .required("Display image is required")
       .test("display-image-required", "Display image is required", (value) => {
-        return value instanceof File || typeof value === "string";
+        return (
+          value instanceof File ||
+          (typeof value === "string" && value.trim().length > 0)
+        );
       }),
     images: Yup.array(),
     tourLink: Yup.string(),
@@ -190,7 +193,8 @@ const MediaFORM = forwardRef<MediaFORMHandles, MediaFORMProps>((props, ref) => {
       // Check if formik is valid and display_image exists
       const displayImage = formikRef.current?.values.display_image;
       const isValid = !!(
-        displayImage instanceof File || typeof displayImage === "string"
+        displayImage instanceof File ||
+        (typeof displayImage === "string" && displayImage.trim().length > 0)
       );
       return isValid && formikRef.current?.isValid;
     },

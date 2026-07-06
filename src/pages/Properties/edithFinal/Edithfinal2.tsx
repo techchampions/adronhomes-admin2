@@ -155,10 +155,18 @@ export default function PropertyListing() {
 
   const displayData = getDisplayData();
 
+  const displayImagePreview =
+    media.display_image instanceof File
+      ? URL.createObjectURL(media.display_image)
+      : media.display_image || null;
+
   // Process images - handle both File objects and URLs
-  const images = media.images.map((file) =>
+  const galleryImages = media.images.map((file) =>
     file instanceof File ? URL.createObjectURL(file) : file
   );
+  const images = [displayImagePreview, ...galleryImages].filter(
+    Boolean
+  ) as string[];
 
   const handleEdit = (field: keyof EditingState) => {
     // Initialize editing state with current data
@@ -378,7 +386,16 @@ export default function PropertyListing() {
 
   // Handle image removal
   const handleRemoveImage = (index: number) => {
-    const newImages = media.images.filter((_, i) => i !== index);
+    if (index === 0 && displayImagePreview) {
+      setCreateMedia({
+        ...media,
+        display_image: undefined,
+      });
+      return;
+    }
+
+    const galleryIndex = displayImagePreview ? index - 1 : index;
+    const newImages = media.images.filter((_, i) => i !== galleryIndex);
     setCreateMedia({
       ...media,
       images: newImages,
