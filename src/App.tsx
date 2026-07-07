@@ -100,6 +100,7 @@ import CommunityDashboard from "./CommunityDashboard/CommunityDashboardtwo/Commu
 import Estate from "./pages/Estate/Estate";
 import EstateUsers from "./pages/Estate/EstateUsers";
 import SingleUserEstate from "./pages/Estate/SingleUserEstate";
+import EstateOperationsPage from "./pages/Estate/EstateOperationsPage";
 // import CommunityDashboard from "./CommunityDashboard/CommunityDashboard";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
@@ -424,6 +425,18 @@ const App = () => {
                 />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/estates" element={<Estate />} />
+                <Route
+                  path="/estate-maintenance"
+                  element={<EstateOperationsPage mode="maintenance" />}
+                />
+                <Route
+                  path="/estate-security-codes"
+                  element={<EstateOperationsPage mode="security" />}
+                />
+                <Route
+                  path="/estate-utility-payments"
+                  element={<EstateOperationsPage mode="utility" />}
+                />
                 <Route path="/estates/:estateId/users" element={<EstateUsers />} />
                 <Route
                   path="/estates/:estateId/users/:userId"

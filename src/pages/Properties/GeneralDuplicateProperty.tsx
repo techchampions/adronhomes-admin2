@@ -680,6 +680,7 @@ if (LandSizeSection.length > 0) {
             <InfrastructureFeesModal
               isOpen={showInfrastructureModal}
               onClose={() => setShowInfrastructureModal(false)}
+              formMode="duplicate"
             />
           )}
 
@@ -795,6 +796,7 @@ if (LandSizeSection.length > 0) {
                 initialData={paymentStructure}
                 isLandProperty={isLandProperty2}
                 isEditMode={true}
+                formMode="duplicate"
                 onOpenInfrastructureModal={() =>
                   setShowInfrastructureModal(true)
                 }

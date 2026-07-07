@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import type { MouseEvent } from "react";
+import { toast } from "react-toastify";
+import { FaTrash } from "react-icons/fa6";
 import Pagination from "../../components/Tables/Pagination";
 import { AppDispatch } from "../../components/Redux/store";
 import {
   selectAllEstatesPagination,
   setAllEstatesCurrentPage,
 } from "../../components/Redux/estate/estateSlice";
-import { Estate, fetchAllEstates } from "../../components/Redux/estate/estateThunk";
+import {
+  deleteEstate,
+  Estate,
+  fetchAllEstates,
+} from "../../components/Redux/estate/estateThunk";
+import ConfirmationModal from "../../components/Modals/delete";
 
 interface EstateTableProps {
   data: Estate[];
@@ -32,10 +41,46 @@ export default function EstateTable({ data }: EstateTableProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const pagination = useSelector(selectAllEstatesPagination);
+  const [estateToDelete, setEstateToDelete] = useState<Estate | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handlePageChange = async (page: number) => {
     dispatch(setAllEstatesCurrentPage(page));
     await dispatch(fetchAllEstates({ page }));
+  };
+
+  const handleDeleteClick = (
+    event: MouseEvent<HTMLButtonElement>,
+    estate: Estate,
+  ) => {
+    event.stopPropagation();
+    setEstateToDelete(estate);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (deleteLoading) return;
+    setIsDeleteModalOpen(false);
+    setEstateToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!estateToDelete) return;
+    setDeleteLoading(true);
+    try {
+      const response = await dispatch(
+        deleteEstate({ estateId: estateToDelete.id }),
+      ).unwrap();
+      toast.success(response.message || "Estate deleted successfully");
+      await dispatch(fetchAllEstates({ page: pagination.currentPage }));
+      setIsDeleteModalOpen(false);
+      setEstateToDelete(null);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete estate");
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   return (
@@ -68,6 +113,9 @@ export default function EstateTable({ data }: EstateTableProps) {
                 </th>
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   Status
+                </th>
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
+                  Action
                 </th>
               </tr>
             </thead>
@@ -126,6 +174,15 @@ export default function EstateTable({ data }: EstateTableProps) {
                       {statusText(estate.is_operating)}
                     </span>
                   </td>
+                  <td className="py-4 pr-6 font-[325] text-sm">
+                    <button
+                      onClick={(event) => handleDeleteClick(event, estate)}
+                      className="h-9 w-9 rounded-full bg-[#FDECEC] text-[#D70E0E] hover:bg-[#F8D7D7] flex items-center justify-center"
+                      title="Delete estate"
+                    >
+                      <FaTrash size={13} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -138,6 +195,20 @@ export default function EstateTable({ data }: EstateTableProps) {
         onPageChange={handlePageChange}
         className="mt-8 mb-4"
       />
+
+      {isDeleteModalOpen && estateToDelete && (
+        <ConfirmationModal
+          isOpen={isDeleteModalOpen}
+          title="Delete Estate"
+          description="Are you sure you want to delete"
+          subjectName={estateToDelete.estate_name || "this estate"}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          loading={deleteLoading}
+          confirmButtonText="Delete Estate"
+          cancelButtonText="Cancel"
+        />
+      )}
     </>
   );
 }

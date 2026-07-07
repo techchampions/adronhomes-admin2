@@ -808,6 +808,7 @@ if (LandSizeSection.length > 0) {
                 initialData={paymentStructure}
                 isLandProperty={isLandProperty2}
                 isEditMode={true}
+                formMode="edit"
                 onOpenInfrastructureModal={() =>
                   setShowInfrastructureModal(true)
                 }

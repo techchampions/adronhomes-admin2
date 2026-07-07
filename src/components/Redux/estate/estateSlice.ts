@@ -5,6 +5,9 @@ import {
   fetchCommunityMessages,
   fetchAllEstates,
   fetchEstateUsers,
+  fetchEstateMaintenances,
+  fetchEstateSecurityCodes,
+  fetchEstateUtilityPayments,
   fetchSingleUserEstateInfo,
   markCommunityMessagesAsRead,
   markEstateChatAsRead,
@@ -22,7 +25,18 @@ import {
   CommunityMessage,
   CommunityConversation,
   PaginatedData,
+  MaintenanceRequest,
+  SecurityCode,
+  UtilityPayment,
+  EstatePaginatedResponse,
 } from "./estateThunk";
+
+const defaultPagination = {
+  currentPage: 1,
+  perPage: 10,
+  totalItems: 0,
+  totalPages: 1,
+};
 
 interface EstateState {
   // All estates data
@@ -77,6 +91,24 @@ interface EstateState {
     messages: PaginatedData<CommunityMessage> | null;
   };
 
+  maintenanceRequests: {
+    data: MaintenanceRequest[];
+    stats: Record<string, any> | null;
+    pagination: typeof defaultPagination;
+  };
+
+  securityCodes: {
+    data: SecurityCode[];
+    stats: Record<string, any> | null;
+    pagination: typeof defaultPagination;
+  };
+
+  utilityPayments: {
+    data: UtilityPayment[];
+    stats: Record<string, any> | null;
+    pagination: typeof defaultPagination;
+  };
+
   // Chat reply
   chatReply: ChatReplyResponse["data"] | null;
 
@@ -88,6 +120,9 @@ interface EstateState {
     chatReply: boolean;
     communityMessages: boolean;
     communityMessageSend: boolean;
+    maintenanceRequests: boolean;
+    securityCodes: boolean;
+    utilityPayments: boolean;
   };
 
   // Error states
@@ -98,6 +133,9 @@ interface EstateState {
     chatReply: string | null;
     communityMessages: string | null;
     communityMessageSend: string | null;
+    maintenanceRequests: string | null;
+    securityCodes: string | null;
+    utilityPayments: string | null;
   };
 }
 
@@ -129,6 +167,21 @@ const initialState: EstateState = {
     conversation: null,
     messages: null,
   },
+  maintenanceRequests: {
+    data: [],
+    stats: null,
+    pagination: defaultPagination,
+  },
+  securityCodes: {
+    data: [],
+    stats: null,
+    pagination: defaultPagination,
+  },
+  utilityPayments: {
+    data: [],
+    stats: null,
+    pagination: defaultPagination,
+  },
   chatReply: null,
   loading: {
     allEstates: false,
@@ -137,6 +190,9 @@ const initialState: EstateState = {
     chatReply: false,
     communityMessages: false,
     communityMessageSend: false,
+    maintenanceRequests: false,
+    securityCodes: false,
+    utilityPayments: false,
   },
   error: {
     allEstates: null,
@@ -145,8 +201,18 @@ const initialState: EstateState = {
     chatReply: null,
     communityMessages: null,
     communityMessageSend: null,
+    maintenanceRequests: null,
+    securityCodes: null,
+    utilityPayments: null,
   },
 };
+
+const toPagination = <T,>(pagination: PaginatedData<T>) => ({
+  currentPage: pagination.current_page,
+  perPage: pagination.per_page,
+  totalItems: pagination.total,
+  totalPages: pagination.last_page,
+});
 
 const estateSlice = createSlice({
   name: "estate",
@@ -157,6 +223,9 @@ const estateSlice = createSlice({
       state.estateUsers = initialState.estateUsers;
       state.singleUserInfo = null;
       state.communityMessages = initialState.communityMessages;
+      state.maintenanceRequests = initialState.maintenanceRequests;
+      state.securityCodes = initialState.securityCodes;
+      state.utilityPayments = initialState.utilityPayments;
       state.chatReply = null;
       state.loading = initialState.loading;
       state.error = initialState.error;
@@ -173,6 +242,18 @@ const estateSlice = createSlice({
     },
     setEstateUsersCurrentPage: (state, action: PayloadAction<number>) => {
       state.estateUsers.pagination.currentPage = action.payload;
+    },
+    setMaintenanceRequestsCurrentPage: (
+      state,
+      action: PayloadAction<number>,
+    ) => {
+      state.maintenanceRequests.pagination.currentPage = action.payload;
+    },
+    setSecurityCodesCurrentPage: (state, action: PayloadAction<number>) => {
+      state.securityCodes.pagination.currentPage = action.payload;
+    },
+    setUtilityPaymentsCurrentPage: (state, action: PayloadAction<number>) => {
+      state.utilityPayments.pagination.currentPage = action.payload;
     },
     updateEstateUser: (state, action: PayloadAction<EstateUser>) => {
       const index = state.estateUsers.data.findIndex(
@@ -363,6 +444,63 @@ const estateSlice = createSlice({
               }
             : state.estateUsers.metrics;
         }
+      })
+      .addCase(fetchEstateMaintenances.pending, (state) => {
+        state.loading.maintenanceRequests = true;
+        state.error.maintenanceRequests = null;
+      })
+      .addCase(
+        fetchEstateMaintenances.fulfilled,
+        (
+          state,
+          action: PayloadAction<EstatePaginatedResponse<MaintenanceRequest>>,
+        ) => {
+          state.loading.maintenanceRequests = false;
+          state.maintenanceRequests.data = action.payload.data.data;
+          state.maintenanceRequests.stats = action.payload.stats;
+          state.maintenanceRequests.pagination = toPagination(action.payload.data);
+        },
+      )
+      .addCase(fetchEstateMaintenances.rejected, (state, action) => {
+        state.loading.maintenanceRequests = false;
+        state.error.maintenanceRequests =
+          action.payload?.message || "Failed to fetch maintenance requests";
+      })
+      .addCase(fetchEstateSecurityCodes.pending, (state) => {
+        state.loading.securityCodes = true;
+        state.error.securityCodes = null;
+      })
+      .addCase(
+        fetchEstateSecurityCodes.fulfilled,
+        (state, action: PayloadAction<EstatePaginatedResponse<SecurityCode>>) => {
+          state.loading.securityCodes = false;
+          state.securityCodes.data = action.payload.data.data;
+          state.securityCodes.stats = action.payload.stats;
+          state.securityCodes.pagination = toPagination(action.payload.data);
+        },
+      )
+      .addCase(fetchEstateSecurityCodes.rejected, (state, action) => {
+        state.loading.securityCodes = false;
+        state.error.securityCodes =
+          action.payload?.message || "Failed to fetch security codes";
+      })
+      .addCase(fetchEstateUtilityPayments.pending, (state) => {
+        state.loading.utilityPayments = true;
+        state.error.utilityPayments = null;
+      })
+      .addCase(
+        fetchEstateUtilityPayments.fulfilled,
+        (state, action: PayloadAction<EstatePaginatedResponse<UtilityPayment>>) => {
+          state.loading.utilityPayments = false;
+          state.utilityPayments.data = action.payload.data.data;
+          state.utilityPayments.stats = action.payload.stats;
+          state.utilityPayments.pagination = toPagination(action.payload.data);
+        },
+      )
+      .addCase(fetchEstateUtilityPayments.rejected, (state, action) => {
+        state.loading.utilityPayments = false;
+        state.error.utilityPayments =
+          action.payload?.message || "Failed to fetch utility payments";
       });
   },
 });
@@ -373,6 +511,9 @@ export const {
   clearChatReply,
   setAllEstatesCurrentPage,
   setEstateUsersCurrentPage,
+  setMaintenanceRequestsCurrentPage,
+  setSecurityCodesCurrentPage,
+  setUtilityPaymentsCurrentPage,
   updateEstateUser,
   updateSingleUserInfo,
 } = estateSlice.actions;
@@ -426,5 +567,35 @@ export const selectCommunityMessageSendLoading = (state: RootState) =>
   state.estate.loading.communityMessageSend;
 export const selectCommunityMessageSendError = (state: RootState) =>
   state.estate.error.communityMessageSend;
+export const selectMaintenanceRequestsData = (state: RootState) =>
+  state.estate.maintenanceRequests.data;
+export const selectMaintenanceRequestsStats = (state: RootState) =>
+  state.estate.maintenanceRequests.stats;
+export const selectMaintenanceRequestsPagination = (state: RootState) =>
+  state.estate.maintenanceRequests.pagination;
+export const selectMaintenanceRequestsLoading = (state: RootState) =>
+  state.estate.loading.maintenanceRequests;
+export const selectMaintenanceRequestsError = (state: RootState) =>
+  state.estate.error.maintenanceRequests;
+export const selectSecurityCodesData = (state: RootState) =>
+  state.estate.securityCodes.data;
+export const selectSecurityCodesStats = (state: RootState) =>
+  state.estate.securityCodes.stats;
+export const selectSecurityCodesPagination = (state: RootState) =>
+  state.estate.securityCodes.pagination;
+export const selectSecurityCodesLoading = (state: RootState) =>
+  state.estate.loading.securityCodes;
+export const selectSecurityCodesError = (state: RootState) =>
+  state.estate.error.securityCodes;
+export const selectUtilityPaymentsData = (state: RootState) =>
+  state.estate.utilityPayments.data;
+export const selectUtilityPaymentsStats = (state: RootState) =>
+  state.estate.utilityPayments.stats;
+export const selectUtilityPaymentsPagination = (state: RootState) =>
+  state.estate.utilityPayments.pagination;
+export const selectUtilityPaymentsLoading = (state: RootState) =>
+  state.estate.loading.utilityPayments;
+export const selectUtilityPaymentsError = (state: RootState) =>
+  state.estate.error.utilityPayments;
 
 export default estateSlice.reducer;

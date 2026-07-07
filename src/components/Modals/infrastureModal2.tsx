@@ -2,7 +2,11 @@ import { ChangeEvent, useState } from "react";
 import { BiCheck, BiX } from "react-icons/bi";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import OptionInputField from "../input/drop_down";
-import { useEditPropertyForm } from "../Redux/hooks/usePropertyForms";
+import {
+  useCreatePropertyForm,
+  useDraftPropertyForm,
+  useEditPropertyForm,
+} from "../Redux/hooks/usePropertyForms";
 import { useDispatch } from "react-redux";
 import { removePropertyDetail } from "../Redux/Properties/deleteSliceDetails";
 import { AppDispatch } from "../Redux/store";
@@ -21,6 +25,7 @@ interface Fee {
 interface InfrastructureFeesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  formMode?: "create" | "edit" | "duplicate";
 }
 
 interface ConfirmationModalProps {
@@ -70,19 +75,35 @@ const ConfirmationModal = ({
 export default function InfrastructureFeesModal({
   isOpen,
   onClose,
+  formMode = "edit",
 }: InfrastructureFeesModalProps) {
-  // Use Redux hooks instead of context
-  const {
-    basicDetails,
-    setEditFees,
-    setEditNewFees,
-    setEditBasicDetails,
-    setEditLandForm,
-    setEditSpecifications,
-    metadata
-  } = useEditPropertyForm();
-  
-  const { fees } = metadata;
+  const createForm = useCreatePropertyForm();
+  const editForm = useEditPropertyForm();
+  const draftForm = useDraftPropertyForm();
+
+  const selectedForm =
+    formMode === "edit"
+      ? {
+          basicDetails: editForm.basicDetails,
+          fees: editForm.metadata.fees,
+          setFees: editForm.setEditFees,
+          setNewFees: editForm.setEditNewFees,
+        }
+      : formMode === "duplicate"
+        ? {
+            basicDetails: draftForm.basicDetails,
+            fees: draftForm.metadata.fees,
+            setFees: draftForm.setDraftFees,
+            setNewFees: draftForm.setDraftNewFees,
+          }
+        : {
+            basicDetails: createForm.basicDetails,
+            fees: createForm.metadata.fees,
+            setFees: createForm.setCreateFees,
+            setNewFees: createForm.setCreateNewFees,
+          };
+
+  const { basicDetails, fees, setFees, setNewFees } = selectedForm;
   
   const useAppDispatch = () => useDispatch<AppDispatch>();
   const dispatch = useAppDispatch();
@@ -101,15 +122,22 @@ export default function InfrastructureFeesModal({
     { value: "others", label: "others" },
   ];
 
-  const mappedPurposes = Array.isArray(basicDetails?.purpose) && basicDetails.purpose.length > 0
-    ? basicDetails.purpose.map(purpose => ({
-        label: purpose,
-        value: purpose
-      }))
-    : [];
+  const purposeValues = Array.isArray(basicDetails?.purpose)
+    ? basicDetails.purpose
+    : typeof basicDetails?.purpose === "string"
+      ? [basicDetails.purpose]
+      : [];
+
+  const mappedPurposes = purposeValues
+    .map((purpose) => purpose?.trim())
+    .filter(Boolean)
+    .map((purpose) => ({
+      label: purpose,
+      value: purpose,
+    }));
 
   const toggleFee = (id: number) => {
-    setEditFees(
+    setFees(
       fees.map((fee: Fee) =>
         fee.id === id ? { ...fee, checked: !fee.checked } : fee
       )
@@ -127,10 +155,10 @@ export default function InfrastructureFeesModal({
     const feeToDelete = fees.find((fee: Fee) => fee.id === feeToRemove);
     
     // If it's a new fee (not in database), just remove it locally
-    if (feeToDelete?.isNew) {
+    if (feeToDelete?.isNew || formMode !== "edit") {
       const updatedFees = fees.filter((fee: Fee) => fee.id !== feeToRemove);
-      setEditFees(updatedFees);
-      setEditNewFees(updatedFees);
+      setFees(updatedFees);
+      setNewFees(updatedFees);
       setShowConfirmation(false);
       setFeeToRemove(null);
       return;
@@ -141,7 +169,7 @@ export default function InfrastructureFeesModal({
     try {
       await dispatch(removePropertyDetail(feeToRemove.toString())).unwrap();
       const updatedFees = fees.filter((fee: Fee) => fee.id !== feeToRemove);
-      setEditFees(updatedFees);
+      setFees(updatedFees);
       setShowConfirmation(false);
       setFeeToRemove(null);
     } catch (error) {
@@ -168,8 +196,8 @@ export default function InfrastructureFeesModal({
       
       // Add to both fees and newFees arrays
       const updatedFees = [...fees, newFee];
-      setEditFees(updatedFees);
-      setEditNewFees(updatedFees);
+      setFees(updatedFees);
+      setNewFees(updatedFees);
       
       // Reset all new fee input fields
       setNewFeeName("");
