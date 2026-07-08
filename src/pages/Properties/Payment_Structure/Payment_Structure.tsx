@@ -33,6 +33,7 @@ interface PaymentStructureProps {
   
   // Props for edit mode
   isEditMode?: boolean;
+  formMode?: "create" | "edit" | "duplicate";
   
   // Props for modal control
   onOpenInfrastructureModal?: () => void;
@@ -43,6 +44,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
   initialData,
   isLandProperty = false,
   isEditMode = false,
+  formMode = isEditMode ? "edit" : "create",
   onOpenInfrastructureModal
 }, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,7 +153,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
   };
 
   const handleOpenInfrastructureModal = () => {
-  isEditMode? setIsModalOpen2(true): setIsModalOpen(true);
+  formMode === "edit" ? setIsModalOpen2(true) : setIsModalOpen(true);
     // if (onOpenInfrastructureModal) {
     //   onOpenInfrastructureModal();
     // }
@@ -262,7 +264,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
             }}
             className="w-full py-3 px-4 bg-[#79B833] text-white rounded-[80px] font-medium max-w-xl hover:bg-[#6aa22c] transition-colors"
           >
-            {isEditMode ? "Manage Allocation Fees" : "Add Allocation Fees"}
+            {formMode === "edit" ? "Manage Allocation Fees" : "Add Allocation Fees"}
           </button>
 
           {/* Conditionally render the appropriate modal based on edit mode */}
@@ -270,6 +272,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
             <InfrastructureFeesModalss
               isOpen={isModalOpen2}
               onClose={() => setIsModalOpen2(false)}
+              formMode={formMode}
             />
           ) }
           
@@ -277,6 +280,7 @@ const Payment_Structure = forwardRef<PaymentStructureHandles, PaymentStructurePr
             <InfrastructureFeesModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
+              formMode={formMode}
             />
           )}
         </div>

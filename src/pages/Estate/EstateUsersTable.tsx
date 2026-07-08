@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import type { MouseEvent } from "react";
+import { toast } from "react-toastify";
+import { FaTrash } from "react-icons/fa6";
 import Pagination from "../../components/Tables/Pagination";
 import { AppDispatch } from "../../components/Redux/store";
 import {
@@ -9,8 +13,10 @@ import {
 import {
   EstateUser,
   fetchEstateUsers,
+  removeUserFromEstate,
 } from "../../components/Redux/estate/estateThunk";
 import { formatDate } from "../../utils/formatdate";
+import ConfirmationModal from "../../components/Modals/delete";
 
 interface EstateUsersTableProps {
   data: EstateUser[];
@@ -31,10 +37,46 @@ export default function EstateUsersTable({ data, estateId }: EstateUsersTablePro
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const pagination = useSelector(selectEstateUsersPagination);
+  const [userToRemove, setUserToRemove] = useState<EstateUser | null>(null);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
 
   const handlePageChange = async (page: number) => {
     dispatch(setEstateUsersCurrentPage(page));
     await dispatch(fetchEstateUsers({ estateId, page }));
+  };
+
+  const handleRemoveClick = (
+    event: MouseEvent<HTMLButtonElement>,
+    user: EstateUser,
+  ) => {
+    event.stopPropagation();
+    setUserToRemove(user);
+    setIsRemoveModalOpen(true);
+  };
+
+  const handleCloseRemoveModal = () => {
+    if (removeLoading) return;
+    setIsRemoveModalOpen(false);
+    setUserToRemove(null);
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!userToRemove) return;
+    setRemoveLoading(true);
+    try {
+      const response = await dispatch(
+        removeUserFromEstate({ userId: userToRemove.id }),
+      ).unwrap();
+      toast.success(response.message || "User removed from estate");
+      await dispatch(fetchEstateUsers({ estateId, page: pagination.currentPage }));
+      setIsRemoveModalOpen(false);
+      setUserToRemove(null);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to remove user from estate");
+    } finally {
+      setRemoveLoading(false);
+    }
   };
 
   return (
@@ -64,6 +106,9 @@ export default function EstateUsersTable({ data, estateId }: EstateUsersTablePro
                 </th>
                 <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
                   Date Joined
+                </th>
+                <th className="py-4 pr-6 font-[325] text-[#757575] text-xs">
+                  Action
                 </th>
               </tr>
             </thead>
@@ -98,6 +143,15 @@ export default function EstateUsersTable({ data, estateId }: EstateUsersTablePro
                   <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     {formatDate(user.joined_at)}
                   </td>
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
+                    <button
+                      onClick={(event) => handleRemoveClick(event, user)}
+                      className="h-9 w-9 rounded-full bg-[#FDECEC] text-[#D70E0E] hover:bg-[#F8D7D7] flex items-center justify-center"
+                      title="Remove user"
+                    >
+                      <FaTrash size={13} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -110,6 +164,26 @@ export default function EstateUsersTable({ data, estateId }: EstateUsersTablePro
         onPageChange={handlePageChange}
         className="mt-8 mb-4"
       />
+
+      {isRemoveModalOpen && userToRemove && (
+        <ConfirmationModal
+          isOpen={isRemoveModalOpen}
+          title="Remove User"
+          description="Are you sure you want to remove"
+          subjectName={
+            `${userToRemove.first_name || ""} ${
+              userToRemove.last_name || ""
+            }`.trim() ||
+            userToRemove.email ||
+            "this user"
+          }
+          onClose={handleCloseRemoveModal}
+          onConfirm={handleConfirmRemove}
+          loading={removeLoading}
+          confirmButtonText="Remove User"
+          cancelButtonText="Cancel"
+        />
+      )}
     </>
   );
 }

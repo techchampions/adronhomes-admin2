@@ -2,7 +2,11 @@ import { ChangeEvent, useState } from "react";
 import { BiCheck, BiX } from "react-icons/bi";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import OptionInputField from "../input/drop_down";
-import { useEditPropertyForm } from "../Redux/hooks/usePropertyForms";
+import {
+  useCreatePropertyForm,
+  useDraftPropertyForm,
+  useEditPropertyForm,
+} from "../Redux/hooks/usePropertyForms";
 // import { useEditPropertyForm } from "../../../hooks/usePropertyForms"; // Adjust path as needed
 
 // The Fee interface has been updated to include an optional purpose field
@@ -18,24 +22,41 @@ interface Fee {
 interface InfrastructureFeesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  formMode?: "create" | "edit" | "duplicate";
 }
 
 export default function InfrastructureFeesModal({
   isOpen,
   onClose,
+  formMode = "create",
 }: InfrastructureFeesModalProps) {
-  // Use Redux hooks instead of context
-  const {
-    basicDetails,
-    setEditFees,
-    setEditNewFees,
-    setEditBasicDetails,
-    setEditLandForm,
-    setEditSpecifications,
-    metadata
-  } = useEditPropertyForm();
-  
-  const {fees}=metadata
+  const createForm = useCreatePropertyForm();
+  const editForm = useEditPropertyForm();
+  const draftForm = useDraftPropertyForm();
+
+  const selectedForm =
+    formMode === "edit"
+      ? {
+          basicDetails: editForm.basicDetails,
+          fees: editForm.metadata.fees,
+          setFees: editForm.setEditFees,
+          setNewFees: editForm.setEditNewFees,
+        }
+      : formMode === "duplicate"
+        ? {
+            basicDetails: draftForm.basicDetails,
+            fees: draftForm.metadata.fees,
+            setFees: draftForm.setDraftFees,
+            setNewFees: draftForm.setDraftNewFees,
+          }
+        : {
+            basicDetails: createForm.basicDetails,
+            fees: createForm.metadata.fees,
+            setFees: createForm.setCreateFees,
+            setNewFees: createForm.setCreateNewFees,
+          };
+
+  const { basicDetails, fees, setFees, setNewFees } = selectedForm;
 
   
   // State for the new fee inputs, including the new purpose field
@@ -50,16 +71,23 @@ export default function InfrastructureFeesModal({
   ];
 
   
-  const mappedPurposes = Array.isArray(basicDetails.purpose) && basicDetails.purpose.length > 0
-    ? basicDetails.purpose.map(purpose => ({
-        label: purpose,
-        value: purpose
-      }))
-    : [];
+  const purposeValues = Array.isArray(basicDetails?.purpose)
+    ? basicDetails.purpose
+    : typeof basicDetails?.purpose === "string"
+      ? [basicDetails.purpose]
+      : [];
+
+  const mappedPurposes = purposeValues
+    .map((purpose) => purpose?.trim())
+    .filter(Boolean)
+    .map((purpose) => ({
+      label: purpose,
+      value: purpose,
+    }));
 
 
   const toggleFee = (id: number) => {
-    setEditFees(
+    setFees(
       fees.map((fee: Fee) =>
         fee.id === id ? { ...fee, checked: !fee.checked } : fee
       )
@@ -67,7 +95,7 @@ export default function InfrastructureFeesModal({
   };
 
   const removeFee = (id: number) => {
-    setEditFees(fees.filter((fee: Fee) => fee.id !== id));
+    setFees(fees.filter((fee: Fee) => fee.id !== id));
   };
 
   const addFee = () => {
@@ -86,8 +114,8 @@ export default function InfrastructureFeesModal({
       
       // Add to both fees and newFees arrays
       const updatedFees = [...fees, newFee];
-      setEditFees(updatedFees);
-      setEditNewFees(updatedFees);
+      setFees(updatedFees);
+      setNewFees(updatedFees);
       
       // Reset all new fee input fields
       setNewFeeName("");

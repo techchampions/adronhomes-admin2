@@ -245,7 +245,367 @@ export interface AssignEstateUsersResponse {
   };
 }
 
+export interface MaintenanceRequest {
+  id: number;
+  user_id: number;
+  estate_id: number;
+  title: string;
+  content: string;
+  status: string;
+  priority: string;
+  attached: string | null;
+  created_at: string;
+  updated_at: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  profile_picture: string | null;
+  estate_name: string;
+}
+
+export interface SecurityCode {
+  id: number;
+  estate_id: number;
+  name: string;
+  code: string;
+  expired_at: string;
+  limit: number;
+  total_used: number;
+  created_at: string;
+  updated_at: string;
+  created_by: number;
+  updated_by: number;
+  created_by_first_name: string;
+  created_by_last_name: string;
+  created_by_email: string;
+  estate_name: string;
+}
+
+export interface UtilityPayment {
+  id: number;
+  user_id: number;
+  estate_id: number;
+  description: string;
+  payment_method: string;
+  payment_type: string;
+  reference: string;
+  status: number;
+  purpose: string;
+  created_at: string;
+  updated_at: string;
+  chargeable_id: number;
+  amount: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  profile_picture: string | null;
+  estate_name: string;
+}
+
+export interface EstatePaginatedResponse<T> {
+  success: boolean;
+  data: PaginatedData<T>;
+  stats: Record<string, any>;
+  filters: any[];
+}
+
+export interface EstateMutationResponse {
+  success: boolean;
+  message: string;
+}
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const getAuthHeaders = () => {
+  const token = Cookies.get("token");
+
+  if (!token) {
+    return null;
+  }
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
+
+const buildAuthError = () => ({
+  message: "No authentication token found. Please login again.",
+});
+
+export const deleteEstate = createAsyncThunk<
+  EstateMutationResponse,
+  { estateId: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>("estate/deleteEstate", async ({ estateId }, { rejectWithValue }) => {
+  const headers = getAuthHeaders();
+
+  if (!headers) {
+    return rejectWithValue(buildAuthError());
+  }
+
+  try {
+    const response = await api.delete<EstateMutationResponse>(
+      `${BASE_URL}/api/admin/estates/delete/${estateId}`,
+      { headers },
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+
+    if (axiosError.response?.status === 401) {
+      Cookies.remove("token");
+    }
+
+    if (axiosError.response) {
+      return rejectWithValue({
+        message: axiosError.response.data.message || "Failed to delete estate",
+        errors: axiosError.response.data.errors,
+      });
+    } else if (axiosError.request) {
+      return rejectWithValue({
+        message: "No response from server. Please check your network connection.",
+      });
+    }
+
+    return rejectWithValue({
+      message: "An unexpected error occurred. Please try again.",
+    });
+  }
+});
+
+export const removeUserFromEstate = createAsyncThunk<
+  EstateMutationResponse,
+  { userId: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>("estate/removeUserFromEstate", async ({ userId }, { rejectWithValue }) => {
+  const headers = getAuthHeaders();
+
+  if (!headers) {
+    return rejectWithValue(buildAuthError());
+  }
+
+  try {
+    const response = await api.delete<EstateMutationResponse>(
+      `${BASE_URL}/api/admin/estates/user-delete/${userId}`,
+      { headers },
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+
+    if (axiosError.response?.status === 401) {
+      Cookies.remove("token");
+    }
+
+    if (axiosError.response) {
+      return rejectWithValue({
+        message:
+          axiosError.response.data.message || "Failed to remove user from estate",
+        errors: axiosError.response.data.errors,
+      });
+    } else if (axiosError.request) {
+      return rejectWithValue({
+        message: "No response from server. Please check your network connection.",
+      });
+    }
+
+    return rejectWithValue({
+      message: "An unexpected error occurred. Please try again.",
+    });
+  }
+});
+
+export const fetchEstateMaintenances = createAsyncThunk<
+  EstatePaginatedResponse<MaintenanceRequest>,
+  {
+    estateId?: number;
+    status?: string;
+    priority?: string;
+    search?: string;
+    date_from?: string;
+    date_to?: string;
+    user_id?: number;
+    per_page?: number;
+    page?: number;
+  },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/fetchEstateMaintenances",
+  async (
+    { estateId, status, priority, search, date_from, date_to, user_id, per_page = 10, page = 1 },
+    { rejectWithValue },
+  ) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.get<EstatePaginatedResponse<MaintenanceRequest>>(
+        `${BASE_URL}/api/admin/estates/maintenances`,
+        {
+          headers,
+          params: {
+            estate_id: estateId,
+            status,
+            priority,
+            search,
+            date_from,
+            date_to,
+            user_id,
+            per_page,
+            page,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message ||
+          "Failed to fetch maintenance requests",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const fetchEstateSecurityCodes = createAsyncThunk<
+  EstatePaginatedResponse<SecurityCode>,
+  { estateId?: number; page?: number; per_page?: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/fetchEstateSecurityCodes",
+  async ({ estateId, page = 1, per_page = 10 }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.get<EstatePaginatedResponse<SecurityCode>>(
+        `${BASE_URL}/api/admin/estates/security-codes`,
+        {
+          headers,
+          params: {
+            estate_id: estateId,
+            page,
+            per_page,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message || "Failed to fetch security codes",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const fetchEstateUtilityPayments = createAsyncThunk<
+  EstatePaginatedResponse<UtilityPayment>,
+  { estateId?: number; page?: number; per_page?: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/fetchEstateUtilityPayments",
+  async ({ estateId, page = 1, per_page = 10 }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.get<EstatePaginatedResponse<UtilityPayment>>(
+        `${BASE_URL}/api/admin/estates/utility-payments`,
+        {
+          headers,
+          params: {
+            estate_id: estateId,
+            page,
+            per_page,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message ||
+          "Failed to fetch utility payments",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const createEstatePersonnel = createAsyncThunk<
+  EstateMutationResponse,
+  { estateId: number; credentials: FormData },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/createEstatePersonnel",
+  async ({ estateId, credentials }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.post<EstateMutationResponse>(
+        `${BASE_URL}/api/admin/create-personnel`,
+        credentials,
+        {
+          headers: {
+            ...headers,
+            "Content-Type": "multipart/form-data",
+          },
+          params: {
+            estate_id: estateId,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message ||
+          "Failed to create estate personnel",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
 
 export const createEstateCommunity = createAsyncThunk<
   CreateEstateCommunityResponse,

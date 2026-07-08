@@ -1,4 +1,12 @@
-import { FormEvent, UIEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FormEvent,
+  ReactNode,
+  UIEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Header from "../../general/Header";
@@ -21,10 +29,31 @@ import {
   selectEstateUsersLoading,
   selectEstateUsersMetrics,
   selectEstateUsersPagination,
+  selectMaintenanceRequestsData,
+  selectMaintenanceRequestsError,
+  selectMaintenanceRequestsLoading,
+  selectMaintenanceRequestsPagination,
+  selectMaintenanceRequestsStats,
+  selectSecurityCodesData,
+  selectSecurityCodesError,
+  selectSecurityCodesLoading,
+  selectSecurityCodesPagination,
+  selectSecurityCodesStats,
+  selectUtilityPaymentsData,
+  selectUtilityPaymentsError,
+  selectUtilityPaymentsLoading,
+  selectUtilityPaymentsPagination,
+  selectUtilityPaymentsStats,
+  setMaintenanceRequestsCurrentPage,
+  setSecurityCodesCurrentPage,
+  setUtilityPaymentsCurrentPage,
 } from "../../components/Redux/estate/estateSlice";
 import {
   fetchCommunityMessages,
+  fetchEstateMaintenances,
+  fetchEstateSecurityCodes,
   fetchEstateUsers,
+  fetchEstateUtilityPayments,
   markCommunityMessagesAsRead,
   sendCommunityMessage,
   CommunityMessage,
@@ -32,6 +61,12 @@ import {
 import EstateUsersTable from "./EstateUsersTable";
 import { formatDate } from "../../utils/formatdate";
 import AddEstateClientsModal from "./AddEstateClientsModal";
+import {
+  MaintenanceTable,
+  SecurityCodesTable,
+  UtilityPaymentsTable,
+} from "./EstateOperationsTables";
+import AddEstatePersonnelModal from "./AddEstatePersonnelModal";
 
 export default function EstateUsers() {
   const dispatch = useDispatch<AppDispatch>();
@@ -49,10 +84,26 @@ export default function EstateUsers() {
   const communityError = useSelector(selectCommunityMessagesError);
   const communitySendLoading = useSelector(selectCommunityMessageSendLoading);
   const communitySendError = useSelector(selectCommunityMessageSendError);
+  const maintenanceRequests = useSelector(selectMaintenanceRequestsData);
+  const maintenanceStats = useSelector(selectMaintenanceRequestsStats);
+  const maintenancePagination = useSelector(selectMaintenanceRequestsPagination);
+  const maintenanceLoading = useSelector(selectMaintenanceRequestsLoading);
+  const maintenanceError = useSelector(selectMaintenanceRequestsError);
+  const securityCodes = useSelector(selectSecurityCodesData);
+  const securityStats = useSelector(selectSecurityCodesStats);
+  const securityPagination = useSelector(selectSecurityCodesPagination);
+  const securityLoading = useSelector(selectSecurityCodesLoading);
+  const securityError = useSelector(selectSecurityCodesError);
+  const utilityPayments = useSelector(selectUtilityPaymentsData);
+  const utilityStats = useSelector(selectUtilityPaymentsStats);
+  const utilityPagination = useSelector(selectUtilityPaymentsPagination);
+  const utilityLoading = useSelector(selectUtilityPaymentsLoading);
+  const utilityError = useSelector(selectUtilityPaymentsError);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("Residents");
   const [communityMessage, setCommunityMessage] = useState("");
   const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [showAddPersonnelModal, setShowAddPersonnelModal] = useState(false);
   const [openedGroupUnreadCount, setOpenedGroupUnreadCount] = useState(0);
   const [markedCommunityChannels, setMarkedCommunityChannels] = useState<
     string[]
@@ -80,6 +131,46 @@ export default function EstateUsers() {
 
     dispatch(fetchCommunityMessages({ channel: groupConversation.channel }));
   }, [activeTab, dispatch, groupConversation?.channel]);
+
+  useEffect(() => {
+    if (!Number.isFinite(numericEstateId)) return;
+
+    if (activeTab === "Maintenance") {
+      dispatch(
+        fetchEstateMaintenances({
+          estateId: numericEstateId,
+          page: maintenancePagination.currentPage,
+          search,
+        }),
+      );
+    }
+
+    if (activeTab === "Security Codes") {
+      dispatch(
+        fetchEstateSecurityCodes({
+          estateId: numericEstateId,
+          page: securityPagination.currentPage,
+        }),
+      );
+    }
+
+    if (activeTab === "Utility Payments") {
+      dispatch(
+        fetchEstateUtilityPayments({
+          estateId: numericEstateId,
+          page: utilityPagination.currentPage,
+        }),
+      );
+    }
+  }, [
+    activeTab,
+    dispatch,
+    maintenancePagination.currentPage,
+    numericEstateId,
+    search,
+    securityPagination.currentPage,
+    utilityPagination.currentPage,
+  ]);
 
   useEffect(() => {
     const messages = communityMessages.messages;
@@ -166,6 +257,21 @@ export default function EstateUsers() {
     await dispatch(
       fetchCommunityMessages({ channel: groupConversation.channel, page }),
     );
+  };
+
+  const handleMaintenancePageChange = (page: number) => {
+    dispatch(setMaintenanceRequestsCurrentPage(page));
+    dispatch(fetchEstateMaintenances({ estateId: numericEstateId, page, search }));
+  };
+
+  const handleSecurityPageChange = (page: number) => {
+    dispatch(setSecurityCodesCurrentPage(page));
+    dispatch(fetchEstateSecurityCodes({ estateId: numericEstateId, page }));
+  };
+
+  const handleUtilityPageChange = (page: number) => {
+    dispatch(setUtilityPaymentsCurrentPage(page));
+    dispatch(fetchEstateUtilityPayments({ estateId: numericEstateId, page }));
   };
 
   const handleCommunityChatScroll = async (event: UIEvent<HTMLDivElement>) => {
@@ -409,6 +515,116 @@ export default function EstateUsers() {
     );
   };
 
+  const renderStatusView = (
+    loadingState: boolean,
+    errorState: string | null,
+    emptyText: string,
+    table: ReactNode,
+  ) => {
+    if (loadingState) {
+      return <LoadingAnimations loading={loadingState} />;
+    }
+
+    if (errorState) {
+      return (
+        <div className="text-center py-8">
+          <p className="text-red-600 font-medium">{errorState}</p>
+        </div>
+      );
+    }
+
+    if (emptyText) {
+      return table;
+    }
+
+    return table;
+  };
+
+  const renderActiveTab = () => {
+    if (activeTab === "Community Chat") return renderCommunityChat();
+
+    if (activeTab === "Maintenance") {
+      return maintenanceRequests.length === 0 && !maintenanceLoading ? (
+        <div className="max-h-screen">
+          <p className="text-center font-normal text-[#767676]">
+            No maintenance request found
+          </p>
+          <NotFound />
+        </div>
+      ) : (
+        renderStatusView(
+          maintenanceLoading,
+          maintenanceError,
+          "Maintenance",
+          <MaintenanceTable
+            data={maintenanceRequests}
+            pagination={maintenancePagination}
+            onPageChange={handleMaintenancePageChange}
+          />,
+        )
+      );
+    }
+
+    if (activeTab === "Security Codes") {
+      return securityCodes.length === 0 && !securityLoading ? (
+        <div className="max-h-screen">
+          <p className="text-center font-normal text-[#767676]">
+            No security code found
+          </p>
+          <NotFound />
+        </div>
+      ) : (
+        renderStatusView(
+          securityLoading,
+          securityError,
+          "Security",
+          <SecurityCodesTable
+            data={securityCodes}
+            pagination={securityPagination}
+            onPageChange={handleSecurityPageChange}
+          />,
+        )
+      );
+    }
+
+    if (activeTab === "Utility Payments") {
+      return utilityPayments.length === 0 && !utilityLoading ? (
+        <div className="max-h-screen">
+          <p className="text-center font-normal text-[#767676]">
+            No utility payment found
+          </p>
+          <NotFound />
+        </div>
+      ) : (
+        renderStatusView(
+          utilityLoading,
+          utilityError,
+          "Utility",
+          <UtilityPaymentsTable
+            data={utilityPayments}
+            pagination={utilityPagination}
+            onPageChange={handleUtilityPageChange}
+          />,
+        )
+      );
+    }
+
+    return loading ? (
+      <LoadingAnimations loading={loading} />
+    ) : error ? (
+      <div className="text-center py-8">
+        <p className="text-red-600 font-medium">{error}</p>
+      </div>
+    ) : filteredUsers.length === 0 ? (
+      <div className="max-h-screen">
+        <p className="text-center font-normal text-[#767676]">No user found</p>
+        <NotFound />
+      </div>
+    ) : (
+      <EstateUsersTable data={filteredUsers} estateId={numericEstateId} />
+    );
+  };
+
   if (!Number.isFinite(numericEstateId)) {
     return (
       <div className="pb-[52px] relative">
@@ -430,28 +646,69 @@ export default function EstateUsers() {
         history={true}
         buttonText="Add Client to Estate"
         onButtonClick={() => setShowAddClientModal(true)}
+        personel={true}
+        Personnel_Text="Add Personnel"
+        onPersonelButtonClick={() => setShowAddPersonnelModal(true)}
       />
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
-          title="Total Users"
-          value={metrics?.total_users || 0}
-          change="Clients in this estate"
+          title={
+            activeTab === "Maintenance"
+              ? "Maintenance Total"
+              : activeTab === "Utility Payments"
+                ? "Utility Total"
+                : activeTab === "Security Codes"
+                  ? "Security Codes"
+                  : "Total Users"
+          }
+          value={
+            activeTab === "Maintenance"
+              ? maintenanceStats?.total || 0
+              : activeTab === "Utility Payments"
+                ? utilityStats?.total || 0
+                : activeTab === "Security Codes"
+                  ? securityStats?.total || 0
+                  : metrics?.total_users || 0
+          }
+          change="Records in this estate"
         />
         <MatrixCard
-          title="Private Unread"
-          value={metrics?.admin_total_unread || 0}
-          change="Private client messages"
+          title={
+            activeTab === "Utility Payments" ? "Total Amount" : "Pending"
+          }
+          value={
+            activeTab === "Utility Payments"
+              ? utilityStats?.total_amount || 0
+              : activeTab === "Maintenance"
+                ? maintenanceStats?.total_pending || 0
+                : activeTab === "Security Codes"
+                  ? securityStats?.total_pending || 0
+                  : metrics?.admin_total_unread || 0
+          }
+          change={activeTab === "Utility Payments" ? "Utility payments" : "Pending records"}
         />
         <MatrixCard
-          title="Group Unread"
-          value={metrics?.admin_group_unread || 0}
-          change="Community messages for admin"
+          title="Attended"
+          value={
+            activeTab === "Maintenance"
+              ? maintenanceStats?.total_attended_to || 0
+              : activeTab === "Security Codes"
+                ? securityStats?.total_attended_to || 0
+                : activeTab === "Utility Payments"
+                  ? utilityStats?.total_attended_to || 0
+                  : metrics?.admin_group_unread || 0
+          }
+          change="Completed or attended records"
         />
         <MatrixCard
-          title="Total Unread"
-          value={metrics?.total_unread_messages || 0}
-          change="All unread estate messages"
+          title={activeTab === "Security Codes" ? "Used Count" : "Total Unread"}
+          value={
+            activeTab === "Security Codes"
+              ? securityStats?.total_used_count || 0
+              : metrics?.total_unread_messages || 0
+          }
+          change="Estate activity"
         />
       </div>
 
@@ -459,6 +716,9 @@ export default function EstateUsers() {
         <ReusableTable
           tabs={[
             "Residents",
+            "Maintenance",
+            "Security Codes",
+            "Utility Payments",
             metrics?.admin_group_unread
               ? `Community Chat (${metrics.admin_group_unread})`
               : "Community Chat",
@@ -475,24 +735,7 @@ export default function EstateUsers() {
           onSearch={setSearch}
           showSearchandSort={activeTab === "Residents"}
         >
-          {activeTab === "Community Chat" ? (
-            renderCommunityChat()
-          ) : loading ? (
-            <LoadingAnimations loading={loading} />
-          ) : error ? (
-            <div className="text-center py-8">
-              <p className="text-red-600 font-medium">{error}</p>
-            </div>
-          ) : filteredUsers.length === 0 ? (
-            <div className="max-h-screen">
-              <p className="text-center font-normal text-[#767676]">
-                No user found
-              </p>
-              <NotFound />
-            </div>
-          ) : (
-            <EstateUsersTable data={filteredUsers} estateId={numericEstateId} />
-          )}
+          {renderActiveTab()}
         </ReusableTable>
       </div>
 
@@ -510,6 +753,12 @@ export default function EstateUsers() {
             }),
           )
         }
+      />
+      <AddEstatePersonnelModal
+        isOpen={showAddPersonnelModal}
+        onClose={() => setShowAddPersonnelModal(false)}
+        estateId={numericEstateId}
+        estateName={estateInfo?.estate_name}
       />
     </div>
   );

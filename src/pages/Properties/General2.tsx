@@ -715,6 +715,7 @@ if (LandSizeSection.length > 0) {
           <InfrastructureFeesModalss
             isOpen={showInfrastructureModal}
             onClose={() => setShowInfrastructureModal(false)}
+            formMode="create"
           />
         )}
         
@@ -834,6 +835,7 @@ if (LandSizeSection.length > 0) {
                   setPaymentStructure={setCreatePaymentStructure}
                   initialData={paymentStructure}
                   isLandProperty={isLandProperty}
+                  formMode="create"
                   onOpenInfrastructureModal={() =>
                     setShowInfrastructureModal(true)
                   }
