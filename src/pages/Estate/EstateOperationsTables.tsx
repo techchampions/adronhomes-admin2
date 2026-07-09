@@ -1,13 +1,23 @@
 import { useState } from "react";
+import type { MouseEvent } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import Pagination from "../../components/Tables/Pagination";
 import {
   MaintenanceRequest,
   SecurityCode,
   UtilityPayment,
+  updateMaintenanceStatus,
 } from "../../components/Redux/estate/estateThunk";
+import {
+  selectMaintenanceUpdateLoading,
+} from "../../components/Redux/estate/estateSlice";
+import { AppDispatch } from "../../components/Redux/store";
 import { formatDate } from "../../utils/formatdate";
 import UtilityPaymentDetailModal from "./UtilityPaymentDetailModal";
 import MaintenanceDetailModal from "./MaintenanceDetailModal";
+import OptionInputField from "../../components/input/drop_down";
+import ConfirmationModal from "../../components/Modals/delete";
 
 interface PaginationShape {
   currentPage: number;
@@ -29,6 +39,7 @@ const statusPill = (status: string | number) => {
     normalized === "completed" ||
     normalized === "attended to";
   const isPending = normalized === "0" || normalized === "pending";
+  const isProcessing = normalized === "processing";
 
   return (
     <span
@@ -37,43 +48,104 @@ const statusPill = (status: string | number) => {
           ? "bg-[#EAF7EA] text-[#2E9B2E]"
           : isPending
             ? "bg-[#FFF4E8] text-[#FF9131]"
-            : "bg-[#F1F1F1] text-[#767676]"
+            : isProcessing
+              ? "bg-[#EAF3FF] text-[#1D6FD8]"
+              : "bg-[#F1F1F1] text-[#767676]"
       }`}
     >
       {typeof status === "number"
         ? status === 1
           ? "Completed"
           : "Pending"
-        : status || "N/A"}
+        : normalized === "attended to"
+          ? "Completed"
+          : status || "N/A"}
     </span>
   );
 };
+
+const maintenanceStatusOptions = [
+  { value: "Pending", label: "Pending" },
+  { value: "Processing", label: "Processing" },
+  { value: "Completed", label: "Completed" },
+];
+
+const normalizeMaintenanceStatus = (status?: string) =>
+  status?.toLowerCase() === "attended to" ? "Completed" : status || "Pending";
 
 export function MaintenanceTable({
   data,
   pagination,
   onPageChange,
 }: TableProps<MaintenanceRequest>) {
+  const dispatch = useDispatch<AppDispatch>();
+  const updating = useSelector(selectMaintenanceUpdateLoading);
   const [selectedRequest, setSelectedRequest] =
     useState<MaintenanceRequest | null>(null);
+  const [requestToUpdate, setRequestToUpdate] =
+    useState<MaintenanceRequest | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const handleUpdateClick = (
+    event: MouseEvent<HTMLButtonElement>,
+    request: MaintenanceRequest,
+  ) => {
+    event.stopPropagation();
+    setSelectedStatus(normalizeMaintenanceStatus(request.status));
+    setRequestToUpdate(request);
+  };
+
+  const closeUpdateDialog = () => {
+    if (updating) return;
+    setRequestToUpdate(null);
+  };
+
+  const confirmUpdate = async () => {
+    if (!requestToUpdate) return;
+
+    try {
+      const response = await dispatch(
+        updateMaintenanceStatus({
+          maintenanceId: requestToUpdate.id,
+          status: selectedStatus,
+        }),
+      ).unwrap();
+
+      toast.success(response.message || "Maintenance status updated");
+      setSelectedRequest((current) =>
+        current?.id === requestToUpdate.id
+          ? { ...current, status: selectedStatus }
+          : current,
+      );
+      setRequestToUpdate(null);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to update maintenance status");
+    }
+  };
 
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[900px]">
+        <div className="min-w-[980px]">
           <table className="w-full table-auto">
             <thead>
               <tr className="text-left">
-                {["Title", "Resident", "Priority", "Status", "Estate", "Date"].map(
-                  (heading) => (
+                {[
+                  "Title",
+                  "Resident",
+                  "Priority",
+                  "Status",
+                  "Estate",
+                  "Date",
+                  "Action",
+                ].map((heading) => (
                     <th
                       key={heading}
                       className="py-4 pr-6 font-[325] text-[#757575] text-xs"
                     >
                       {heading}
                     </th>
-                  ),
-                )}
+                  ))}
               </tr>
             </thead>
             <tbody>
@@ -113,6 +185,15 @@ export function MaintenanceTable({
                   <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     {formatDate(request.created_at)}
                   </td>
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
+                    <button
+                      onClick={(event) => handleUpdateClick(event, request)}
+                      disabled={updating}
+                      className="h-10 rounded-full bg-[#79B833] px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Update
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -124,7 +205,32 @@ export function MaintenanceTable({
         isOpen={!!selectedRequest}
         onClose={() => setSelectedRequest(null)}
         request={selectedRequest}
+        onUpdated={(status) =>
+          setSelectedRequest((current) =>
+            current ? { ...current, status } : current,
+          )
+        }
       />
+      <ConfirmationModal
+        isOpen={!!requestToUpdate}
+        title="Update Maintenance Status"
+        description="Are you sure you want to update this maintenance request to"
+        subjectName={selectedStatus}
+        onClose={closeUpdateDialog}
+        onConfirm={confirmUpdate}
+        loading={updating}
+        confirmButtonText="Yes, Update"
+        className="bg-[#79B833]!"
+      >
+        <OptionInputField
+          label="Status"
+          placeholder="Select status"
+          value={selectedStatus}
+          onChange={setSelectedStatus}
+          options={maintenanceStatusOptions}
+          dropdownTitle="Maintenance Status"
+        />
+      </ConfirmationModal>
     </>
   );
 }

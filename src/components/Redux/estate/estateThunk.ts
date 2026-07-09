@@ -316,6 +316,11 @@ export interface EstateMutationResponse {
   message: string;
 }
 
+export interface UpdateMaintenanceResponse {
+  success: boolean;
+  message: string;
+}
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const getAuthHeaders = () => {
@@ -477,6 +482,54 @@ export const fetchEstateMaintenances = createAsyncThunk<
         message:
           axiosError.response?.data.message ||
           "Failed to fetch maintenance requests",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const updateMaintenanceStatus = createAsyncThunk<
+  UpdateMaintenanceResponse,
+  { maintenanceId: number; status: string },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/updateMaintenanceStatus",
+  async ({ maintenanceId, status }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.post<UpdateMaintenanceResponse>(
+        `${BASE_URL}/api/admin/estates/update-maintenance`,
+        {
+          maintenance_id: maintenanceId,
+          status,
+        },
+        {
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.status === 401) {
+        Cookies.remove("token");
+      }
+
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message ||
+          "Failed to update maintenance request",
         errors: axiosError.response?.data.errors,
       });
     }
