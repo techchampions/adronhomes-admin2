@@ -5,6 +5,7 @@ interface ConfirmationModalProps {
   title: string;
   description: string;
   subjectName?: string;
+  children?: React.ReactNode;
   onClose: () => void;
   onConfirm: () => void;
   loading?: boolean;
@@ -18,6 +19,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   title,
   description,
   subjectName,
+  children,
   onClose,
   onConfirm,
   loading = false,
@@ -49,6 +51,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             {description} 
             {subjectName && <strong>{subjectName}</strong>}.
           </p>
+
+          {children && <div className="mb-6">{children}</div>}
 
           <div className="flex justify-end space-x-3">
             <button

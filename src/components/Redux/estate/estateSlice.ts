@@ -13,6 +13,7 @@ import {
   markEstateChatAsRead,
   sendCommunityMessage,
   sendChatReply,
+  updateMaintenanceStatus,
   AllEstatesResponse,
   CommunityMessagesResponse,
   EstateUsersResponse,
@@ -123,6 +124,7 @@ interface EstateState {
     maintenanceRequests: boolean;
     securityCodes: boolean;
     utilityPayments: boolean;
+    maintenanceUpdate: boolean;
   };
 
   // Error states
@@ -136,6 +138,7 @@ interface EstateState {
     maintenanceRequests: string | null;
     securityCodes: string | null;
     utilityPayments: string | null;
+    maintenanceUpdate: string | null;
   };
 }
 
@@ -193,6 +196,7 @@ const initialState: EstateState = {
     maintenanceRequests: false,
     securityCodes: false,
     utilityPayments: false,
+    maintenanceUpdate: false,
   },
   error: {
     allEstates: null,
@@ -204,6 +208,7 @@ const initialState: EstateState = {
     maintenanceRequests: null,
     securityCodes: null,
     utilityPayments: null,
+    maintenanceUpdate: null,
   },
 };
 
@@ -466,6 +471,27 @@ const estateSlice = createSlice({
         state.error.maintenanceRequests =
           action.payload?.message || "Failed to fetch maintenance requests";
       })
+      .addCase(updateMaintenanceStatus.pending, (state) => {
+        state.loading.maintenanceUpdate = true;
+        state.error.maintenanceUpdate = null;
+      })
+      .addCase(updateMaintenanceStatus.fulfilled, (state, action) => {
+        state.loading.maintenanceUpdate = false;
+        const { maintenanceId, status } = action.meta.arg;
+        const request = state.maintenanceRequests.data.find(
+          (item) => item.id === maintenanceId,
+        );
+
+        if (request) {
+          request.status = status;
+          request.updated_at = new Date().toISOString();
+        }
+      })
+      .addCase(updateMaintenanceStatus.rejected, (state, action) => {
+        state.loading.maintenanceUpdate = false;
+        state.error.maintenanceUpdate =
+          action.payload?.message || "Failed to update maintenance request";
+      })
       .addCase(fetchEstateSecurityCodes.pending, (state) => {
         state.loading.securityCodes = true;
         state.error.securityCodes = null;
@@ -577,6 +603,10 @@ export const selectMaintenanceRequestsLoading = (state: RootState) =>
   state.estate.loading.maintenanceRequests;
 export const selectMaintenanceRequestsError = (state: RootState) =>
   state.estate.error.maintenanceRequests;
+export const selectMaintenanceUpdateLoading = (state: RootState) =>
+  state.estate.loading.maintenanceUpdate;
+export const selectMaintenanceUpdateError = (state: RootState) =>
+  state.estate.error.maintenanceUpdate;
 export const selectSecurityCodesData = (state: RootState) =>
   state.estate.securityCodes.data;
 export const selectSecurityCodesStats = (state: RootState) =>
