@@ -66,6 +66,9 @@ export default function Promotions() {
         subtitle="Manage all promotional campaigns and tiered rewards"
         buttonText="Create Promotion"
         onButtonClick={handleCreatePromo}
+        personel
+        Personnel_Text="Pickup Vendors"
+        onPersonelButtonClick={() => navigate("/promotions/vendors")}
       />
       
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
@@ -121,7 +124,6 @@ export default function Promotions() {
           )}
         </ReusableTable>
       </div>
- 
     </div>
   );
 }

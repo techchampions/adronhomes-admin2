@@ -94,6 +94,8 @@ import PromoFormPage from "./components/gift/components/promo/PromoFormPage";
 import PromoPage from "./components/gift/components/promo/PromoPage";
 import PromoRequestsTab from "./components/gift/components/promo/PromoRequestsTab";
 import CreatePromoFormPage from "./components/gift/components/promo/createPromo";
+import GiftVendorsPage from "./components/gift/components/promo/GiftVendorsPage";
+import GiftVendorDetailsPage from "./components/gift/components/promo/GiftVendorDetailsPage";
 import ParentComponent from "./pages/contract/newImplementationContracts/ParentComponent";
 import ContractDocumentsPage from "./pages/contract/newImplementationContracts/ContractDocumentsPage";
 import CommunityDashboard from "./CommunityDashboard/CommunityDashboardtwo/CommunityDashboard";
@@ -410,6 +412,11 @@ const App = () => {
                   element={<ClientsPartnership />}
                 />
                 <Route path="/promotions" element={<Promotions />} />
+                <Route path="/promotions/vendors" element={<GiftVendorsPage />} />
+                <Route
+                  path="/promotions/vendors/:vendorId"
+                  element={<GiftVendorDetailsPage />}
+                />
                 <Route
                   path="/promotions/promotion-requests/:id"
                   element={<PromoRequestsTab />}
