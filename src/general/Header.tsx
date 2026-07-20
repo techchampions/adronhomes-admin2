@@ -6,6 +6,9 @@ import { PropertyContext } from "../MyContext/MyContext";
 import PersonnelModal from "../pages/Personnel/createPersonnelModal";
 import MassUploadModal from "../pages/Personnel/mass_upload";
 import BulkPersonnelSelectModal from "../pages/Personnel/BulkPersonalSelectModal";
+import SyncCitaModal from "./SyncCitaModal";
+import { useCreatePropertyForm } from "../components/Redux/hooks/usePropertyForms";
+import { setIsCreateLandProperty, setIsCreateLandProperty2 } from "../components/Redux/propertyForm/createPropertySlice";
 
 
 interface HeaderProps {
@@ -20,6 +23,10 @@ interface HeaderProps {
   handleViewPurchaseFormClick?: () => void;
   showSearchAndButton?: boolean;
   viewForm?: boolean;
+  cita?: boolean; // Add this prop
+  personel?: boolean;
+  onPersonelButtonClick?: () => void;
+  Personnel_Text?: string;
 }
 
 export default function Header({
@@ -32,6 +39,10 @@ export default function Header({
   showSearchAndButton = true,
   viewForm = false,
   handleViewPurchaseFormClick,
+  cita = false, // Default to false
+  personel = false,
+  onPersonelButtonClick,
+  Personnel_Text = "Create Personnel",
 }: HeaderProps) {
   const {
     showBulkModal,
@@ -49,13 +60,32 @@ export default function Header({
     setIsLandProperty,
     resetFormData,
   } = useContext(PropertyContext)!;
+  
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [createpersonnel, setcreatepersonnel] = useState(false);
+  const [showSyncCitaModal, setShowSyncCitaModal] = useState(false); // State for Sync Cita modal
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isPersonnelPage = location.pathname === "/personnel";
-  const isFormPage = location.pathname === "/properties/form";
+  // Check if we're on info-tech routes
+  const hasInfoTech = location.pathname.includes('/info-tech');
+  
+  // Update page detection to handle both regular and info-tech routes
+  const isPersonnelPage = location.pathname === "/personnel" || location.pathname === "/info-tech/personnel";
+  const isFormPage = location.pathname === "/properties/form" || location.pathname === "/info-tech/properties/form";
+
+  // Create navigation helper functions
+  const navigateToProperties = () => {
+    navigate(hasInfoTech ? '/info-tech/properties' : '/properties');
+  };
+
+  const navigateToPersonnel = () => {
+    navigate(hasInfoTech ? '/info-tech/personnel' : '/personnel');
+  };
+
+  const navigateToForm = () => {
+    navigate(hasInfoTech ? '/info-tech/properties/form' : '/properties/form');
+  };
 
   // Set cancel state based on URL when component mounts or location changes
   useEffect(() => {
@@ -72,10 +102,16 @@ export default function Header({
       onButtonClick();
     } else if (isCancelState || isFormPage) {
       // When in cancel state or on form page, navigate back
-      navigate(isPersonnelPage ? "/personnel" : "/properties");
+      if (isPersonnelPage) {
+        navigateToPersonnel();
+      } else {
+        navigateToProperties();
+      }
       setIsCancelState(false);
       resetFormData();
       setIsLandProperty(false);
+      setIsCreateLandProperty(false)
+      setIsCreateLandProperty2(false)
     } else {
       // Normal state behavior
       if (isPersonnelPage) {
@@ -88,16 +124,30 @@ export default function Header({
     }
   };
 
+  // Handle Sync Cita button click
+  const handleButtonClickcita = () => {
+    setShowSyncCitaModal(true);
+    // You might want to start the sync process here
+    // For example: startSyncProcess();
+  };
+
   // Determine button text based on page and state
   const getButtonText = () => {
     if (isCancelState || isFormPage) return "Cancel";
     return isPersonnelPage ? "Create Personnel" : buttonText;
   };
 
+  // Handle personel button click
+  const handlePersonelButtonClick = () => {
+    if (onPersonelButtonClick) {
+      onPersonelButtonClick();
+    }
+  };
+
   return (
     <>
       <div className="w-full flex flex-col lg:flex-row lg:flex-wrap justify-between it pt-16 pb-4 px-4 sm:p-6 md:pt-16 md:pb-8 md:px-8 lg:pr-[68px] lg:pl-[38px] relative overflow-hidden lg:overflow-visible">
-        <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0 ">
+        <div className="w-full sm:w-auto mb-4 sm:mb-0 lg:ml-0 ml-0">
           <h2 className="font-[325] text-xl sm:text-2xl md:text-3xl lg:text-[34px] leading-tight text-dark mb-2 break-words lg:break-normal">
             {title}
           </h2>
@@ -125,21 +175,27 @@ export default function Header({
         <div className="w-full lg:w-auto flex flex-col lg:flex-row lg:flex-wrap items-center gap-3 lg:gap-4 mt-4 sm:mt-0">
           {showSearchAndButton && (
             <>
-              {/* <div
+              {/* Search input is commented out as in original */}
 
-                className={`relative h-[45px] lg:h-[51px] w-full sm:w-64 lg:w-[410px] rounded-full border transition-all font-[400] ${isSearchFocused
-                  ? "border-[#79B833] shadow-sm"
-                  : "border-[#D8D8D8]"} bg-white overflow-hidden`}
-              >
-                <input
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  className="w-full h-full px-4 lg:px-6 py-3 border-none bg-transparent text-[#878787] text-sm font-normal focus:outline-none placeholder:text-[#878787]"
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => setIsSearchFocused(false)}
-                />
+              {/* Personel button - only shows when personel is true */}
+              {personel && (
+                <button
+                  className="text-[#79B833] border-[#79B833] border bg-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap order-first lg:order-none mb-2 lg:mb-0"
+                  onClick={handlePersonelButtonClick}
+                >
+                  {Personnel_Text}
+                </button>
+              )}
 
-              </div> */}
+              {/* Sync Cita Button - Only shows when cita prop is true */}
+              {cita && (
+                <button
+                  className="text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap bg-[#79B833] hover:bg-[#6aa22c]"
+                  onClick={handleButtonClickcita}
+                >
+                  Sync With Cita
+                </button>
+              )}
 
               <button
                 className={`text-white text-xs lg:text-sm font-bold rounded-full w-full sm:w-auto py-3 px-4 lg:px-6 md:px-10 transition-colors min-w-0 lg:min-w-[140px] sm:min-w-0 lg:sm:min-w-[185px] h-[45px] flex justify-center items-center whitespace-nowrap ${
@@ -166,20 +222,32 @@ export default function Header({
         </div>
       </div>
 
+      {/* Sync Cita Modal */}
+      {showSyncCitaModal && (
+        <SyncCitaModal
+          isOpen={showSyncCitaModal}
+          onClose={() => setShowSyncCitaModal(false)}
+        />
+      )}
+
       {/* Modals */}
       {!isPersonnelPage && showBulkModal && (
         <BulkSelectModal
           onSelect={(isBulk) => {
-            navigate("/properties/form");
+            navigateToForm();
             setIsLandProperty(true);
             setShowBulkModal(false);
             setIsCancelState(true);
+             setIsCreateLandProperty(true)
+              setIsCreateLandProperty2(true)
           }}
           onSelects={(isBulk) => {
-            navigate("/properties/form");
+            navigateToForm();
             setShowBulkModal(false);
             setIsLandProperty(false);
+             setIsCreateLandProperty(false)
             setIsCancelState(true);
+            setIsCreateLandProperty2(false)
           }}
           onClose={() => setShowBulkModal(false)}
           x={() => {
@@ -188,6 +256,7 @@ export default function Header({
           }}
         />
       )}
+      
       {createpersonnel && (
         <BulkPersonnelSelectModal
           onSelect={(isBulk) => {
@@ -204,6 +273,7 @@ export default function Header({
           x={() => setcreatepersonnel(false)}
         />
       )}
+      
       {showPersonnelModal && (
         <>
           {isUserBulk ? (

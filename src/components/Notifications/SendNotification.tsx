@@ -24,7 +24,10 @@ const SendNotification: React.FC<ModalProps> = ({
 }) => {
   const [page, setpage] = useState(1);
   const [hasSelectedCustomers, sethasSelectedCustomers] = useState(false);
-  const { data, isLoading } = useGetCustomersAndProperties();
+  const [searchValue, setSearchValue] = useState("");
+  const { data, isLoading } = useGetCustomersAndProperties({
+    search: searchValue,
+  });
   const { mutate: notify, isPending } = useSendNotification();
   type tab = "Customers" | "Plans";
   const [activeTab, setactiveTab] = useState<tab>("Customers");
@@ -34,10 +37,8 @@ const SendNotification: React.FC<ModalProps> = ({
   const [selectAllPlans, setSelectAllPlans] = useState(false);
   const customers = data?.data.users || [];
   const properties = data?.data.properties || [];
-  const searchInitialValues = {
-    search: "",
-  };
 
+  
   const nftInitialValues = {
     message: "",
     image: null,
@@ -78,7 +79,7 @@ const SendNotification: React.FC<ModalProps> = ({
       if (selectedCustomers.includes(id)) {
         // Deselect item
         setSelectedCustomers(
-          selectedCustomers.filter((itemId) => itemId !== id)
+          selectedCustomers.filter((itemId) => itemId !== id),
         );
         setSelectAllCustomers(false); // Uncheck "Select all" if any item is deselected
       } else {
@@ -234,8 +235,10 @@ const SendNotification: React.FC<ModalProps> = ({
               <div className="px-0 mt-4">
                 <input
                   type="text"
+                  value={searchValue}
                   className="rounded-full w-full p-1 px-5 text-sm border border-gray-300"
                   placeholder="Search..."
+                  onChange={(e) => setSearchValue(e.target.value)}
                 />
               </div>
             </div>

@@ -98,10 +98,10 @@ export const useGetPropertyRequest = (page: number, director_id?: number) => {
     queryFn: () => getPropertyRequest(page, director_id),
   });
 };
-export const useGetPropertyRequestByID = (id: number) => {
+export const useGetPropertyRequestByID = (id: number, page: number) => {
   return useQuery<PropertyByIdRequestsResponse>({
-    queryKey: ["property-requests", id],
-    queryFn: () => getPropertyRequestByID(id),
+    queryKey: ["property-requests", id, page],
+    queryFn: () => getPropertyRequestByID(id, page),
   });
 };
 
@@ -149,12 +149,15 @@ export const useGetCustomers = (page: number) => {
   });
 };
 // CUSTOMER List
-export const useGetCustomersAndProperties = () => {
+export const useGetCustomersAndProperties = (params?: {
+  search?: string;
+}) => {
   return useQuery<UsersAndPropertiesResponse>({
-    queryKey: ["customers and properties"],
-    queryFn: getCustomersAndProperties,
+    queryKey: ["customers-and-properties", params],
+    queryFn: () => getCustomersAndProperties(params),
   });
 };
+
 
 // Query hook for Getting User
 export const useGetUser = () => {

@@ -15,6 +15,7 @@ import { PropertyContext } from "../../MyContext/MyContext";
 import { resetOtpPasswordState } from "../Redux/resetPassword/resetPassword_slice";
 import { resetOtpState } from "../Redux/resetPassword/sendOtp_slice";
 import { FormField, PasswordFormField } from "./logininput";
+import Cookies from "js-cookie"; // ADD THIS IMPORT
 
 // Role-to-route mapping
 const roleRoutes: Record<number, string> = {
@@ -31,7 +32,7 @@ const roleRoutes: Record<number, string> = {
 export default function LoginMarketers() {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, token, success, message, error } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
   const {
     loading: userLoading,
@@ -45,7 +46,7 @@ export default function LoginMarketers() {
   const initialValues = {
     email: "",
     password: "",
-    isAdmin:false
+    isAdmin: false,
   };
 
   const validationSchema = Yup.object({
@@ -59,7 +60,7 @@ export default function LoginMarketers() {
 
   const onSubmit = async (values: typeof initialValues) => {
     try {
-      await dispatch(loginUser(values))
+      await dispatch(loginUser(values));
     } catch (err) {}
   };
 
@@ -83,18 +84,21 @@ export default function LoginMarketers() {
     }
   }, [token, dispatch]);
 
-  // Handle redirection based on user role or error
-  useEffect(() => {
-    if (userError) {
-      navigate("/");
-      return;
-    }
+  // Handle redirection based on user role or error - UPDATED to set cookie
+useEffect(() => {
+  if (userError) {
+    navigate("/");
+    return;
+  }
 
-    if (userSuccess && user?.role) {
-      const route = roleRoutes[user.role] || "/";
-      navigate(route, { replace: true });
-    }
-  }, [userError, userSuccess, user?.role, navigate]);
+  if (userSuccess && user?.role) {
+    // Store user role in cookie for AuthGuard
+    Cookies.set("user", JSON.stringify({ role: user.role }), { expires: 1 });
+
+    const route = roleRoutes[user.role] || "/";
+    navigate(route, { replace: true });
+  }
+}, [userError, userSuccess, user?.role, navigate]);
 
   return (
     <section className="w-full flex justify-center items-center min-h-screen px-4 sm:px-6 py-6">

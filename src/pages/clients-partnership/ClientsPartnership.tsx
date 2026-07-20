@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import { useGetPartnershipRequest } from "../../utils/hooks/query";
@@ -6,6 +6,8 @@ import SoosarPagination from "../../components/SoosarPagination";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
 import PartnershipListTable from "./PartnershipListTable";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
+import ExportClientPartnershipModal from "../../components/exportModal/ExportClientPartnershipModal";
 
 export default function ClientsPartnership() {
   const [page, setpage] = useState(1);
@@ -13,13 +15,22 @@ export default function ClientsPartnership() {
   const propertyData = data?.data.data || [];
   const totalPages = data?.data.last_page || 1;
   const tab = ["Requests"];
+
+   const ClientPartnershipModal =   useRef<ExportModalRef>(null);
+    const openClientPartnershipModal = () => {
+      if (ClientPartnershipModal.current) {
+        ClientPartnershipModal.current.openModal()
+      }
+    };
   return (
     <div className="pb-[52px]">
       <Header
         title="Client Partnership Requests"
         subtitle="Attend to requests client partnership"
         history={true}
-        showSearchAndButton={false}
+        // showSearchAndButton={false}
+        buttonText="Export"
+          onButtonClick={openClientPartnershipModal}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable activeTab={tab[0]} tabs={tab} showSearchandSort={false}>
@@ -40,6 +51,7 @@ export default function ClientsPartnership() {
           hasPrev={!!data?.data.prev_page_url}
         />
       </div>
+         <ExportClientPartnershipModal ref={ClientPartnershipModal} />
     </div>
   );
 }

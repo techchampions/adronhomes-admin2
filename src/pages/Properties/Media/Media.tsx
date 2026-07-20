@@ -18,6 +18,7 @@ interface MediaFormValues {
   videoLink: string;
   mapUrl: string;
   images: (File | string)[]; // Allow both File objects and string URLs
+  display_image: string | File;
 }
 
 const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
@@ -27,6 +28,7 @@ const MediaFORM = forwardRef<MediaFORMHandles>((props, ref) => {
     videoLink: '',
     mapUrl: '',
     images: [],
+    display_image: '',
 
   });
 
@@ -50,6 +52,7 @@ useEffect(() => {
       videoLink: formData.media.videoLink || '',
       mapUrl: formData.media.mapUrl || '',
       images: formData.media.images || [],
+      display_image: formData.media.display_image || '',
     });
   }
 }, [formData.media]);
@@ -62,7 +65,8 @@ useEffect(() => {
           videoLink: true,
           mapUrl: true,
           images: true,
-          videoFile: true
+          videoFile: true,
+          display_image: true
         });
         formikRef.current.handleSubmit();
       }
@@ -76,7 +80,8 @@ useEffect(() => {
           videoLink: true,
           mapUrl: true,
           images: true,
-          videoFile: true
+          videoFile: true,
+          display_image: true
         });
       });
       
@@ -128,7 +133,7 @@ useEffect(() => {
             <p className="text-[#767676] text-sm font-[325] mb-3">
               Upload the virtual tour link of the property in the text field below.
             </p>
-            <InputField
+            {/* <InputField
               label="Virtual tour link"
               placeholder="Enter virtual tour link"
               name="tourLink"
@@ -137,7 +142,7 @@ useEffect(() => {
               error={
                 touched.tourLink && errors.tourLink ? errors.tourLink : undefined
               }
-            />
+            /> */}
           </div>
 
           {/* Video Link */}

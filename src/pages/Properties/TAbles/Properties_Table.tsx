@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../components/Redux/store";
 import { fetchProperties } from "../../../components/Redux/Properties/properties_Thunk";
 import {
-  // selectPropertiesagination,
   selectPropertiesPagination,
-  setPropertiesPage,
+  selectPublishedPropertiesPagination,
+  selectSoldPropertiesPagination,
+  setDraftedPropertiesPage,
+  setPublishedPropertiesPage,
+  setSoldPropertiesPage,
 } from "../../../components/Redux/Properties/propertiesTable_slice";
-import InputField from "../../../components/input/inputtext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { resetPropertyState } from "../../../components/Redux/addProperty/addProperty_slice";
@@ -18,16 +20,15 @@ import { DeleteProperty } from "../../../components/Redux/addProperty/UpdateProp
 import ConfirmationModal from "../../../components/Modals/delete";
 import PropertyModal from "../PropertyModal";
 import { directors } from "../../../components/Redux/directors/directors_thunk";
-import OptionInputField from "../../../components/input/drop_down";
 import { resetToggleFeaturedState } from "../../../components/Redux/Properties/toggle_featured_slice";
 import { toggleFeatured } from "../../../components/Redux/Properties/toggle_featured_thunk";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { resetToggleLatestState } from "../../../components/Redux/Properties/toggleLatestslice";
 import { toggleLatest } from "../../../components/Redux/Properties/tooggleLatestThunk";
 
 export interface PropertyData {
   is_featured: any;
-  is_offer:any
+  is_offer: any;
   id: number;
   name: string;
   display_image: string;
@@ -77,19 +78,24 @@ export interface PropertyData {
   unit_sold: any;
   property_view: any;
   property_requests: any;
-  director_id?: any | null; // Add director_id to the interface
+  director_id?: any | null;
+  isSelected?: boolean;
 }
 
 interface PropertyTableProps {
   data: PropertyData[];
   CurrentPage: any;
+  activeTab: any;
 }
 
 export default function PropertyTableComponent({
   data,
   CurrentPage,
+  activeTab,
 }: PropertyTableProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(
     null
@@ -98,7 +104,11 @@ export default function PropertyTableComponent({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Get the update state from Redux
+  const navigateToPropertyDetails = (propertyId: number) => {
+    const hasInfoTech = location.pathname.includes('/info-tech');
+    navigate(hasInfoTech ? `/info-tech/properties/${propertyId}` : `/properties/${propertyId}`);
+  };
+
   const { loading, success, error } = useSelector(
     (state: RootState) => state.updateproperty
   );
@@ -112,22 +122,11 @@ export default function PropertyTableComponent({
   const [propertyToDelete, setPropertyToDelete] = useState<PropertyData | null>(
     null
   );
-  interface DropdownOption {
-    label: string;
-    value: string | number;
-  }
-  const {
-    loading: userLoading,
-    error: userError,
-    data: directorDta,
-  } = useSelector((state: RootState) => state.directors);
+  
+  // const {
+  //   data: directorDta,
+  // } = useSelector((state: RootState) => state.directors);
 
-  const labels: DropdownOption[] = Array.isArray(directorDta)
-    ? directorDta.map((person) => ({
-        label: `${person.first_name} ${person.last_name}`,
-        value: person.id,
-      }))
-    : [];
   useEffect(() => {
     if (deletesuccess && propertyToDelete) {
       toast.success("Property deleted successfully!");
@@ -142,8 +141,8 @@ export default function PropertyTableComponent({
     if (deleteerror) {
       toast.error(deleteerror || "Failed to delete property");
     }
-  }, [deletesuccess, deleteerror, dispatch, propertyToDelete]);
-  // Add these handler functions
+  }, [deletesuccess, deleteerror, dispatch, propertyToDelete, CurrentPage]);
+  
   const handleDeleteClick = (property: PropertyData) => {
     setPropertyToDelete(property);
     setIsDeleteModalOpen(true);
@@ -168,13 +167,28 @@ export default function PropertyTableComponent({
   };
 
   const handlePageChange = async (page: any) => {
-    await dispatch(setPropertiesPage(page));
-    await dispatch(fetchProperties(page));
+    if (activeTab === "Published") {
+      await dispatch(setPublishedPropertiesPage({ type: "published", page }));
+    } else if (activeTab === "Sold") {
+      await dispatch(setSoldPropertiesPage({ type: "sold", page }));
+    } else if (activeTab === "Drafted") {
+      await dispatch(setDraftedPropertiesPage({ type: "drafted", page }));
+    }
   };
 
-  const pagination = useSelector(selectPropertiesPagination);
+  const pagination = useSelector((state: RootState) => {
+    switch (activeTab) {
+      case "Published":
+        return selectPublishedPropertiesPagination(state);
+      case "Sold":
+        return selectSoldPropertiesPagination(state);
+      case "Drafted":
+        return selectPropertiesPagination(state); 
+      default:
+        return selectPublishedPropertiesPagination(state);
+    }
+  });
 
-  // Handle success and error states
   useEffect(() => {
     if (success) {
       toast.success("Property updated successfully!");
@@ -189,9 +203,9 @@ export default function PropertyTableComponent({
     if (error) {
       toast.error(error.message || "Failed to update property");
     }
-  }, [success, error, dispatch]);
+  }, [success, error, dispatch, CurrentPage]);
 
- const getPropertyType = (type: number) => {
+  const getPropertyType = (type: number) => {
     switch (type) {
       case 1:
         return "land";
@@ -203,11 +217,11 @@ export default function PropertyTableComponent({
         return "Commercial";
     }
   };
-  const navigate = useNavigate();
 
   const handleRowClick = (propertyId: number) => {
-    navigate(`/properties/${propertyId}`);
+    navigateToPropertyDetails(propertyId);
   };
+  
   const handleEditClick = (property: PropertyData) => {
     setEditingProperty(property);
     setImagePreview(property.display_image || null);
@@ -234,17 +248,14 @@ export default function PropertyTableComponent({
     setEditingProperty((prev) => {
       if (!prev) return null;
 
-      // Handle checkboxes (including is_discount)
       if (type === "checkbox") {
         const checked = (e.target as HTMLInputElement).checked;
         const numericValue = checked ? 1 : 0;
 
-        // Handle the mutually exclusive checkboxes
         if (name === "is_active" || name === "is_sold") {
           return {
             ...prev,
             [name]: numericValue,
-            // When one is checked (1), the other must be unchecked (0)
             ...(name === "is_active"
               ? { is_sold: numericValue === 1 ? 0 : prev.is_sold }
               : {}),
@@ -254,14 +265,12 @@ export default function PropertyTableComponent({
           };
         }
 
-        // Handle other checkboxes (like is_discount)
         return {
           ...prev,
           [name]: numericValue,
         };
       }
 
-      // Handle other input types
       return {
         ...prev,
         [name]:
@@ -274,6 +283,7 @@ export default function PropertyTableComponent({
       };
     });
   };
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -326,29 +336,15 @@ export default function PropertyTableComponent({
       })
     );
   };
-  // handler for array fields
-  const handleArrayInputChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    if (!editingProperty) return;
-
-    const { name, value } = e.target;
-    const arrayValue = value.split(",").map((item) => item.trim());
-
-    setEditingProperty({
-      ...editingProperty,
-      [name]: arrayValue,
-    });
-  };
-
+  
   const [selectedProperty, setSelectedProperty] = useState<PropertyData | null>(
     null
   );
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
 
-  // Add this handler
   const handlePropertyClick = (property: PropertyData) => {
     setSelectedProperty(property);
+    setIsPropertyModalOpen(true);
   };
 
   const {
@@ -363,7 +359,6 @@ export default function PropertyTableComponent({
 
   useEffect(() => {
     if (toggleSuccess) {
-      // toast.success("Featured status updated successfully!");
       dispatch(
         fetchProperties({
           page: CurrentPage,
@@ -373,26 +368,27 @@ export default function PropertyTableComponent({
     }
 
     if (toggleError) {
-      // toast.error(toggleError);
       dispatch(resetToggleFeaturedState());
     }
-  }, [toggleSuccess, toggleError, dispatch]);
+  }, [toggleSuccess, toggleError, dispatch, CurrentPage]);
 
-  // Handler to toggle featured status
   const handleToggleFeatured = async (propertyId: number) => {
     setLoadingPropertyId(propertyId);
     await dispatch(toggleFeatured({ id: propertyId }));
     setLoadingPropertyId(null);
   };
+  
   const {
     loading: toggleLatestLoading,
     success: toggleLatestSuccess,
     error: toggleLatestError,
   } = useSelector((state: RootState) => state.toggleLatest);
-   const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<number | null>(
-    null
-  );
-useEffect(() => {
+  
+  const [loadingLatestPropertyId, setLoadingLatestPropertyId] = useState<
+    number | null
+  >(null);
+  
+  useEffect(() => {
     if (toggleLatestSuccess) {
       dispatch(
         fetchProperties({
@@ -405,15 +401,17 @@ useEffect(() => {
     if (toggleLatestError) {
       dispatch(resetToggleLatestState());
     }
-  }, [toggleLatestSuccess, toggleLatestError, dispatch]);
-   const handleToggleLatest = async (propertyId: number) => {
+  }, [toggleLatestSuccess, toggleLatestError, dispatch, CurrentPage]);
+  
+  const handleToggleLatest = async (propertyId: number) => {
     setLoadingLatestPropertyId(propertyId);
     await dispatch(toggleLatest({ id: propertyId }));
     setLoadingLatestPropertyId(null);
-  }
+  };
+
   return (
     <>
-        <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto">
         <div className="min-w-[800px] md:min-w-0">
           <table className="w-full">
             <thead>
@@ -427,9 +425,6 @@ useEffect(() => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Property Type
                 </th>
-
-         
-
                 <th className="w-1/12 py-4 px-6 font-normal text-[#757575] text-xs">
                   Status
                 </th>
@@ -439,11 +434,9 @@ useEffect(() => {
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Featured
                 </th>
-
                 <th className="w-1/6 py-4 px-6 font-normal text-[#757575] text-xs">
                   Latest
-                </th> 
-
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -452,7 +445,6 @@ useEffect(() => {
                   <tr
                     key={`property-${property.id}`}
                     className="hover:bg-gray-50 cursor-pointer"
-
                   >
                     <td
                       className="w-2/5 py-4 pr-6 text-dark text-sm max-w-[300px]"
@@ -462,7 +454,10 @@ useEffect(() => {
                         <div className="flex items-center">
                           <div
                             className="w-10 h-10 mr-3 overflow-hidden rounded-[15px] shrink-0 bg-gray-100"
-                            onClick={() => handlePropertyClick(property)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePropertyClick(property);
+                            }}
                           >
                             <img
                               src={
@@ -487,6 +482,7 @@ useEffect(() => {
                               <img
                                 src={"/location.svg"}
                                 className="mr-1 shrink-0"
+                                alt="location"
                               />
                               <span className="truncate">
                                 {property.street_address}
@@ -498,7 +494,7 @@ useEffect(() => {
                           {property.name} - {property.street_address}
                         </div>
                       </div>
-                    </td>
+                     </td>
                     <td
                       className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[150px]"
                       onClick={() => handleRowClick(property.id)}
@@ -511,7 +507,7 @@ useEffect(() => {
                           ₦{property.price?.toLocaleString()}
                         </div>
                       </div>
-                    </td>
+                     </td>
                     <td
                       className="w-1/6 py-4 px-6 font-[325] text-dark text-sm max-w-[120px]"
                       onClick={() => handleRowClick(property.id)}
@@ -524,8 +520,7 @@ useEffect(() => {
                           {getPropertyType(property.type)}
                         </div>
                       </div>
-                    </td>
-               
+                     </td>
                     <td
                       className="w-1/12 py-4 px-6 font-[325] text-dark text-sm max-w-[80px]"
                       onClick={() => handleRowClick(property.id)}
@@ -546,10 +541,9 @@ useEffect(() => {
                             : "Available"}
                         </div>
                       </div>
-                    </td>
+                     </td>
                     <td className="w-1/6 py-4 pl-4 text-sm">
                       <div className="flex space-x-2">
-                     
                         <button
                           aria-label="Delete property"
                           onClick={() => handleDeleteClick(property)}
@@ -557,10 +551,11 @@ useEffect(() => {
                           <img
                             src="mingcute_delete-fill.svg"
                             className="w-[18px] h-[18px]"
+                            alt="delete"
                           />
                         </button>
                       </div>
-                    </td>
+                     </td>
                     <td className="w-1/6 py-4 px-6 text-sm">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
@@ -595,8 +590,8 @@ useEffect(() => {
                             : "Off"}
                         </span>
                       </label>
-                    </td>
-                    <td className="w-1/6 py-4 px-6 text-sm"> {/* Add this new cell */}
+                     </td>
+                    <td className="w-1/6 py-4 px-6 text-sm">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -609,7 +604,8 @@ useEffect(() => {
                         />
                         <div
                           className={`w-11 h-6 rounded-full peer transition-colors duration-300 ${
-                            toggleLatestLoading && loadingLatestPropertyId === property.id
+                            toggleLatestLoading &&
+                            loadingLatestPropertyId === property.id
                               ? "bg-gray-300"
                               : property.is_offer === 1
                               ? "bg-[#79B833]"
@@ -623,27 +619,29 @@ useEffect(() => {
                           ></div>
                         </div>
                         <span className="ml-3 text-sm font-medium text-gray-700">
-                          {toggleLatestLoading && loadingLatestPropertyId === property.id
+                          {toggleLatestLoading &&
+                          loadingLatestPropertyId === property.id
                             ? "Updating..."
                             : property.is_offer === 1
                             ? "On"
                             : "Off"}
                         </span>
                       </label>
-                    </td>
-                  </tr>
+                     </td>
+                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan={7} className="py-4 text-center text-gray-500">
                     No properties found
-                  </td>
-                </tr>
+                   </td>
+                 </tr>
               )}
             </tbody>
-          </table>
+           </table>
         </div>
       </div>
+
       {/* delete property */}
       {isDeleteModalOpen && propertyToDelete && (
         <ConfirmationModal
@@ -658,7 +656,16 @@ useEffect(() => {
           cancelButtonText="Cancel"
         />
       )}
-      
+
+      {/* Property Modal */}
+      {isPropertyModalOpen && selectedProperty && (
+        <PropertyModal
+          isOpen={isPropertyModalOpen}
+          onClose={() => setIsPropertyModalOpen(false)}
+          property={selectedProperty}
+        />
+      )}
+
       <div className="w-full">
         <Pagination
           pagination={pagination}

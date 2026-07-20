@@ -28,6 +28,7 @@ interface EditPersonnelFormValues {
   role: string;
   email: string;
   password: string; // new field
+  erp_id: string; // added field
 }
 
 const roleOptions = [
@@ -63,13 +64,13 @@ export default function EditPersonnelModal({
 }: EditPersonnelModalProps) {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector(
-    (state: RootState) => state.Edithpersonel
+    (state: RootState) => state.Edithpersonel,
   );
 
   const { option, setOption } = useContext(PropertyContext)!;
   const handleSubmit = async (
     values: EditPersonnelFormValues,
-    { setSubmitting }: FormikHelpers<EditPersonnelFormValues>
+    { setSubmitting }: FormikHelpers<EditPersonnelFormValues>,
   ) => {
     const formData = new FormData();
 
@@ -78,6 +79,7 @@ export default function EditPersonnelModal({
     formData.append("phone_number", values.phoneNumber);
     formData.append("role", values.role);
     formData.append("email", values.email);
+         formData.append("erp_id", values.erp_id);
     if (values.password) {
       formData.append("password", values.password);
     }
@@ -87,7 +89,7 @@ export default function EditPersonnelModal({
         Edithpersonel({
           UpdateId: personnel.id,
           credentials: formData,
-        })
+        }),
       );
 
       if (Edithpersonel.fulfilled.match(resultAction)) {
@@ -135,117 +137,129 @@ export default function EditPersonnelModal({
             role: personnel.role.toString(),
             email: personnel.email,
             password: "", // default empty
+            erp_id: personnel.referral_code || "", // added field
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ errors, touched, handleChange, values }) => (
             <Form>
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 mb-2 sm:mb-3 md:mb-4">
-                <div className="mb-1 xs:mb-0">
-                  <InputField
-                    label="First Name"
-                    placeholder="First name"
-                    value={values.firstName}
-                    onChange={handleChange}
-                    name="firstName"
-                    error={touched.firstName && errors.firstName}
-                    required
-                  />
-                </div>
-                <div>
-                  <InputField
-                    label="Last Name"
-                    placeholder="Last name"
-                    value={values.lastName}
-                    onChange={handleChange}
-                    name="lastName"
-                    error={touched.lastName && errors.lastName}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <InputField
-                  label="Phone Number"
-                  placeholder="Phone number"
-                  name="phoneNumber"
-                  value={values.phoneNumber}
-                  onChange={handleChange}
-                  type="tel"
-                  error={touched.phoneNumber && errors.phoneNumber}
-                  required
-                />
-              </div>
-
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <EnhancedOptionInputField
-                  label="Role"
-                  placeholder="Select role"
-                  value={values.role}
-                  onChange={(value) => {
-                    handleChange({
-                      target: {
-                        name: "role",
-                        value,
-                      },
-                    } as any);
-                  }}
-                  name="role"
-                  error={touched.role && errors.role}
-                  options={roleOptions}
-                  dropdownTitle="Select Role"
-                />
-
-                <div className="flex items-start mt-1 text-[#767676] font-light text-[10px] xs:text-xs">
-                  <div className="rounded-full bg-gray-200 p-0.5 mr-1 mt-0.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-2.5 w-2.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+              <div className="w-full h-[60vh]  overflow-scroll ">
+                <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 mb-2 sm:mb-3 md:mb-4">
+                  <div className="mb-1 xs:mb-0">
+                    <InputField
+                      label="First Name"
+                      placeholder="First name"
+                      value={values.firstName}
+                      onChange={handleChange}
+                      name="firstName"
+                      error={touched.firstName && errors.firstName}
+                      required
+                    />
                   </div>
-                  <span>
-                    Personnel role dictates the operation permission they have
-                    on the admin dashboard.
-                  </span>
+                  <div>
+                    <InputField
+                      label="Last Name"
+                      placeholder="Last name"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      name="lastName"
+                      error={touched.lastName && errors.lastName}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <InputField
+                    label="Phone Number"
+                    placeholder="Phone number"
+                    name="phoneNumber"
+                    value={values.phoneNumber}
+                    onChange={handleChange}
+                    type="tel"
+                    error={touched.phoneNumber && errors.phoneNumber}
+                    required
+                  />
+                </div>
+
+                  <div className="mb-2 sm:mb-3 md:mb-4">
+                    <InputField
+                    label="Erp Identification number"
+                    placeholder="Erp Identification number"
+                    value={values.erp_id}
+                    onChange={handleChange}
+                    name="erp_id"
+                  />
+                </div>
+
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <EnhancedOptionInputField
+                    label="Role"
+                    placeholder="Select role"
+                    value={values.role}
+                    onChange={(value) => {
+                      handleChange({
+                        target: {
+                          name: "role",
+                          value,
+                        },
+                      } as any);
+                    }}
+                    name="role"
+                    error={touched.role && errors.role}
+                    options={roleOptions}
+                    dropdownTitle="Select Role"
+                  />
+
+                  <div className="flex items-start mt-1 text-[#767676] font-light text-[10px] xs:text-xs">
+                    <div className="rounded-full bg-gray-200 p-0.5 mr-1 mt-0.5">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-2.5 w-2.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span>
+                      Personnel role dictates the operation permission they have
+                      on the admin dashboard.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <InputField
+                    label="Email"
+                    placeholder="Email"
+                    value={values.email}
+                    onChange={handleChange}
+                    name="email"
+                    type="email"
+                    error={touched.email && errors.email}
+                    required
+                  />
+                </div>
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <InputField
+                    label="Password"
+                    placeholder="Enter new password (leave blank to keep current)"
+                    value={values.password}
+                    onChange={handleChange}
+                    name="password"
+                    type="password"
+                    error={touched.password && errors.password}
+                  />
                 </div>
               </div>
-
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <InputField
-                  label="Email"
-                  placeholder="Email"
-                  value={values.email}
-                  onChange={handleChange}
-                  name="email"
-                  type="email"
-                  error={touched.email && errors.email}
-                  required
-                />
-              </div>
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <InputField
-                  label="Password"
-                  placeholder="Enter new password (leave blank to keep current)"
-                  value={values.password}
-                  onChange={handleChange}
-                  name="password"
-                  type="password"
-                  error={touched.password && errors.password}
-                />
-              </div>
-
               <div className="flex justify-between items-center gap-2 mt-[50px]">
                 <button
                   type="button"

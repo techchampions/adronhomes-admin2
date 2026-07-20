@@ -116,7 +116,7 @@ const DigitsInfo = () => {
                   placeholder="100+"
                   className="rounded-lg !text-xs"
                 />
-                <label htmlFor="">Properites</label>
+                <label htmlFor="">Properties</label>
               </div>
               <div className="text-center">
                 <SoosarInputField
@@ -145,7 +145,7 @@ const DigitsInfo = () => {
                   className="rounded-lg"
                 />
                 <label htmlFor="" className="truncate">
-                  Properites
+                  Location
                 </label>
               </div>
               <div className="text-center">

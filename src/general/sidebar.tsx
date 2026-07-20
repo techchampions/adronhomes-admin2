@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // import { Icon1, Icon2, Icon3, Icon5, Icon6, Icon7, Icon8, Icon9 } from './icon';
 import {
@@ -8,15 +8,43 @@ import {
 } from "../components/Redux/Login/login_slice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../components/Redux/store";
-import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9 } from "./icon";
+import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9, IconGift } from "./icon";
+import { FaBolt, FaBuilding, FaShieldAlt, FaStore, FaTools } from "react-icons/fa";
+
+const EstateCommunitiesIcon = ({ isActive }: { isActive: boolean }) => (
+  <FaBuilding className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
+);
+
+const EstateMaintenanceIcon = ({ isActive }: { isActive: boolean }) => (
+  <FaTools className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
+);
+
+const EstateSecurityIcon = ({ isActive }: { isActive: boolean }) => (
+  <FaShieldAlt className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
+);
+
+const EstateUtilityIcon = ({ isActive }: { isActive: boolean }) => (
+  <FaBolt className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
+);
+
+const PickupVendorIcon = ({ isActive }: { isActive: boolean }) => (
+  <FaStore className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
+);
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/dashboard" },
-  { label: "Customers", icon: Icon2, path: "/customers" },
+  { label: "Clients", icon: Icon2, path: "/customers" },
   { label: "Property Payments", icon: Icon3, path: "/payments" },
   { label: "Wallet Transactions", icon: Icon8, path: "/wallet-Transactions" },
   { label: "Contracts", icon: Icon7, path: "/contracts" },
+  { label: "Contract Payments", icon: Icon7, path: "/contract-payments" },
   { label: "Properties", icon: Icon5, path: "/properties" },
+  { label: "Estate Communities", icon: EstateCommunitiesIcon, path: "/estates" },
+  { label: "Estate Maintenance", icon: EstateMaintenanceIcon, path: "/estate-maintenance" },
+  { label: "Estate Security Codes", icon: EstateSecurityIcon, path: "/estate-security-codes" },
+  { label: "Estate Utility Payments", icon: EstateUtilityIcon, path: "/estate-utility-payments" },
+  { label: "Promotions", icon: IconGift, path: "/promotions" },
+  { label: "Pickup Vendors", icon: PickupVendorIcon, path: "/promotions/vendors" },
   {
     label: "Client Partnership",
     icon: Icon7,
@@ -111,6 +139,9 @@ export default function Sidebar() {
             Logout
           </div>
         </div>
+        <div className="text-[#79B833] hover:underline text-sm">
+          <Link to={"/marketer-customer"}>Access Marketer Dashboard</Link>
+        </div>
       </div>
     </div>
   );
@@ -200,6 +231,9 @@ export default function Sidebar() {
                   <div className="font-[325] text-[16px] leading-[1] tracking-[0] w-full text-[#767676]">
                     Logout
                   </div>
+                </div>
+                <div className="text-[#79B833] hover:underline mt4">
+                  <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
                 </div>
               </div>
             </div>

@@ -7,47 +7,61 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { customer } from "../../components/Redux/customers/customers_thunk";
 import LoadingAnimations from "../../components/LoadingAnimations";
-import { setCustomersSearch } from "../../components/Redux/customers/customers_slice"; // Assuming the slice file is named customers_slice
+import { setCustomersSearch } from "../../components/Redux/customers/customers_slice"; 
 import ExportCustomersModal from "../../components/exportModal/customerExport";
 import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 export default function Customers() {
   const dispatch = useDispatch<AppDispatch>();
   const { data, customers, loading, error, pagination, search } = useSelector(
-    (state: RootState) => state.customers
+    (state: RootState) => state.customers,
   );
-  const tabs = ['Customers'];
+  const tabs = ["Clients"];
+  const [sort, setSort] = React.useState<string>("customer code");
 
   useEffect(() => {
-    dispatch(customer({ page: pagination.currentPage, search }));
-  }, [dispatch, pagination.currentPage, search]);
+    dispatch(customer({ page: pagination.currentPage, search, filter: sort }));
+  }, [dispatch, pagination.currentPage, search, sort]);
+  
   useEffect(() => {
     return () => {
       dispatch(setCustomersSearch(""));
     };
-  }, [dispatch]);
+  }, [dispatch]); 
 
- const customersModalRef = useRef<ExportModalRef>(null);
-   const openCustomersModal = () => {
+  const customersModalRef = useRef<ExportModalRef>(null);
+  const openCustomersModal = () => {
     if (customersModalRef.current) {
       customersModalRef.current.openModal();
     }
   };
+  
+  const sortOptions = [
+    { value: "customer code", name: "Sort by Client Code" },
+    { value: "newest", name: "Sort by Newest" },
+    { value: "oldest", name: "Sort by Oldest" },
+  ];
+
   return (
     <div className="pb-[52px] relative">
       <Header
-        title="Customers"
-        subtitle="Manage the list of registered customers"
-         buttonText="Export"
-         onButtonClick={openCustomersModal}
+        title="Clients"
+        subtitle="Manage the list of registered Clients"
+        buttonText="Export"
+        onButtonClick={openCustomersModal}
       />
-      <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px]  lg:pr-[68px]  pl-[15px] pr-[15px] mb-[30px]">
-        <MatrixCardGreen 
-               value={data?.total || 0}/>
+
+      <div className="grid md:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
+        <MatrixCardGreen
+          title="Total Registered Clients"
+          change="includes all registered Client"
+          value={data?.total || 0}
+        />
+
         <MatrixCard
-          title="Total Active Customers"
+          title="Total Active Clients"
           value={data?.active_customer || 0}
-          change="includes all customers on  active contracts"
+          change="includes all clients's on active contracts"
         />
         <MatrixCard
           title="Total Active Contracts"
@@ -55,20 +69,30 @@ export default function Customers() {
           change="Includes all active contracts"
         />
       </div>
-       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+      
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
+          onSortChange={(sortOption) => {setSort(sortOption.value);}}
+          sortOptions={sortOptions.map((sortOption, index) => ({
+            value: sortOption.value,
+            name: sortOption.name,
+          }))}
+          defaultSort={sortOptions.findIndex((option) => option.value === sortOptions[0].value) || 0}
           tabs={tabs}
-          searchPlaceholder={"Search Customer"}
-          activeTab={"Customers"}
+          sort={true}
+          searchPlaceholder={"Search Clients"}
+          activeTab={"Client"}
           onSearch={(value) => dispatch(setCustomersSearch(value))}
-        >{loading ? (
-   <LoadingAnimations loading={loading} />
-      ) :
-     (
-          <CustomersTableComponent data={customers} />)}
+        >
+          {loading ? (
+            <LoadingAnimations loading={loading} />
+          ) : (
+            <CustomersTableComponent data={customers} />
+          )}
         </ReusableTable>
       </div>
-        <ExportCustomersModal ref={customersModalRef} />
+      
+      <ExportCustomersModal ref={customersModalRef} />
     </div>
   );
 }

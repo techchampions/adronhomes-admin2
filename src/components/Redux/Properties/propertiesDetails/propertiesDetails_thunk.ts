@@ -16,10 +16,40 @@ interface PropertyType {
   created_at: string | null;
   updated_at: string | null;
 }
+// Define the Duration interface
+interface Duration {
+  id: number;
+  price: number;
+  citta_id: string; // Assuming this is a city code or identifier
+  duration: number; // Assuming this is the length of the duration in years or months
+  is_active: boolean;
+}
+
+// Define the LandSize interface
+interface LandSize {
+  id: number;
+  size: string; // Size of the land (e.g., "450")
+  durations: Duration[]; // Array of durations
+  citta_category_id?: string;
+  citta_estate_name?: string;
+  citta_estate_code?: string;
+  citta_property_category?: string;
+  citta_promo_code?: string;
+  citta_promo_name?: string;
+  citta_termination_code?: string;
+  citta_termination_name?: string;
+}
+// Define the main interface containing land sizes and total amount
+// interface LandTransaction {
+//   land_sizes: LandSize[];
+
+// }
+
 
 export interface Property {
   id: number;
   name: string;
+  land_sizes:LandSize[]
   display_image: string;
   photos: string[];
   size: string;
@@ -140,6 +170,7 @@ export interface SavedPropertyUser {
 }
 
 export interface PropertyDataResponse {
+  properties: any;
   status: string;
   message: string;
   data: {

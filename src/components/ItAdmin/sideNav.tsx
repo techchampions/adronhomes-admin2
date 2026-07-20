@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Icon1,
   Icon2,
@@ -16,7 +16,8 @@ import { RootState } from "../Redux/store";
 
 const navItems = [
   { label: "Dashboard", icon: Icon1, path: "/info-tech" },
-  { label: "Requests & Enquiries", icon: Icon7, path: "/info-tech/Requests-Enquiries" },
+    { label: "Properties", icon: Icon5, path: "/info-tech/properties" },
+  // { label: "Requests & Enquiries", icon: Icon7, path: "/info-tech/Requests-Enquiries" },
   { label: "Settings", icon: Icon9, path: "/info-tech/settings" },
 ];
 
@@ -35,7 +36,7 @@ export default function InfoTechSidebar() {
     if (path === "/info-tech") {
       return currentPath === "/info-tech";
     }
-    
+
     // Other routes can use startsWith for nested routes
     return currentPath.startsWith(path);
   };
@@ -43,7 +44,7 @@ export default function InfoTechSidebar() {
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const DesktopSidebar = () => (
@@ -103,6 +104,9 @@ export default function InfoTechSidebar() {
             Logout
           </div>
         </div>
+         <div className="text-[#79B833] hover:underline mt4">
+                  <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
+                </div>
       </div>
     </div>
   );
@@ -194,6 +198,9 @@ export default function InfoTechSidebar() {
                   </div>
                 </div>
               </div>
+               <div className="text-[#79B833] hover:underline mt4">
+                                <Link to={"/marketer-customer"}>Marketer Dashboard</Link>
+                              </div>
             </div>
           </div>
         </>

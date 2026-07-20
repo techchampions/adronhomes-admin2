@@ -85,12 +85,12 @@ export const personnels = createAsyncThunk<
     }
 
     // Build query parameters
-    const params: Record<string, any> = { role };
-    if (search) {
-      params.search = search;
-    } else {
-      params.page = currentPage;
-    }
+    const params: Record<string, any> = { role,search, page: currentPage }; // Include page in params
+    // if (search) {
+    //   params.search = search;
+    // } else {
+    //   params.page = currentPage;
+    // }
 
     try {
       const response = await api.get<PersonnelsResponse>(
@@ -133,15 +133,6 @@ export const personnels = createAsyncThunk<
 );
 
 
-// Rename your interface to avoid conflict with built-in FormData
-interface PersonnelFormData {
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  role: string;
-  email: string;
-  password: string;
-}
 
 // Your response interface remains the same
 export interface PersonnelResponse {

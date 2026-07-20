@@ -7,7 +7,7 @@ interface DropdownOption {
 }
 
 interface EnhancedOptionInputFieldProps {
-  label: string;
+  label: string | undefined
   placeholder: string;
   value: any;
   onChange: (value: any) => void;

@@ -14,7 +14,7 @@ const PropertyEnquiries = () => {
   const [page, setpage] = useState(1);
   const params = useParams();
   const id = params?.id;
-  const { data, isLoading } = useGetPropertyRequestByID(Number(id));
+  const { data, isLoading } = useGetPropertyRequestByID(Number(id),page);
   const totalPages = data?.data.last_page || 1;
   const propertyData = data?.data.data || [];
 
@@ -24,7 +24,7 @@ const PropertyEnquiries = () => {
         title="Requests & Enquiries"
         subtitle="Attend to requests and enquiries on properties"
         history={true}
-       
+        showSearchAndButton={false}
 
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">

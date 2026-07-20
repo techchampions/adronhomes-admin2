@@ -1,0 +1,1148 @@
+import React, {
+  useImperativeHandle,
+  useState,
+  forwardRef,
+  useEffect,
+  useRef,
+} from "react";
+import InputField from "../../../components/input/inputtext";
+import EnhancedOptionInputField from "../../../components/input/enhancedSelecet";
+import { formatToNaira, validationSchema } from "./types";
+import { getIn, useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearPropertyCategories,
+  fetchCittaPropertyCategories,
+  selectAllPropertyCategories,
+  selectPropertyCategoriesLoading,
+} from "../../../components/Redux/citta/fetchCittaPropertyCategories";
+import {
+  clearCittaEstates,
+  fetchCittaEstates,
+  selectAllCittaEstates,
+  selectCittaEstatesLoading,
+} from "../../../components/Redux/citta/fetchCittaEstates";
+import {
+  clearPropertyMap,
+  fetchCittaPropertyMap,
+  selectFilteredPropertyMapItems,
+  selectPropertyMapLoading,
+} from "../../../components/Redux/citta/fetchCittaPropertyMap";
+import {
+  fetchPromoCodes,
+  selectAllPromoCodes,
+  selectPromoCodesLoading,
+  selectFilteredPromoCodes,
+  clearPromoCodes,
+} from "../../../components/Redux/gift/promo/PromoCodelist";
+import {
+  fetchTerminationCodes,
+  selectAllTerminationCodes,
+  selectTerminationCodesLoading,
+  selectFilteredTerminationCodes,
+  clearTerminationCodes,
+} from "../../../components/Redux/gift/promo/fetchTerminationCodes";
+import {
+  RefreshCwIcon,
+  AlertCircle,
+  TagIcon,
+  AlertTriangleIcon,
+} from "lucide-react";
+import {
+  selectSyncPropertyMapSuccess,
+  selectSyncPropertyMapSyncing,
+  syncPropertyMap,
+} from "../../../components/Redux/citta/syncPropertyMap";
+import {
+  fetchCittaContractTypes,
+  selectAllCittaContractTypes,
+  selectCittaContractTypesLoading,
+  selectCittaContractTypesDropdownOptions,
+  clearCittaContractTypes,
+} from "../../../components/Redux/citta/CittaContractType";
+import { toast } from "react-toastify";
+import { useAppDispatch } from "../../../components/Redux/hook";
+
+// Duration interface
+interface Duration {
+  id: any;
+  duration: any;
+  price: any;
+  citta_id: string;
+  property_code?: string;
+  property_id?: number;
+  pre_filled?: boolean;
+  appliedPromoCode?: string;
+  discountedPrice?: number;
+  appliedTerminationCode?: string;
+  terminationDiscountedPrice?: number; // For metadata only
+  originalPrice?: number; // Store original price for reference
+}
+
+export interface LandSizeSection {
+  id: number;
+  size: any;
+  durations: Duration[];
+  citta_category_id?: string;
+  citta_estate_name?: string;
+  citta_estate_code?: string;
+  citta_property_category?: string;
+  citta_promo_code?: string;
+  citta_promo_name?: string;
+  citta_termination_code?: string;
+  citta_termination_name?: string;
+  citta_contract_type?: string;
+  citta_contract_type_name?: string;
+}
+
+interface PropertyListingPageProps {
+  setLandSizeSections: (data: LandSizeSection[]) => void;
+  initialData?: LandSizeSection[];
+  isEditMode?: boolean;
+}
+
+interface PropertyListingFormValues {
+  landSizeSections: LandSizeSection[];
+}
+
+export interface PropertyListingPageRef {
+  handleSubmit: () => Promise<boolean>;
+  isValid: boolean;
+  values: LandSizeSection[];
+}
+
+// Helper functions
+const extractDiscountFromPromo = (pName: string): number | null => {
+  const match = pName.match(/(\d+(?:\.\d+)?)%/);
+  if (match) return parseFloat(match[1]);
+  return null;
+};
+
+// Calculate price with promo discount only
+const calculatePriceWithPromo = (
+  originalPrice: number,
+  promoDiscount: number | null,
+): number => {
+  if (!promoDiscount) return originalPrice;
+  const discounted = originalPrice * (1 - promoDiscount / 100);
+  return Math.round(discounted);
+};
+
+const parseNumericPrice = (value: any): number => {
+  const parsed = parseFloat(String(value ?? "").replace(/[^0-9.]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getDurationOriginalPrice = (duration: Duration): number => {
+  const storedOriginal = parseNumericPrice(duration.originalPrice);
+  return storedOriginal > 0 ? storedOriginal : parseNumericPrice(duration.price);
+};
+
+const PropertyListingPage = forwardRef<
+  PropertyListingPageRef,
+  PropertyListingPageProps
+>(({ setLandSizeSections, initialData = [], isEditMode = false }, ref) => {
+  const dispatch = useAppDispatch();
+
+  const [selectedEstate, setSelectedEstate] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [availableSizes, setAvailableSizes] = useState<any[]>([]);
+  const [landSizeSections, setLocalLandSizeSections] =
+    useState<LandSizeSection[]>(initialData);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isAutoPopulating, setIsAutoPopulating] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedPromoCode, setSelectedPromoCode] = useState<any>(null);
+  const [selectedTerminationCode, setSelectedTerminationCode] =
+    useState<any>(null);
+
+  // Sequential ID counters
+  const nextSectionIdRef = useRef(1);
+  const nextDurationIdRef = useRef(1);
+
+  const getNextSectionId = () => {
+    const id = nextSectionIdRef.current;
+    nextSectionIdRef.current++;
+    return id;
+  };
+
+  const getNextDurationId = () => {
+    const id = nextDurationIdRef.current;
+    nextDurationIdRef.current++;
+    return id;
+  };
+
+  const resetIds = () => {
+    nextSectionIdRef.current = 1;
+    nextDurationIdRef.current = 1;
+  };
+
+  // Redux selectors
+  const categories = useSelector(selectAllPropertyCategories);
+  const categoriesLoading = useSelector(selectPropertyCategoriesLoading);
+  const estates = useSelector(selectAllCittaEstates);
+  const estatesLoading = useSelector(selectCittaEstatesLoading);
+  const contractTypes = useSelector(selectAllCittaContractTypes);
+  const contractTypesLoading = useSelector(selectCittaContractTypesLoading);
+  const contractTypesDropdownOptions = useSelector(
+    selectCittaContractTypesDropdownOptions,
+  );
+  const propertyMapItems = useSelector(selectFilteredPropertyMapItems);
+  const propertyMapLoading = useSelector(selectPropertyMapLoading);
+  const syncSuccess = useSelector(selectSyncPropertyMapSuccess);
+  const syncSyncing = useSelector(selectSyncPropertyMapSyncing);
+
+  const allPromoCodes = useSelector(selectAllPromoCodes);
+  const promoCodesLoading = useSelector(selectPromoCodesLoading);
+  const filteredPromoCodes = useSelector(selectFilteredPromoCodes);
+
+  const allTerminationCodes = useSelector(selectAllTerminationCodes);
+  const terminationCodesLoading = useSelector(selectTerminationCodesLoading);
+  const filteredTerminationCodes = useSelector(selectFilteredTerminationCodes);
+
+  useEffect(() => {
+    refreshAllData();
+  }, []);
+
+  const refreshAllData = async () => {
+    setIsRefreshing(true);
+
+    resetIds();
+
+    dispatch(clearPropertyCategories());
+    dispatch(clearCittaEstates());
+    dispatch(clearPropertyMap());
+    dispatch(clearPromoCodes());
+    dispatch(clearTerminationCodes());
+    dispatch(clearCittaContractTypes());
+
+    setSelectedEstate(null);
+    setSelectedCategory(null);
+    setLocalLandSizeSections([]);
+    setAvailableSizes([]);
+    setSelectedPromoCode(null);
+    setSelectedTerminationCode(null);
+
+    await Promise.all([
+      dispatch(fetchCittaPropertyCategories()).unwrap(),
+      dispatch(fetchCittaEstates()).unwrap(),
+      dispatch(fetchCittaContractTypes()).unwrap(),
+      dispatch(fetchPromoCodes()).unwrap(),
+      dispatch(fetchTerminationCodes()).unwrap(),
+    ]);
+
+    setIsRefreshing(false);
+  };
+
+  // Load Edit Mode Data
+  useEffect(() => {
+    if (
+      initialData?.length > 0 &&
+      estates.length > 0 &&
+      categories.length > 0 &&
+      contractTypes.length > 0
+    ) {
+      setLocalLandSizeSections(initialData);
+
+      // Set max IDs from existing data to continue sequentially
+      const maxSectionId = Math.max(
+        ...initialData.map((section) => section.id),
+        0,
+      );
+      nextSectionIdRef.current = maxSectionId + 1;
+
+      const maxDurationId = Math.max(
+        ...initialData.flatMap((section) => section.durations.map((d) => d.id)),
+        0,
+      );
+      nextDurationIdRef.current = maxDurationId + 1;
+
+      if (initialData[0]?.citta_estate_code) {
+        const estate = estates.find(
+          (e) => e.EstateCode === initialData[0].citta_estate_code,
+        );
+        if (estate) setSelectedEstate(estate);
+      }
+
+      if (initialData[0]?.citta_property_category) {
+        const category = categories.find(
+          (c) => c.pName === initialData[0].citta_property_category,
+        );
+        if (category) setSelectedCategory(category);
+      }
+
+      if (initialData[0]?.citta_promo_code) {
+        const promo = allPromoCodes.find(
+          (p) => p.pCode === initialData[0].citta_promo_code,
+        );
+        if (promo) setSelectedPromoCode(promo);
+      }
+
+      if (initialData[0]?.citta_termination_code) {
+        const termination = allTerminationCodes.find(
+          (t) => t.pCode === initialData[0].citta_termination_code,
+        );
+        if (termination) setSelectedTerminationCode(termination);
+      }
+    }
+  }, [
+    initialData,
+    estates,
+    categories,
+    contractTypes,
+    allPromoCodes,
+    allTerminationCodes,
+  ]);
+
+  // Fetch Property Map
+  useEffect(() => {
+    if (selectedEstate?.EstateCode && selectedCategory?.pCode) {
+      dispatch(
+        fetchCittaPropertyMap({
+          estate_code: selectedEstate.EstateCode,
+          category_code: selectedCategory.pCode,
+        }),
+      );
+    }
+  }, [selectedEstate, selectedCategory, dispatch]);
+
+  // Extract unique sizes
+  useEffect(() => {
+    if (propertyMapItems?.length > 0) {
+      const uniqueSizes = [
+        ...new Map(propertyMapItems.map((item) => [item.size, item])).values(),
+      ];
+      setAvailableSizes(uniqueSizes);
+    } else {
+      setAvailableSizes([]);
+    }
+  }, [propertyMapItems]);
+
+  useEffect(() => {
+    if (!propertyMapItems?.length || !landSizeSections.length) return;
+
+    setLocalLandSizeSections((prevSections) => {
+      let changed = false;
+
+      const updatedSections = prevSections.map((section) => ({
+        ...section,
+        durations: section.durations.map((duration) => {
+          const matchingCittaItem = propertyMapItems.find((item: any) => {
+            const samePropertyCode =
+              item.property_code &&
+              (item.property_code === duration.property_code ||
+                item.property_code === duration.citta_id);
+            const samePropertyId =
+              item.id &&
+              duration.property_id &&
+              String(item.id) === String(duration.property_id);
+            const sameSizeAndDuration =
+              String(item.size) === String(section.size) &&
+              String(item.duration) === String(duration.duration);
+
+            return samePropertyCode || samePropertyId || sameSizeAndDuration;
+          });
+
+          const cittaOriginalPrice = parseNumericPrice(
+            matchingCittaItem?.trimmed_price,
+          );
+
+          if (
+            cittaOriginalPrice > 0 &&
+            parseNumericPrice(duration.originalPrice) !== cittaOriginalPrice
+          ) {
+            changed = true;
+            return {
+              ...duration,
+              originalPrice: cittaOriginalPrice,
+            };
+          }
+
+          return duration;
+        }),
+      }));
+
+      return changed ? updatedSections : prevSections;
+    });
+  }, [landSizeSections.length, propertyMapItems]);
+
+  // Auto-populate when data is available
+  useEffect(() => {
+    if (
+      propertyMapItems?.length > 0 &&
+      !isAutoPopulating &&
+      landSizeSections.length === 0 &&
+      selectedEstate &&
+      selectedCategory &&
+      !isRefreshing
+    ) {
+      autoPopulateFromPropertyMap();
+    }
+  }, [propertyMapItems, selectedEstate, selectedCategory, isRefreshing]);
+
+  // Apply promo code only - termination is just metadata
+  const applyPromoToDurations = (
+    sections: LandSizeSection[],
+    promoCode: any,
+    terminationCode: any,
+  ): LandSizeSection[] => {
+    const promoDiscount = extractDiscountFromPromo(promoCode?.pName || "");
+
+    return sections.map((section) => ({
+      ...section,
+      citta_promo_code: promoCode?.pCode || undefined,
+      citta_promo_name: promoCode?.pName || "",
+      citta_termination_code: terminationCode?.pCode || undefined,
+      citta_termination_name: terminationCode?.pName || "",
+      durations: section.durations.map((duration) => {
+        const originalPrice = getDurationOriginalPrice(duration);
+        // Calculate price with promo discount only
+        const finalPrice = calculatePriceWithPromo(
+          originalPrice,
+          promoDiscount,
+        );
+
+        return {
+          ...duration,
+          price: finalPrice.toString(),
+          originalPrice: originalPrice,
+          discountedPrice: finalPrice, // Same as price since termination doesn't affect display
+          appliedPromoCode: promoCode?.pCode,
+          appliedTerminationCode: terminationCode?.pCode,
+          terminationDiscountedPrice: undefined, // No display calculation
+        };
+      }),
+    }));
+  };
+
+  const autoPopulateFromPropertyMap = () => {
+    setIsAutoPopulating(true);
+
+    const groupedBySize = propertyMapItems.reduce((acc: any, item: any) => {
+      if (!acc[item.size]) acc[item.size] = [];
+      acc[item.size].push(item);
+      return acc;
+    }, {});
+
+    const promoDiscount = extractDiscountFromPromo(
+      selectedPromoCode?.pName || "",
+    );
+
+    const newSections: LandSizeSection[] = Object.entries(groupedBySize).map(
+      ([size, items]: any) => {
+        const durations: Duration[] = items.map((item: any) => {
+          const originalPrice = parseNumericPrice(item.trimmed_price);
+          // Calculate price with promo discount only
+          const finalPrice = calculatePriceWithPromo(
+            originalPrice,
+            promoDiscount,
+          );
+
+          return {
+            id: getNextDurationId(),
+            duration: item.duration,
+            price: finalPrice.toString(),
+            citta_id: item.property_code || "",
+            property_code: item.property_code || "",
+            property_id: item.id,
+            pre_filled: true,
+            originalPrice: originalPrice,
+            discountedPrice: finalPrice,
+            appliedPromoCode: selectedPromoCode?.pCode,
+            appliedTerminationCode: selectedTerminationCode?.pCode,
+            terminationDiscountedPrice: undefined,
+          };
+        });
+
+        return {
+          id: getNextSectionId(),
+          size,
+          durations,
+          citta_category_id: String(selectedCategory?.pCode || ""),
+          citta_estate_name: selectedEstate?.EstateName || "",
+          citta_estate_code: selectedEstate?.EstateCode || "",
+          citta_property_category: selectedCategory?.pName || "",
+          citta_promo_code: selectedPromoCode?.pCode || undefined,
+          citta_promo_name: selectedPromoCode?.pName || "",
+          citta_termination_code: selectedTerminationCode?.pCode || undefined,
+          citta_termination_name: selectedTerminationCode?.pName || "",
+          citta_contract_type: "",
+          citta_contract_type_name: "",
+        };
+      },
+    );
+
+    setLocalLandSizeSections(newSections);
+    setIsAutoPopulating(false);
+  };
+
+  const applyPromoCodeToAllSections = (promoCode: any) => {
+    const updatedSections = applyPromoToDurations(
+      landSizeSections,
+      promoCode,
+      selectedTerminationCode,
+    );
+    setLocalLandSizeSections(updatedSections);
+  };
+
+  const applyTerminationCodeToAllSections = (terminationCode: any) => {
+    // Just update metadata, no price calculation changes
+    const updatedSections = landSizeSections.map((section) => ({
+      ...section,
+      citta_termination_code: terminationCode?.pCode || undefined,
+      citta_termination_name: terminationCode?.pName || "",
+      durations: section.durations.map((duration) => ({
+        ...duration,
+        appliedTerminationCode: terminationCode?.pCode,
+        terminationDiscountedPrice: undefined,
+      })),
+    }));
+    setLocalLandSizeSections(updatedSections);
+  };
+
+  const handleEstateChange = (value: string) => {
+    const estate = estates.find((e) => e.EstateCode === value);
+    setSelectedEstate(estate);
+    setSelectedCategory(null);
+    setSelectedPromoCode(null);
+    setSelectedTerminationCode(null);
+    setLocalLandSizeSections([]);
+    setAvailableSizes([]);
+    dispatch(clearPropertyMap());
+  };
+
+  const handleCategoryChange = (value: string) => {
+    const category = categories.find((c) => String(c.pCode) === value);
+    setSelectedCategory(category);
+    setSelectedPromoCode(null);
+    setSelectedTerminationCode(null);
+    setLocalLandSizeSections([]);
+    setAvailableSizes([]);
+    dispatch(clearPropertyMap());
+  };
+
+  const handleSectionContractTypeChange = (
+    sectionId: number,
+    contractTypeCode: string,
+  ) => {
+    const contractType = contractTypes.find((c) => c.code === contractTypeCode);
+
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              citta_contract_type: contractType?.code || "",
+              citta_contract_type_name: contractType?.name || "",
+            }
+          : section,
+      ),
+    );
+  };
+
+  const addLandSizeSection = () => {
+    const newSection: LandSizeSection = {
+      id: getNextSectionId(),
+      size: "",
+      durations: [
+        {
+          id: getNextDurationId(),
+          duration: "",
+          price: "",
+          citta_id: "",
+          property_code: "",
+          property_id: undefined,
+        },
+      ],
+      citta_category_id: String(selectedCategory?.pCode || ""),
+      citta_estate_name: selectedEstate?.EstateName || "",
+      citta_estate_code: selectedEstate?.EstateCode || "",
+      citta_property_category: selectedCategory?.pName || "",
+      citta_promo_code: selectedPromoCode?.pCode || undefined,
+      citta_promo_name: selectedPromoCode?.pName || "",
+      citta_termination_code: selectedTerminationCode?.pCode || undefined,
+      citta_termination_name: selectedTerminationCode?.pName || "",
+      citta_contract_type: "",
+      citta_contract_type_name: "",
+    };
+    setLocalLandSizeSections((prev) => [...prev, newSection]);
+  };
+
+  const removeLandSizeSection = (sectionId: number) => {
+    if (landSizeSections.length > 1) {
+      setLocalLandSizeSections((prev) =>
+        prev.filter((s) => s.id !== sectionId),
+      );
+    }
+  };
+
+  const addDurationToSection = (sectionId: number) => {
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              durations: [
+                ...section.durations,
+                {
+                  id: getNextDurationId(),
+                  duration: "",
+                  price: "",
+                  citta_id: "",
+                  property_code: "",
+                  property_id: undefined,
+                },
+              ],
+            }
+          : section,
+      ),
+    );
+  };
+
+  const removeDurationFromSection = (sectionId: number, durationId: number) => {
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId && section.durations.length > 1
+          ? {
+              ...section,
+              durations: section.durations.filter((d) => d.id !== durationId),
+            }
+          : section,
+      ),
+    );
+  };
+
+  // When selecting a land size, apply promo discount only
+  const updateLandSize = (sectionId: number, value: string) => {
+    const propertyItems = propertyMapItems.filter(
+      (item) => item.size === value,
+    );
+    const promoDiscount = extractDiscountFromPromo(
+      selectedPromoCode?.pName || "",
+    );
+
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) => {
+        if (section.id === sectionId) {
+          const newDurations = propertyItems.map((item) => {
+            const originalPrice = parseNumericPrice(item.trimmed_price);
+            const finalPrice = calculatePriceWithPromo(
+              originalPrice,
+              promoDiscount,
+            );
+
+            return {
+              id: getNextDurationId(),
+              duration: item.duration,
+              price: finalPrice.toString(),
+              citta_id: item.property_code || "",
+              property_code: item.property_code || "",
+              property_id: item.id,
+              pre_filled: true,
+              originalPrice: originalPrice,
+              discountedPrice: finalPrice,
+              appliedPromoCode: selectedPromoCode?.pCode,
+              appliedTerminationCode: selectedTerminationCode?.pCode,
+              terminationDiscountedPrice: undefined,
+            };
+          });
+
+          return {
+            ...section,
+            size: value,
+            durations:
+              newDurations.length > 0 ? newDurations : section.durations,
+          };
+        }
+        return section;
+      }),
+    );
+  };
+
+  const updateDuration = (
+    sectionId: number,
+    durationId: number,
+    field: keyof Duration,
+    value: string,
+  ) => {
+    setLocalLandSizeSections((prev) =>
+      prev.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              durations: section.durations.map((duration) =>
+                duration.id === durationId
+                  ? { ...duration, [field]: value }
+                  : duration,
+              ),
+            }
+          : section,
+      ),
+    );
+  };
+
+  // Formik setup with proper synchronization
+  const formik = useFormik<PropertyListingFormValues>({
+    initialValues: { landSizeSections },
+    validationSchema,
+    enableReinitialize: false,
+    onSubmit: (values) => {
+      setLandSizeSections(values.landSizeSections);
+    },
+  });
+
+  // Keep formik values in sync with local state
+  useEffect(() => {
+    const currentFormikValues = formik.values.landSizeSections;
+    if (
+      JSON.stringify(currentFormikValues) !== JSON.stringify(landSizeSections)
+    ) {
+      formik.setValues({ landSizeSections });
+    }
+  }, [landSizeSections, formik]);
+
+  useImperativeHandle(ref, () => ({
+    handleSubmit: async () => {
+      setSubmitAttempted(true);
+
+      if (!selectedEstate) {
+        toast.warning("Please select an estate");
+        return false;
+      }
+      if (!selectedCategory) {
+        toast.warning("Please select a property category");
+        return false;
+      }
+
+      await formik.setValues({ landSizeSections });
+
+      const errors = await formik.validateForm();
+
+      if (Object.keys(errors).length > 0) {
+        console.log("Validation errors:", errors);
+
+        const errorMessages: string[] = [];
+        if (errors.landSizeSections) {
+          if (Array.isArray(errors.landSizeSections)) {
+            errors.landSizeSections.forEach(
+              (sectionError: any, index: number) => {
+                if (sectionError?.size)
+                  errorMessages.push(
+                    `Section ${index + 1}: ${sectionError.size}`,
+                  );
+                if (sectionError?.durations) {
+                  if (Array.isArray(sectionError.durations)) {
+                    sectionError.durations.forEach(
+                      (durationError: any, durIndex: number) => {
+                        if (durationError?.duration)
+                          errorMessages.push(
+                            `Section ${index + 1}, Duration ${durIndex + 1}: ${durationError.duration}`,
+                          );
+                        if (durationError?.price)
+                          errorMessages.push(
+                            `Section ${index + 1}, Duration ${durIndex + 1}: ${durationError.price}`,
+                          );
+                      },
+                    );
+                  }
+                }
+              },
+            );
+          }
+        }
+
+        if (errorMessages.length > 0) {
+          toast.error(`Please fix: ${errorMessages.join(", ")}`);
+        } else {
+          toast.error("Please fix the errors in the form");
+        }
+        return false;
+      }
+
+      await formik.submitForm();
+      toast.success("Land sizes saved successfully!");
+      return true;
+    },
+    isValid: formik.isValid,
+    get values() {
+      return landSizeSections;
+    },
+  }));
+
+  const getErrorMessage = (fieldPath: string): string | undefined =>
+    submitAttempted ? getIn(formik.errors, fieldPath) : undefined;
+
+  const isDataEmpty =
+    propertyMapItems.length === 0 &&
+    !propertyMapLoading &&
+    selectedEstate &&
+    selectedCategory &&
+    !isAutoPopulating &&
+    !isRefreshing;
+
+  const showLoadingIndicator =
+    (propertyMapLoading || isAutoPopulating) &&
+    selectedEstate &&
+    selectedCategory;
+
+  return (
+    <div>
+      <div className="mx-auto">
+        <div className="flex justify-between mb-4">
+          <p className="text-base font-semibold text-gray-800">
+            Link Property to Citta
+          </p>
+          <button
+            type="button"
+            onClick={refreshAllData}
+            disabled={isRefreshing || syncSyncing}
+            className={`px-4 py-2 text-white text-sm font-medium rounded-[60px] transition-colors flex items-center gap-2 ${
+              isRefreshing || syncSyncing
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#57713A] hover:bg-[#57713A]/80"
+            }`}
+          >
+            {isRefreshing || syncSyncing ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+            ) : (
+              <RefreshCwIcon size={16} />
+            )}
+            <span>Refresh Citta Data</span>
+          </button>
+        </div>
+      </div>
+
+      <form onSubmit={formik.handleSubmit} className="space-y-8">
+        {/* Estate & Category Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl border border-gray-200">
+          <EnhancedOptionInputField
+            label="Select Citta Estate *"
+            placeholder="Choose an estate..."
+            value={selectedEstate?.EstateCode || ""}
+            onChange={handleEstateChange}
+            options={estates.map((estate) => ({
+              value: estate.EstateCode,
+              label: `${estate.EstateCode} - ${estate.EstateName}`,
+              original: estate,
+            }))}
+            isSearchable
+            isLoading={estatesLoading || isRefreshing}
+          />
+
+          <EnhancedOptionInputField
+            label="Select Citta Property Category *"
+            placeholder="Choose a category..."
+            value={
+              selectedCategory?.pCode ? String(selectedCategory.pCode) : ""
+            }
+            onChange={handleCategoryChange}
+            options={categories.map((category) => ({
+              value: String(category.pCode),
+              label: `${category.pCode} - ${category.pName}`,
+              original: category,
+            }))}
+            isSearchable
+            isLoading={categoriesLoading || isRefreshing}
+          />
+        </div>
+
+        {/* Promo Code & Termination Code Selection */}
+        {selectedEstate &&
+          selectedCategory &&
+          !showLoadingIndicator &&
+          !isDataEmpty && (
+            <div className="space-y-6">
+              {/* Promo Code Section */}
+              <div className="p-6 rounded-2xl border border-gray-200 bg-[#57713A]/40">
+                <div className="flex items-center gap-2 mb-4">
+                  <TagIcon className="h-5 w-5 text-[#57713A]" />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Apply Promo Code
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Select a promo code to apply discount to the price
+                </p>
+
+                <EnhancedOptionInputField
+                  label="Select Promo Code"
+                  placeholder="Search and select a promo code..."
+                  value={selectedPromoCode?.pCode || ""}
+                  onChange={(value: string) => {
+                    const promoCode = allPromoCodes.find(
+                      (p) => p.pCode === value,
+                    );
+                    setSelectedPromoCode(promoCode);
+                    applyPromoCodeToAllSections(promoCode);
+                  }}
+                  options={filteredPromoCodes.map((code) => ({
+                    value: code.pCode,
+                    label: `${code.pCode} - ${code.pName}`,
+                    original: code,
+                  }))}
+                  isSearchable
+                  isLoading={promoCodesLoading || isRefreshing}
+                />
+
+                {selectedPromoCode && (
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <span className="font-semibold">Active Promo:</span>{" "}
+                      {selectedPromoCode.pCode} -{" "}
+                      {extractDiscountFromPromo(selectedPromoCode.pName)}%
+                      discount applied
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Termination Code Section */}
+              <div className="p-6 rounded-2xl border border-gray-200 bg-orange-50/30">
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangleIcon className="h-5 w-5 text-orange-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Apply Termination Code
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Select a termination code for reference only (does not affect
+                  price)
+                </p>
+
+                <EnhancedOptionInputField
+                  label="Select Termination Code"
+                  placeholder="Search and select a termination code..."
+                  value={selectedTerminationCode?.pCode || ""}
+                  onChange={(value: string) => {
+                    const terminationCode = allTerminationCodes.find(
+                      (t) => t.pCode === value,
+                    );
+                    setSelectedTerminationCode(terminationCode);
+                    applyTerminationCodeToAllSections(terminationCode);
+                  }}
+                  options={filteredTerminationCodes.map((code) => ({
+                    value: code.pCode,
+                    label: `${code.pCode} - ${code.pName}`,
+                    original: code,
+                  }))}
+                  isSearchable
+                  isLoading={terminationCodesLoading || isRefreshing}
+                />
+
+                {selectedTerminationCode && (
+                  <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="text-sm text-orange-800">
+                      <span className="font-semibold">
+                        Selected Termination Code:
+                      </span>{" "}
+                      {selectedTerminationCode.pCode} -{" "}
+                      {selectedTerminationCode.pName}
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">
+                      This is for reference only and does not affect the price
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+        {/* Loading Indicator */}
+        {showLoadingIndicator && (
+          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-2xl border-2 border-gray-200">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#57713A] border-t-transparent mb-4"></div>
+            <p className="text-gray-600 font-medium">
+              Loading property data...
+            </p>
+          </div>
+        )}
+
+        {/* Empty Data */}
+        {isDataEmpty && !showLoadingIndicator && (
+          <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-2xl border-2 border-slate-200">
+            <AlertCircle className="h-12 w-12 text-slate-500 mb-4" />
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">
+              No Data Available
+            </h3>
+            <p className="text-slate-600 text-center max-w-md">
+              No property data found for the selected estate and category.
+            </p>
+          </div>
+        )}
+
+        {/* Land Sizes Section */}
+        {!showLoadingIndicator && !isDataEmpty && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-base font-semibold text-gray-800">
+                Land Sizes & Pricing
+              </h2>
+            </div>
+
+            <div className="space-y-8">
+              {landSizeSections.map((section, sectionIndex) => (
+                <div
+                  key={section.id}
+                  className="border border-gray-200 rounded-2xl p-6 relative bg-gray-50/50"
+                >
+                  {landSizeSections.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeLandSizeSection(section.id)}
+                      className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <EnhancedOptionInputField
+                      label="Land Size *"
+                      placeholder="Select land size..."
+                      value={section.size || ""}
+                      onChange={(value: string) =>
+                        updateLandSize(section.id, value)
+                      }
+                      options={availableSizes.map((item) => ({
+                        value: item.size,
+                        label: item.size,
+                        original: item,
+                      }))}
+                      disabled
+                      isSearchable
+                      isLoading={propertyMapLoading}
+                      error={getErrorMessage(
+                        `landSizeSections[${sectionIndex}].size`,
+                      )}
+                    />
+
+                    <EnhancedOptionInputField
+                      label="Select Contract Type (Optional)"
+                      placeholder="Choose a contract type..."
+                      value={section.citta_contract_type || ""}
+                      onChange={(value: string) =>
+                        handleSectionContractTypeChange(section.id, value)
+                      }
+                      options={contractTypesDropdownOptions}
+                      isSearchable
+                      isLoading={contractTypesLoading || isRefreshing}
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    {section.durations.map((duration, durationIndex) => {
+                      const hasPromoDiscount =
+                        duration.appliedPromoCode &&
+                        duration.price !== duration.originalPrice?.toString();
+
+                      return (
+                        <div
+                          key={duration.id}
+                          className="flex gap-4 items-end p-4 bg-white border border-gray-200 rounded-xl flex-wrap md:flex-nowrap"
+                        >
+                          <div className="flex-1 min-w-[150px]">
+                            <InputField
+                              label="Duration (months)"
+                              type="number"
+                              value={duration.duration || ""}
+                              onChange={(e) =>
+                                updateDuration(
+                                  section.id,
+                                  duration.id,
+                                  "duration",
+                                  e.target.value,
+                                )
+                              }
+                              disabled
+                              error={getErrorMessage(
+                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].duration`,
+                              )}
+                              placeholder={""}
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-[150px]">
+                            <InputField
+                              label="Original Price (₦)"
+                              type="text"
+                              value={formatToNaira(
+                                duration.originalPrice || duration.price || "",
+                              )}
+                              onChange={() => {}}
+                              placeholder={""}
+                              disabled
+                            />
+                          </div>
+
+                          <div className="flex-1 min-w-[150px]">
+                            <InputField
+                              label="Final Price (₦)"
+                              type="text"
+                              value={formatToNaira(duration.price || "")}
+                              onChange={(e) => {
+                                const raw = e.target.value.replace(
+                                  /[^0-9]/g,
+                                  "",
+                                );
+                                updateDuration(
+                                  section.id,
+                                  duration.id,
+                                  "price",
+                                  raw,
+                                );
+                              }}
+                              disabled
+                              error={getErrorMessage(
+                                `landSizeSections[${sectionIndex}].durations[${durationIndex}].price`,
+                              )}
+                              placeholder={""}
+                            />
+                            {hasPromoDiscount && (
+                              <span className="text-xs text-green-600">
+                                ✓ Promo discount applied
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex-1 min-w-[180px]">
+                            <label className="block text-sm mb-1">
+                              Citta Property Code
+                            </label>
+                            <input
+                              type="text"
+                              readOnly
+                              value={duration.citta_id || ""}
+                              className="w-full px-3 py-2 rounded-full bg-gray-100 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {section.durations.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeDurationFromSection(
+                                  section.id,
+                                  duration.id,
+                                )
+                              }
+                              className="text-red-500 hover:text-red-700 p-2"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+});
+
+PropertyListingPage.displayName = "PropertyListingPage";
+export default PropertyListingPage;

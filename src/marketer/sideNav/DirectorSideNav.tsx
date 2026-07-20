@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
   Icon1,
@@ -97,6 +97,11 @@ export default function DirectorSideBar() {
             Logout
           </div>
         </div>
+        <div className="text-[#79B833] hover:underline text-sm">
+                  <Link to={'/marketer-customer'}>
+                 Access Marketer Dashboard</Link>
+                </div>
+     
       </div>
     </div>
   );
@@ -192,7 +197,12 @@ export default function DirectorSideBar() {
                   </div>
                 </div>
               </div>
-            </div>
+            <div className="text-[#79B833] hover:underline mt-4 text-sm">
+                          <Link to={'/marketer-customer'}>
+                        Access  Marketer Dashboard</Link>
+                        </div>
+             
+              </div>
           </div>
         </>
       )}

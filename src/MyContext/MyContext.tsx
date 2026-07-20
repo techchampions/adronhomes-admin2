@@ -12,8 +12,9 @@ import {
 import { add_property_detail } from "../components/Redux/addProperty/addFees/addFees_thunk";
 import { resetPropertyDetailState } from "../components/Redux/addProperty/addFees/add_property_detail_slice";
 import { useLocation, useNavigate } from "react-router-dom";
+import { LandSizeSection } from "../pages/Properties/addPropplan/planForm";
 
-interface Fee {
+export interface Fee {
   [x: string]: any;
   id: number;
   name: string;
@@ -23,7 +24,7 @@ interface Fee {
   purpose: any;
 }
 
-interface BasicDetailsFormValues {
+export interface BasicDetailsFormValues {
   propertyName: string;
   propertyType: any;
   price: string;
@@ -39,7 +40,7 @@ interface BasicDetailsFormValues {
   propertyFiles: File[];
 }
 
-interface BulkDetailsFormValues {
+export interface BulkDetailsFormValues {
   propertyName: string;
   propertyType: any;
   propertyUnits: string;
@@ -52,7 +53,7 @@ interface BulkDetailsFormValues {
   lga: any;
 }
 
-interface PropertySpecificationsFormValues {
+export interface PropertySpecificationsFormValues {
   bedrooms: string;
   bathrooms: string;
   propertySize: string;
@@ -73,7 +74,7 @@ interface PropertySpecificationsFormValues {
   titleDocumentTypeProp: string[];
 }
 
-interface LandFormValues {
+export interface LandFormValues {
   plotShape: string;
   topography: string;
   propertySize: string;
@@ -92,18 +93,19 @@ interface LandFormValues {
   nearbyLandmarks: string[];
 }
 
-interface FeaturesFormValues {
+export interface FeaturesFormValues {
   features: string[];
 }
 
-interface MediaFormValues {
+export interface MediaFormValues {
   tourLink: string;
   videoLink: string;
   mapUrl: string;
   images: (File | string)[];
+  display_image: string | File | undefined
 }
 
-interface DiscountFormValues {
+export interface DiscountFormValues {
   discountName: string;
   discountType: string;
   discountOff: string;
@@ -112,14 +114,14 @@ interface DiscountFormValues {
   validTo: string;
 }
 
-interface PaymentStructureFormValues {
+export interface PaymentStructureFormValues {
   paymentType: string;
   paymentDuration: string;
   paymentSchedule: string[];
   feesCharges: string;
 }
 
-interface PropertyFormData {
+export interface PropertyFormData {
   basicDetails: BasicDetailsFormValues;
   bulkDetails: BulkDetailsFormValues;
   specifications: PropertySpecificationsFormValues;
@@ -131,8 +133,44 @@ interface PropertyFormData {
   display: {
     status: "draft" | "publish";
   };
+  LandSizeSection:LandSizeSection[]
+}
+export interface PropertyFormMetadata {
+  currentStep: number;
+  isLandProperty: boolean;
+  isLandProperty2: boolean;
+  isBulk: boolean;
+  isSubmitting: boolean;
+  sales: boolean;
+  propertyId?: string | null;
+  director_name: string;
+  previousPropType: string;
+  isLoaded: boolean;
+  showBulkModal: boolean;
+  showPersonnelModal: boolean;
+  isUserBulk: boolean;
+  forgotPassword: boolean;
+  isCancelState: boolean;
+  isInfrastructure: boolean;
+  option: number;
+  role?: any;
+  fees: Fee[];
+  newFees: Fee[];
+  imagePreview: string | null;
 }
 
+
+
+export type CreatePropertyFormData = PropertyFormData & {
+  metadata: Omit<PropertyFormMetadata, 'isLoaded' | 'propertyId'> & {
+    isLoaded?: boolean;
+    propertyId?: string | null;
+  };
+};
+
+export type EditPropertyFormData = PropertyFormData & {
+  metadata: PropertyFormMetadata;
+};
 interface PropertyContextType {
   formData: PropertyFormData;
   director_name: any;
@@ -145,6 +183,7 @@ interface PropertyContextType {
   setBulkDetails: (data: BulkDetailsFormValues) => void;
   setSpecifications: (data: PropertySpecificationsFormValues) => void;
   setLandForm: (data: LandFormValues) => void;
+  setLandSizeSections:(data:LandSizeSection[])=>void
   setFeatures: (data: FeaturesFormValues) => void;
   setMedia: (data: MediaFormValues) => void;
   setDiscount: (data: DiscountFormValues) => void;
@@ -199,6 +238,7 @@ interface PropertyProviderProps {
 }
 
 const initialFormData: PropertyFormData = {
+LandSizeSection: [], 
   basicDetails: {
     propertyName: "",
     propertyType: "",
@@ -272,6 +312,7 @@ const initialFormData: PropertyFormData = {
     tourLink: "",
     videoLink: "",
     images: [],
+    display_image: '',
   },
   discount: {
     discountName: "",
@@ -395,7 +436,12 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       landForm: data,
     }));
   };
-
+const setLandSizeSections=(data:LandSizeSection[])=>{
+    setFormData((prev) => ({
+      ...prev,
+      LandSizeSection: data, 
+    }));
+}
   const setFeatures = (data: FeaturesFormValues) => {
     setFormData((prev) => ({
       ...prev,
@@ -438,6 +484,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         media,
         discount,
         paymentStructure,
+        LandSizeSection
       } = formData;
 
       console.log("Submitting with displayStatus:", displayStatus);
@@ -528,6 +575,18 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
       }
 
       if (isLandProperty) {
+        formData.LandSizeSection.forEach((ls, i) => {
+  formPayload.append(`land_sizes[${i}][id]`, String(ls.id));
+  formPayload.append(`land_sizes[${i}][size]`, String(ls.size));
+
+  ls.durations.forEach((d, j) => {
+    formPayload.append(`land_sizes[${i}][durations][${j}][id]`, (d.id));
+    formPayload.append(`land_sizes[${i}][durations][${j}][duration]`, (d.duration));
+    formPayload.append(`land_sizes[${i}][durations][${j}][price]`, (d.price));
+    formPayload.append(`land_sizes[${i}][durations][${j}][citta_id]`, (d.citta_id));
+  });
+});
+
         if (landForm.landSize) {
           formPayload.append("size", landForm.landSize);
         }
@@ -804,6 +863,7 @@ const PropertyProvider: React.FC<PropertyProviderProps> = ({ children }) => {
         setBulkDetails,
         setSpecifications,
         setLandForm,
+        setLandSizeSections,
         setFeatures,
         setMedia,
         setDiscount,

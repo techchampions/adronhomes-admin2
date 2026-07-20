@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ProfileCard from "../../general/SmallProfileCard";
 import { RiFolderCheckFill } from "react-icons/ri";
 import PaymentListCard from "../../general/PaymentListCard";
@@ -28,17 +28,57 @@ import { ContractDocumentsModal } from "./ContractDocumentsModal";
 import { UserProfileCard } from "./contractProfileCard";
 import { formatDate } from "../../utils/formatdate";
 import { ConfirmAllocationModal } from "./confirmDocumentSubmited";
+import ContractDocumentsPage from "./newImplementationContracts/ContractDocumentsPage";
+import ContractDocumentsViewer from "./newImplementationContracts/ContractDocumentsViewer";
+import ContractDocumentsForm, {
+  ContractDocumentsHandles,
+} from "./newImplementationContracts/ContractDocumentsForm";
+import ParentComponent from "./newImplementationContracts/ParentComponent";
 
 export default function ContractInvoice() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentListOpen, setIsPaymentListOpen] = useState(false);
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+  const [showDocumentsViewer, setShowDocumentsViewer] = useState(false);
+  const [showDocumentsManager, setShowDocumentsManager] = useState(false);
+  const [showContractForm, setShowContractForm] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>();
   const { plan_id, user_id } = useParams<{
     plan_id: string;
     user_id: string;
   }>();
 
+
+   const formRef = useRef<ContractDocumentsHandles>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFormSubmit = async () => {
+    if (formRef.current && !isSubmitting) {
+      setIsSubmitting(true);
+      try {
+        const isValid = await formRef.current.handleSubmit();
+        if (isValid) {
+          console.log("Form submitted successfully");
+        } else {
+          console.log("Form validation failed");
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleSuccess = (response: any) => {
+    console.log("Operation successful:", response);
+  };
+
+  const handleError = (error: string) => {
+    console.error("Operation failed:", error);
+  };
+
+
+ 
   const [showModal, setShowModal] = useState(false);
   // Get data from Redux store
   const {
@@ -92,10 +132,6 @@ export default function ContractInvoice() {
     setCurrentPage(page);
   };
 
-  // const [isChecked, setIsChecked] = useState(
-  //   planProperties?.is_allocated === 1?true:false
-  // );
-
   const [isChecked, setIsChecked] = useState(false);
 
   // Set initial state once planProperties is available
@@ -119,6 +155,33 @@ export default function ContractInvoice() {
     }
   };
 
+  // Handle view documents
+  const handleViewDocuments = () => {
+    if (!plan_id) {
+      toast.error("Plan ID is missing");
+      return;
+    }
+    setShowDocumentsViewer(true);
+  };
+
+  // Handle manage documents
+  const handleManageDocuments = () => {
+    if (!plan_id) {
+      toast.error("Plan ID is missing");
+      return;
+    }
+    setShowDocumentsManager(true);
+  };
+
+  // Handle open contract form
+  const handleOpenContractForm = () => {
+    if (!plan_id) {
+      toast.error("Plan ID is missing");
+      return;
+    }
+    setShowContractForm(true);
+  };
+
   const formatTransactions = () => {
     if (!transactions) return [];
 
@@ -135,8 +198,8 @@ export default function ContractInvoice() {
         transaction.status === 1
           ? "Completed"
           : transaction.status === 0
-          ? "Pending"
-          : "Failed",
+            ? "Pending"
+            : "Failed",
       transactionData: {
         from:
           `${planProperties?.user?.first_name} ${planProperties?.user?.last_name}` ||
@@ -150,8 +213,8 @@ export default function ContractInvoice() {
           transaction.status === 1
             ? "Completed"
             : transaction.status === 0
-            ? "Pending"
-            : "Failed",
+              ? "Pending"
+              : "Failed",
         bankIcon: "/bank-icon.svg",
         property: {
           name:
@@ -195,7 +258,7 @@ export default function ContractInvoice() {
     features: planProperties?.property?.features || [],
   };
   const { loading: documentUploadLoading } = useSelector(
-    (state: RootState) => state.contractDocuments
+    (state: RootState) => state.contractDocuments,
   );
 
   const handleSubmit = async (values: {
@@ -227,7 +290,7 @@ export default function ContractInvoice() {
       };
 
       const resultAction = await dispatch(
-        createContractDocumentsThunk(payload)
+        createContractDocumentsThunk(payload),
       );
 
       if (createContractDocumentsThunk.fulfilled.match(resultAction)) {
@@ -236,7 +299,7 @@ export default function ContractInvoice() {
         toast.success(
           hasContractDocuments
             ? "Documents updated successfully!"
-            : "Documents uploaded successfully!"
+            : "Documents uploaded successfully!",
         );
       }
     } catch (error) {
@@ -246,7 +309,7 @@ export default function ContractInvoice() {
   };
   const [showContractModal, setShowContractModal] = useState(false);
   const { contract, loading: contractLoading } = useSelector(
-    (state: RootState) => state.contractForm
+    (state: RootState) => state.contractForm,
   );
   useEffect(() => {
     if (planProperties?.contract_id) {
@@ -257,7 +320,7 @@ export default function ContractInvoice() {
   // Calculate pagination
   const paginatedPayments = formatTransactions().slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const pagination = {
@@ -294,9 +357,6 @@ export default function ContractInvoice() {
   return (
     <>
       <div className="relative w-full pb-[30px]">
-        {/* <button className='absolute lg:top-32 md:top-56 top-48 lg:right-20 right-9 text-xs border-2 border-[#79B833] p-2 rounded-full text-[#79B833] font-bold' onClick={() => setShowContractModal(true)} >
-          View Purchase Form
-        </button> */}
         <Header
           viewForm={true}
           title="Contracts"
@@ -308,6 +368,27 @@ export default function ContractInvoice() {
           handleViewPurchaseFormClick={() => setShowContractModal(true)}
         />
       </div>
+
+      {/* Document Action Buttons */}
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-6">
+        <div className="flex gap-4 flex-wrap">
+          <button
+            onClick={handleManageDocuments}
+            className="px-6 py-2 bg-[#79B833] text-white rounded-[30px] hover:bg-[#68a32b] transition-colors flex items-center gap-2"
+          >
+            <RiFolderCheckFill size={18} />
+            Manage Documents
+          </button>
+          <button
+            onClick={handleOpenContractForm}
+            className="px-6 py-2 bg-black/80  text-white rounded-[30px]  transition-colors flex items-center gap-2"
+          >
+            <RiFolderCheckFill size={18} />
+            Contract Documents Form
+          </button>
+        </div>
+      </div>
+
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] space-y-[30px] pb-[52px]">
         {hasContractDocuments && (
           <div className="flex items-center  mb-6">
@@ -315,7 +396,6 @@ export default function ContractInvoice() {
             <input
               type="checkbox"
               id="confirmCheckbox"
-              // value={isChecked}
               className="
                             mr-3
                             appearance-none inline-block w-6 h-6 border-2 border-gray-300 rounded-md
@@ -356,35 +436,6 @@ export default function ContractInvoice() {
           jointType={contract?.contract_business_type === "Joint"}
           unique_contract_id={contract?.unique_contract_id ?? "N/A"}
         />
-        {/* {hasContractDocuments && ( */}
-        {/* <div className="relative">
-            <div
-              className="absolute top-6 right-6 font-[350] text-[#79B833] md:flex items-center hidden"
-              onClick={() => setShowDocumentsModal(true)}
-            >
-              <RiFolderCheckFill size={20} className="mr-2" />
-              list of Documents
-            </div>
-            <div className="absolute top-16 right-6 font-[350] items-center md:flex hidden">
-              Click to view
-            </div>
-            <div className="absolute top-6 right-6 font-[350] items-center md:hidden flex">
-              view Documents
-            </div>
-            <ProfileCard
-              imageUrl={planProperties.user?.profile_picture || "/unknown.png"}
-              name={`${planProperties.user?.first_name} ${planProperties.user?.last_name}`}
-              dateJoined={new Date(
-                planProperties.user?.created_at
-              ).toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-              customerId={planProperties.user?.referral_code}
-            />
-          </div> */}
-        {/* )} */}
 
         <InvoiceCard
           other={
@@ -419,7 +470,7 @@ export default function ContractInvoice() {
             name: planProperties.property?.name || "Property",
             address: `${planProperties.property?.lga}, ${planProperties.property?.state}`,
             image: planProperties.property?.display_image || "/land.svg",
-            size: planProperties.property?.size || "N/A",
+            size: planProperties.purchased_property_size || "N/A",
             features: planProperties.property?.features || [],
             type: getPropertyType(planProperties.property_type),
           }}
@@ -466,100 +517,112 @@ export default function ContractInvoice() {
           </div>
         </ReusableTable>
 
-       {isModalOpen && (
-  <div className="fixed inset-0 bg-[#00000066] bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-    <div className="rounded-lg sm:rounded-[30px] bg-white p-3 sm:p-6 w-full max-w-full min-w-0 md:min-w-[800px] max-h-[90vh] overflow-y-auto">
-      <div className="flex justify-between items-center mb-3 sm:mb-4">
-        <h2 className="text-lg sm:text-xl font-bold">
-          Payment Schedule
-        </h2>
-        <button
-          onClick={() => setIsModalOpen(false)}
-          className="text-[#767676] hover:text-dark text-sm sm:text-base"
-        >
-          Close
-        </button>
-      </div>
-
-      {/* Empty state handling */}
-      {!data || data.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
-          <div className="text-[#767676] mb-4">
-            <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg sm:text-xl font-semibold text-dark mb-2">
-            No Payment Schedule
-          </h3>
-          <p className="text-sm sm:text-base text-[#767676] max-w-md">
-            There are no payments scheduled at the moment. Payments will appear here once they are available.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-2 sm:space-y-4">
-          {data.map((item, index) => {
-            const status = statusMap[item.status];
-            const style = statusStyles[status];
-            const bgColor = index % 2 === 0 ? "bg-white" : "bg-[#F5F5F5]";
-
-            return (
-              <div
-                key={item.id}
-                className={`rounded-lg sm:rounded-[30px] ${bgColor} p-3 sm:p-6`}
-              >
-                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 w-full items-center">
-                  <div className="min-w-0 col-span-1 xs:col-span-2 sm:col-span-1">
-                    <p className="text-sm sm:text-base font-[325] text-dark truncate">
-                      Payment {item.property?.name || "Property"}
-                    </p>
-                    <p className="font-[400] text-xs sm:text-sm text-[#767676] truncate">
-                      Payment #{item.id}
-                    </p>
-                  </div>
-
-                  <div className="flex justify-start sm:justify-center col-span-1">
-                    <button
-                      className={`text-xs sm:text-sm font-[400] ${style.text} ${style.bg} border ${style.border} py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap`}
-                    >
-                      {status}
-                    </button>
-                  </div>
-
-                  <p className="text-dark font-bold text-sm sm:text-base text-left sm:text-right col-span-1 truncate">
-                    ₦{item.amount.toLocaleString()}
-                  </p>
-
-                  <div className="flex justify-start sm:justify-end col-span-1">
-                    {status === "Rejected" ? (
-                      <button className="text-xs sm:text-sm font-[400] text-white bg-[#272727] py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap">
-                        Mark Paid
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {}}
-                        className="text-xs sm:text-sm font-[400] text-[#767676] bg-transparent py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap hover:bg-[#EAEAEA]"
-                      >
-                        {new Date(item.due_date).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </div>
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-[#00000066] bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+            <div className="rounded-lg sm:rounded-[30px] bg-white p-3 sm:p-6 w-full max-w-full min-w-0 md:min-w-[800px] max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-3 sm:mb-4">
+                <h2 className="text-lg sm:text-xl font-bold">
+                  Payment Schedule
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-[#767676] hover:text-dark text-sm sm:text-base"
+                >
+                  Close
+                </button>
               </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  </div>
-)}
+
+              {/* Empty state handling */}
+              {!data || data.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
+                  <div className="text-[#767676] mb-4">
+                    <svg
+                      className="w-12 h-12 sm:w-16 sm:h-16 mx-auto"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-dark mb-2">
+                    No Payment Schedule
+                  </h3>
+                  <p className="text-sm sm:text-base text-[#767676] max-w-md">
+                    There are no payments scheduled at the moment. Payments will
+                    appear here once they are available.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 sm:space-y-4">
+                  {data.map((item, index) => {
+                    const status = statusMap[item.status];
+                    const style = statusStyles[status];
+                    const bgColor =
+                      index % 2 === 0 ? "bg-white" : "bg-[#F5F5F5]";
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={`rounded-lg sm:rounded-[30px] ${bgColor} p-3 sm:p-6`}
+                      >
+                        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 w-full items-center">
+                          <div className="min-w-0 col-span-1 xs:col-span-2 sm:col-span-1">
+                            <p className="text-sm sm:text-base font-[325] text-dark truncate">
+                              Payment {item.property?.name || "Property"}
+                            </p>
+                            <p className="font-[400] text-xs sm:text-sm text-[#767676] truncate">
+                              Payment #{item.id}
+                            </p>
+                          </div>
+
+                          <div className="flex justify-start sm:justify-center col-span-1">
+                            <button
+                              className={`text-xs sm:text-sm font-[400] ${style.text} ${style.bg} border ${style.border} py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap`}
+                            >
+                              {status}
+                            </button>
+                          </div>
+
+                          <p className="text-dark font-bold text-sm sm:text-base text-left sm:text-right col-span-1 truncate">
+                            ₦{item.amount.toLocaleString()}
+                          </p>
+
+                          <div className="flex justify-start sm:justify-end col-span-1">
+                            {status === "Rejected" ? (
+                              <button className="text-xs sm:text-sm font-[400] text-white bg-[#272727] py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap">
+                                Mark Paid
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => {}}
+                                className="text-xs sm:text-sm font-[400] text-[#767676] bg-transparent py-2 sm:py-[11px] rounded-[20px] sm:rounded-[30px] px-3 sm:px-6 whitespace-nowrap hover:bg-[#EAEAEA]"
+                              >
+                                {new Date(item.due_date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       <>
         {isAllocationModalOpen && (
@@ -592,6 +655,77 @@ export default function ContractInvoice() {
             isLoading={documentUploadLoading}
             isEditMode={hasContractDocuments}
           />
+        )}
+
+        {/* Document Manager Modal */}
+        {showDocumentsManager && plan_id && (
+          <div className="fixed inset-0 bg-black/10 bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-[30px] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Manage Documents
+                </h2>
+                <button
+                  onClick={() => setShowDocumentsManager(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-6">
+                <ContractDocumentsPage planId={parseInt(plan_id)} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Contract Documents Form Modal */}
+        {showContractForm && plan_id && (
+          <div className="fixed inset-0 bg-black/10 bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-[30px] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky z-40 top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                <h1 className="text-2xl font-bold mb-6">
+                  Contract Documents Manager
+                </h1>
+                <button
+                  onClick={() => setShowContractForm(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-6">
+                <div>
+                  <ContractDocumentsForm
+                    ref={formRef}
+                    planId={plan_id}
+                    onSuccess={handleSuccess}
+                    onError={handleError}
+                    initialDocuments={[]}
+                  />
+                </div>
+                <div className="mt-6 w-full sticky bottom-0 bg-white p-4 ">
+                  <div className="mt-6 flex gap-4 w-[60%] justify-end ml-auto">
+                    <button
+                      onClick={handleFormSubmit}
+                      disabled={isSubmitting}
+                      className="bg-[#79B833] border-2 rounded-[30px] w-full text-white text-base font-semibold border-[#79B833] disabled:opacity-50 disabled:cursor-not-allowed py-2 px-6 transition duration-300"
+                    >
+                      {isSubmitting ? "Processing..." : "Submit"}
+                    </button>
+
+                    {/* <button
+            onClick={() => formRef.current?.resetForm()}
+            disabled={isSubmitting}
+            className="w-full text-[#79B833] border-2 rounded-[30px] border-[#79B833] bg-transparent text-base font-semibold py-2 px-6 transition duration-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Reset
+          </button> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </>
     </>

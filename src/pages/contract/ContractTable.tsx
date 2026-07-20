@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../components/Tables/Pagination";
 import { formatAsNaira } from "../../utils/formatcurrency";
-// import { formatDateTime } from "../../utils/formatDateTime"; // Import the new utility
 import {
   fetchContracts,
   singleContract,
@@ -16,12 +15,20 @@ import {
   UpdateContractPayload,
 } from "../../components/Redux/UpdateContract/UpdateContract";
 import { formatDateTime } from "../../utils/date";
+import {
+  createSubscriber,
+  resetSubscriberState,
+} from "../../components/Redux/subscriberSlice/subscriberSlice";
+import { toast } from "react-toastify";
+// import { createSubscriber, resetSubscriberState } from "../../components/Redux/Subscriber/subscriberSlice"; // Import the subscriber action
 
 export interface Contract {
   id: number;
   contract_id: string | null;
   user_id: any;
   property_id: any;
+  payment_id: any;
+  prospect_id: any;
   property: {
     name: string;
     type: number;
@@ -82,12 +89,18 @@ export default function ContractsTableComponent({
   const navigation = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { loading: updateContractLoading } = useSelector(
-    (state: RootState) => state.contract
+    (state: RootState) => state.contract,
+  );
+  const { loading: subscriberLoading } = useSelector(
+    (state: RootState) => state.subscriber,
   );
   const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [selectedContractForInput, setSelectedContractForInput] =
     useState<Contract | null>(null);
+  const [subscribingContractId, setSubscribingContractId] = useState<
+    number | null
+  >(null);
 
   const handleSubmit = async (values: {
     customerCode: any;
@@ -105,14 +118,14 @@ export default function ContractsTableComponent({
 
       try {
         await dispatch(
-          updateContract({ contractId: contractIdToUpdate, data: updateData })
+          updateContract({ contractId: contractIdToUpdate, data: updateData }),
         ).unwrap();
         await dispatch(
           fetchContracts({
             page: page,
             contract: contract,
             status: statuss,
-          })
+          }),
         );
       } catch (error) {
         console.error("Failed to update contract:", error);
@@ -128,6 +141,48 @@ export default function ContractsTableComponent({
   const handleInputCodeClick = (contract: Contract) => {
     setSelectedContractForInput(contract);
     setShowModal(true);
+  };
+
+  const handleCreateSubscriber = async (contract: Contract) => {
+    // You'll need to determine the payment_id and plan_id from your contract data
+    // This is an example - adjust based on your actual data structure
+    const paymentId = contract.id; // or contract.payment_id if available
+    const planId = contract.payment_id 
+
+    setSubscribingContractId(contract.id);
+
+    try {
+      const result = await dispatch(
+        createSubscriber({
+          payment_id: planId,
+          plan_id: paymentId,
+        }),
+      ).unwrap();
+
+      if (result.success) {
+        // Show success message (you might want to add a toast notification here)
+        console.log("Subscriber created successfully:", result.message);
+        toast.success(result.message || "Subscriber created successfully!");
+
+        // Refresh the contracts list if needed
+        await dispatch(
+          fetchContracts({
+            page: page,
+            // contract: contract,
+            status: statuss,
+          }),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to create subscriber:", error);
+      toast.error("Failed to create subscriber. Please try again.");
+    } finally {
+      setSubscribingContractId(null);
+      // Reset subscriber state after 3 seconds
+      setTimeout(() => {
+        dispatch(resetSubscriberState());
+      }, 3000);
+    }
   };
 
   const getStatusBadgeClass = (status: number) => {
@@ -174,7 +229,7 @@ export default function ContractsTableComponent({
                 <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] pr-[40px] whitespace-nowrap max-w-[120px]">
                   Time
                 </th>
-                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] whitespace-nowrap max-w-[200px] text-center">
+                <th className="pb-[23px] font-gotham font-[325] text-[#757575] text-[12px] whitespace-nowrap max-w-[250px] text-center">
                   Action
                 </th>
               </tr>
@@ -182,6 +237,8 @@ export default function ContractsTableComponent({
             <tbody>
               {data.map((contract, index) => {
                 const { date, time } = formatDateTime(contract.created_at);
+                const isSubscribing = subscribingContractId === contract.id;
+
                 return (
                   <tr
                     key={contract.id}
@@ -199,8 +256,8 @@ export default function ContractsTableComponent({
                         const basePath = path.startsWith("/payments/contracts")
                           ? "/payments/customers"
                           : path.startsWith("/client/contracts")
-                          ? "/client/customers"
-                          : "/customers";
+                            ? "/client/customers"
+                            : "/customers";
 
                         navigation(`${basePath}/${contract.user.id}`);
                       }}
@@ -270,21 +327,21 @@ export default function ContractsTableComponent({
                     <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[120px] truncate pr-4">
                       {time}
                     </td>
-                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm max-w-[200px] overflow-x-auto truncate relative group text-center">
+                    <td className="pb-[31px] font-gotham font-[325] text-dark text-sm overflow-x-auto truncate relative group text-center">
                       <div className="flex items-center justify-center space-x-2">
                         <button
                           onClick={() => {
                             const path = location.pathname;
                             const basePath = path.startsWith(
-                              "/payments/contracts"
+                              "/payments/contracts",
                             )
                               ? "/payments/contracts/details"
                               : path.startsWith("/client/contracts")
-                              ? "/client/contracts/details"
-                              : "/contracts/details";
+                                ? "/client/contracts/details"
+                                : "/contracts/details";
 
                             navigation(
-                              `${basePath}/${contract.user_id}/${contract.id}`
+                              `${basePath}/${contract.user_id}/${contract.id}`,
                             );
                           }}
                           className="bg-[#272727] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-gray-800 transition-colors whitespace-nowrap"
@@ -294,7 +351,7 @@ export default function ContractsTableComponent({
                         </button>
                         <button
                           onClick={() => handleInputCodeClick(contract)}
-                          className="bg-[#6B9F4B] cursor-pointer text-white px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-[#5C8C3C] transition-colors whitespace-nowrap"
+                          className="bg-[#6B9F4B] cursor-pointer text-white border px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-white hover:text-[#6B9F4B]! hover:border-[#6B9F4B]!  transition-colors whitespace-nowrap"
                           aria-label="Input code for contract"
                           disabled={updateContractLoading}
                         >
@@ -303,6 +360,19 @@ export default function ContractsTableComponent({
                             contract.contract_id
                             ? "Processing..."
                             : "Input Code"}
+                        </button>
+                        <button
+                          onClick={() => handleCreateSubscriber(contract)}
+                          className="bg-white border border-[#6B9F4B] cursor-pointer text-[#6B9F4B] px-2 py-2 rounded-full xl:text-xs text-xs font-[350] hover:bg-[#6B9F4B]! hover:text-white transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-[#6B9F4B]"
+                          aria-label="Create subscriber"
+                          disabled={
+                            (subscriberLoading && isSubscribing) ||
+                            contract?.prospect_id !== null
+                          }
+                        >
+                          {subscriberLoading && isSubscribing
+                            ? "Creating..."
+                            : "Create Subscriber"}
                         </button>
                       </div>
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 min-w-max">

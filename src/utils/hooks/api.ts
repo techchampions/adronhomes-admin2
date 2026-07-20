@@ -352,9 +352,14 @@ export const getPropertyRequest = async (
 };
 //Get Requests for Property by ID
 export const getPropertyRequestByID = async (
-  id: number
+  id: number,
+  page?: number,
 ): Promise<PropertyByIdRequestsResponse> => {
-  const response = await adronApi.get(`/admin/properties/${id}/requests`);
+  const response = await adronApi.get(`/admin/properties/${id}/requests`,{
+    params: {
+      page: page,
+    }
+  });
   return response.data;
 };
 
@@ -394,8 +399,12 @@ export const getCustomers = async (
 };
 // GET CUSTOMERS
 export const getCustomersAndProperties =
-  async (): Promise<UsersAndPropertiesResponse> => {
-    const res = await adminApi.get(`/users-and-properties`);
+  async (params?:{
+    search?: string;
+  }): Promise<UsersAndPropertiesResponse> => {
+    const res = await adminApi.get(`/users-and-properties`,{
+      params: params,
+    });
     return res.data;
   };
 

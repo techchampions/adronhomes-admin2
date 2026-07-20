@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import UsersTableComponent from "./Personnel_Table";
@@ -12,6 +12,8 @@ import {
   setPersonnelSearch,
   setCurrentPage,
 } from "../../components/Redux/personnel/personnel_slice";
+import ExportPersonnelModal from "../../components/exportModal/PersonnelExport";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 const getRoleName = (roleId: number): string => {
   switch (roleId) {
@@ -37,17 +39,32 @@ const getRoleName = (roleId: number): string => {
       return "Unknown";
   }
 };
-
+const roles: string[] = [
+  "All",
+  "Admin",
+  "Marketer",
+  "Director",
+  "Accountant",
+  "HR",
+  "Legal",
+  "Info Tech",
+  "Client service",
+];
 export default function Personnel() {
   const tabs = ["All"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
-
+  const PersonnelModalRef = useRef<ExportModalRef>(null);
+  const openPersonnelModal = () => {
+    if (PersonnelModalRef.current) {
+      PersonnelModalRef.current.openModal();
+    }
+  };
   const dispatch = useDispatch<AppDispatch>();
   const { data, error, loading, search, pagination } = useSelector(
-    (state: RootState) => state.getpersonnel
+    (state: RootState) => state.getpersonnel,
   );
 
-  const { option } = useContext(PropertyContext)!;
+  const { option, setOption } = useContext(PropertyContext)!;
 
   // Fetch data on mount, and when search or role changes
   useEffect(() => {
@@ -58,10 +75,10 @@ export default function Personnel() {
     dispatch(setPersonnelSearch(term)); // Resets page to 1 inside reducer
     dispatch(personnels({ role: option.value, search: term }));
   };
-  useEffect(()=>{
- dispatch(setPersonnelSearch(''))
-   dispatch(personnels({ role: option.value, search: "" }));
-  },[dispatch])
+  useEffect(() => {
+    dispatch(setPersonnelSearch(""));
+    dispatch(personnels({ role: option.value, search: "" }));
+  }, [dispatch]);
 
   const personnelData = (): any[] => {
     if (!data?.data) return [];
@@ -88,6 +105,10 @@ export default function Personnel() {
       <Header
         title="Personnel"
         subtitle="Manage the list of personnel and their access"
+          //  onButtonClick={}
+           personel={true}
+           Personnel_Text="Export"
+           onPersonelButtonClick={()=>{openPersonnelModal()}}
       />
 
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] relative">
@@ -97,6 +118,19 @@ export default function Personnel() {
           onTabChange={setActiveTab}
           searchPlaceholder="Search for personnel"
           onSearch={handleSearch}
+          sortOptions={roles.map((role, index) => ({
+            value: index,
+            name: role,
+          }))}
+          defaultSort={roles.findIndex((role) => role === role[0]) || 0}
+          sort={true}
+          showTabs={true}
+          showSearchandSort={true}
+          onSortChange={(sortOption) => {
+            setOption(sortOption);
+          }}
+          // showResetButton={false}
+        
         >
           {loading ? (
             <div className="w-full flex items-center justify-center">
@@ -114,6 +148,7 @@ export default function Personnel() {
           )}
         </ReusableTable>
       </div>
+       <ExportPersonnelModal ref={PersonnelModalRef} />
     </div>
   );
 }

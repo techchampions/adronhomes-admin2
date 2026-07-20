@@ -306,7 +306,6 @@ export default function MarketerInvoice() {
           onButtonClick={() => setShowModal(true)}
           showSearchAndButton={false}
 
-        
           // handleViewPurchaseFormClick={() => setShowContractModal(true)}
         />
       </div>
@@ -421,7 +420,7 @@ export default function MarketerInvoice() {
             name: planProperties.property?.name || "Property",
             address: `${planProperties.property?.lga}, ${planProperties.property?.state}`,
             image: planProperties.property?.display_image || "/land.svg",
-            size: planProperties.property?.size || "N/A",
+            size: planProperties.purchased_property_size || "N/A",
             features: planProperties.property?.features || [],
             type: getPropertyType(planProperties.property_type),
           }}
@@ -532,7 +531,7 @@ export default function MarketerInvoice() {
                                   month: "short",
                                   day: "numeric",
                                   year: "numeric",
-                                }
+                                },
                               )}
                             </button>
                           )}

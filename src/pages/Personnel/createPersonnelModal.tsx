@@ -25,6 +25,7 @@ interface PersonnelFormValues {
   role: string;
   email: string;
   password: string;
+  erp_id: string;
 }
 
 const roleOptions = [
@@ -61,12 +62,12 @@ export default function PersonnelModal({
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, success } = useSelector(
-    (state: RootState) => state.Createpersonnel
+    (state: RootState) => state.Createpersonnel,
   );
 
   const handleSubmit = async (
     values: PersonnelFormValues,
-    { setSubmitting }: FormikHelpers<PersonnelFormValues>
+    { setSubmitting }: FormikHelpers<PersonnelFormValues>,
   ) => {
     const formData = new FormData();
 
@@ -77,10 +78,11 @@ export default function PersonnelModal({
     formData.append("role", values.role);
     formData.append("email", values.email);
     formData.append("password", values.password);
+     formData.append("erp_id", values.erp_id);
 
     try {
       const resultAction = await dispatch(
-        CreatePersonnel({ credentials: formData })
+        CreatePersonnel({ credentials: formData }),
       );
 
       if (CreatePersonnel.fulfilled.match(resultAction)) {
@@ -129,121 +131,133 @@ export default function PersonnelModal({
             role: "",
             email: "",
             password: "",
+            erp_id: "",
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ errors, touched, handleChange, values }) => (
             <Form>
-              <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 mb-2 sm:mb-3 md:mb-4">
-                <div className="mb-1 xs:mb-0">
-                  <InputField
-                    label="First Name"
-                    placeholder="First name"
-                    value={values.firstName}
-                    onChange={handleChange}
-                    name="firstName"
-                    error={touched.firstName && errors.firstName}
-                    required
-                  />
-                </div>
-                <div>
-                  <InputField
-                    label="Last Name"
-                    placeholder="Last name"
-                    value={values.lastName}
-                    onChange={handleChange}
-                    name="lastName"
-                    error={touched.lastName && errors.lastName}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <InputField
-                  label="Phone Number"
-                  placeholder="Phone number"
-                  value={values.phoneNumber}
-                  onChange={handleChange}
-                  name="phoneNumber"
-                  type="tel"
-                  error={touched.phoneNumber && errors.phoneNumber}
-                  required
-                />
-              </div>
-
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <EnhancedOptionInputField
-                  label="Role"
-                  placeholder="Select role"
-                  value={values.role}
-                  onChange={(value) => {
-                    handleChange({
-                      target: {
-                        name: "role",
-                        value,
-                      },
-                    } as any);
-                  }}
-                  name="role"
-                  error={touched.role && errors.role}
-                  options={roleOptions}
-                  dropdownTitle="Select Role"
-                />
-
-                <div className="flex items-start mt-1 text-[#767676] font-light text-[10px] xs:text-xs">
-                  <div className="rounded-full bg-gray-200 p-0.5 mr-1 mt-0.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-2.5 w-2.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+              <div className="w-full h-[60vh]  overflow-scroll ">
+                <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 mb-2 sm:mb-3 md:mb-4">
+                  <div className="mb-1 xs:mb-0">
+                    <InputField
+                      label="First Name"
+                      placeholder="First name"
+                      value={values.firstName}
+                      onChange={handleChange}
+                      name="firstName"
+                      error={touched.firstName && errors.firstName}
+                      required
+                    />
                   </div>
-                  <span>
-                    Personnel role dictates the operation permission they have
-                    on the admin dashboard.
-                  </span>
+                  <div>
+                    <InputField
+                      label="Last Name"
+                      placeholder="Last name"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      name="lastName"
+                      error={touched.lastName && errors.lastName}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="mb-2 sm:mb-3 md:mb-4">
-                <InputField
-                  label="Email"
-                  placeholder="Email"
-                  value={values.email}
-                  onChange={handleChange}
-                  name="email"
-                  type="email"
-                  error={touched.email && errors.email}
-                  required
-                />
-              </div>
-
-              <div className="mb-3 sm:mb-4">
-                <div className="relative">
+                <div className="mb-2 sm:mb-3 md:mb-4">
                   <InputField
-                    label="Password"
-                    placeholder="Password"
-                    value={values.password}
+                    label="Phone Number"
+                    placeholder="Phone number"
+                    value={values.phoneNumber}
                     onChange={handleChange}
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    error={touched.password && errors.password}
+                    name="phoneNumber"
+                    type="tel"
+                    error={touched.phoneNumber && errors.phoneNumber}
                     required
                   />
                 </div>
-              </div>
 
+                  <div className="mb-2 sm:mb-3 md:mb-4">
+                  <InputField
+                    label="Erp Identification number"
+                    placeholder="Erp Identification number"
+                    value={values.erp_id}
+                    onChange={handleChange}
+                    name="erp_id"
+                  />
+                </div>
+
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <EnhancedOptionInputField
+                    label="Role"
+                    placeholder="Select role"
+                    value={values.role}
+                    onChange={(value) => {
+                      handleChange({
+                        target: {
+                          name: "role",
+                          value,
+                        },
+                      } as any);
+                    }}
+                    name="role"
+                    error={touched.role && errors.role}
+                    options={roleOptions}
+                    dropdownTitle="Select Role"
+                  />
+
+                  <div className="flex items-start mt-1 text-[#767676] font-light text-[10px] xs:text-xs">
+                    <div className="rounded-full bg-gray-200 p-0.5 mr-1 mt-0.5">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-2.5 w-2.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span>
+                      Personnel role dictates the operation permission they have
+                      on the admin dashboard.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-2 sm:mb-3 md:mb-4">
+                  <InputField
+                    label="Email"
+                    placeholder="Email"
+                    value={values.email}
+                    onChange={handleChange}
+                    name="email"
+                    type="email"
+                    error={touched.email && errors.email}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3 sm:mb-4">
+                  <div className="relative">
+                    <InputField
+                      label="Password"
+                      placeholder="Password"
+                      value={values.password}
+                      onChange={handleChange}
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      error={touched.password && errors.password}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="flex justify-between items-center gap-2 mt-[50px]">
                 <button
                   type="button"
