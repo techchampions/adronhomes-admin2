@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -19,6 +20,7 @@ import AddEstateModal from "./AddEstateModal";
 
 export default function Estate() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const estates = useSelector(selectAllEstatesData);
   const metrics = useSelector(selectAllEstatesMetrics);
   const loading = useSelector(selectAllEstatesLoading);
@@ -50,6 +52,29 @@ export default function Estate() {
         buttonText="Add Estate Community"
         onButtonClick={() => setShowAddEstateModal(true)}
       />
+
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[24px]">
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => navigate("/estate-maintenance")}
+            className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+          >
+            Estate Maintenance
+          </button>
+          <button
+            onClick={() => navigate("/estate-security-codes")}
+            className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+          >
+            Estate Security Codes
+          </button>
+          <button
+            onClick={() => navigate("/estate-utility-payments")}
+            className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+          >
+            Estate Utility Payments
+          </button>
+        </div>
+      </div>
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
