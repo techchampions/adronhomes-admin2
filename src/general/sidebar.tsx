@@ -25,6 +25,7 @@ const navItems = [
   { label: "Properties", icon: Icon5, path: "/properties" },
   { label: "Estate Communities", icon: EstateCommunitiesIcon, path: "/estates" },
   { label: "Promotions", icon: IconGift, path: "/promotions" },
+  { label: "Pickup Vendors", icon: PickupVendorIcon, path: "/promotions/vendors" },
   {
     label: "Client Partnership",
     icon: Icon7,
