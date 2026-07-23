@@ -9,26 +9,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../components/Redux/store";
 import { Icon1, Icon2, Icon3, Icon7, Icon5, Icon6, Icon8, Icon9, IconGift } from "./icon";
-import { FaBolt, FaBuilding, FaShieldAlt, FaStore, FaTools } from "react-icons/fa";
+import { FaBuilding } from "react-icons/fa";
 
 const EstateCommunitiesIcon = ({ isActive }: { isActive: boolean }) => (
   <FaBuilding className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
-);
-
-const EstateMaintenanceIcon = ({ isActive }: { isActive: boolean }) => (
-  <FaTools className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
-);
-
-const EstateSecurityIcon = ({ isActive }: { isActive: boolean }) => (
-  <FaShieldAlt className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
-);
-
-const EstateUtilityIcon = ({ isActive }: { isActive: boolean }) => (
-  <FaBolt className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
-);
-
-const PickupVendorIcon = ({ isActive }: { isActive: boolean }) => (
-  <FaStore className={`h-5 w-5 ${isActive ? "text-[#79B833]" : "text-[#767676]"}`} />
 );
 
 const navItems = [
@@ -40,11 +24,7 @@ const navItems = [
   { label: "Contract Payments", icon: Icon7, path: "/contract-payments" },
   { label: "Properties", icon: Icon5, path: "/properties" },
   { label: "Estate Communities", icon: EstateCommunitiesIcon, path: "/estates" },
-  { label: "Estate Maintenance", icon: EstateMaintenanceIcon, path: "/estate-maintenance" },
-  { label: "Estate Security Codes", icon: EstateSecurityIcon, path: "/estate-security-codes" },
-  { label: "Estate Utility Payments", icon: EstateUtilityIcon, path: "/estate-utility-payments" },
   { label: "Promotions", icon: IconGift, path: "/promotions" },
-  { label: "Pickup Vendors", icon: PickupVendorIcon, path: "/promotions/vendors" },
   {
     label: "Client Partnership",
     icon: Icon7,

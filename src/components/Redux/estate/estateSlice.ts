@@ -9,6 +9,7 @@ import {
   fetchEstateSecurityCodes,
   fetchEstateUtilityPayments,
   fetchSingleUserEstateInfo,
+  exportEstateSecurityCodes,
   markCommunityMessagesAsRead,
   markEstateChatAsRead,
   sendCommunityMessage,
@@ -104,6 +105,12 @@ interface EstateState {
     pagination: typeof defaultPagination;
   };
 
+  securityCodesExport: {
+    success: boolean;
+    downloadUrl: string | null;
+    lastExportDate: string | null;
+  };
+
   utilityPayments: {
     data: UtilityPayment[];
     stats: Record<string, any> | null;
@@ -123,6 +130,7 @@ interface EstateState {
     communityMessageSend: boolean;
     maintenanceRequests: boolean;
     securityCodes: boolean;
+    securityCodesExport: boolean;
     utilityPayments: boolean;
     maintenanceUpdate: boolean;
   };
@@ -137,6 +145,7 @@ interface EstateState {
     communityMessageSend: string | null;
     maintenanceRequests: string | null;
     securityCodes: string | null;
+    securityCodesExport: string | null;
     utilityPayments: string | null;
     maintenanceUpdate: string | null;
   };
@@ -180,6 +189,11 @@ const initialState: EstateState = {
     stats: null,
     pagination: defaultPagination,
   },
+  securityCodesExport: {
+    success: false,
+    downloadUrl: null,
+    lastExportDate: null,
+  },
   utilityPayments: {
     data: [],
     stats: null,
@@ -195,6 +209,7 @@ const initialState: EstateState = {
     communityMessageSend: false,
     maintenanceRequests: false,
     securityCodes: false,
+    securityCodesExport: false,
     utilityPayments: false,
     maintenanceUpdate: false,
   },
@@ -207,6 +222,7 @@ const initialState: EstateState = {
     communityMessageSend: null,
     maintenanceRequests: null,
     securityCodes: null,
+    securityCodesExport: null,
     utilityPayments: null,
     maintenanceUpdate: null,
   },
@@ -259,6 +275,17 @@ const estateSlice = createSlice({
     },
     setUtilityPaymentsCurrentPage: (state, action: PayloadAction<number>) => {
       state.utilityPayments.pagination.currentPage = action.payload;
+    },
+    resetSecurityCodesExportState: (state) => {
+      state.loading.securityCodesExport = false;
+      state.error.securityCodesExport = null;
+      state.securityCodesExport.success = false;
+      state.securityCodesExport.downloadUrl = null;
+      state.securityCodesExport.lastExportDate = null;
+    },
+    clearSecurityCodesExportDownloadUrl: (state) => {
+      state.securityCodesExport.downloadUrl = null;
+      state.securityCodesExport.success = false;
     },
     updateEstateUser: (state, action: PayloadAction<EstateUser>) => {
       const index = state.estateUsers.data.findIndex(
@@ -510,6 +537,26 @@ const estateSlice = createSlice({
         state.error.securityCodes =
           action.payload?.message || "Failed to fetch security codes";
       })
+      .addCase(exportEstateSecurityCodes.pending, (state) => {
+        state.loading.securityCodesExport = true;
+        state.error.securityCodesExport = null;
+        state.securityCodesExport.success = false;
+        state.securityCodesExport.downloadUrl = null;
+      })
+      .addCase(exportEstateSecurityCodes.fulfilled, (state, action) => {
+        state.loading.securityCodesExport = false;
+        state.securityCodesExport.success = true;
+        state.securityCodesExport.downloadUrl =
+          action.payload.download_url || action.payload.url;
+        state.securityCodesExport.lastExportDate =
+          action.payload.date_range?.end || new Date().toISOString();
+      })
+      .addCase(exportEstateSecurityCodes.rejected, (state, action) => {
+        state.loading.securityCodesExport = false;
+        state.securityCodesExport.success = false;
+        state.error.securityCodesExport =
+          action.payload?.message || "Failed to export security codes";
+      })
       .addCase(fetchEstateUtilityPayments.pending, (state) => {
         state.loading.utilityPayments = true;
         state.error.utilityPayments = null;
@@ -540,6 +587,8 @@ export const {
   setMaintenanceRequestsCurrentPage,
   setSecurityCodesCurrentPage,
   setUtilityPaymentsCurrentPage,
+  resetSecurityCodesExportState,
+  clearSecurityCodesExportDownloadUrl,
   updateEstateUser,
   updateSingleUserInfo,
 } = estateSlice.actions;
@@ -617,6 +666,16 @@ export const selectSecurityCodesLoading = (state: RootState) =>
   state.estate.loading.securityCodes;
 export const selectSecurityCodesError = (state: RootState) =>
   state.estate.error.securityCodes;
+export const selectSecurityCodesExportLoading = (state: RootState) =>
+  state.estate.loading.securityCodesExport;
+export const selectSecurityCodesExportError = (state: RootState) =>
+  state.estate.error.securityCodesExport;
+export const selectSecurityCodesExportSuccess = (state: RootState) =>
+  state.estate.securityCodesExport.success;
+export const selectSecurityCodesExportDownloadUrl = (state: RootState) =>
+  state.estate.securityCodesExport.downloadUrl;
+export const selectSecurityCodesExportLastExportDate = (state: RootState) =>
+  state.estate.securityCodesExport.lastExportDate;
 export const selectUtilityPaymentsData = (state: RootState) =>
   state.estate.utilityPayments.data;
 export const selectUtilityPaymentsStats = (state: RootState) =>
