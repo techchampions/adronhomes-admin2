@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  FaCopy,
   FaDownload,
   FaEdit,
   FaEnvelope,
@@ -116,6 +117,21 @@ export default function GiftVendorDetailsPage() {
     }
   };
 
+  const publicVendorLink = vendor?.store_slug
+    ? `https://adronhomes.com/vendor/${vendor.store_slug}`
+    : "";
+
+  const copyVendorLink = async () => {
+    if (!publicVendorLink) return;
+
+    try {
+      await navigator.clipboard.writeText(publicVendorLink);
+      toast.success("Vendor link copied");
+    } catch {
+      toast.error("Unable to copy vendor link");
+    }
+  };
+
   return (
     <div className="pb-[52px]">
       <Header
@@ -174,6 +190,24 @@ export default function GiftVendorDetailsPage() {
                   </p>
                 </div>
               </div>
+
+              {publicVendorLink && (
+                <div className="mt-4 rounded-xl bg-[#F6F6F8] p-4">
+                  <p className="text-xs text-[#767676]">Vendor Portal Link</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <p className="break-all text-sm font-[350] text-dark">
+                      {publicVendorLink}
+                    </p>
+                    <button
+                      onClick={copyVendorLink}
+                      className="inline-flex h-9 items-center gap-2 rounded-full bg-white px-4 text-xs font-bold text-[#79B833]"
+                    >
+                      <FaCopy className="text-xs" />
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-4 rounded-xl bg-[#F6F6F8] p-4">
                 <p className="text-xs text-[#767676]">Pickup Location</p>

@@ -1,12 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { IoArrowBackSharp } from "react-icons/io5";
+import { Download } from "lucide-react";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
+import ExportModal, {
+  ExportModalRef,
+} from "../../components/exportModal/modalexport";
 import { AppDispatch } from "../../components/Redux/store";
 import {
+  clearSecurityCodesExportDownloadUrl,
   selectMaintenanceRequestsData,
   selectMaintenanceRequestsError,
   selectMaintenanceRequestsLoading,
@@ -14,6 +21,11 @@ import {
   selectMaintenanceRequestsStats,
   selectSecurityCodesData,
   selectSecurityCodesError,
+  selectSecurityCodesExportDownloadUrl,
+  selectSecurityCodesExportError,
+  selectSecurityCodesExportLastExportDate,
+  selectSecurityCodesExportLoading,
+  selectSecurityCodesExportSuccess,
   selectSecurityCodesLoading,
   selectSecurityCodesPagination,
   selectSecurityCodesStats,
@@ -22,11 +34,13 @@ import {
   selectUtilityPaymentsLoading,
   selectUtilityPaymentsPagination,
   selectUtilityPaymentsStats,
+  resetSecurityCodesExportState,
   setMaintenanceRequestsCurrentPage,
   setSecurityCodesCurrentPage,
   setUtilityPaymentsCurrentPage,
 } from "../../components/Redux/estate/estateSlice";
 import {
+  exportEstateSecurityCodes,
   fetchEstateMaintenances,
   fetchEstateSecurityCodes,
   fetchEstateUtilityPayments,
@@ -69,6 +83,8 @@ const config = {
 
 export default function EstateOperationsPage({ mode }: EstateOperationsPageProps) {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const securityExportModalRef = useRef<ExportModalRef>(null);
   const [search, setSearch] = useState("");
 
   const maintenanceRequests = useSelector(selectMaintenanceRequestsData);
@@ -82,6 +98,15 @@ export default function EstateOperationsPage({ mode }: EstateOperationsPageProps
   const securityPagination = useSelector(selectSecurityCodesPagination);
   const securityLoading = useSelector(selectSecurityCodesLoading);
   const securityError = useSelector(selectSecurityCodesError);
+  const securityExportLoading = useSelector(selectSecurityCodesExportLoading);
+  const securityExportError = useSelector(selectSecurityCodesExportError);
+  const securityExportSuccess = useSelector(selectSecurityCodesExportSuccess);
+  const securityExportDownloadUrl = useSelector(
+    selectSecurityCodesExportDownloadUrl,
+  );
+  const securityExportLastExportDate = useSelector(
+    selectSecurityCodesExportLastExportDate,
+  );
 
   const utilityPayments = useSelector(selectUtilityPaymentsData);
   const utilityStats = useSelector(selectUtilityPaymentsStats);
@@ -168,6 +193,16 @@ export default function EstateOperationsPage({ mode }: EstateOperationsPageProps
     dispatch(fetchEstateSecurityCodes({ page }));
   };
 
+  const handleSecurityExport = (startDate: string, endDate: string) => {
+    dispatch(
+      exportEstateSecurityCodes({
+        start_date: startDate,
+        end_date: endDate,
+        status: "active",
+      }),
+    );
+  };
+
   const handleUtilityPageChange = (page: number) => {
     dispatch(setUtilityPaymentsCurrentPage(page));
     dispatch(fetchEstateUtilityPayments({ page }));
@@ -234,6 +269,25 @@ export default function EstateOperationsPage({ mode }: EstateOperationsPageProps
         showSearchAndButton={false}
       />
 
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[24px] flex flex-wrap items-center gap-3">
+        <button
+          onClick={() => navigate("/estates")}
+          className="inline-flex h-11 items-center gap-2 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+        >
+          <IoArrowBackSharp className="text-base" />
+          Back to Estates
+        </button>
+        {mode === "security" && (
+          <button
+            onClick={() => securityExportModalRef.current?.openModal()}
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-[#272727] px-5 text-sm font-bold text-white hover:bg-[#101010]"
+          >
+            <Download size={16} />
+            Export Security Codes
+          </button>
+        )}
+      </div>
+
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen
           title="Total"
@@ -276,6 +330,26 @@ export default function EstateOperationsPage({ mode }: EstateOperationsPageProps
           {renderTable()}
         </ReusableTable>
       </div>
+
+      {mode === "security" && (
+        <ExportModal
+          ref={securityExportModalRef}
+          modalTitle="Export Security Codes"
+          description="Select the date range to export active estate security codes. The system will generate an Excel file for the selected period."
+          exportType="security-codes"
+          onExport={handleSecurityExport}
+          isLoading={securityExportLoading}
+          error={securityExportError}
+          success={securityExportSuccess}
+          downloadUrl={securityExportDownloadUrl}
+          lastExportDate={securityExportLastExportDate}
+          resetExportState={() => dispatch(resetSecurityCodesExportState())}
+          clearDownloadUrl={() =>
+            dispatch(clearSecurityCodesExportDownloadUrl())
+          }
+          baseUrl={import.meta.env.VITE_API_BASE_URL || ""}
+        />
+      )}
     </div>
   );
 }

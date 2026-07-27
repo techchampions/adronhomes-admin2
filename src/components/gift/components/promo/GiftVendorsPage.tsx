@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import type { MouseEvent } from "react";
 import {
   FaBuilding,
+  FaCopy,
   FaEnvelope,
   FaMapMarkerAlt,
   FaPhone,
@@ -65,6 +67,25 @@ export default function GiftVendorsPage() {
     dispatch(setGiftVendorsPage(page));
   };
 
+  const handleCopyAccessCode = async (
+    event: MouseEvent<HTMLButtonElement>,
+    accessCode?: string | number | null,
+  ) => {
+    event.stopPropagation();
+
+    if (!accessCode) {
+      toast.info("No access code available");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(String(accessCode));
+      toast.success("Access code copied");
+    } catch {
+      toast.error("Unable to copy access code");
+    }
+  };
+
   const handleDeleteVendor = async () => {
     if (!vendorToDelete) return;
 
@@ -117,7 +138,7 @@ export default function GiftVendorsPage() {
               <table className="w-full table-auto">
                 <thead>
                   <tr className="text-left">
-                    {["Vendor", "Contact", "Location", "Created", "Action"].map((heading) => (
+                    {["Vendor", "Contact", "Location", "Access Code", "Created", "Action"].map((heading) => (
                       <th
                         key={heading}
                         className="py-3 pr-6 font-[325] text-xs text-[#757575]"
@@ -165,6 +186,18 @@ export default function GiftVendorsPage() {
                           <FaMapMarkerAlt className="shrink-0 text-xs" />
                           {vendor.address}
                         </p>
+                      </td>
+                      <td className="py-4 pr-6 text-sm text-dark">
+                        <button
+                          onClick={(event) =>
+                            handleCopyAccessCode(event, vendor.access_code)
+                          }
+                          className="inline-flex items-center gap-2 rounded-full bg-[#F6F6F8] px-3 py-2 text-xs font-[350] text-dark hover:bg-[#79B833]/10"
+                          title="Copy access code"
+                        >
+                          <span>{vendor.access_code || "N/A"}</span>
+                          <FaCopy className="text-[#79B833]" />
+                        </button>
                       </td>
                       <td className="py-4 pr-6 text-sm text-dark">
                         {formatDate(vendor.created_at)}

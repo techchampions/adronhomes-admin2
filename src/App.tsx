@@ -96,6 +96,7 @@ import PromoRequestsTab from "./components/gift/components/promo/PromoRequestsTa
 import CreatePromoFormPage from "./components/gift/components/promo/createPromo";
 import GiftVendorsPage from "./components/gift/components/promo/GiftVendorsPage";
 import GiftVendorDetailsPage from "./components/gift/components/promo/GiftVendorDetailsPage";
+import VendorPortalPage from "./components/gift/components/promo/VendorPortalPage";
 import ParentComponent from "./pages/contract/newImplementationContracts/ParentComponent";
 import ContractDocumentsPage from "./pages/contract/newImplementationContracts/ContractDocumentsPage";
 import CommunityDashboard from "./CommunityDashboard/CommunityDashboardtwo/CommunityDashboard";
@@ -315,6 +316,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const shouldShowSidebar =
     location.pathname !== "/" &&
     location.pathname !== "/login-marketer" &&
+    !location.pathname.startsWith("/vendor/") &&
     !location.pathname.includes("/error-500") &&
     !location.pathname.includes("/error-404");
 
@@ -370,6 +372,7 @@ const App = () => {
             <Routes>
               {/* Public Route */}
               <Route path="/" element={<Login />} />
+              <Route path="/vendor/:link" element={<VendorPortalPage />} />
               <Route
                 path="/estate"
                 element={<CommunityDashboard initialSection="overview" />}

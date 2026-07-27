@@ -321,6 +321,20 @@ export interface UpdateMaintenanceResponse {
   message: string;
 }
 
+export interface ExportEstateSecurityCodesResponse {
+  success: boolean;
+  message: string;
+  count: number;
+  status_filter: string;
+  date_range: {
+    start: string;
+    end: string;
+  };
+  file_name: string;
+  url: string;
+  download_url: string;
+}
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const getAuthHeaders = () => {
@@ -570,6 +584,52 @@ export const fetchEstateSecurityCodes = createAsyncThunk<
       return rejectWithValue({
         message:
           axiosError.response?.data.message || "Failed to fetch security codes",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const exportEstateSecurityCodes = createAsyncThunk<
+  ExportEstateSecurityCodesResponse,
+  { start_date: string; end_date: string; status?: string },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/exportEstateSecurityCodes",
+  async ({ start_date, end_date, status = "active" }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.post<ExportEstateSecurityCodesResponse>(
+        `${BASE_URL}/api/admin/estates/security-codes/export`,
+        null,
+        {
+          headers,
+          params: {
+            start_date,
+            end_date,
+            status,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.status === 401) {
+        Cookies.remove("token");
+      }
+
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message || "Failed to export security codes",
         errors: axiosError.response?.data.errors,
       });
     }

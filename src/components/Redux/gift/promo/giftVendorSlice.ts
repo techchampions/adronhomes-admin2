@@ -4,6 +4,8 @@ import api from "../../middleware";
 export interface GiftVendor {
   id: number;
   name: string;
+  store_slug?: string;
+  access_code?: string | number | null;
   email: string;
   phone: string;
   lga: string;
