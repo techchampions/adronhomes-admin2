@@ -16,6 +16,7 @@ import {
   fetchAllEstates,
 } from "../../components/Redux/estate/estateThunk";
 import ConfirmationModal from "../../components/Modals/delete";
+import { useEstatePaths } from "./estatePaths";
 
 interface EstateTableProps {
   data: Estate[];
@@ -40,6 +41,7 @@ const CountBadge = ({
 export default function EstateTable({ data }: EstateTableProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const estatePaths = useEstatePaths();
   const pagination = useSelector(selectAllEstatesPagination);
   const [estateToDelete, setEstateToDelete] = useState<Estate | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -124,7 +126,7 @@ export default function EstateTable({ data }: EstateTableProps) {
                 <tr
                   key={estate.id}
                   className="cursor-pointer"
-                  onClick={() => navigate(`/estates/${estate.id}/users`)}
+                  onClick={() => navigate(estatePaths.users(estate.id))}
                 >
                   <td className="py-4 pr-6 font-[325] text-dark text-sm max-w-[220px]">
                     <div className="truncate">{estate.estate_name || "N/A"}</div>

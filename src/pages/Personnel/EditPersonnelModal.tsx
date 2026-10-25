@@ -40,6 +40,8 @@ const roleOptions = [
   { value: "6", label: "Legal" },
   { value: "7", label: "Info Tech" },
   { value: "8", label: "Client service" },
+  { value: "9", label: "Security" },
+  { value: "10", label: "Director of Estate Community" },
 ];
 
 const validationSchema = Yup.object().shape({

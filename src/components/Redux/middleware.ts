@@ -51,6 +51,15 @@ export const setupAxiosInterceptors = (
     (error) => {
       // Handle 401 Unauthorized
       if (error.response?.status === 401) {
+        const message = String(error.response?.data?.message || "");
+        const isPermissionDenial = /authori[sz]ed|permission/i.test(message);
+        if (isPermissionDenial) {
+          sessionStorage.setItem(
+            "auth_error_message",
+            message || "You are not authorised to access this page.",
+          );
+        }
+
         const userRole = (() => {
           try {
             const userStr = Cookies.get("user");
@@ -95,6 +104,10 @@ export const setupAxiosInterceptors = (
           navigate("/client/error-500", { replace: true });
         } else if (currentPath.startsWith("/info-tech")) {
           navigate("/info-tech/error-500", { replace: true });
+        } else if (currentPath.startsWith("/estate-director")) {
+          navigate("/estate-director/error-500", { replace: true });
+        } else if (currentPath.startsWith("/security")) {
+          navigate("/security/error-500", { replace: true });
         } else {
           // Default fallback for admin or other routes
           navigate("/error-500", { replace: true });

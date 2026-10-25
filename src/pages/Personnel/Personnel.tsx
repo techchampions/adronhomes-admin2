@@ -35,20 +35,26 @@ const getRoleName = (roleId: number): string => {
       return "Info Tech";
     case 8:
       return "Client service";
+    case 9:
+      return "Security";
+    case 10:
+      return "Director of Estate Community";
     default:
       return "Unknown";
   }
 };
-const roles: string[] = [
-  "All",
-  "Admin",
-  "Marketer",
-  "Director",
-  "Accountant",
-  "HR",
-  "Legal",
-  "Info Tech",
-  "Client service",
+const roles: { name: string; value: number }[] = [
+  { name: "All", value: 0 },
+  { name: "Admin", value: 1 },
+  { name: "Marketer", value: 2 },
+  { name: "Director", value: 3 },
+  { name: "Accountant", value: 4 },
+  { name: "HR", value: 5 },
+  { name: "Legal", value: 6 },
+  { name: "Info Tech", value: 7 },
+  { name: "Client service", value: 8 },
+  { name: "Security", value: 9 },
+  { name: "Director of Estate Community", value: 10 },
 ];
 export default function Personnel() {
   const tabs = ["All"];
@@ -118,11 +124,11 @@ export default function Personnel() {
           onTabChange={setActiveTab}
           searchPlaceholder="Search for personnel"
           onSearch={handleSearch}
-          sortOptions={roles.map((role, index) => ({
-            value: index,
-            name: role,
+          sortOptions={roles.map((role) => ({
+            value: role.value,
+            name: role.name,
           }))}
-          defaultSort={roles.findIndex((role) => role === role[0]) || 0}
+          defaultSort={roles.findIndex((role) => role.value === 0)}
           sort={true}
           showTabs={true}
           showSearchandSort={true}

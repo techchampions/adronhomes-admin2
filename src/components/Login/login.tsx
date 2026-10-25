@@ -26,6 +26,8 @@ const roleRoutes: Record<number, string> = {
   6: "/legal",
   7: "/info-tech",
   8: "/client/customers",
+  9: "/security",
+  10: "/estate-director/estates",
 };
 
 export default function Login() {
@@ -62,6 +64,13 @@ export default function Login() {
       await dispatch(loginUser(values)).unwrap();
     } catch (err) {}
   };
+
+  useEffect(() => {
+    const authError = sessionStorage.getItem("auth_error_message");
+    if (!authError) return;
+    sessionStorage.removeItem("auth_error_message");
+    toast.error(authError);
+  }, []);
 
   // Handle toast notifications
   useEffect(() => {

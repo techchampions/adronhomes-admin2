@@ -27,6 +27,8 @@ const roleRoutes: Record<number, string> = {
   6: "/legal",
   7: "/info-tech",
   8: "/client/customers",
+  9: "/security",
+  10: "/estate-director/estates",
 };
 
 export default function LoginMarketers() {

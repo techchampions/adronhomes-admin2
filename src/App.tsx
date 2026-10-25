@@ -17,6 +17,8 @@ import DirectorSideBar from "./marketer/sideNav/DirectorSideNav";
 import CarrerSideBar from "./hr/sideNav";
 import LegalSideBar from "./Legal/sidenavlegal";
 import ClientSidebar from "./components/ClientSideBar";
+import EstateDirectorSidebar from "./components/EstateDirectorSidebar";
+import SecuritySidebar from "./components/SecuritySidebar";
 import PaymentBar from "./components/Payments/PaymentNavBar";
 
 // Pages
@@ -172,6 +174,12 @@ const ImpersonationFloatingButton = () => {
       case "8":
         roleName = "Client";
         break;
+      case "9":
+        roleName = "Security";
+        break;
+      case "10":
+        roleName = "Director of Estate Community";
+        break;
       default:
         roleName = "";
     }
@@ -313,6 +321,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const isPayments = location.pathname.startsWith("/payments/");
   const isLegal = location.pathname.startsWith("/legal");
   const client = location.pathname.startsWith("/client/");
+  const isEstateDirector = location.pathname.startsWith("/estate-director");
+  const isSecurity = location.pathname.startsWith("/security");
   const shouldShowSidebar =
     location.pathname !== "/" &&
     location.pathname !== "/login-marketer" &&
@@ -340,6 +350,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <LegalSideBar />
           ) : isinfotech ? (
             <InfoTechSidebar />
+          ) : isEstateDirector ? (
+            <EstateDirectorSidebar />
+          ) : isSecurity ? (
+            <SecuritySidebar />
           ) : (
             <AdminSidebar />
           )}
@@ -629,6 +643,39 @@ const App = () => {
                   path="/payments/customers/payment/:user_id/:plan_id"
                   element={<Customers_payment />}
                 />
+              </Route>
+
+              {/* Director of Estate Routes */}
+              <Route element={<AuthGuard />}>
+                <Route path="/estate-director" element={<Estate />} />
+                <Route path="/estate-director/estates" element={<Estate />} />
+                <Route
+                  path="/estate-director/estates/maintenance"
+                  element={<EstateOperationsPage mode="maintenance" />}
+                />
+                <Route
+                  path="/estate-director/estates/security-codes"
+                  element={<EstateOperationsPage mode="security" />}
+                />
+                <Route
+                  path="/estate-director/estates/utility-payments"
+                  element={<EstateOperationsPage mode="utility" />}
+                />
+                <Route path="/estate-director/estates/:estateId/users" element={<EstateUsers />} />
+                <Route
+                  path="/estate-director/estates/:estateId/users/:userId"
+                  element={<SingleUserEstate />}
+                />
+                <Route path="/estate-director/error-500" element={<Error500 />} />
+              </Route>
+
+              {/* Security Routes */}
+              <Route element={<AuthGuard />}>
+                <Route
+                  path="/security"
+                  element={<EstateOperationsPage mode="security" />}
+                />
+                <Route path="/security/error-500" element={<Error500 />} />
               </Route>
 
               {/* HR Routes */}
