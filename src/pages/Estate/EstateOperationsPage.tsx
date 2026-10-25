@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEstatePaths } from "./estatePaths";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { Download } from "lucide-react";
 import Header from "../../general/Header";
@@ -84,6 +85,9 @@ const config = {
 export default function EstateOperationsPage({ mode }: EstateOperationsPageProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const estatePaths = useEstatePaths();
+  const isSecurityRole = location.pathname.startsWith("/security");
   const securityExportModalRef = useRef<ExportModalRef>(null);
   const [search, setSearch] = useState("");
 
@@ -270,13 +274,15 @@ export default function EstateOperationsPage({ mode }: EstateOperationsPageProps
       />
 
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[24px] flex flex-wrap items-center gap-3">
-        <button
-          onClick={() => navigate("/estates")}
-          className="inline-flex h-11 items-center gap-2 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
-        >
-          <IoArrowBackSharp className="text-base" />
-          Back to Estates
-        </button>
+        {!isSecurityRole && (
+          <button
+            onClick={() => navigate(estatePaths.estates)}
+            className="inline-flex h-11 items-center gap-2 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+          >
+            <IoArrowBackSharp className="text-base" />
+            Back to Estates
+          </button>
+        )}
         {mode === "security" && (
           <button
             onClick={() => securityExportModalRef.current?.openModal()}

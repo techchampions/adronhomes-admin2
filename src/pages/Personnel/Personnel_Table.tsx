@@ -47,6 +47,8 @@ const roleRoutes: Record<number, string> = {
   6: "/legal",
   7: "/info-tech",
   8: "/client/customers",
+  9: "/security",
+  10: "/estate-director/estates",
 };
 
 // Role display names for buttons
@@ -59,6 +61,8 @@ const roleButtonText: Record<number, string> = {
   6: "Log into Legal Dashboard",
   7: "Log into IT Dashboard",
   8: "Log into Client Dashboard",
+  9: "Log into Security Dashboard",
+  10: "Log into Estate Director Dashboard",
 };
 
 export default function UsersTableComponent({ userData }: UsersTableProps) {

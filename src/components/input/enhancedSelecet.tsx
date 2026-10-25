@@ -35,6 +35,7 @@ const EnhancedOptionInputField: React.FC<EnhancedOptionInputFieldProps> = ({
   isLoading = false,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const menuMaxHeight = Math.min(options.length * 44 + 16, 420);
 
   const customStyles = {
     control: (base: any, state: any) => ({
@@ -51,13 +52,20 @@ const EnhancedOptionInputField: React.FC<EnhancedOptionInputFieldProps> = ({
     }),
     menu: (base: any) => ({
       ...base,
-      borderRadius: "30px",
-      overflow: "hidden",
+      borderRadius: "16px",
       marginTop: "8px",
+      overflow: "visible",
+      zIndex: 9999,
     }),
     menuList: (base: any) => ({
       ...base,
-      padding: "24px",
+      padding: "8px",
+      maxHeight: menuMaxHeight,
+      overflowY: "auto",
+    }),
+    menuPortal: (base: any) => ({
+      ...base,
+      zIndex: 9999,
     }),
     option: (base: any, state: any) => ({
       ...base,
@@ -67,9 +75,9 @@ const EnhancedOptionInputField: React.FC<EnhancedOptionInputFieldProps> = ({
       "&:hover": {
         backgroundColor: "#f0f0f0",
       },
-      marginBottom: "8px",
+      marginBottom: "4px",
       borderRadius: "8px",
-      padding: "12px 16px",
+      padding: "10px 14px",
     }),
     placeholder: (base: any) => ({
       ...base,
@@ -106,6 +114,10 @@ const EnhancedOptionInputField: React.FC<EnhancedOptionInputFieldProps> = ({
         isLoading={isLoading}
         isSearchable={isSearchable}
         styles={customStyles}
+        menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+        menuPosition="fixed"
+        menuPlacement="auto"
+        maxMenuHeight={menuMaxHeight}
         name={name}
         inputValue={inputValue}
         onInputChange={setInputValue}

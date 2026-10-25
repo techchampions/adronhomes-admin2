@@ -17,10 +17,12 @@ import {
 import { fetchAllEstates } from "../../components/Redux/estate/estateThunk";
 import EstateTable from "./EstateTable";
 import AddEstateModal from "./AddEstateModal";
+import { useEstatePaths } from "./estatePaths";
 
 export default function Estate() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const estatePaths = useEstatePaths();
   const estates = useSelector(selectAllEstatesData);
   const metrics = useSelector(selectAllEstatesMetrics);
   const loading = useSelector(selectAllEstatesLoading);
@@ -56,19 +58,19 @@ export default function Estate() {
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[24px]">
         <div className="flex flex-wrap gap-3">
           <button
-            onClick={() => navigate("/estate-maintenance")}
+            onClick={() => navigate(estatePaths.maintenance)}
             className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
           >
             Estate Maintenance
           </button>
           <button
-            onClick={() => navigate("/estate-security-codes")}
+            onClick={() => navigate(estatePaths.security)}
             className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
           >
             Estate Security Codes
           </button>
           <button
-            onClick={() => navigate("/estate-utility-payments")}
+            onClick={() => navigate(estatePaths.utility)}
             className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
           >
             Estate Utility Payments
