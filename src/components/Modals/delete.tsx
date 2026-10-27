@@ -4,6 +4,7 @@ interface ConfirmationModalProps {
   isOpen: boolean;
   title: string;
   description: string;
+  message?: string;
   subjectName?: string;
   children?: React.ReactNode;
   onClose: () => void;
@@ -18,6 +19,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   title,
   description,
+  message,
   subjectName,
   children,
   onClose,
@@ -48,8 +50,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
 
           <p className="mb-6 flex flex-col text-center gap-4">
-            {description} 
-            {subjectName && <strong>{subjectName}</strong>}.
+            {message ? (
+              message
+            ) : (
+              <>
+                {description}
+                {subjectName && <strong>{subjectName}</strong>}.
+              </>
+            )}
           </p>
 
           {children && <div className="mb-6">{children}</div>}

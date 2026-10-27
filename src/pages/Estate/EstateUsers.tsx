@@ -8,7 +8,8 @@ import {
   useState,
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEstatePaths } from "./estatePaths";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
 import { ReusableTable } from "../../components/Tables/Table_one";
@@ -70,6 +71,8 @@ import AddEstatePersonnelModal from "./AddEstatePersonnelModal";
 
 export default function EstateUsers() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const estatePaths = useEstatePaths();
   const { estateId } = useParams();
   const numericEstateId = Number(estateId);
   const users = useSelector(selectEstateUsersData);
@@ -647,9 +650,19 @@ export default function EstateUsers() {
         buttonText="Add Client to Estate"
         onButtonClick={() => setShowAddClientModal(true)}
         personel={true}
-        Personnel_Text="Add Personnel"
+        Personnel_Text="Add Security Personnels"
         onPersonelButtonClick={() => setShowAddPersonnelModal(true)}
       />
+
+      <div className="mb-6 px-4 lg:pl-[38px] lg:pr-[68px]">
+        <button
+          type="button"
+          onClick={() => navigate(estatePaths.personnel(numericEstateId))}
+          className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+        >
+          Security Personnels
+        </button>
+      </div>
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen

@@ -1,6 +1,7 @@
 import { FormEvent, UIEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEstatePaths } from "./estatePaths";
 import { toast } from "react-toastify";
 import Header from "../../general/Header";
 import { MatrixCard, MatrixCardGreen } from "../../components/firstcard";
@@ -71,6 +72,8 @@ const getPriorityStyle = (priority?: string) => {
 
 export default function SingleUserEstate() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const estatePaths = useEstatePaths();
   const { estateId, userId } = useParams();
   const numericEstateId = Number(estateId);
   const numericUserId = Number(userId);
@@ -662,6 +665,18 @@ export default function SingleUserEstate() {
         history={true}
         showSearchAndButton={false}
       />
+
+      <div className="mb-6 px-4 lg:pl-[38px] lg:pr-[68px]">
+        <button
+          type="button"
+          onClick={() =>
+            navigate(estatePaths.household(estateId || "", userId || ""))
+          }
+          className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+        >
+          Family and Staff
+        </button>
+      </div>
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">
         <MatrixCardGreen

@@ -18,6 +18,7 @@ import UtilityPaymentDetailModal from "./UtilityPaymentDetailModal";
 import MaintenanceDetailModal from "./MaintenanceDetailModal";
 import OptionInputField from "../../components/input/drop_down";
 import ConfirmationModal from "../../components/Modals/delete";
+import SecurityCodePass from "../../components/security/SecurityCodePass";
 
 interface PaginationShape {
   currentPage: number;
@@ -243,11 +244,11 @@ export function SecurityCodesTable({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[860px]">
+        <div className="min-w-[1040px]">
           <table className="w-full table-auto">
             <thead>
               <tr className="text-left">
-                {["Name", "Code", "Estate", "Limit", "Used", "Expires", "Created By"].map(
+                {["Name", "Code", "QR Pass", "Estate", "Limit", "Used", "Expires", "Created By"].map(
                   (heading) => (
                     <th
                       key={heading}
@@ -267,6 +268,13 @@ export function SecurityCodesTable({
                   </td>
                   <td className="py-4 pr-6 font-[350] text-dark text-sm">
                     {code.code || "N/A"}
+                  </td>
+                  <td className="py-4 pr-6">
+                    <SecurityCodePass
+                      code={code.code}
+                      name={code.name}
+                      estateName={code.estate_name}
+                    />
                   </td>
                   <td className="py-4 pr-6 font-[325] text-dark text-sm">
                     {code.estate_name || "N/A"}

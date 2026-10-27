@@ -8,6 +8,7 @@ import { createEstatePersonnel } from "../../components/Redux/estate/estateThunk
 interface AddEstatePersonnelModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onCreated?: () => void;
   estateId: number;
   estateName?: string;
 }
@@ -26,6 +27,7 @@ export default function AddEstatePersonnelModal({
   onClose,
   estateId,
   estateName,
+  onCreated,
 }: AddEstatePersonnelModalProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [form, setForm] = useState(initialForm);
@@ -52,7 +54,7 @@ export default function AddEstatePersonnelModal({
       !form.password ||
       !form.role
     ) {
-      toast.warning("Please fill all personnel fields");
+      toast.warning("Please fill all Security Personnels fields");
       return;
     }
 
@@ -67,11 +69,12 @@ export default function AddEstatePersonnelModal({
       const response = await dispatch(
         createEstatePersonnel({ estateId, credentials: formData }),
       ).unwrap();
-      toast.success(response.message || "Personnel created successfully");
+      toast.success(response.message || "Security Personnels created successfully");
       setForm(initialForm);
+      onCreated?.();
       onClose();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to create personnel");
+      toast.error(error?.message || "Failed to create Security Personnels");
     } finally {
       setSubmitting(false);
     }
@@ -84,9 +87,9 @@ export default function AddEstatePersonnelModal({
       <div className="bg-white rounded-[30px] w-full max-w-2xl max-h-[92vh] overflow-hidden flex flex-col shadow-2xl">
         <div className="px-6 py-5 border-b border-gray-100 flex justify-between gap-4">
           <div>
-            <h2 className="font-[350] text-2xl text-dark">Add Personnel</h2>
+            <h2 className="font-[350] text-2xl text-dark">Add Security Personnels</h2>
             <p className="font-[325] text-sm text-[#767676] mt-1">
-              Create personnel for {estateName || "this estate"}.
+              Create Security Personnels for {estateName || "this estate"}.
             </p>
           </div>
           <button
@@ -154,11 +157,13 @@ export default function AddEstatePersonnelModal({
             </label>
             <label className="space-y-2">
               <span className="font-[325] text-sm text-[#767676]">Role</span>
-              <input
+              <select
                 value={form.role}
                 onChange={(event) => updateField("role", event.target.value)}
                 className="w-full h-11 rounded-full bg-[#F6F6F8] px-4 text-sm outline-none"
-              />
+              >
+                <option value="9">Security</option>
+              </select>
             </label>
           </div>
 
@@ -176,7 +181,7 @@ export default function AddEstatePersonnelModal({
               disabled={submitting}
               className="h-11 rounded-full bg-[#79B833] px-6 text-sm font-bold text-white hover:bg-[#6aa22c] disabled:opacity-50"
             >
-              {submitting ? "Creating..." : "Create Personnel"}
+              {submitting ? "Creating..." : "Create Security Personnels"}
             </button>
           </div>
         </form>

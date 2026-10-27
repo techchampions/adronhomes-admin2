@@ -282,6 +282,25 @@ export interface SecurityCode {
   estate_name: string;
 }
 
+export interface AssignedSecurityCode extends SecurityCode {
+  is_active: boolean;
+  remaining_uses: number;
+  created_by_full_name: string;
+  status_label: string;
+}
+
+export interface AssignedEstate {
+  id: number;
+  estate_name: string;
+  property_slug: string;
+}
+
+export interface AssignedSecurityCodesResponse {
+  success: boolean;
+  estates: AssignedEstate[];
+  data: PaginatedData<AssignedSecurityCode>;
+}
+
 export interface UtilityPayment {
   id: number;
   user_id: number;
@@ -576,6 +595,42 @@ export const fetchEstateSecurityCodes = createAsyncThunk<
             page,
             per_page,
           },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message || "Failed to fetch security codes",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const fetchAssignedSecurityCodes = createAsyncThunk<
+  AssignedSecurityCodesResponse,
+  { page?: number; per_page?: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/fetchAssignedSecurityCodes",
+  async ({ page = 1, per_page = 12 }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.get<AssignedSecurityCodesResponse>(
+        `${BASE_URL}/api/admin/security/codes`,
+        {
+          headers,
+          params: { page, per_page },
         },
       );
       return response.data;
