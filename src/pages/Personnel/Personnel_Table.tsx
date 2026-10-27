@@ -22,6 +22,8 @@ import PersonnelModal from "./Viewmodal";
 import { PropertyContext } from "../../MyContext/MyContext";
 import { impersonateUser } from "../../components/Redux/adminimpersonate/adminimpersonatethunk";
 import { clearImpersonation } from "../../components/Redux/adminimpersonate/adminimpersonateslice";
+import { logout } from "../../components/Redux/Login/login_slice";
+import { clearUser } from "../../components/Redux/User/user_Slice";
 
 export interface UsersTable {
   User: string;
@@ -76,6 +78,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
   const [impersonatingUserId, setImpersonatingUserId] = useState<number | null>(
     null,
   );
+  const [loginCandidate, setLoginCandidate] = useState<UsersTable | null>(null);
 
   const { option, setOption } = useContext(PropertyContext)!;
 
@@ -153,21 +156,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
     setIsPersonnelModalOpen(true);
   };
 
-  // Store original token before impersonation
-  const storeOriginalToken = () => {
-    const currentToken = Cookies.get("token");
-    if (currentToken) {
-      sessionStorage.setItem("original_token", currentToken);
-    }
-  };
-
-  // Handle impersonation with token replacement and redirect
-  const handleImpersonate = async (
-    userData: UsersTable,
-    e: React.MouseEvent,
-  ) => {
-    e.stopPropagation(); // Prevent row click event
-
+  const handleImpersonate = async (userData: UsersTable) => {
     const userId = Number(userData.id);
     const userRole = userData.user?.role;
 
@@ -179,34 +168,24 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
     setImpersonatingUserId(userId);
 
     try {
-      // Store original token before impersonation
-      storeOriginalToken();
-
-      // Show loading toast
-      const loadingToast = toast.loading(`Logging in as a user...`);
-
+      const loadingToast = toast.loading("Logging in...");
       const result = await dispatch(impersonateUser(userId)).unwrap();
 
       if (result.success && result.token) {
-        // Replace the current token with impersonation token
-        Cookies.set("token", result.token, {
-          expires: 1 / 24, // 1 hour expiry
-          secure: true,
-          sameSite: "strict",
+        dispatch(logout());
+        dispatch(clearUser());
+        dispatch(clearImpersonation());
+        Cookies.remove("user");
+        sessionStorage.removeItem("original_token");
+        sessionStorage.removeItem("is_impersonating");
+        sessionStorage.removeItem("impersonated_user_name");
+        sessionStorage.removeItem("impersonated_user_role");
+
+        Cookies.set("token", result.token, { expires: 7 });
+        Cookies.set("user", JSON.stringify({ role: result.data.role }), {
+          expires: 1,
         });
 
-        // Set impersonation flag
-        sessionStorage.setItem("is_impersonating", "true");
-        sessionStorage.setItem(
-          "impersonated_user_name",
-          `${result.data.first_name} ${result.data.last_name}`,
-        );
-        sessionStorage.setItem(
-          "impersonated_user_role",
-          String(result.data.role),
-        );
-
-        // Update toast
         toast.update(loadingToast, {
           render: "Login successful! Redirecting...",
           type: "success",
@@ -214,52 +193,12 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
           autoClose: 2000,
         });
 
-        // Small delay to ensure token is set before navigation
-        setTimeout(() => {
-          // Navigate based on user role
-          const route = roleRoutes[result.data.role] || "/";
-
-          // Use replace to prevent going back to impersonation page
-          navigate(route, {
-            replace: true,
-            state: {
-              isImpersonating: true,
-              impersonatedUser: result.data,
-              impersonatedUserId: userId,
-            },
-          });
-        }, 1500); // Delay to show success message
+        const route = roleRoutes[result.data.role] || "/";
+        navigate(route, { replace: true });
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
       toast.error(error?.message || "Login failed. Please try again.");
       setImpersonatingUserId(null);
-    }
-  };
-
-  // Stop impersonation function (can be called from a header component)
-  const handleStopImpersonation = () => {
-    const originalToken = sessionStorage.getItem("original_token");
-
-    if (originalToken) {
-      // Restore original token
-      Cookies.set("token", originalToken, {
-        expires: 1,
-        secure: true,
-        sameSite: "strict",
-      });
-
-      // Clear impersonation state
-      dispatch(clearImpersonation());
-      sessionStorage.removeItem("original_token");
-      sessionStorage.removeItem("is_impersonating");
-      sessionStorage.removeItem("impersonated_user_name");
-      sessionStorage.removeItem("impersonated_user_role");
-
-      toast.success("Stopped impersonating");
-
-      // Navigate back to admin/users page
-      navigate("/admin/users", { replace: true });
     }
   };
 
@@ -369,7 +308,7 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
                     >
                       <button
                         type="button"
-                        onClick={(e) => handleImpersonate(user, e)}
+                        onClick={() => setLoginCandidate(user)}
                         disabled={isLoading || !!isImpersonating}
                         className={`px-3 py-1.5 text-[#79B833] border border-[#79B833] text-xs rounded-full transition-colors min-w-[140px] ${
                           isImpersonating
@@ -484,6 +423,24 @@ export default function UsersTableComponent({ userData }: UsersTableProps) {
           className="mt-8 mb-4"
         />
       </div>
+
+      {loginCandidate && (
+        <ConfirmationModal
+          isOpen={!!loginCandidate}
+          title="Confirm login"
+          description=""
+          message={`Are you sure you want to login to the ${loginCandidate.Role} dashboard belonging to ${loginCandidate.User}. You will be logged out of your current session if you proceed.`}
+          onClose={() => setLoginCandidate(null)}
+          onConfirm={() => {
+            const person = loginCandidate;
+            setLoginCandidate(null);
+            handleImpersonate(person);
+          }}
+          confirmButtonText="Login"
+          cancelButtonText="Cancel"
+          className="!bg-[#79B833]"
+        />
+      )}
 
       {/* delete property */}
       {isDeleteModalOpen && personelToDelete && (

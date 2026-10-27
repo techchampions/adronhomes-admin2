@@ -75,6 +75,12 @@ export default function Estate() {
           >
             Estate Utility Payments
           </button>
+          <button
+            onClick={() => navigate(estatePaths.marketplace)}
+            className="h-11 rounded-full border border-[#79B833] bg-white px-5 text-sm font-bold text-[#79B833] hover:bg-[#79B833]/10"
+          >
+            Marketplace
+          </button>
         </div>
       </div>
 

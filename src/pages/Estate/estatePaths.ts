@@ -15,6 +15,13 @@ export function useEstatePaths() {
     utility: isEstateDirector
       ? "/estate-director/estates/utility-payments"
       : "/estate-utility-payments",
+    marketplace: isEstateDirector
+      ? "/estate-director/estates/marketplace"
+      : "/estate-marketplace",
+    personnel: (estateId: string | number) =>
+      isEstateDirector
+        ? `/estate-director/estates/${estateId}/personnel`
+        : `/estates/${estateId}/personnel`,
     users: (estateId: string | number) =>
       isEstateDirector
         ? `/estate-director/estates/${estateId}/users`
@@ -23,5 +30,9 @@ export function useEstatePaths() {
       isEstateDirector
         ? `/estate-director/estates/${estateId}/users/${userId}`
         : `/estates/${estateId}/users/${userId}`,
+    household: (estateId: string | number, userId: string | number) =>
+      isEstateDirector
+        ? `/estate-director/estates/${estateId}/users/${userId}/household`
+        : `/estates/${estateId}/users/${userId}/household`,
   };
 }

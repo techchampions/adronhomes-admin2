@@ -106,6 +106,10 @@ import Estate from "./pages/Estate/Estate";
 import EstateUsers from "./pages/Estate/EstateUsers";
 import SingleUserEstate from "./pages/Estate/SingleUserEstate";
 import EstateOperationsPage from "./pages/Estate/EstateOperationsPage";
+import MarketplacePage from "./pages/Estate/MarketplacePage";
+import HouseholdPage from "./pages/Estate/HouseholdPage";
+import EstatePersonnelPage from "./pages/Estate/EstatePersonnelPage";
+import SecurityCodesPage from "./pages/Security/SecurityCodesPage";
 // import CommunityDashboard from "./CommunityDashboard/CommunityDashboard";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
@@ -461,10 +465,19 @@ const App = () => {
                   path="/estate-utility-payments"
                   element={<EstateOperationsPage mode="utility" />}
                 />
+                <Route path="/estate-marketplace" element={<MarketplacePage />} />
                 <Route path="/estates/:estateId/users" element={<EstateUsers />} />
+                <Route
+                  path="/estates/:estateId/personnel"
+                  element={<EstatePersonnelPage />}
+                />
                 <Route
                   path="/estates/:estateId/users/:userId"
                   element={<SingleUserEstate />}
+                />
+                <Route
+                  path="/estates/:estateId/users/:userId/household"
+                  element={<HouseholdPage />}
                 />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/gift-form" element={<GiftFormPage />} />
@@ -661,20 +674,29 @@ const App = () => {
                   path="/estate-director/estates/utility-payments"
                   element={<EstateOperationsPage mode="utility" />}
                 />
+                <Route
+                  path="/estate-director/estates/marketplace"
+                  element={<MarketplacePage />}
+                />
                 <Route path="/estate-director/estates/:estateId/users" element={<EstateUsers />} />
+                <Route
+                  path="/estate-director/estates/:estateId/personnel"
+                  element={<EstatePersonnelPage />}
+                />
                 <Route
                   path="/estate-director/estates/:estateId/users/:userId"
                   element={<SingleUserEstate />}
+                />
+                <Route
+                  path="/estate-director/estates/:estateId/users/:userId/household"
+                  element={<HouseholdPage />}
                 />
                 <Route path="/estate-director/error-500" element={<Error500 />} />
               </Route>
 
               {/* Security Routes */}
               <Route element={<AuthGuard />}>
-                <Route
-                  path="/security"
-                  element={<EstateOperationsPage mode="security" />}
-                />
+                <Route path="/security" element={<SecurityCodesPage />} />
                 <Route path="/security/error-500" element={<Error500 />} />
               </Route>
 
