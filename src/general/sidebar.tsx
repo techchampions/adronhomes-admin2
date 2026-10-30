@@ -33,6 +33,7 @@ const navItems = [
   { label: "Personnel", icon: Icon6, path: "/personnel" },
 
   { label: "Requests & Enquiries", icon: Icon7, path: "/Requests-Enquiries" },
+  { label: "Support Tickets", icon: Icon7, path: "/support-tickets" },
   { label: "Notifications", icon: Icon8, path: "/notifications" },
   { label: "Settings", icon: Icon9, path: "/settings" },
 ];
