@@ -124,17 +124,32 @@ export default function HouseholdPage() {
                 key={member.id}
                 className="rounded-[28px] border border-[#F0F0F0] bg-white p-5 shadow-sm"
               >
-                <p className="text-xs uppercase tracking-wide text-[#888888]">
-                  {member.role_label}
-                </p>
-                <h2 className="mt-1 text-lg font-medium text-[#272727]">
-                  {member.full_name}
-                </h2>
-                <p className="mt-3 text-sm text-[#272727]">{member.phone}</p>
-                {member.email && (
-                  <p className="mt-1 text-sm text-[#767676]">{member.email}</p>
-                )}
-                <p className="mt-3 text-xs text-[#888888]">{estateName}</p>
+                <div className="flex items-start gap-4">
+                  {member.profile_picture ? (
+                    <img
+                      src={member.profile_picture}
+                      alt=""
+                      className="h-14 w-14 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#79B833]/15 text-sm font-semibold text-[#032147]">
+                      {member.full_name.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-wide text-[#888888]">
+                      {member.role_label}
+                    </p>
+                    <h2 className="mt-1 text-lg font-medium text-[#272727]">
+                      {member.full_name}
+                    </h2>
+                    <p className="mt-3 text-sm text-[#272727]">{member.phone}</p>
+                    {member.email && (
+                      <p className="mt-1 text-sm text-[#767676]">{member.email}</p>
+                    )}
+                    <p className="mt-3 text-xs text-[#888888]">{estateName}</p>
+                  </div>
+                </div>
               </article>
             ))}
           </div>

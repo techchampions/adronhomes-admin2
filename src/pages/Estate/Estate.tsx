@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Header from "../../general/Header";
@@ -13,6 +13,7 @@ import {
   selectAllEstatesLoading,
   selectAllEstatesMetrics,
   selectAllEstatesPagination,
+  setAllEstatesCurrentPage,
 } from "../../components/Redux/estate/estateSlice";
 import { fetchAllEstates } from "../../components/Redux/estate/estateThunk";
 import EstateTable from "./EstateTable";
@@ -32,19 +33,15 @@ export default function Estate() {
   const [showAddEstateModal, setShowAddEstateModal] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllEstates({ page: pagination.currentPage }));
-  }, [dispatch, pagination.currentPage]);
+    dispatch(fetchAllEstates({ page: pagination.currentPage, search }));
+  }, [dispatch, pagination.currentPage, search]);
 
-  const filteredEstates = useMemo(() => {
-    const query = search.toLowerCase().trim();
-    if (!query) return estates;
-
-    return estates.filter((estate) =>
-      [estate.estate_name, estate.property_slug]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(query)),
-    );
-  }, [estates, search]);
+  const handleSearch = (query: string) => {
+    setSearch(query);
+    if (pagination.currentPage !== 1) {
+      dispatch(setAllEstatesCurrentPage(1));
+    }
+  };
 
   return (
     <div className="pb-[52px] relative">
@@ -112,7 +109,7 @@ export default function Estate() {
           tabs={["Estate List"]}
           activeTab="Estate List"
           searchPlaceholder="Search Estates"
-          onSearch={setSearch}
+          onSearch={handleSearch}
           showTabs={false}
         >
           {loading ? (
@@ -121,7 +118,7 @@ export default function Estate() {
             <div className="text-center py-8">
               <p className="text-red-600 font-medium">{error}</p>
             </div>
-          ) : filteredEstates.length === 0 ? (
+          ) : estates.length === 0 ? (
             <div className="max-h-screen">
               <p className="text-center font-normal text-[#767676]">
                 No estate found
@@ -129,7 +126,7 @@ export default function Estate() {
               <NotFound />
             </div>
           ) : (
-            <EstateTable data={filteredEstates} />
+            <EstateTable data={estates} search={search} />
           )}
         </ReusableTable>
       </div>
@@ -137,7 +134,9 @@ export default function Estate() {
       <AddEstateModal
         isOpen={showAddEstateModal}
         onClose={() => setShowAddEstateModal(false)}
-        onCreated={() => dispatch(fetchAllEstates({ page: pagination.currentPage }))}
+        onCreated={() =>
+          dispatch(fetchAllEstates({ page: pagination.currentPage, search }))
+        }
       />
     </div>
   );

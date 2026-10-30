@@ -902,12 +902,12 @@ export const assignUsersToEstate = createAsyncThunk<
 // Fetch all estates with metrics
 export const fetchAllEstates = createAsyncThunk<
   AllEstatesResponse,
-  { page?: number },
+  { page?: number; search?: string },
   {
     state: RootState;
     rejectValue: ErrorResponse;
   }
->("estate/fetchAllEstates", async ({ page = 1 }, { rejectWithValue }) => {
+>("estate/fetchAllEstates", async ({ page = 1, search }, { rejectWithValue }) => {
   const token = Cookies.get("token");
 
   if (!token) {
@@ -926,6 +926,7 @@ export const fetchAllEstates = createAsyncThunk<
         },
         params: {
           page,
+          search: search || undefined,
         },
       },
     );
