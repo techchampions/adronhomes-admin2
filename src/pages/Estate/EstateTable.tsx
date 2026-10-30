@@ -20,6 +20,7 @@ import { useEstatePaths } from "./estatePaths";
 
 interface EstateTableProps {
   data: Estate[];
+  search?: string;
 }
 
 const statusText = (status: number) => (status === 1 ? "Operating" : "Inactive");
@@ -38,7 +39,7 @@ const CountBadge = ({
   </span>
 );
 
-export default function EstateTable({ data }: EstateTableProps) {
+export default function EstateTable({ data, search = "" }: EstateTableProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const estatePaths = useEstatePaths();
@@ -49,7 +50,7 @@ export default function EstateTable({ data }: EstateTableProps) {
 
   const handlePageChange = async (page: number) => {
     dispatch(setAllEstatesCurrentPage(page));
-    await dispatch(fetchAllEstates({ page }));
+    await dispatch(fetchAllEstates({ page, search }));
   };
 
   const handleDeleteClick = (
@@ -75,7 +76,7 @@ export default function EstateTable({ data }: EstateTableProps) {
         deleteEstate({ estateId: estateToDelete.id }),
       ).unwrap();
       toast.success(response.message || "Estate deleted successfully");
-      await dispatch(fetchAllEstates({ page: pagination.currentPage }));
+      await dispatch(fetchAllEstates({ page: pagination.currentPage, search }));
       setIsDeleteModalOpen(false);
       setEstateToDelete(null);
     } catch (error: any) {
