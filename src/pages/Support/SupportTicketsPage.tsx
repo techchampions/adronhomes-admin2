@@ -7,6 +7,7 @@ import {
   setSupportTicketStatus,
   SupportTicket,
   TicketMessage,
+  TicketStatus,
 } from "./supportTicketsApi";
 
 function when(value?: string) {
