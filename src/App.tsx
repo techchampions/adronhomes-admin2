@@ -32,6 +32,7 @@ import Transactions from "./pages/Transactions/Transactions";
 import Properties from "./pages/Properties/Properties";
 import Personnel from "./pages/Personnel/Personnel";
 import RequestsEnquiries from "./pages/Requests_Enquiries/Requests_Enquiries";
+import SupportTicketsPage from "./pages/Support/SupportTicketsPage";
 import Notifications from "./components/Notifications/Notifications";
 import Settings from "./components/Settings/Settings";
 import CustomerSinglePage from "./pages/Customers/CustomerSinglePage";
@@ -525,6 +526,7 @@ const App = () => {
                   path="/requests-enquiries"
                   element={<RequestsEnquiries />}
                 />
+                <Route path="/support-tickets" element={<SupportTicketsPage />} />
 
                 <Route
                   path="/director/requests-enquiries/:id"
