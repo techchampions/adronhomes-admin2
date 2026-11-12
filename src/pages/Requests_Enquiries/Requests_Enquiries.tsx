@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../../general/Header";
 import { ReusableTable } from "../../components/Tables/Table_one";
 import PropertyTableComponent from "./Requests_Enquiries_Tables";
@@ -9,27 +10,33 @@ import {
 import SoosarPagination from "../../components/SoosarPagination";
 import LoadingAnimations from "../../components/LoadingAnimations";
 import NotFound from "../../components/NotFound";
+import PropertyRequestsExportModal from "../../components/exportModal/PropertyRequestsExportModal";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 export default function Requests_Enquiries() {
   const [page, setpage] = useState(1);
+  const location = useLocation();
+  const exportModalRef = useRef<ExportModalRef>(null);
   const {
     data: directorData,
     isLoading: loadingDR,
-    isError: errorDR,
   } = useGetDirectorDashboard();
   const isDirectorRoute = location.pathname.startsWith("/director");
   const director_id = isDirectorRoute ? directorData?.director.id : undefined;
-  const { data, isLoading, isError } = useGetPropertyRequest(page, director_id);
+  const { data, isLoading } = useGetPropertyRequest(page, director_id);
   const propertyData = data?.data.data || [];
   const totalPages = data?.data.last_page || 1;
   const tab = ["Requests"];
+
   return (
     <div className="pb-[52px]">
       <Header
         title="Requests & Enquiries"
         subtitle="Attend to requests and enquiries on properties"
         history={true}
-         showSearchAndButton={false}
+        buttonText="Export"
+        onButtonClick={() => exportModalRef.current?.openModal()}
+        showSearchAndButton={true}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         <ReusableTable
@@ -38,8 +45,8 @@ export default function Requests_Enquiries() {
           searchPlaceholder="Search Requests..."
           showSearchandSort={false}
         >
-          {isLoading ? (
-            <LoadingAnimations loading={isLoading} />
+          {isLoading || (isDirectorRoute && loadingDR) ? (
+            <LoadingAnimations loading={isLoading || loadingDR} />
           ) : propertyData.length < 1 ? (
             <NotFound />
           ) : (
@@ -49,7 +56,6 @@ export default function Requests_Enquiries() {
             />
           )}
         </ReusableTable>
-        {/* Pagination */}
         <SoosarPagination
           currentPage={page}
           totalPages={totalPages}
@@ -58,6 +64,11 @@ export default function Requests_Enquiries() {
           hasPrev={!!data?.data.prev_page_url}
         />
       </div>
+
+      <PropertyRequestsExportModal
+        ref={exportModalRef}
+        directorId={director_id}
+      />
     </div>
   );
 }

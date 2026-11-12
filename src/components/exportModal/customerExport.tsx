@@ -42,7 +42,7 @@ const ExportCustomersModal: React.FC<ExportCustomersModalProps> = React.forwardR
     <ExportModal
       ref={ref}
       modalTitle="Export Customers"
-      description="Select the date range to export customer data. The system will generate an Excel file containing all customers within the specified period."
+      description="Select any start and end date to export the clients list. The system will generate an Excel file of clients registered in that period."
       exportType="customers"
       onExport={handleExport}
       isLoading={isLoading}

@@ -82,6 +82,7 @@ import promoTableReducer from "./gift/promo/promoTableSlice";
 import promoRequestsReducer from "./gift/promo/promoRequestsSlice";
 import giftVendorReducer from "./gift/promo/giftVendorSlice";
 import exportClientPartnershipReducer from "./export/exportClientPartnershipSlice";
+import exportPropertyRequestsReducer from "./export/exportPropertyRequestsSlice";
 import fetchCittaPropertyCategoriesReducer from "./citta/fetchCittaPropertyCategories";
 import fetchCittaEstatesReducer from "./citta/fetchCittaEstates";
 import fetchCittaPropertyMapReducer from "./citta/fetchCittaPropertyMap";
@@ -189,6 +190,7 @@ export const store = configureStore({
     promoRequests: promoRequestsReducer,
     giftVendors: giftVendorReducer,
     exportClientPartnership: exportClientPartnershipReducer,
+    exportPropertyRequests: exportPropertyRequestsReducer,
     draftProperty: duplicateDraftFormReducer,
     editProperty: editPropertyReducer,
     assignMarketer: assignMarketerSlice,
