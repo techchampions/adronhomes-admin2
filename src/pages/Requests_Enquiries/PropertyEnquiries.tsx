@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetPropertyRequestByID } from "../../utils/hooks/query";
 import Header from "../../general/Header";
@@ -9,12 +9,15 @@ import SoosarPagination from "../../components/SoosarPagination";
 import PropertyEnquiriesList from "./PropertEnquiriesList";
 import PropertySummary from "./PropertySummary";
 import SmallLoader from "../../components/SmallLoader";
+import PropertyRequestsExportModal from "../../components/exportModal/PropertyRequestsExportModal";
+import { ExportModalRef } from "../../components/exportModal/modalexport";
 
 const PropertyEnquiries = () => {
   const [page, setpage] = useState(1);
   const params = useParams();
   const id = params?.id;
-  const { data, isLoading } = useGetPropertyRequestByID(Number(id),page);
+  const exportModalRef = useRef<ExportModalRef>(null);
+  const { data, isLoading } = useGetPropertyRequestByID(Number(id), page);
   const totalPages = data?.data.last_page || 1;
   const propertyData = data?.data.data || [];
 
@@ -24,15 +27,16 @@ const PropertyEnquiries = () => {
         title="Requests & Enquiries"
         subtitle="Attend to requests and enquiries on properties"
         history={true}
-        showSearchAndButton={false}
-
+        buttonText="Export"
+        onButtonClick={() => exportModalRef.current?.openModal()}
+        showSearchAndButton={true}
       />
       <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
         {isLoading ? (
           <SmallLoader classname="!h-[120px]" />
         ) : (
           <div className="mb-10">
-            <PropertySummary id={propertyData[0].property_id || 0} />
+            <PropertySummary id={propertyData[0]?.property_id || Number(id) || 0} />
           </div>
         )}
         <ReusableTable activeTab={"All"} tabs={[""]}>
@@ -44,7 +48,6 @@ const PropertyEnquiries = () => {
             <PropertyEnquiriesList data={propertyData} />
           )}
         </ReusableTable>
-        {/* Pagination */}
         <SoosarPagination
           currentPage={page}
           totalPages={totalPages}
@@ -53,6 +56,11 @@ const PropertyEnquiries = () => {
           hasPrev={!!data?.data.prev_page_url}
         />
       </div>
+
+      <PropertyRequestsExportModal
+        ref={exportModalRef}
+        propertyId={Number(id) || undefined}
+      />
     </div>
   );
 };

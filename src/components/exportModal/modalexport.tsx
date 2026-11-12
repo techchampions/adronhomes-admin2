@@ -51,35 +51,43 @@ const ExportModal = forwardRef<ExportModalRef, ExportModalProps>(({
 
   // Handle successful export and auto-download
   useEffect(() => {
-    if (success && downloadUrl) {
-      // Create full URL for download
-      const fullDownloadUrl = downloadUrl.startsWith('http') 
-        ? downloadUrl 
-        : `${baseUrl}${downloadUrl}`;
-      
-      // Trigger download
-      const link = document.createElement('a');
-      link.href = fullDownloadUrl;
-      link.download = downloadUrl.split('/').pop() || `${exportType}_export_${Date.now()}.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Close modal and reset state after successful download
-      setTimeout(() => {
-        setIsOpen(false);
-        clearDownloadUrl();
-        resetExportState();
-      }, 1000);
-    }
-  }, [success, downloadUrl, resetExportState, clearDownloadUrl, baseUrl, exportType]);
+    if (!success || !downloadUrl) return;
 
-  // Reset state when modal opens
-  useEffect(() => {
-    if (isOpen) {
+    const fullDownloadUrl = downloadUrl.startsWith('http')
+      ? downloadUrl
+      : `${baseUrl}${downloadUrl}`;
+
+    const link = document.createElement('a');
+    link.href = fullDownloadUrl;
+    const fallbackExt =
+      exportType === "requests-enquiries" ? "pdf" : "xlsx";
+    link.download =
+      downloadUrl.split("/").pop() ||
+      `${exportType}_export_${Date.now()}.${fallbackExt}`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    const timeoutId = window.setTimeout(() => {
+      setIsOpen(false);
+      clearDownloadUrl();
       resetExportState();
-    }
-  }, [isOpen, resetExportState]);
+      setStartDate('');
+      setEndDate('');
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [success, downloadUrl]);
+
+  // Reset state only when the modal is opened
+  useEffect(() => {
+    if (!isOpen) return;
+    resetExportState();
+    setStartDate('');
+    setEndDate('');
+  }, [isOpen]);
 
   const handleExport = () => {
     if (!isValidDateRange()) return;
@@ -212,7 +220,10 @@ const ExportModal = forwardRef<ExportModalRef, ExportModalProps>(({
 </span>
 </div>
                 <div className="text-xs text-gray-500 mt-2">
-                  File format: Excel (.xlsx)
+                  File format:{" "}
+                  {exportType === "requests-enquiries"
+                    ? "PDF (.pdf)"
+                    : "Excel (.xlsx)"}
                 </div>
               </div>
             </div>
