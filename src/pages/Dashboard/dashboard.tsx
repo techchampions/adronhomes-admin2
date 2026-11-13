@@ -1,5 +1,4 @@
 import {
-  RevenueCard,
   RevenueWhiteCard,
   StatsCard,
 } from "../../components/firstcard";
@@ -7,7 +6,10 @@ import { AppDispatch, RootState } from "../../components/Redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUser } from "../../components/Redux/User/user_Thunk";
-import { getDashboardData } from "../../components/Redux/dashboard/dashboard_thunk";
+import {
+  getDashboardData,
+  getDashboardVisits,
+} from "../../components/Redux/dashboard/dashboard_thunk";
 import DashboardHeader from "../../general/DashboardHearder";
 import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
@@ -17,10 +19,19 @@ import { useLocation } from "react-router-dom";
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
+
+  const loadDashboard = () => {
+    dispatch(getUser());
+    dispatch(getDashboardData()).then((result) => {
+      if (getDashboardData.fulfilled.match(result)) {
+        dispatch(getDashboardVisits());
+      }
+    });
+  };
 
   useEffect(() => {
-    dispatch(getUser());
-    dispatch(getDashboardData());
+    loadDashboard();
   }, [dispatch]);
 
   const {
@@ -28,14 +39,13 @@ export default function Dashboard() {
     error: userError,
     user,
   } = useSelector((state: RootState) => state.user);
-  const location = useLocation();
   const {
     loading: dashLoading,
+    visitsLoading,
     error: dashError,
     data: dashdata,
   } = useSelector((state: RootState) => state.dashboardData);
 
-  // Safe property stats with default values
   const propstats = [
     {
       value: dashdata?.properties?.total || 0,
@@ -53,15 +63,15 @@ export default function Dashboard() {
 
   const Customerstats = [
     {
-      value: dashdata?.customers.total || 0,
+      value: dashdata?.customers?.total || 0,
       label: "Registered Customers",
     },
     {
-      value: dashdata?.contracts.completed || 0,
+      value: dashdata?.contracts?.completed || 0,
       label: "Completed Contracts",
     },
     {
-      value: dashdata?.contracts.active || 0,
+      value: dashdata?.contracts?.active || 0,
       label: "Active Contracts",
     },
   ];
@@ -83,31 +93,39 @@ export default function Dashboard() {
 
   const PaymentsStat = [
     {
-      value: dashdata?.payments.total_count || 0,
+      value: dashdata?.payments?.total_count || 0,
       label: "Total Payments",
     },
     {
-      value: dashdata?.payments.approved_count || 0,
+      value: dashdata?.payments?.approved_count || 0,
       label: "Approved",
     },
     {
-      value: dashdata?.payments.pending_count || 0,
+      value: dashdata?.payments?.pending_count || 0,
       label: "Pending",
     },
   ];
-  const basePath = location.pathname.startsWith(
-    "/payments/dashboard"
-  );
-  const basePath2 = location.pathname.startsWith(
-    "/dashboard"
-  );
 
-  if (userError || dashError) {
+  const basePath = location.pathname.startsWith("/payments/dashboard");
+  const basePath2 = location.pathname.startsWith("/dashboard");
+  const hasDashboardData = !!dashdata;
+  const blockingError = !hasDashboardData && !!(userError || dashError);
+
+  if (blockingError) {
     return (
       <div className="flex h-screen w-full justify-center items-center">
-        <div className="text-center">
-          <p className="font-normal text-[#767676]">No data found</p>
+        <div className="text-center max-w-md px-6">
+          <p className="font-normal text-[#767676] mb-2">
+            {dashError?.message || userError?.message || "No data found"}
+          </p>
           <NotFound />
+          <button
+            type="button"
+            onClick={loadDashboard}
+            className="mt-4 h-11 rounded-full bg-[#272727] px-6 text-sm font-bold text-white"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -117,18 +135,30 @@ export default function Dashboard() {
     <div className="pb-[390px] overflow-x-hidden ">
       {userLoading || dashLoading ? (
         <div className="flex justify-center items-center h-screen">
-          {" "}
           <LoadingAnimations loading={userLoading || dashLoading} />
         </div>
       ) : (
         <>
-          {basePath2 && <DashboardHeader
-            title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`} />}
-          {basePath && <Header
-            showSearchAndButton={false}
-            title="Payment Admin"
-            subtitle="Manage the list of payments made by customers" />}
+          {basePath2 && (
+            <DashboardHeader
+              title={`${capitalize(user?.first_name) || "N/A"} ${capitalize(user?.last_name) || "N/A"}`}
+            />
+          )}
+          {basePath && (
+            <Header
+              showSearchAndButton={false}
+              title="Payment Admin"
+              subtitle="Manage the list of payments made by customers"
+            />
+          )}
           <div className="space-y-[20px]">
+            {visitsLoading && (
+              <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+                <p className="text-sm text-[#888888]">
+                  Refreshing website visit analytics...
+                </p>
+              </div>
+            )}
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
               <StatsCard stats={propstats} />
               <StatsCard stats={Customerstats} tag="Customers" />
