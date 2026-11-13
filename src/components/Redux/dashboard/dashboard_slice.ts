@@ -1,15 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DashboardData, ErrorResponse, getDashboardData } from "./dashboard_thunk";
+import {
+  DashboardData,
+  DashboardVisits,
+  ErrorResponse,
+  getDashboardData,
+  getDashboardVisits,
+} from "./dashboard_thunk";
 
 interface DashboardState {
-  data: DashboardData['data'] | null;
+  data: DashboardData["data"] | null;
   loading: boolean;
+  visitsLoading: boolean;
+  visitsMessage: string | null;
+  visitsStatus: "idle" | "loading" | "success" | "error";
   error: ErrorResponse | null;
 }
 
 const initialState: DashboardState = {
   data: null,
   loading: false,
+  visitsLoading: false,
+  visitsMessage: null,
+  visitsStatus: "idle",
   error: null,
 };
 
@@ -20,27 +32,36 @@ const dashboardSlice = createSlice({
     clearDashboardData: (state) => {
       state.data = null;
       state.error = null;
+      state.visitsLoading = false;
+      state.visitsMessage = null;
+      state.visitsStatus = "idle";
     },
     resetDashboardError: (state) => {
       state.error = null;
     },
+    clearVisitsMessage: (state) => {
+      state.visitsMessage = null;
+      if (state.visitsStatus !== "loading") {
+        state.visitsStatus = "idle";
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Handle pending state
       .addCase(getDashboardData.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.visitsLoading = false;
+        state.visitsMessage = null;
+        state.visitsStatus = "idle";
       })
-      // Handle fulfilled state
       .addCase(
         getDashboardData.fulfilled,
         (state, action: PayloadAction<DashboardData>) => {
           state.loading = false;
           state.data = action.payload.data;
-        }
+        },
       )
-      // Handle rejected state
       .addCase(
         getDashboardData.rejected,
         (state, action: PayloadAction<ErrorResponse | undefined>) => {
@@ -48,13 +69,35 @@ const dashboardSlice = createSlice({
           state.error = action.payload || {
             message: "Failed to fetch dashboard data",
           };
-        }
-      );
+        },
+      )
+      .addCase(getDashboardVisits.pending, (state) => {
+        state.visitsLoading = true;
+        state.visitsStatus = "loading";
+        state.visitsMessage = "Fetching website visit analytics...";
+      })
+      .addCase(
+        getDashboardVisits.fulfilled,
+        (state, action: PayloadAction<DashboardVisits>) => {
+          state.visitsLoading = false;
+          state.visitsStatus = "success";
+          state.visitsMessage = "Website visit analytics updated successfully.";
+          if (state.data) {
+            state.data.visit = action.payload;
+          }
+        },
+      )
+      .addCase(getDashboardVisits.rejected, (state, action) => {
+        state.visitsLoading = false;
+        state.visitsStatus = "error";
+        state.visitsMessage =
+          action.payload?.message ||
+          "Unable to load website visit analytics right now.";
+      });
   },
 });
 
-// Export actions
-export const { clearDashboardData, resetDashboardError } = dashboardSlice.actions;
+export const { clearDashboardData, resetDashboardError, clearVisitsMessage } =
+  dashboardSlice.actions;
 
-// Export reducer
 export default dashboardSlice.reducer;

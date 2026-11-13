@@ -33,6 +33,7 @@ interface StatsCardProps {
     label: string;
   }[];
   icon?: string;
+  loading?: boolean;
 }
 
 export const StatsCard: React.FC<StatsCardProps> = ({
@@ -43,6 +44,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
     { value: 6, label: "Active Plans" },
   ],
   icon = "/arrw.svg",
+  loading = false,
 }) => {
   return (
     <div className="h-[151px] p-5 bg-white rounded-[20px] relative cursor-pointer">
@@ -53,19 +55,27 @@ export const StatsCard: React.FC<StatsCardProps> = ({
         <div className="grid grid-cols-3 md:gap-[70px] gap-1">
           {stats.map((stat, index) => (
             <div key={index} className="relative group">
-              <p
-                className="font-gotham font-[350] md:text-[30px] tex-[15px] leading-[100%] text-dark tracking-[0%] text-center mb-[5px] truncate max-w-[100px] mx-auto"
-                title={
-                  typeof stat.value === "string"
-                    ? stat.value
-                    : String(stat.value)
-                }
-              >
-                {stat.value.toLocaleString()}
-              </p>
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
-                {stat.value.toLocaleString()}
-              </div>
+              {loading ? (
+                <div className="mb-[5px] flex h-[30px] items-center justify-center">
+                  <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-[#79B833] border-t-transparent" />
+                </div>
+              ) : (
+                <>
+                  <p
+                    className="font-gotham font-[350] md:text-[30px] tex-[15px] leading-[100%] text-dark tracking-[0%] text-center mb-[5px] truncate max-w-[100px] mx-auto"
+                    title={
+                      typeof stat.value === "string"
+                        ? stat.value
+                        : String(stat.value)
+                    }
+                  >
+                    {stat.value.toLocaleString()}
+                  </p>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    {stat.value.toLocaleString()}
+                  </div>
+                </>
+              )}
               <h1 className="font-gotham font-[325] md:text-[14px]  text-[10px] leading-[100%] tracking-[0%] text-center text-[#767676]">
                 {stat.label}
               </h1>
