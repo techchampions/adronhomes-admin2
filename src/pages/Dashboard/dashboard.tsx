@@ -24,7 +24,7 @@ export default function Dashboard() {
 
   const loadDashboard = () => {
     dispatch(getUser());
-    dispatch(getDashboardData()).then((result) => {
+    return dispatch(getDashboardData()).then((result) => {
       if (getDashboardData.fulfilled.match(result)) {
         dispatch(getDashboardVisits());
       }
@@ -32,7 +32,19 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    loadDashboard();
+    let cancelled = false;
+
+    dispatch(getUser());
+    dispatch(getDashboardData()).then((result) => {
+      if (cancelled) return;
+      if (getDashboardData.fulfilled.match(result)) {
+        dispatch(getDashboardVisits());
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch]);
 
   const {

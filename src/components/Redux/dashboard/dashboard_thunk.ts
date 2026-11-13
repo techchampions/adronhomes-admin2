@@ -117,35 +117,46 @@ export const getDashboardVisits = createAsyncThunk<
   DashboardVisits,
   void,
   { rejectValue: ErrorResponse }
->("dashboard/getVisits", async (_, { rejectWithValue }) => {
-  const token = Cookies.get("token");
+>(
+  "dashboard/getVisits",
+  async (_, { rejectWithValue }) => {
+    const token = Cookies.get("token");
 
-  if (!token) {
-    return rejectWithValue({
-      message: "No authentication token found. Please login again.",
-    });
-  }
+    if (!token) {
+      return rejectWithValue({
+        message: "No authentication token found. Please login again.",
+      });
+    }
 
-  try {
-    const response = await api.get<{ success: boolean; data: DashboardVisits }>(
-      `${BASE_URL}/api/admin/dashboard/visits`,
-      {
-        timeout: 45000,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
-          device_id: "1010l0010l1",
+    try {
+      const response = await api.get<{ success: boolean; data: DashboardVisits }>(
+        `${BASE_URL}/api/admin/dashboard/visits`,
+        {
+          timeout: 45000,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
+            device_id: "1010l0010l1",
+          },
         },
-      },
-    );
-    return response.data.data;
-  } catch (error) {
-    const axiosError = error as AxiosError<ErrorResponse>;
-    return rejectWithValue({
-      message:
-        axiosError.response?.data?.message ||
-        "Unable to refresh website visit analytics.",
-    });
-  }
-});
+      );
+      return response.data.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data?.message ||
+          "Unable to refresh website visit analytics.",
+      });
+    }
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as {
+        dashboardData: { visitsLoading: boolean };
+      };
+      return !state.dashboardData.visitsLoading;
+    },
+  },
+);
