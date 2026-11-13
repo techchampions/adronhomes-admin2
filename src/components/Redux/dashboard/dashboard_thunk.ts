@@ -132,7 +132,7 @@ export const getDashboardVisits = createAsyncThunk<
       const response = await api.get<{ success: boolean; data: DashboardVisits }>(
         `${BASE_URL}/api/admin/dashboard/visits`,
         {
-          timeout: 45000,
+          timeout: 20000,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
