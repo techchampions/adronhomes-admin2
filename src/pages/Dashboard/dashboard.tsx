@@ -10,6 +10,7 @@ import {
   getDashboardData,
   getDashboardVisits,
 } from "../../components/Redux/dashboard/dashboard_thunk";
+import { clearVisitsMessage } from "../../components/Redux/dashboard/dashboard_slice";
 import DashboardHeader from "../../general/DashboardHearder";
 import { capitalize } from "../../utils/formatname";
 import LoadingAnimations from "../../components/LoadingAnimations";
@@ -42,9 +43,21 @@ export default function Dashboard() {
   const {
     loading: dashLoading,
     visitsLoading,
+    visitsMessage,
+    visitsStatus,
     error: dashError,
     data: dashdata,
   } = useSelector((state: RootState) => state.dashboardData);
+
+  useEffect(() => {
+    if (visitsStatus !== "success" && visitsStatus !== "error") return;
+
+    const timeoutId = window.setTimeout(() => {
+      dispatch(clearVisitsMessage());
+    }, 5000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [visitsStatus, dispatch]);
 
   const propstats = [
     {
@@ -152,20 +165,32 @@ export default function Dashboard() {
             />
           )}
           <div className="space-y-[20px]">
-            {visitsLoading && (
-              <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-                <p className="text-sm text-[#888888]">
-                  Refreshing website visit analytics...
-                </p>
-              </div>
-            )}
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
               <StatsCard stats={propstats} />
               <StatsCard stats={Customerstats} tag="Customers" />
             </div>
 
             <div className="grid lg:grid-cols-2 gap-[22px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
-              <StatsCard stats={VisitStats} tag="Website Visits" />
+              <div>
+                <StatsCard
+                  stats={VisitStats}
+                  tag="Website Visits"
+                  loading={visitsLoading}
+                />
+                {visitsMessage && (
+                  <p
+                    className={`mt-2 text-sm ${
+                      visitsStatus === "error"
+                        ? "text-red-600"
+                        : visitsStatus === "success"
+                          ? "text-[#4d7a1f]"
+                          : "text-[#888888]"
+                    }`}
+                  >
+                    {visitsMessage}
+                  </p>
+                )}
+              </div>
               <StatsCard stats={PaymentsStat} tag="Payments" />
             </div>
             <div className="grid lg:grid-cols-3 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mt-[2px]">
