@@ -43,6 +43,7 @@ export interface MarketOrder {
   unit_price: string | number;
   total_price: string | number;
   status: OrderStatus;
+  delivery_address?: string | null;
   created_at: string;
   estate?: { id: number; estate_name: string } | null;
   user?: MarketOrderUser | null;
@@ -236,11 +237,16 @@ export async function fetchUserMarketplaceOrders(page = 1, perPage = 12) {
 export async function placeUserMarketplaceOrder(
   productId: number,
   quantity: number,
+  deliveryAddress: string,
 ) {
   try {
     const response = await api.post<ItemResponse<MarketOrder>>(
       "/api/user/marketplace/orders",
-      { product_id: productId, quantity },
+      {
+        product_id: productId,
+        quantity,
+        delivery_address: deliveryAddress,
+      },
     );
     return response.data;
   } catch (error) {

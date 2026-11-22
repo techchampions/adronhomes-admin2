@@ -19,6 +19,7 @@ import LegalSideBar from "./Legal/sidenavlegal";
 import ClientSidebar from "./components/ClientSideBar";
 import EstateDirectorSidebar from "./components/EstateDirectorSidebar";
 import SecuritySidebar from "./components/SecuritySidebar";
+import DaffSidebar from "./components/DaffSidebar";
 import PaymentBar from "./components/Payments/PaymentNavBar";
 
 // Pages
@@ -185,6 +186,9 @@ const ImpersonationFloatingButton = () => {
       case "10":
         roleName = "Director of Estate Community";
         break;
+      case "11":
+        roleName = "DAFF";
+        break;
       default:
         roleName = "";
     }
@@ -318,6 +322,19 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
+const getCookieRole = (): number | null => {
+  try {
+    const raw = Cookies.get("user");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return typeof parsed?.role === "number"
+      ? parsed.role
+      : Number(parsed?.role) || null;
+  } catch {
+    return null;
+  }
+};
+
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isCareerPage = location.pathname.startsWith("/human-resources");
@@ -328,6 +345,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const client = location.pathname.startsWith("/client/");
   const isEstateDirector = location.pathname.startsWith("/estate-director");
   const isSecurity = location.pathname.startsWith("/security");
+  const isDaff = getCookieRole() === 11;
   const shouldShowSidebar =
     location.pathname !== "/" &&
     location.pathname !== "/login-marketer" &&
@@ -359,6 +377,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <EstateDirectorSidebar />
           ) : isSecurity ? (
             <SecuritySidebar />
+          ) : isDaff ? (
+            <DaffSidebar />
           ) : (
             <AdminSidebar />
           )}

@@ -347,6 +347,12 @@ export default function MarketplacePage() {
                         <p className="mt-1 text-sm text-[#767676]">
                           {customer} · {order.estate?.estate_name || "Estate"}
                         </p>
+                        {order.delivery_address && (
+                          <p className="mt-2 text-sm text-[#272727]">
+                            <span className="text-[#888888]">Deliver to: </span>
+                            {order.delivery_address}
+                          </p>
+                        )}
                       </div>
                       <div className="text-sm text-[#272727]">
                         <p>

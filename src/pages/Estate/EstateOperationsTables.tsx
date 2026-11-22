@@ -40,6 +40,7 @@ const statusPill = (status: string | number) => {
     normalized === "completed" ||
     normalized === "attended to";
   const isPending = normalized === "0" || normalized === "pending";
+  const isRejected = normalized === "2" || normalized === "rejected";
   const isProcessing = normalized === "processing";
 
   return (
@@ -49,6 +50,8 @@ const statusPill = (status: string | number) => {
           ? "bg-[#EAF7EA] text-[#2E9B2E]"
           : isPending
             ? "bg-[#FFF4E8] text-[#FF9131]"
+            : isRejected
+              ? "bg-[#FDECEC] text-[#D64545]"
             : isProcessing
               ? "bg-[#EAF3FF] text-[#1D6FD8]"
               : "bg-[#F1F1F1] text-[#767676]"
@@ -57,9 +60,13 @@ const statusPill = (status: string | number) => {
       {typeof status === "number"
         ? status === 1
           ? "Completed"
-          : "Pending"
+          : status === 2
+            ? "Rejected"
+            : "Pending"
         : normalized === "attended to"
           ? "Completed"
+          : normalized === "rejected"
+            ? "Rejected"
           : status || "N/A"}
     </span>
   );
@@ -313,6 +320,15 @@ export function UtilityPaymentsTable({
     null,
   );
 
+  const typeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      electricity: "Electricity",
+      annual_service_charge: "Estate Service Charge",
+      annual_capital_charge: "Estate Capital Charge",
+    };
+    return labels[type] || type || "N/A";
+  };
+
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -346,8 +362,8 @@ export function UtilityPaymentsTable({
                     {`${payment.first_name || ""} ${payment.last_name || ""}`.trim() ||
                       "N/A"}
                   </td>
-                  <td className="py-4 pr-6 font-[325] text-dark text-sm capitalize">
-                    {payment.payment_type || "N/A"}
+                  <td className="py-4 pr-6 font-[325] text-dark text-sm">
+                    {typeLabel(payment.payment_type)}
                   </td>
                   <td className="py-4 pr-6 font-[350] text-dark text-sm">
                     ₦{Number(payment.amount || 0).toLocaleString()}
@@ -372,6 +388,7 @@ export function UtilityPaymentsTable({
         isOpen={!!selectedPayment}
         onClose={() => setSelectedPayment(null)}
         payment={selectedPayment}
+        onUpdated={() => onPageChange(pagination.currentPage)}
       />
     </>
   );

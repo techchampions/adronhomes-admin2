@@ -44,6 +44,7 @@ export function personnelRoleName(role: number) {
     8: "Client service",
     9: "Security",
     10: "Director of Estate Community",
+    11: "DAFF",
   };
   return names[role] || "Security Personnels";
 }

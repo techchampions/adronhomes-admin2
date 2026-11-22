@@ -22,6 +22,7 @@ const TypeOptions = [
   { value: "infrastructure", label: "Infrastructure Account" },
   { value: "other", label: "Others Fees Account" },
   { value: "fund", label: "Fund Wallet Account" },
+  { value: "estate_utility", label: "Estate Utility Account" },
 ];
 
 const initialValues = {

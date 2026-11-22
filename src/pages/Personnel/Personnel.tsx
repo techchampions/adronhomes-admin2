@@ -39,6 +39,8 @@ const getRoleName = (roleId: number): string => {
       return "Security";
     case 10:
       return "Director of Estate Community";
+    case 11:
+      return "DAFF";
     default:
       return "Unknown";
   }
@@ -55,6 +57,7 @@ const roles: { name: string; value: number }[] = [
   { name: "Client service", value: 8 },
   { name: "Security", value: 9 },
   { name: "Director of Estate Community", value: 10 },
+  { name: "DAFF", value: 11 },
 ];
 export default function Personnel() {
   const tabs = ["All"];
