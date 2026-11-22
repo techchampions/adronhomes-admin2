@@ -11,6 +11,14 @@ import EditAccount from "./EditAccount";
 import { AccountDetail } from "../../../pages/Properties/types/AccountDetailsTypes";
 import DeleteAccount from "./DeleteAccount";
 
+const accountTypeLabels: Record<string, string> = {
+  property: "Property Account",
+  infrastructure: "Infrastructure Account",
+  other: "Others Fees Account",
+  fund: "Fund Wallet Account",
+  estate_utility: "Estate Utility Account",
+};
+
 const AccountDetails = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -66,7 +74,9 @@ const AccountDetails = () => {
                       >
                         <div className="text-xs text-center">
                           Bank Details for{" "}
-                          <span className="font-bold">{account.type}</span>{" "}
+                          <span className="font-bold">
+                            {accountTypeLabels[account.type] || account.type}
+                          </span>{" "}
                           Payments
                         </div>
                         <div className="">
@@ -112,7 +122,7 @@ const AccountDetails = () => {
                   </div>
                 )}
               </div>
-              {accounts.length < 4 && (
+              {accounts.length < 5 && (
                 <Button
                   label="Add Account"
                   className="!w-fit px-8 !bg-black mt-10"

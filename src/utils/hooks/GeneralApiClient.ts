@@ -5,21 +5,22 @@ import { logout } from "../../components/Redux/Login/login_slice";
 
 export type ApiError = {
   response?: {
+    status?: number;
     data?: {
       errors?: Record<string, string[]>;
       message?: string;
     };
   };
-  status: number;
+  status?: number;
   message?: string;
 };
 
 const adronApi: AxiosInstance = axios.create({
-  baseURL: "https://adron.microf10.sg-host.com/api/",
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/`,
   headers: {
     "Content-Type": "application/json",
     identifier: "dMNOcdMNOPefFGHIlefFGHIJKLmno",
-    device_id: 1234567,
+    device_id: "1010l0010l1",
   },
 });
 
@@ -33,7 +34,7 @@ adronApi.interceptors.response.use(
     return response;
   },
   (error: ApiError) => {
-    if (error.status === 401) {
+    if (error.response?.status === 401 || error.status === 401) {
       handleLogout();
     }
     return Promise.reject(error);

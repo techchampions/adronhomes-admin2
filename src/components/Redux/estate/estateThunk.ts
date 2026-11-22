@@ -313,8 +313,10 @@ export interface UtilityPayment {
   purpose: string;
   created_at: string;
   updated_at: string;
-  chargeable_id: number;
+  chargeable_id: number | string;
   amount: number;
+  proof_of_payment?: string | null;
+  bank_name?: string | null;
   first_name: string;
   last_name: string;
   email: string;
@@ -726,6 +728,135 @@ export const fetchEstateUtilityPayments = createAsyncThunk<
         message:
           axiosError.response?.data.message ||
           "Failed to fetch utility payments",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export const updateUtilityPaymentStatus = createAsyncThunk<
+  EstateMutationResponse & { data?: UtilityPayment },
+  { paymentId: number; status: 1 | 2 },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/updateUtilityPaymentStatus",
+  async ({ paymentId, status }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.post<
+        EstateMutationResponse & { data?: UtilityPayment }
+      >(
+        `${BASE_URL}/api/admin/estates/utility-payments/${paymentId}/status`,
+        { status },
+        {
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message ||
+          "Failed to update utility payment status",
+        errors: axiosError.response?.data.errors,
+      });
+    }
+  },
+);
+
+export interface EstateUtilityDue {
+  estate_id: number;
+  payment_type: "annual_service_charge" | "annual_capital_charge" | string;
+  name: string;
+  amount_due: number;
+}
+
+export const fetchEstateUtilityDues = createAsyncThunk<
+  { success: boolean; data: EstateUtilityDue[] },
+  { estateId: number },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>("estate/fetchEstateUtilityDues", async ({ estateId }, { rejectWithValue }) => {
+  const headers = getAuthHeaders();
+
+  if (!headers) {
+    return rejectWithValue(buildAuthError());
+  }
+
+  try {
+    const response = await api.get<{ success: boolean; data: EstateUtilityDue[] }>(
+      `${BASE_URL}/api/admin/estates/${estateId}/utility-dues`,
+      { headers },
+    );
+    return response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    return rejectWithValue({
+      message:
+        axiosError.response?.data.message ||
+        "Failed to load estate utility dues",
+      errors: axiosError.response?.data.errors,
+    });
+  }
+});
+
+export const setEstateUtilityDue = createAsyncThunk<
+  EstateMutationResponse & { data?: EstateUtilityDue },
+  {
+    estateId: number;
+    paymentType: "annual_service_charge" | "annual_capital_charge";
+    amountDue: number;
+  },
+  {
+    state: RootState;
+    rejectValue: ErrorResponse;
+  }
+>(
+  "estate/setEstateUtilityDue",
+  async ({ estateId, paymentType, amountDue }, { rejectWithValue }) => {
+    const headers = getAuthHeaders();
+
+    if (!headers) {
+      return rejectWithValue(buildAuthError());
+    }
+
+    try {
+      const response = await api.post<
+        EstateMutationResponse & { data?: EstateUtilityDue }
+      >(
+        `${BASE_URL}/api/admin/estates/${estateId}/utility-dues`,
+        {
+          payment_type: paymentType,
+          amount_due: amountDue,
+        },
+        {
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      return rejectWithValue({
+        message:
+          axiosError.response?.data.message ||
+          "Failed to update estate utility amount due",
         errors: axiosError.response?.data.errors,
       });
     }

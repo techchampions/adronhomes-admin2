@@ -266,6 +266,7 @@ const roleOptions = [
   { value: "8", label: "Client service" },
   { value: "9", label: "Security" },
   { value: "10", label: "Director of Estate Community" },
+  { value: "11", label: "DAFF" },
 ];
 
 const getRole = (value:any) => {

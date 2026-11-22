@@ -68,6 +68,7 @@ import {
   UtilityPaymentsTable,
 } from "./EstateOperationsTables";
 import AddEstatePersonnelModal from "./AddEstatePersonnelModal";
+import EstateUtilityDuesPanel from "./EstateUtilityDuesPanel";
 
 export default function EstateUsers() {
   const dispatch = useDispatch<AppDispatch>();
@@ -662,6 +663,10 @@ export default function EstateUsers() {
         >
           Security Personnels
         </button>
+      </div>
+
+      <div className="lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px]">
+        <EstateUtilityDuesPanel estateId={numericEstateId} />
       </div>
 
       <div className="grid md:grid-cols-4 gap-[20px] lg:pl-[38px] lg:pr-[68px] pl-[15px] pr-[15px] mb-[30px]">

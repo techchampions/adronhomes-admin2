@@ -3,28 +3,58 @@ import { FaXmark } from "react-icons/fa6";
 import { FiDownload } from "react-icons/fi";
 import jsPDF from "jspdf";
 import domtoimage from "dom-to-image";
-import { UtilityPayment } from "../../components/Redux/estate/estateThunk";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import {
+  UtilityPayment,
+  updateUtilityPaymentStatus,
+} from "../../components/Redux/estate/estateThunk";
+import { AppDispatch } from "../../components/Redux/store";
 import { formatDate } from "../../utils/formatdate";
 
 interface UtilityPaymentDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   payment: UtilityPayment | null;
+  onUpdated?: () => void;
 }
 
-const statusText = (status: number) => (status === 1 ? "Completed" : "Pending");
-const statusClass = (status: number) =>
-  status === 1 ? "text-[#2E9B2E]" : "text-[#FF9131]";
+const statusText = (status: number) => {
+  if (status === 1) return "Completed";
+  if (status === 2) return "Rejected";
+  return "Pending";
+};
+
+const statusClass = (status: number) => {
+  if (status === 1) return "text-[#2E9B2E]";
+  if (status === 2) return "text-[#D64545]";
+  return "text-[#FF9131]";
+};
+
+const paymentTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    electricity: "Electricity",
+    annual_service_charge: "Estate Service Charge",
+    annual_capital_charge: "Estate Capital Charge",
+  };
+  return labels[type] || type;
+};
 
 export default function UtilityPaymentDetailModal({
   isOpen,
   onClose,
   payment,
+  onUpdated,
 }: UtilityPaymentDetailModalProps) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen || !payment) return null;
+
+  const canValidate =
+    payment.status === 0 && payment.payment_method === "bank_transfer";
 
   const rows = [
     ["Estate", payment.estate_name],
@@ -32,10 +62,11 @@ export default function UtilityPaymentDetailModal({
     ["Email", payment.email],
     ["Phone", payment.phone_number],
     ["Reference", payment.reference],
-    ["Payment Type", payment.payment_type],
+    ["Payment Type", paymentTypeLabel(payment.payment_type)],
     ["Payment Method", payment.payment_method],
     ["Purpose", payment.purpose],
     ["Chargeable ID", String(payment.chargeable_id || "")],
+    ["Payer Account Name", payment.bank_name || ""],
     ["Amount", `NGN ${Number(payment.amount || 0).toLocaleString()}`],
     ["Status", statusText(payment.status)],
     ["Date", formatDate(payment.created_at)],
@@ -73,6 +104,22 @@ export default function UtilityPaymentDetailModal({
       pdf.save(`utility-payment-${payment.reference || payment.id}.pdf`);
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (status: 1 | 2) => {
+    setUpdating(true);
+    try {
+      const result = await dispatch(
+        updateUtilityPaymentStatus({ paymentId: payment.id, status }),
+      ).unwrap();
+      toast.success(result.message || "Utility payment updated");
+      onUpdated?.();
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || "Could not update utility payment");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -127,11 +174,30 @@ export default function UtilityPaymentDetailModal({
                   {payment.description || "N/A"}
                 </p>
               </div>
+              {payment.proof_of_payment && (
+                <div className="py-3">
+                  <p className="font-[325] text-xs text-[#767676] mb-2">
+                    Bank Transfer Receipt
+                  </p>
+                  <a
+                    href={payment.proof_of_payment}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block"
+                  >
+                    <img
+                      src={payment.proof_of_payment}
+                      alt="Bank transfer receipt"
+                      className="max-h-64 w-full rounded-2xl object-contain bg-gray-50"
+                    />
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-gray-100 flex flex-wrap justify-end gap-3">
           <button
             onClick={handleDownloadTxt}
             className="h-10 rounded-full bg-[#F1F1F1] px-5 text-sm font-bold text-dark flex items-center gap-2"
@@ -147,6 +213,24 @@ export default function UtilityPaymentDetailModal({
             <FiDownload size={14} />
             {isDownloading ? "Generating..." : "PDF"}
           </button>
+          {canValidate && (
+            <>
+              <button
+                onClick={() => handleStatusUpdate(2)}
+                disabled={updating}
+                className="h-10 rounded-full bg-[#FDECEC] px-5 text-sm font-bold text-[#D64545] disabled:opacity-50"
+              >
+                {updating ? "Updating..." : "Reject"}
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(1)}
+                disabled={updating}
+                className="h-10 rounded-full bg-[#79B833] px-5 text-sm font-bold text-white disabled:opacity-50"
+              >
+                {updating ? "Updating..." : "Approve"}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
