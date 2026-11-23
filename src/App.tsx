@@ -112,6 +112,7 @@ import MarketplacePage from "./pages/Estate/MarketplacePage";
 import HouseholdPage from "./pages/Estate/HouseholdPage";
 import EstatePersonnelPage from "./pages/Estate/EstatePersonnelPage";
 import SecurityCodesPage from "./pages/Security/SecurityCodesPage";
+import AdminLogsPage from "./pages/AdminLogs/AdminLogsPage";
 // import CommunityDashboard from "./CommunityDashboard/CommunityDashboard";
 
 // NotFoundRedirect Component - Handles 404 with toast and redirect
@@ -533,6 +534,7 @@ const App = () => {
                   path="/personnel/:id"
                   element={<PersonnelMarketersDashboard />}
                 />
+                <Route path="/admin-logs" element={<AdminLogsPage />} />
                 <Route path="/contracts" element={<Contract />} />
                 <Route
                   path="/contracts/details/:user_id/:plan_id"
@@ -789,6 +791,7 @@ const App = () => {
               {/* Info-Tech Route Group */}
               <Route path="/info-tech" element={<AuthGuard />}>
                 <Route index element={<Dashboard_It />} />
+                <Route path="/info-tech/admin-logs" element={<AdminLogsPage />} />
                 <Route
                   path="/info-tech/requests-enquiries"
                   element={<RequestsEnquiries />}

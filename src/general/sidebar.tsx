@@ -31,6 +31,7 @@ const navItems = [
     path: "/partnership-requests",
   },
   { label: "Personnel", icon: Icon6, path: "/personnel" },
+  { label: "Admin Logs", icon: Icon8, path: "/admin-logs" },
 
   { label: "Requests & Enquiries", icon: Icon7, path: "/Requests-Enquiries" },
   { label: "Support Tickets", icon: Icon7, path: "/support-tickets" },
