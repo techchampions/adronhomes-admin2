@@ -144,8 +144,8 @@ export default function AdminLogsPage() {
           </div>
         )}
 
-        <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-          <div className="overflow-hidden rounded-[28px] bg-white shadow-sm">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] xl:items-start">
+          <div className="min-w-0 overflow-hidden rounded-[28px] bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <div>
                 <p className="font-[350] text-lg text-[#272727]">Activity feed</p>
@@ -180,23 +180,25 @@ export default function AdminLogsPage() {
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-medium capitalize text-[#272727]">
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <p className="truncate font-medium capitalize text-[#272727]">
                           {log.description}
                         </p>
-                        <p className="mt-1 text-sm text-[#767676]">
+                        <p className="mt-1 truncate text-sm text-[#767676]">
                           {log.actor_name || "Unknown"} ({log.actor_personnel || "personnel"})
                           {" • "}
                           {log.module}
                           {" • "}
                           {log.action}
                         </p>
-                        <p className="mt-1 text-xs text-[#888888]">
+                        <p className="mt-1 truncate text-xs text-[#888888]">
                           {when(log.created_at)}
                           {log.endpoint ? ` • ${log.method} ${log.endpoint}` : ""}
                         </p>
                       </div>
-                      <span className={`text-xs font-semibold ${statusTone(log.status_code)}`}>
+                      <span
+                        className={`shrink-0 text-xs font-semibold ${statusTone(log.status_code)}`}
+                      >
                         {log.status_code || "—"}
                       </span>
                     </div>
@@ -230,8 +232,19 @@ export default function AdminLogsPage() {
             )}
           </div>
 
-          <div className="rounded-[28px] bg-white p-5 shadow-sm">
-            <p className="font-[350] text-lg text-[#272727]">Action details</p>
+          <div className="min-w-0 overflow-hidden rounded-[28px] bg-white p-5 shadow-sm xl:sticky xl:top-6">
+            <div className="flex items-start justify-between gap-3">
+              <p className="font-[350] text-lg text-[#272727]">Action details</p>
+              {selected && (
+                <button
+                  type="button"
+                  onClick={() => setSelected(null)}
+                  className="shrink-0 text-xs font-semibold text-[#888888] hover:text-[#032147]"
+                >
+                  Close
+                </button>
+              )}
+            </div>
             {detailLoading ? (
               <p className="mt-4 text-sm text-[#767676]">Loading details...</p>
             ) : !selected ? (
@@ -240,28 +253,28 @@ export default function AdminLogsPage() {
                 which payload.
               </p>
             ) : (
-              <div className="mt-4 space-y-4 text-sm">
-                <div>
+              <div className="mt-4 max-h-[75vh] space-y-4 overflow-y-auto overflow-x-hidden pr-1 text-sm">
+                <div className="min-w-0">
                   <p className="text-xs uppercase tracking-wide text-[#888888]">
                     Description
                   </p>
-                  <p className="mt-1 font-medium capitalize text-[#032147]">
+                  <p className="mt-1 break-words font-medium capitalize text-[#032147]">
                     {selected.description}
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       Actor
                     </p>
-                    <p className="mt-1 text-[#272727]">
+                    <p className="mt-1 break-words text-[#272727]">
                       {selected.actor_name || "Unknown"}
                     </p>
-                    <p className="text-xs text-[#767676]">
+                    <p className="break-all text-xs text-[#767676]">
                       {selected.actor_email}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       Role
                     </p>
@@ -269,7 +282,7 @@ export default function AdminLogsPage() {
                       {selected.actor_personnel || "—"}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       Module
                     </p>
@@ -277,7 +290,7 @@ export default function AdminLogsPage() {
                       {selected.module}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       Action
                     </p>
@@ -285,16 +298,16 @@ export default function AdminLogsPage() {
                       {selected.action}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       Entity
                     </p>
-                    <p className="mt-1 text-[#272727]">
+                    <p className="mt-1 break-words text-[#272727]">
                       {selected.entity_type || "—"}
                       {selected.entity_id ? ` #${selected.entity_id}` : ""}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       When
                     </p>
@@ -303,24 +316,24 @@ export default function AdminLogsPage() {
                     </p>
                   </div>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs uppercase tracking-wide text-[#888888]">
                     Request
                   </p>
                   <p className="mt-1 break-all text-[#272727]">
                     {selected.method} {selected.endpoint}
                   </p>
-                  <p className="mt-1 text-xs text-[#767676]">
+                  <p className="mt-1 break-all text-xs text-[#767676]">
                     Status {selected.status_code || "—"} • IP{" "}
                     {selected.ip_address || "—"}
                   </p>
                 </div>
                 {selected.payload && (
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wide text-[#888888]">
                       Payload
                     </p>
-                    <pre className="mt-2 max-h-72 overflow-auto rounded-2xl bg-[#F7F7F7] p-3 text-xs text-[#272727]">
+                    <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-2xl bg-[#F7F7F7] p-3 text-xs text-[#272727]">
                       {JSON.stringify(selected.payload, null, 2)}
                     </pre>
                   </div>
